@@ -35,7 +35,7 @@ Avant de considérer un lot terminé : `npm run typecheck && npm run lint && npm
 
 ## Supabase
 
-- Projet dev `trycast-dev` (`bmdzadvugtkclnqjpndr`, eu-west-3), lié via `supabase link`
+- Projet dev `trycast-dev`, lié via `supabase link` (l'id du projet se retrouve avec `supabase projects list`)
 - Schéma : uniquement par migrations dans `supabase/migrations/`, puis `supabase db push` + `npm run typegen`
 - Toute règle de sécurité (deadline prono au kickoff, accès données) est imposée par RLS côté serveur, le client n'est qu'une UX
 - Edge Functions dans `supabase/functions/`, déploiement `supabase functions deploy <name>`
