@@ -12,35 +12,35 @@ import { queryClient } from '@/lib/query';
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
-  const { session, isLoading } = useSession();
+    const { session, isLoading } = useSession();
 
-  // Le splash overlay reste affiché tant que la session n'est pas restaurée
-  if (isLoading) {
-    return null;
-  }
+    // Le splash overlay reste affiché tant que la session n'est pas restaurée
+    if (isLoading) {
+        return null;
+    }
 
-  return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={!!session}>
-        <Stack.Screen name="(app)" />
-      </Stack.Protected>
-      <Stack.Protected guard={!session}>
-        <Stack.Screen name="(auth)" />
-      </Stack.Protected>
-    </Stack>
-  );
+    return (
+        <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Protected guard={!!session}>
+                <Stack.Screen name="(app)" />
+            </Stack.Protected>
+            <Stack.Protected guard={!session}>
+                <Stack.Screen name="(auth)" />
+            </Stack.Protected>
+        </Stack>
+    );
 }
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  return (
-    <QueryClientProvider client={queryClient}>
-      <SessionProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <AnimatedSplashOverlay />
-          <RootNavigator />
-        </ThemeProvider>
-      </SessionProvider>
-    </QueryClientProvider>
-  );
+    const colorScheme = useColorScheme();
+    return (
+        <QueryClientProvider client={queryClient}>
+            <SessionProvider>
+                <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                    <AnimatedSplashOverlay />
+                    <RootNavigator />
+                </ThemeProvider>
+            </SessionProvider>
+        </QueryClientProvider>
+    );
 }

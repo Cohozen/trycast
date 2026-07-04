@@ -4,37 +4,37 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
 type SessionContextValue = {
-  session: Session | null;
-  /** true tant que la session initiale n'a pas été restaurée depuis le storage */
-  isLoading: boolean;
+    session: Session | null;
+    /** true tant que la session initiale n'a pas été restaurée depuis le storage */
+    isLoading: boolean;
 };
 
 const SessionContext = createContext<SessionContextValue>({ session: null, isLoading: true });
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+    const [session, setSession] = useState<Session | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setIsLoading(false);
-    });
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data }) => {
+            setSession(data.session);
+            setIsLoading(false);
+        });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-    });
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, newSession) => {
+            setSession(newSession);
+        });
 
-    return () => subscription.unsubscribe();
-  }, []);
+        return () => subscription.unsubscribe();
+    }, []);
 
-  return (
-    <SessionContext.Provider value={{ session, isLoading }}>{children}</SessionContext.Provider>
-  );
+    return (
+        <SessionContext.Provider value={{ session, isLoading }}>{children}</SessionContext.Provider>
+    );
 }
 
 export function useSession() {
-  return useContext(SessionContext);
+    return useContext(SessionContext);
 }
