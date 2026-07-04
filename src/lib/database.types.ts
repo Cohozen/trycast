@@ -8,6 +8,130 @@ export type Database = {
     };
     public: {
         Tables: {
+            competitions: {
+                Row: {
+                    api_league_id: number;
+                    api_season: number;
+                    ends_on: string;
+                    id: string;
+                    is_active: boolean;
+                    name: string;
+                    slug: string;
+                    starts_on: string;
+                };
+                Insert: {
+                    api_league_id: number;
+                    api_season: number;
+                    ends_on: string;
+                    id?: string;
+                    is_active?: boolean;
+                    name: string;
+                    slug: string;
+                    starts_on: string;
+                };
+                Update: {
+                    api_league_id?: number;
+                    api_season?: number;
+                    ends_on?: string;
+                    id?: string;
+                    is_active?: boolean;
+                    name?: string;
+                    slug?: string;
+                    starts_on?: string;
+                };
+                Relationships: [];
+            };
+            matches: {
+                Row: {
+                    api_game_id: number;
+                    away_score: number | null;
+                    away_team_id: string | null;
+                    away_tries: number | null;
+                    competition_id: string;
+                    home_score: number | null;
+                    home_team_id: string | null;
+                    home_tries: number | null;
+                    id: string;
+                    kickoff_at: string;
+                    needs_review: boolean;
+                    odds_away: number | null;
+                    odds_captured_at: string | null;
+                    odds_draw: number | null;
+                    odds_home: number | null;
+                    odds_source: string | null;
+                    round: string | null;
+                    scored_at: string | null;
+                    status: Database['public']['Enums']['match_status'];
+                    tries_missing: boolean;
+                };
+                Insert: {
+                    api_game_id: number;
+                    away_score?: number | null;
+                    away_team_id?: string | null;
+                    away_tries?: number | null;
+                    competition_id: string;
+                    home_score?: number | null;
+                    home_team_id?: string | null;
+                    home_tries?: number | null;
+                    id?: string;
+                    kickoff_at: string;
+                    needs_review?: boolean;
+                    odds_away?: number | null;
+                    odds_captured_at?: string | null;
+                    odds_draw?: number | null;
+                    odds_home?: number | null;
+                    odds_source?: string | null;
+                    round?: string | null;
+                    scored_at?: string | null;
+                    status?: Database['public']['Enums']['match_status'];
+                    tries_missing?: boolean;
+                };
+                Update: {
+                    api_game_id?: number;
+                    away_score?: number | null;
+                    away_team_id?: string | null;
+                    away_tries?: number | null;
+                    competition_id?: string;
+                    home_score?: number | null;
+                    home_team_id?: string | null;
+                    home_tries?: number | null;
+                    id?: string;
+                    kickoff_at?: string;
+                    needs_review?: boolean;
+                    odds_away?: number | null;
+                    odds_captured_at?: string | null;
+                    odds_draw?: number | null;
+                    odds_home?: number | null;
+                    odds_source?: string | null;
+                    round?: string | null;
+                    scored_at?: string | null;
+                    status?: Database['public']['Enums']['match_status'];
+                    tries_missing?: boolean;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'matches_away_team_id_fkey';
+                        columns: ['away_team_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'teams';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'matches_competition_id_fkey';
+                        columns: ['competition_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'competitions';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'matches_home_team_id_fkey';
+                        columns: ['home_team_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'teams';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             profiles: {
                 Row: {
                     created_at: string;
@@ -26,6 +150,33 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            teams: {
+                Row: {
+                    api_team_id: number;
+                    code: string | null;
+                    color: string | null;
+                    flag_emoji: string | null;
+                    id: string;
+                    name: string;
+                };
+                Insert: {
+                    api_team_id: number;
+                    code?: string | null;
+                    color?: string | null;
+                    flag_emoji?: string | null;
+                    id?: string;
+                    name: string;
+                };
+                Update: {
+                    api_team_id?: number;
+                    code?: string | null;
+                    color?: string | null;
+                    flag_emoji?: string | null;
+                    id?: string;
+                    name?: string;
+                };
+                Relationships: [];
+            };
         };
         Views: {
             [_ in never]: never;
@@ -34,7 +185,7 @@ export type Database = {
             username_available: { Args: { candidate: string }; Returns: boolean };
         };
         Enums: {
-            [_ in never]: never;
+            match_status: 'scheduled' | 'in_play' | 'finished' | 'postponed' | 'cancelled';
         };
         CompositeTypes: {
             [_ in never]: never;
@@ -161,6 +312,8 @@ export type CompositeTypes<
 
 export const Constants = {
     public: {
-        Enums: {},
+        Enums: {
+            match_status: ['scheduled', 'in_play', 'finished', 'postponed', 'cancelled'],
+        },
     },
 } as const;
