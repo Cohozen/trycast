@@ -1,0 +1,4 @@
+# Fichiers locaux de la CLI Supabase (déjà ignorés par supabase/.gitignore,
+# mais Prettier ne lit pas les .gitignore imbriqués)
+supabase/.temp
+supabase/.branches

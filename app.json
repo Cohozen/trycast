@@ -38,6 +38,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7dfc088c-9942-4873-97ba-4c2a048d3170"
+      }
+    },
+    "owner": "cohozen"
   }
 }
