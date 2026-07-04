@@ -20,6 +20,15 @@ export default function AppTabs() {
                 />
             </NativeTabs.Trigger>
 
+            <NativeTabs.Trigger name="results">
+                <NativeTabs.Trigger.Label>Résultats</NativeTabs.Trigger.Label>
+                <NativeTabs.Trigger.Icon
+                    sf="list.bullet.rectangle"
+                    src={require('@/assets/images/tabIcons/explore.png')}
+                    renderingMode="template"
+                />
+            </NativeTabs.Trigger>
+
             <NativeTabs.Trigger name="profile">
                 <NativeTabs.Trigger.Label>Profil</NativeTabs.Trigger.Label>
                 <NativeTabs.Trigger.Icon
