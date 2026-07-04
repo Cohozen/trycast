@@ -52,7 +52,14 @@ for (const [name, metadata] of Object.entries(TEAM_METADATA)) {
     normalized[name.trim().toLowerCase()] = metadata;
 }
 
-/** Lookup tolérant (trim, insensible à la casse). Null si nation hors mapping. */
+// Noms alternatifs utilisés par Highlightly → nation du mapping
+// (constaté sur le Nations Championship 2026 : les Fidji y jouent sous « Fijian Drua »)
+const TEAM_ALIASES: Record<string, string> = {
+    'fijian drua': 'fiji',
+};
+
+/** Lookup tolérant (trim, insensible à la casse, alias). Null si nation hors mapping. */
 export function findTeamMetadata(apiName: string): TeamMetadata | null {
-    return normalized[apiName.trim().toLowerCase()] ?? null;
+    const key = apiName.trim().toLowerCase();
+    return normalized[TEAM_ALIASES[key] ?? key] ?? null;
 }

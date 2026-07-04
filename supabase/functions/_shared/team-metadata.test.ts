@@ -37,6 +37,10 @@ describe('findTeamMetadata', () => {
         expect(findTeamMetadata('FRANCE')?.code).toBe('FRA');
     });
 
+    it('résout les alias Highlightly vers la nation', () => {
+        expect(findTeamMetadata('Fijian Drua')?.code).toBe('FIJ');
+    });
+
     it('renvoie null pour une nation hors mapping', () => {
         expect(findTeamMetadata('Barbarians')).toBeNull();
     });

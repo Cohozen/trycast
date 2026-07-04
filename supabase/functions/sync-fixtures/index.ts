@@ -23,6 +23,7 @@ type CompetitionSummary = {
     games?: number;
     teams_upserted?: number;
     odds_captured?: number;
+    odds_error?: string;
     error?: string;
 };
 
@@ -144,28 +145,39 @@ async function syncCompetition(
     }
 
     // Cotes des matchs à J-7 → kickoff : chaque run réécrit, la dernière capture
-    // avant le coup d'envoi fait foi pour le scoring
+    // avant le coup d'envoi fait foi pour le scoring. Best-effort : un échec de
+    // cotes ne bloque jamais les fixtures (le scoring a un fallback cote 2.0).
     let oddsCaptured = 0;
+    let oddsError: string | undefined;
     for (const match of selectMatchesForOddsCapture(matchRows, new Date())) {
-        const markets = await fetchOdds(match.api_game_id, state);
-        const odds = parseOddsResponse(markets);
-        if (!odds) {
-            continue;
+        try {
+            const markets = await fetchOdds(match.api_game_id, state);
+            const odds = parseOddsResponse(markets);
+            if (!odds) {
+                continue;
+            }
+            const { error } = await admin
+                .from('matches')
+                .update({
+                    odds_home: odds.home,
+                    odds_draw: odds.draw,
+                    odds_away: odds.away,
+                    odds_source: 'api',
+                    odds_captured_at: new Date().toISOString(),
+                })
+                .eq('api_game_id', match.api_game_id);
+            if (error) {
+                throw new Error(`update odds ${match.api_game_id}: ${error.message}`);
+            }
+            oddsCaptured += 1;
+        } catch (error) {
+            oddsError = error instanceof Error ? error.message : String(error);
+            console.error(`sync-fixtures: odds ${match.api_game_id} failed`, oddsError);
+            // 401 = restriction de plan : inutile d'insister sur les autres matchs
+            if (oddsError.includes('api_http_401')) {
+                break;
+            }
         }
-        const { error } = await admin
-            .from('matches')
-            .update({
-                odds_home: odds.home,
-                odds_draw: odds.draw,
-                odds_away: odds.away,
-                odds_source: 'api',
-                odds_captured_at: new Date().toISOString(),
-            })
-            .eq('api_game_id', match.api_game_id);
-        if (error) {
-            throw new Error(`update odds ${match.api_game_id}: ${error.message}`);
-        }
-        oddsCaptured += 1;
     }
 
     state.summaries.push({
@@ -173,6 +185,7 @@ async function syncCompetition(
         games: matches.length,
         teams_upserted: teamRows.length,
         odds_captured: oddsCaptured,
+        ...(oddsError ? { odds_error: oddsError } : {}),
     });
 }
 
