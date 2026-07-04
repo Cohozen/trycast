@@ -48,15 +48,16 @@ Le projet tourne dans **Expo Go** (aucun module natif custom pour l'instant) : p
 
 ```
 src/
-  app/            # Écrans Expo Router — (auth): login/signup/reset, (app): app connectée
+  app/            # Écrans Expo Router — (auth): login/signup/reset, (app): matchs, profil
   components/     # Composants UI partagés
-  features/       # Logique par domaine (auth, profile…) + tests colocalisés
+  features/       # Logique par domaine (auth, profile, matches…) + tests colocalisés
   lib/            # Client Supabase typé, stockage session chiffré, React Query
   hooks/ constants/ tw/
 supabase/
   migrations/     # Migrations SQL (source de vérité du schéma)
-  functions/      # Edge Functions (delete-account)
-scripts/          # Seeds de test, script E2E
+  functions/      # Edge Functions (delete-account, sync-fixtures) — logique pure testée sous Vitest
+scripts/          # Seeds (compétitions, users de test), saisie admin des essais, script E2E
+docs/             # Notes de décision (choix du fournisseur de données…)
 ```
 
 ## Backend Supabase
@@ -71,24 +72,40 @@ La sécurité (deadlines de pronostic, accès aux données) est imposée côté 
 
 ## Pipeline compétition (Lot 2)
 
-Les fixtures et cotes viennent de **Highlightly** (plan Pro — le free tier
-d'API-Sports s'est révélé limité aux saisons 2022-2024, voir
+Les fixtures et cotes viennent de **Highlightly** (le free tier d'API-Sports s'est
+révélé limité aux saisons 2022-2024 — historique complet du choix dans
 [docs/spike-highlightly.md](docs/spike-highlightly.md)), synchronisées chaque nuit par
-l'Edge Function `sync-fixtures` (05:00 UTC via pg_cron). Chaque run est tracé dans
-`job_runs` (statut + budget API). Les essais, absents des deux fournisseurs, sont
-saisis manuellement après chaque match (`scripts/admin-set-tries.sql`).
+l'Edge Function `sync-fixtures` (05:00 UTC via pg_cron + Vault). Chaque run est tracé
+dans `job_runs` (statut, budget API, équipes hors mapping, erreurs par compétition).
+Les essais, absents des deux fournisseurs, sont saisis manuellement après chaque match
+(`scripts/admin-set-tries.sql`).
 
-Mise en route (ordre important, secrets jamais dans le repo) :
+**État** : en fonctionnement sur le Nations Championship 2026 (18 matchs, 12 équipes,
+seed `scripts/seed-competitions.sql`). La capture des cotes (matchs à J-7 du kickoff,
+best-effort) requiert le plan Highlightly Pro — en Basic, `/odds` répond 401, tracé
+dans `job_runs.detail.odds_error` sans impacter les fixtures ; le scoring a un
+fallback cote 2.0.
+
+Déclenchement manuel (le secret reste dans Vault) — SQL editor :
+
+```sql
+select net.http_post(
+  url := 'https://<projet>.supabase.co/functions/v1/sync-fixtures',
+  headers := jsonb_build_object('Content-Type', 'application/json', 'x-sync-secret',
+    (select decrypted_secret from vault.decrypted_secrets where name = 'sync_fixtures_secret')),
+  body := '{}'::jsonb, timeout_milliseconds := 30000);
+```
+
+Mise en route sur un nouveau projet (ordre important, secrets jamais dans le repo) :
 
 1. Relever les `leagueId` (`GET /leagues?leagueName=…` avec la clé Highlightly), compléter
-   et exécuter `scripts/seed-competitions.sql` sur le projet dev
+   et exécuter `scripts/seed-competitions.sql`
 2. `supabase secrets set HIGHLIGHTLY_API_KEY=<clé> SYNC_FIXTURES_SECRET=<aléatoire>`
 3. `supabase functions deploy sync-fixtures`
 4. Côté Postgres : `select vault.create_secret('<même valeur>', 'sync_fixtures_secret');`
 5. `supabase db push` (migrations pg_cron `20260705000300` + durcissement des grants
    `20260705000400`) — jamais avant le deploy
-6. Test manuel : `curl -X POST https://<projet>.supabase.co/functions/v1/sync-fixtures -H "x-sync-secret: <valeur>"`,
-   puis vérifier `teams`, `matches` et la ligne `job_runs`
+6. Déclenchement manuel (ci-dessus), puis vérifier `teams`, `matches` et la ligne `job_runs`
 
 ## Builds (EAS)
 

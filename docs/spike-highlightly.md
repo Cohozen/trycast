@@ -47,3 +47,8 @@ des plans payants : API-Sports Pro 19 $/mois vs **Highlightly Pro 5,99 $/mois**
 accessible par Corentin). Décision : **bascule complète de `sync-fixtures` sur
 Highlightly** (fixtures + cotes ; les essais restent en saisie admin, aucun des deux
 fournisseurs ne les expose). API-Sports n'est plus utilisé.
+
+Bascule validée en conditions réelles le soir même : 18 matchs / 12 équipes du
+NC 2026 importés (leagueId 124179), idempotence vérifiée. Particularités relevées :
+les Fidji y jouent sous « Fijian Drua » (alias ajouté au mapping équipes), et `/odds`
+exige un plan payant (401 en Basic, capture best-effort en attendant l'upgrade Pro).
