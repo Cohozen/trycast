@@ -84,7 +84,8 @@ Mise en route (ordre important, secrets jamais dans le repo) :
 2. `supabase secrets set API_SPORTS_KEY=<clé> SYNC_FIXTURES_SECRET=<aléatoire>`
 3. `supabase functions deploy sync-fixtures`
 4. Côté Postgres : `select vault.create_secret('<même valeur>', 'sync_fixtures_secret');`
-5. `supabase db push` (migration pg_cron `20260705000300`) — jamais avant le deploy
+5. `supabase db push` (migrations pg_cron `20260705000300` + durcissement des grants
+   `20260705000400`) — jamais avant le deploy
 6. Test manuel : `curl -X POST https://<projet>.supabase.co/functions/v1/sync-fixtures -H "x-sync-secret: <valeur>"`,
    puis vérifier `teams`, `matches` et la ligne `job_runs`
 
