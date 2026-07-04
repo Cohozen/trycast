@@ -1,15 +1,24 @@
 import { PrimaryButton } from '@/components/form';
-import { RoundSection } from '@/features/matches/components/round-section';
-import { groupMatchesByRound } from '@/features/matches/group-matches-by-round';
+import { useSession } from '@/features/auth/session-context';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
 import { useMatches } from '@/features/matches/use-matches';
+import { UpcomingMatchCard } from '@/features/predictions/components/upcoming-match-card';
+import { splitMatches } from '@/features/predictions/split-matches';
+import { useMyPredictions } from '@/features/predictions/use-my-predictions';
 import { ActivityIndicator, ScrollView, Text, View } from '@/tw';
 
 export default function MatchesScreen() {
+    const { session } = useSession();
     const competition = useActiveCompetition();
     const matches = useMatches(competition.data?.id);
+    const predictions = useMyPredictions(competition.data?.id);
+    const userId = session?.user.id;
 
-    if (competition.isPending || (competition.data && matches.isPending)) {
+    if (
+        !userId ||
+        competition.isPending ||
+        (competition.data && (matches.isPending || predictions.isPending))
+    ) {
         return (
             <View className="flex-1 items-center justify-center">
                 <ActivityIndicator />
@@ -17,7 +26,7 @@ export default function MatchesScreen() {
         );
     }
 
-    if (competition.isError || matches.isError) {
+    if (competition.isError || matches.isError || predictions.isError) {
         return (
             <View className="flex-1 items-center justify-center gap-4 p-6">
                 <Text className="text-center text-base text-gray-600">
@@ -28,13 +37,14 @@ export default function MatchesScreen() {
                     onPress={() => {
                         void competition.refetch();
                         void matches.refetch();
+                        void predictions.refetch();
                     }}
                 />
             </View>
         );
     }
 
-    if (!competition.data || !matches.data || matches.data.length === 0) {
+    if (!competition.data || !matches.data) {
         return (
             <View className="flex-1 items-center justify-center gap-2 p-6">
                 <Text className="text-3xl">🏉</Text>
@@ -45,14 +55,25 @@ export default function MatchesScreen() {
         );
     }
 
-    const rounds = groupMatchesByRound(matches.data);
+    const { upcoming } = splitMatches(matches.data, new Date());
 
     return (
-        <ScrollView className="flex-1" contentContainerClassName="gap-6 p-6 pt-16">
+        <ScrollView className="flex-1" contentContainerClassName="gap-4 p-6 pt-16">
             <Text className="text-2xl font-bold text-gray-900">{competition.data.name}</Text>
-            {rounds.map((group) => (
-                <RoundSection key={group.round} round={group.round} matches={group.matches} />
-            ))}
+            {upcoming.length === 0 ? (
+                <Text className="text-center text-base text-gray-500">
+                    Aucun match à venir — rendez-vous dans l’onglet Résultats.
+                </Text>
+            ) : (
+                upcoming.map((match) => (
+                    <UpcomingMatchCard
+                        key={match.id}
+                        match={match}
+                        prediction={predictions.data?.get(match.id)}
+                        userId={userId}
+                    />
+                ))
+            )}
         </ScrollView>
     );
 }
