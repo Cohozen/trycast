@@ -69,6 +69,25 @@ Projet dev : `trycast-dev` (`bmdzadvugtkclnqjpndr`, eu-west-3). Workflow :
 
 La sécurité (deadlines de pronostic, accès aux données) est imposée côté serveur par RLS — jamais uniquement côté client.
 
+## Pipeline compétition (Lot 2)
+
+Les fixtures et cotes viennent d'API-Sports (tier gratuit, 100 req/jour), synchronisées
+chaque nuit par l'Edge Function `sync-fixtures` (05:00 UTC via pg_cron). Chaque run est
+tracé dans `job_runs` (statut + budget API). Les essais, absents d'API-Sports, sont
+saisis manuellement après chaque match (`scripts/admin-set-tries.sql`) — automatisation
+éventuelle à l'étude : [spike Highlightly](docs/spike-highlightly.md).
+
+Mise en route (ordre important, secrets jamais dans le repo) :
+
+1. Relever les `api_league_id` (`GET /leagues?search=…` avec la clé API-Sports), compléter
+   et exécuter `scripts/seed-competitions.sql` sur le projet dev
+2. `supabase secrets set API_SPORTS_KEY=<clé> SYNC_FIXTURES_SECRET=<aléatoire>`
+3. `supabase functions deploy sync-fixtures`
+4. Côté Postgres : `select vault.create_secret('<même valeur>', 'sync_fixtures_secret');`
+5. `supabase db push` (migration pg_cron `20260705000300`) — jamais avant le deploy
+6. Test manuel : `curl -X POST https://<projet>.supabase.co/functions/v1/sync-fixtures -H "x-sync-secret: <valeur>"`,
+   puis vérifier `teams`, `matches` et la ligne `job_runs`
+
 ## Builds (EAS)
 
 Projet EAS initialisé (owner `cohozen`). Builds et soumission aux stores : à venir dans les lots suivants (`eas build`, `eas submit`).
