@@ -9,6 +9,7 @@ export default defineConfig({
     },
     test: {
         environment: 'node',
-        include: ['src/**/*.test.ts'],
+        // supabase/functions : uniquement les modules purs (zéro import Deno)
+        include: ['src/**/*.test.ts', 'supabase/functions/**/*.test.ts'],
     },
 });
