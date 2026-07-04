@@ -1,20 +1,20 @@
-// Logique pure de sync-fixtures (Lot 2) : transformation des réponses API-Sports
+// Logique pure de sync-fixtures (Lot 2) : transformation des réponses Highlightly
 // en lignes teams/matches. Zéro I/O, zéro global Deno — testé sous Vitest.
+// Source : API rugby Highlightly (rugby.highlightly.net) — bascule depuis
+// API-Sports le 2026-07-04 (free tier limité aux saisons 2022-2024).
 import type { TeamMetadata } from '../_shared/team-metadata.ts';
 import { findTeamMetadata } from '../_shared/team-metadata.ts';
 
 export type MatchStatus = 'scheduled' | 'in_play' | 'finished' | 'postponed' | 'cancelled';
 
-// Forme minimale d'un match dans la réponse /games (response[])
-export type ApiGame = {
+// Forme minimale d'un match dans la réponse GET /matches (data[])
+export type ApiMatch = {
     id: number;
     date: string;
     week: string | number | null;
-    status: { short: string };
-    teams: {
-        home: { id: number; name: string } | null;
-        away: { id: number; name: string } | null;
-    };
+    state: { description: string };
+    homeTeam: { id: number; name: string } | null;
+    awayTeam: { id: number; name: string } | null;
 };
 
 export type TeamRow = {
@@ -38,33 +38,41 @@ export type MatchRow = {
     status: MatchStatus;
 };
 
-const STATUS_BY_API_CODE: Record<string, MatchStatus> = {
-    NS: 'scheduled',
-    '1H': 'in_play',
-    HT: 'in_play',
-    '2H': 'in_play',
-    ET: 'in_play',
-    BT: 'in_play',
-    PT: 'in_play',
-    FT: 'finished',
-    AET: 'finished',
-    POST: 'postponed',
-    PST: 'postponed',
-    CANC: 'cancelled',
+// Highlightly décrit l'état par un libellé (state.description), pas un code
+const STATUS_BY_STATE_DESCRIPTION: Record<string, MatchStatus> = {
+    'not started': 'scheduled',
+    'to be announced': 'scheduled',
+    'first half': 'in_play',
+    'half time': 'in_play',
+    'second half': 'in_play',
+    'extra time': 'in_play',
+    'break time': 'in_play',
+    penalties: 'in_play',
+    interrupted: 'in_play',
+    suspended: 'in_play',
+    finished: 'finished',
+    'finished after extra time': 'finished',
+    awarded: 'finished',
+    postponed: 'postponed',
+    cancelled: 'cancelled',
+    abandoned: 'cancelled',
 };
 
-/** Statut inconnu → 'scheduled' + isUnknown, remonté dans job_runs.detail. */
-export function mapApiStatus(short: string): { status: MatchStatus; isUnknown: boolean } {
-    const status = STATUS_BY_API_CODE[short];
+/** État inconnu → 'scheduled' + isUnknown, remonté dans job_runs.detail. */
+export function mapApiStatus(stateDescription: string): {
+    status: MatchStatus;
+    isUnknown: boolean;
+} {
+    const status = STATUS_BY_STATE_DESCRIPTION[stateDescription.trim().toLowerCase()];
     return status ? { status, isUnknown: false } : { status: 'scheduled', isUnknown: true };
 }
 
 /** Dédoublonne les équipes des matchs et attache le mapping statique par nom. */
-export function buildTeamRows(games: ApiGame[]): { rows: TeamRow[]; unmappedTeams: string[] } {
+export function buildTeamRows(matches: ApiMatch[]): { rows: TeamRow[]; unmappedTeams: string[] } {
     const byApiId = new Map<number, TeamRow>();
     const unmapped = new Set<string>();
-    for (const game of games) {
-        for (const team of [game.teams.home, game.teams.away]) {
+    for (const match of matches) {
+        for (const team of [match.homeTeam, match.awayTeam]) {
             if (!team || byApiId.has(team.id)) {
                 continue;
             }
@@ -85,27 +93,23 @@ export function buildTeamRows(games: ApiGame[]): { rows: TeamRow[]; unmappedTeam
 }
 
 export function buildMatchRows(
-    games: ApiGame[],
+    matches: ApiMatch[],
     teamUuidByApiId: Map<number, string>,
     competitionId: string,
 ): { rows: MatchRow[]; unknownStatuses: string[] } {
     const unknownStatuses = new Set<string>();
-    const rows = games.map((game) => {
-        const { status, isUnknown } = mapApiStatus(game.status.short);
+    const rows = matches.map((match) => {
+        const { status, isUnknown } = mapApiStatus(match.state.description);
         if (isUnknown) {
-            unknownStatuses.add(game.status.short);
+            unknownStatuses.add(match.state.description);
         }
         return {
-            api_game_id: game.id,
+            api_game_id: match.id,
             competition_id: competitionId,
-            home_team_id: game.teams.home
-                ? (teamUuidByApiId.get(game.teams.home.id) ?? null)
-                : null,
-            away_team_id: game.teams.away
-                ? (teamUuidByApiId.get(game.teams.away.id) ?? null)
-                : null,
-            kickoff_at: game.date,
-            round: game.week == null ? null : String(game.week),
+            home_team_id: match.homeTeam ? (teamUuidByApiId.get(match.homeTeam.id) ?? null) : null,
+            away_team_id: match.awayTeam ? (teamUuidByApiId.get(match.awayTeam.id) ?? null) : null,
+            kickoff_at: match.date,
+            round: match.week == null ? null : String(match.week),
             status,
         };
     });
@@ -128,44 +132,39 @@ export function selectMatchesForOddsCapture<T extends { kickoff_at: string; stat
     });
 }
 
-// Forme minimale de la réponse /odds?game= (response[])
-export type ApiOddsGame = {
-    bookmakers: {
-        name?: string;
-        bets: { name: string; values: { value: string; odd: string }[] }[];
-    }[];
+// Forme minimale de la réponse GET /odds?matchId= : marchés à plat, tous
+// bookmakers confondus (champ `odds` de l'objet réponse)
+export type ApiOddsMarket = {
+    bookmakerName?: string;
+    type?: string;
+    market: string;
+    values: { value: string; odd: number | string }[];
 };
 
 export type ParsedOdds = { home: number; draw: number; away: number };
 
 /**
- * Premier marché 3 issues (Home/Draw/Away) trouvé chez n'importe quel bookmaker.
- * Repérage par les valeurs plutôt que par le nom du marché (libellés variables).
+ * Premier marché 3 issues complet (Home/Draw/Away) — nominalement
+ * « Full Time Result ». Repérage par les valeurs plutôt que par le libellé du
+ * marché, pour tolérer ses variations.
  */
-export function parseOddsResponse(oddsGames: ApiOddsGame[]): ParsedOdds | null {
-    for (const oddsGame of oddsGames) {
-        for (const bookmaker of oddsGame.bookmakers ?? []) {
-            for (const bet of bookmaker.bets ?? []) {
-                const byOutcome = new Map(
-                    bet.values.map((entry) => [
-                        entry.value.trim().toLowerCase(),
-                        Number(entry.odd),
-                    ]),
-                );
-                const home = byOutcome.get('home');
-                const draw = byOutcome.get('draw');
-                const away = byOutcome.get('away');
-                if (
-                    home !== undefined &&
-                    draw !== undefined &&
-                    away !== undefined &&
-                    Number.isFinite(home) &&
-                    Number.isFinite(draw) &&
-                    Number.isFinite(away)
-                ) {
-                    return { home, draw, away };
-                }
-            }
+export function parseOddsResponse(markets: ApiOddsMarket[]): ParsedOdds | null {
+    for (const market of markets) {
+        const byOutcome = new Map(
+            market.values.map((entry) => [entry.value.trim().toLowerCase(), Number(entry.odd)]),
+        );
+        const home = byOutcome.get('home');
+        const draw = byOutcome.get('draw');
+        const away = byOutcome.get('away');
+        if (
+            home !== undefined &&
+            draw !== undefined &&
+            away !== undefined &&
+            Number.isFinite(home) &&
+            Number.isFinite(draw) &&
+            Number.isFinite(away)
+        ) {
+            return { home, draw, away };
         }
     }
     return null;

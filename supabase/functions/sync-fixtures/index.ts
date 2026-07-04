@@ -1,20 +1,21 @@
-// Synchronisation quotidienne des fixtures + cotes API-Sports (Lot 2).
+// Synchronisation quotidienne des fixtures + cotes Highlightly (Lot 2).
 // Appelée par pg_cron (pas d'utilisateur) : accès protégé par le secret partagé
 // x-sync-secret, écritures via la service_role key. Chaque run est tracé dans
-// job_runs (statut + budget API, limite du tier gratuit : 100 req/jour).
+// job_runs (statut + budget API — plan Highlightly Pro : 7 500 req/jour).
 import { createClient, type SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 import {
-    type ApiGame,
-    type ApiOddsGame,
+    type ApiMatch,
+    type ApiOddsMarket,
     buildMatchRows,
     buildTeamRows,
     parseOddsResponse,
     selectMatchesForOddsCapture,
 } from './transform.ts';
 
-const API_BASE = 'https://v1.rugby.api-sports.io';
-// Garde-fou par run : bien au-delà du régime de croisière (1 /games + qq /odds),
-// protège le budget quotidien d'un emballement (ex. RWC entière dans la fenêtre J-7)
+const API_BASE = 'https://rugby.highlightly.net';
+const PAGE_SIZE = 100;
+// Garde-fou par run : bien au-delà du régime de croisière (1-2 pages /matches
+// + qq /odds par jour), protège d'un emballement (boucle de pagination, etc.)
 const MAX_API_CALLS_PER_RUN = 20;
 
 type CompetitionSummary = {
@@ -97,12 +98,9 @@ async function syncCompetition(
         unknownStatuses: Set<string>;
     },
 ): Promise<void> {
-    const games = await fetchApi<ApiGame>(
-        `/games?league=${competition.api_league_id}&season=${competition.api_season}`,
-        state,
-    );
+    const matches = await fetchAllMatches(competition.api_league_id, competition.api_season, state);
 
-    const { rows: teamRows, unmappedTeams } = buildTeamRows(games);
+    const { rows: teamRows, unmappedTeams } = buildTeamRows(matches);
     for (const name of unmappedTeams) {
         state.unmappedTeams.add(name);
     }
@@ -129,12 +127,12 @@ async function syncCompetition(
     );
 
     const { rows: matchRows, unknownStatuses } = buildMatchRows(
-        games,
+        matches,
         teamUuidByApiId,
         competition.id,
     );
-    for (const short of unknownStatuses) {
-        state.unknownStatuses.add(short);
+    for (const description of unknownStatuses) {
+        state.unknownStatuses.add(description);
     }
     if (matchRows.length > 0) {
         const { error } = await admin
@@ -149,8 +147,8 @@ async function syncCompetition(
     // avant le coup d'envoi fait foi pour le scoring
     let oddsCaptured = 0;
     for (const match of selectMatchesForOddsCapture(matchRows, new Date())) {
-        const oddsGames = await fetchApi<ApiOddsGame>(`/odds?game=${match.api_game_id}`, state);
-        const odds = parseOddsResponse(oddsGames);
+        const markets = await fetchOdds(match.api_game_id, state);
+        const odds = parseOddsResponse(markets);
         if (!odds) {
             continue;
         }
@@ -172,34 +170,65 @@ async function syncCompetition(
 
     state.summaries.push({
         slug: competition.slug,
-        games: games.length,
+        games: matches.length,
         teams_upserted: teamRows.length,
         odds_captured: oddsCaptured,
     });
 }
 
-// API-Sports répond 200 même en erreur (quota, clé invalide) : `errors` non vide fait foi
-async function fetchApi<T>(path: string, state: { apiCalls: number }): Promise<T[]> {
+/** GET /matches paginé (offset/limit) : toutes les pages de la ligue × saison. */
+async function fetchAllMatches(
+    leagueId: number,
+    season: number,
+    state: { apiCalls: number },
+): Promise<ApiMatch[]> {
+    const all: ApiMatch[] = [];
+    let offset = 0;
+    while (true) {
+        const body = await fetchApi<{
+            data?: ApiMatch[];
+            pagination?: { totalCount?: number };
+        }>(
+            `/matches?leagueId=${leagueId}&season=${season}&limit=${PAGE_SIZE}&offset=${offset}`,
+            state,
+        );
+        const page = body.data ?? [];
+        all.push(...page);
+        const totalCount = body.pagination?.totalCount ?? all.length;
+        offset += PAGE_SIZE;
+        if (page.length < PAGE_SIZE || all.length >= totalCount) {
+            return all;
+        }
+    }
+}
+
+/** GET /odds?matchId= : marchés prematch à plat (tous bookmakers). */
+async function fetchOdds(matchId: number, state: { apiCalls: number }): Promise<ApiOddsMarket[]> {
+    const body = await fetchApi<{
+        odds?: ApiOddsMarket[];
+        data?: { odds?: ApiOddsMarket[] }[];
+    }>(`/odds?matchId=${matchId}&oddsType=prematch`, state);
+    if (Array.isArray(body.odds)) {
+        return body.odds;
+    }
+    // Tolère une réponse enveloppée en liste (un objet par match)
+    return (body.data ?? []).flatMap((entry) => entry.odds ?? []);
+}
+
+async function fetchApi<T>(path: string, state: { apiCalls: number }): Promise<T> {
     if (state.apiCalls >= MAX_API_CALLS_PER_RUN) {
         throw new Error(`api_budget_exceeded (${MAX_API_CALLS_PER_RUN} appels/run)`);
     }
     state.apiCalls += 1;
 
     const response = await fetch(`${API_BASE}${path}`, {
-        headers: { 'x-apisports-key': Deno.env.get('API_SPORTS_KEY')! },
+        headers: { 'x-rapidapi-key': Deno.env.get('HIGHLIGHTLY_API_KEY')! },
     });
     if (!response.ok) {
-        throw new Error(`api_http_${response.status} on ${path}`);
+        const detail = (await response.text()).slice(0, 200);
+        throw new Error(`api_http_${response.status} on ${path}: ${detail}`);
     }
-    const body = (await response.json()) as { errors?: unknown; response?: T[] };
-    const errors = body.errors;
-    const hasErrors = Array.isArray(errors)
-        ? errors.length > 0
-        : errors != null && Object.keys(errors).length > 0;
-    if (hasErrors) {
-        throw new Error(`api_error on ${path}: ${JSON.stringify(errors)}`);
-    }
-    return body.response ?? [];
+    return (await response.json()) as T;
 }
 
 async function finishRun(
