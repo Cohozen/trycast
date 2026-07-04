@@ -25,18 +25,14 @@ Lecture de <https://highlightly.net/rugby-api/documentation/> :
 marketing (`events`/`matchStatistics`). Une vérification empirique reste nécessaire :
 la doc peut être partielle.
 
-## Vérification empirique — À FAIRE (clé requise, compte à créer par Corentin)
+## Vérification empirique (Corentin, 2026-07-04)
 
-1. Créer un compte gratuit sur highlightly.net, récupérer la clé.
-2. Lister les matchs rugby récents terminés (tournées de juillet 2026), noter 2-3 ids
-   (dont un match d'une nation « moyenne »).
-3. `curl` sur `matches/{id}` : chercher des événements typés « try » attribués à une
-   équipe, ou un décompte d'essais dans des statistiques.
-4. Si présents : contre-vérifier le nombre d'essais avec les feuilles de match réelles.
-5. Consigner ici les requêtes, extraits de réponse et la décision finale.
+Constat identique à la pré-analyse : **pas de statistiques de match visibles sur
+Highlightly** — pas d'événements « try » ni de décompte d'essais exploitables.
 
-## Décision
+## Décision (2026-07-04)
 
-_En attente de la vérification empirique._ Tant qu'elle n'est pas concluante, le flux
-nominal du MVP est le scoring en 2 temps avec saisie admin des essais
-(`tries_missing` + `scripts/admin-set-tries.sql`).
+**Spike non concluant — pas d'EF `sync-tries`.** Le flux nominal du MVP est le scoring
+en 2 temps avec saisie admin des essais après chaque match (`tries_missing` +
+`scripts/admin-set-tries.sql`, ~1 min/match, max 3/jour en RWC). À réévaluer seulement
+si une nouvelle source d'essais fiable apparaît d'ici la RWC 2027.
