@@ -30,7 +30,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  return <SessionContext.Provider value={{ session, isLoading }}>{children}</SessionContext.Provider>;
+  return (
+    <SessionContext.Provider value={{ session, isLoading }}>{children}</SessionContext.Provider>
+  );
 }
 
 export function useSession() {

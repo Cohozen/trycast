@@ -37,9 +37,7 @@ export function PrimaryButton({
   variant = 'primary',
 }: PrimaryButtonProps) {
   const background =
-    variant === 'danger'
-      ? 'bg-red-600 active:bg-red-700'
-      : 'bg-blue-600 active:bg-blue-700';
+    variant === 'danger' ? 'bg-red-600 active:bg-red-700' : 'bg-blue-600 active:bg-blue-700';
   return (
     <Pressable
       className={`items-center justify-center rounded-xl px-4 py-3.5 ${background} ${
@@ -58,8 +56,7 @@ export function PrimaryButton({
 
 export function FormBanner({ message, tone }: { message: string; tone: 'error' | 'success' }) {
   return (
-    <View
-      className={`rounded-xl px-4 py-3 ${tone === 'error' ? 'bg-red-50' : 'bg-green-50'}`}>
+    <View className={`rounded-xl px-4 py-3 ${tone === 'error' ? 'bg-red-50' : 'bg-green-50'}`}>
       <Text className={`text-sm ${tone === 'error' ? 'text-red-700' : 'text-green-700'}`}>
         {message}
       </Text>

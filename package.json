@@ -42,7 +42,12 @@
   "devDependencies": {
     "@types/aes-js": "^3.1.4",
     "@types/react": "~19.2.2",
-    "typescript": "~6.0.3"
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~57.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.4",
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.9"
   },
   "scripts": {
     "start": "expo start",
@@ -51,6 +56,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "test": "vitest run",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "typegen": "supabase gen types typescript --project-id bmdzadvugtkclnqjpndr --schema public > src/lib/database.types.ts"
   },

@@ -12,9 +12,13 @@ import { useCssElement, useNativeVariable as useFunctionalVariable } from 'react
 
 // CSS-enabled Link (cast: typed-routes prop unions are too complex for tsc)
 export const Link = (props: React.ComponentProps<typeof RouterLink> & { className?: string }) => {
-  return useCssElement(RouterLink as unknown as React.ComponentType<Record<string, unknown>>, props, {
-    className: 'style',
-  });
+  return useCssElement(
+    RouterLink as unknown as React.ComponentType<Record<string, unknown>>,
+    props,
+    {
+      className: 'style',
+    },
+  );
 };
 
 Link.Trigger = RouterLink.Trigger;
