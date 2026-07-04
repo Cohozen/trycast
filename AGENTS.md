@@ -39,7 +39,7 @@ Avant de considérer un lot terminé : `npm run typecheck && npm run lint && npm
 - Schéma : uniquement par migrations dans `supabase/migrations/`, puis `supabase db push` + `npm run typegen`
 - Toute règle de sécurité (deadline prono au kickoff, accès données) est imposée par RLS côté serveur, le client n'est qu'une UX
 - Edge Functions dans `supabase/functions/`, déploiement `supabase functions deploy <name>`
-- Vérification E2E auth/RLS : `bash scripts/e2e-auth.sh` (utilisateurs de test : `scripts/seed-test-users.sql`)
+- Vérification E2E auth/RLS : `bash scripts/e2e-auth.sh` (utilisateurs de test : `scripts/seed-test-users.sql`) et `bash scripts/e2e-predictions.sh` (matchs de test : `scripts/seed-test-predictions.sql`, à seeder après les users)
 
 ## Secrets
 

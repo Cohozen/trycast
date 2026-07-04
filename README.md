@@ -7,7 +7,7 @@ Pronostic unique par match (score exact + bonus offensifs), points pondérés pa
 ## Stack
 
 - **App** : [Expo SDK 57](https://docs.expo.dev/versions/v57.0.0/) / React Native 0.86 / TypeScript, routing par fichiers avec [Expo Router](https://docs.expo.dev/router/introduction/)
-- **Styling** : [NativeWind v5](https://www.nativewind.dev/) (Tailwind CSS v4)
+- **Styling** : [NativeWind v5](https://www.nativewind.dev/) (Tailwind CSS v4) — override npm : `lightningcss` épinglé en 1.30.1 pour `react-native-css`, sinon crash au bundling natif sur les `var()` externes (ex. CSS de `@expo/log-box`)
 - **Backend** : [Supabase](https://supabase.com) (Postgres + RLS, Auth email/mot de passe, Edge Functions)
 - **Data fetching** : TanStack Query
 - **Tests** : Vitest (logique pure), script E2E auth/RLS
@@ -43,20 +43,21 @@ Le projet tourne dans **Expo Go** (aucun module natif custom pour l'instant) : p
 | `npm run format` / `format:check` | Biome (formatage : 4 espaces, 100 colonnes)                                    |
 | `npm run typegen`                 | Régénère `src/lib/database.types.ts` depuis le schéma Supabase                 |
 | `bash scripts/e2e-auth.sh`        | Vérification E2E auth + RLS contre le projet Supabase (voir en-tête du script) |
+| `bash scripts/e2e-predictions.sh` | Vérification E2E RLS des pronostics (deadline kickoff, colonnes de points)     |
 
 ## Structure
 
 ```
 src/
-  app/            # Écrans Expo Router — (auth): login/signup/reset, (app): matchs, profil
+  app/            # Écrans Expo Router — (auth): login/signup/reset, (app): matchs, résultats, profil
   components/     # Composants UI partagés
-  features/       # Logique par domaine (auth, profile, matches…) + tests colocalisés
+  features/       # Logique par domaine (auth, profile, matches, predictions, scoring…) + tests colocalisés
   lib/            # Client Supabase typé, stockage session chiffré, React Query
   hooks/ constants/ tw/
 supabase/
   migrations/     # Migrations SQL (source de vérité du schéma)
   functions/      # Edge Functions (delete-account, sync-fixtures) — logique pure testée sous Vitest
-scripts/          # Seeds (compétitions, users de test), saisie admin des essais, script E2E
+scripts/          # Seeds (compétitions, users/matchs de test), saisie admin des essais, scripts E2E
 docs/             # Notes de décision (choix du fournisseur de données…)
 ```
 
@@ -69,6 +70,21 @@ Le projet dev est lié en local via `supabase link`. Workflow :
 3. Edge Functions déployées avec `supabase functions deploy <name>`
 
 La sécurité (deadlines de pronostic, accès aux données) est imposée côté serveur par RLS — jamais uniquement côté client.
+
+## Pronostics
+
+Un pronostic par joueur et par match : score exact + case « bonus offensif » (4 essais ou plus)
+par équipe. La saisie se fait dans l'onglet **Matchs** (matchs à venir, du plus proche au plus
+lointain) ; l'onglet **Résultats** montre le score réel, le prono et les points obtenus.
+
+- **Deadline au coup d'envoi, imposée par RLS** : après le kickoff, Postgres refuse toute
+  écriture, quelle que soit l'UI. Les colonnes de points ne sont accordées qu'au rôle serveur
+  (grants par colonne) — un client ne peut pas s'attribuer de points.
+- **Barème dans `src/features/scoring/`** (module TS pur, testé unitairement) : points
+  vainqueur pondérés par le multiplicateur du résultat prédit (×2.0 par défaut sans cotes),
+  +50 pour le score exact, volets écart, bonus défensif et offensif. L'aperçu « peut rapporter
+  N pts » affiché à la saisie utilise ce même module ; l'attribution officielle des points
+  (job serveur + barème versionné en base) reste à venir.
 
 ## Pipeline compétition
 
