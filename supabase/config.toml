@@ -385,6 +385,11 @@ deno_version = 2
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
+# Appelée par pg_cron (pas de JWT utilisateur) : l'accès est protégé par le
+# secret partagé x-sync-secret vérifié dans la fonction elle-même.
+[functions.sync-fixtures]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327
