@@ -32,7 +32,18 @@ Highlightly** — pas d'événements « try » ni de décompte d'essais exploita
 
 ## Décision (2026-07-04)
 
-**Spike non concluant — pas d'EF `sync-tries`.** Le flux nominal du MVP est le scoring
-en 2 temps avec saisie admin des essais après chaque match (`tries_missing` +
-`scripts/admin-set-tries.sql`, ~1 min/match, max 3/jour en RWC). À réévaluer seulement
-si une nouvelle source d'essais fiable apparaît d'ici la RWC 2027.
+**Pour les essais : spike non concluant — pas d'EF `sync-tries`.** Le flux nominal du
+MVP est le scoring en 2 temps avec saisie admin des essais après chaque match
+(`tries_missing` + `scripts/admin-set-tries.sql`, ~1 min/match, max 3/jour en RWC).
+À réévaluer seulement si une nouvelle source d'essais fiable apparaît d'ici la RWC 2027.
+
+## Rebondissement (2026-07-04, soir) : Highlightly devient la source principale
+
+Au premier run réel de `sync-fixtures`, découverte que le **free tier d'API-Sports est
+limité aux saisons 2022-2024** (« Free plans do not have access to this season ») — le
+risque n°1 du plan MVP, cru levé par le spike du 2026-07-03, était bien réel. Comparaison
+des plans payants : API-Sports Pro 19 $/mois vs **Highlightly Pro 5,99 $/mois**
+(7 500 req/jour, cotes 65+ bookmakers incluses, Nations Championship 2026 vérifié
+accessible par Corentin). Décision : **bascule complète de `sync-fixtures` sur
+Highlightly** (fixtures + cotes ; les essais restent en saisie admin, aucun des deux
+fournisseurs ne les expose). API-Sports n'est plus utilisé.

@@ -71,17 +71,18 @@ La sécurité (deadlines de pronostic, accès aux données) est imposée côté 
 
 ## Pipeline compétition (Lot 2)
 
-Les fixtures et cotes viennent d'API-Sports (tier gratuit, 100 req/jour), synchronisées
-chaque nuit par l'Edge Function `sync-fixtures` (05:00 UTC via pg_cron). Chaque run est
-tracé dans `job_runs` (statut + budget API). Les essais, absents d'API-Sports, sont
-saisis manuellement après chaque match (`scripts/admin-set-tries.sql`) — automatisation
-éventuelle à l'étude : [spike Highlightly](docs/spike-highlightly.md).
+Les fixtures et cotes viennent de **Highlightly** (plan Pro — le free tier
+d'API-Sports s'est révélé limité aux saisons 2022-2024, voir
+[docs/spike-highlightly.md](docs/spike-highlightly.md)), synchronisées chaque nuit par
+l'Edge Function `sync-fixtures` (05:00 UTC via pg_cron). Chaque run est tracé dans
+`job_runs` (statut + budget API). Les essais, absents des deux fournisseurs, sont
+saisis manuellement après chaque match (`scripts/admin-set-tries.sql`).
 
 Mise en route (ordre important, secrets jamais dans le repo) :
 
-1. Relever les `api_league_id` (`GET /leagues?search=…` avec la clé API-Sports), compléter
+1. Relever les `leagueId` (`GET /leagues?leagueName=…` avec la clé Highlightly), compléter
    et exécuter `scripts/seed-competitions.sql` sur le projet dev
-2. `supabase secrets set API_SPORTS_KEY=<clé> SYNC_FIXTURES_SECRET=<aléatoire>`
+2. `supabase secrets set HIGHLIGHTLY_API_KEY=<clé> SYNC_FIXTURES_SECRET=<aléatoire>`
 3. `supabase functions deploy sync-fixtures`
 4. Côté Postgres : `select vault.create_secret('<même valeur>', 'sync_fixtures_secret');`
 5. `supabase db push` (migrations pg_cron `20260705000300` + durcissement des grants
