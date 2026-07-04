@@ -162,6 +162,69 @@ export type Database = {
                     },
                 ];
             };
+            predictions: {
+                Row: {
+                    created_at: string;
+                    id: string;
+                    match_id: string;
+                    points_awarded: number | null;
+                    points_breakdown: Json | null;
+                    predicted_away_score: number;
+                    predicted_bonus_off_away: boolean;
+                    predicted_bonus_off_home: boolean;
+                    predicted_home_score: number;
+                    scored_at: string | null;
+                    scoring_rule_version: number | null;
+                    updated_at: string;
+                    user_id: string;
+                };
+                Insert: {
+                    created_at?: string;
+                    id?: string;
+                    match_id: string;
+                    points_awarded?: number | null;
+                    points_breakdown?: Json | null;
+                    predicted_away_score: number;
+                    predicted_bonus_off_away?: boolean;
+                    predicted_bonus_off_home?: boolean;
+                    predicted_home_score: number;
+                    scored_at?: string | null;
+                    scoring_rule_version?: number | null;
+                    updated_at?: string;
+                    user_id: string;
+                };
+                Update: {
+                    created_at?: string;
+                    id?: string;
+                    match_id?: string;
+                    points_awarded?: number | null;
+                    points_breakdown?: Json | null;
+                    predicted_away_score?: number;
+                    predicted_bonus_off_away?: boolean;
+                    predicted_bonus_off_home?: boolean;
+                    predicted_home_score?: number;
+                    scored_at?: string | null;
+                    scoring_rule_version?: number | null;
+                    updated_at?: string;
+                    user_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'predictions_match_id_fkey';
+                        columns: ['match_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'matches';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'predictions_user_id_fkey';
+                        columns: ['user_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'profiles';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             profiles: {
                 Row: {
                     created_at: string;
