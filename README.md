@@ -1,56 +1,74 @@
-# Welcome to your Expo app 👋
+# TryCast 🏉
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Application mobile de pronostics rugby entre amis. Cible : Coupe du monde 2027, soft-launch sur le 6 Nations 2027.
 
-## Get started
+Pronostic unique par match (score exact + bonus offensifs), points pondérés par les cotes bookmaker, classements par ligue et général. 100 % gratuit et social.
 
-1. Install dependencies
+## Stack
 
-   ```bash
-   npm install
-   ```
+- **App** : [Expo SDK 57](https://docs.expo.dev/versions/v57.0.0/) / React Native 0.86 / TypeScript, routing par fichiers avec [Expo Router](https://docs.expo.dev/router/introduction/)
+- **Styling** : [NativeWind v5](https://www.nativewind.dev/) (Tailwind CSS v4)
+- **Backend** : [Supabase](https://supabase.com) (Postgres + RLS, Auth email/mot de passe, Edge Functions)
+- **Data fetching** : TanStack Query
+- **Tests** : Vitest (logique pure), script E2E auth/RLS
+- **CI** : GitHub Actions (lint, format, typecheck, tests)
 
-2. Start the app
+## Prérequis
 
-   ```bash
-   npx expo start
-   ```
+- Node.js ≥ 20 et npm
+- **iOS** : Xcode + un simulateur iOS (macOS uniquement)
+- **Android** : Android Studio + un émulateur (image ARM64 sur Apple Silicon)
+- Ou l'app [Expo Go](https://expo.dev/go) sur un téléphone physique (même compte réseau non requis, scan du QR code)
+- CLI optionnelles : `supabase` (migrations, typegen) et `eas-cli` (builds) — `npm install -g supabase eas-cli`
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Démarrage
 
 ```bash
-npm run reset-project
+npm install
+cp .env.example .env   # puis renseigner l'URL et la clé publishable Supabase
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Depuis le terminal Metro : `i` ouvre le simulateur iOS, `a` l'émulateur Android, `w` le navigateur, `j` les React Native DevTools. Raccourcis : `npm run ios`, `npm run android`, `npm run web`.
 
-### Other setup steps
+Le projet tourne dans **Expo Go** (aucun module natif custom pour l'instant) : pas besoin de development build.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Scripts
 
-## Learn more
+| Commande                          | Rôle                                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------ |
+| `npm run test`                    | Tests unitaires Vitest                                                         |
+| `npm run typecheck`               | `tsc --noEmit`                                                                 |
+| `npm run lint`                    | ESLint (config Expo + Prettier)                                                |
+| `npm run format` / `format:check` | Prettier                                                                       |
+| `npm run typegen`                 | Régénère `src/lib/database.types.ts` depuis le schéma Supabase                 |
+| `bash scripts/e2e-auth.sh`        | Vérification E2E auth + RLS contre le projet Supabase (voir en-tête du script) |
 
-To learn more about developing your project with Expo, look at the following resources:
+## Structure
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```
+src/
+  app/            # Écrans Expo Router — (auth): login/signup/reset, (app): app connectée
+  components/     # Composants UI partagés
+  features/       # Logique par domaine (auth, profile…) + tests colocalisés
+  lib/            # Client Supabase typé, stockage session chiffré, React Query
+  hooks/ constants/ tw/
+supabase/
+  migrations/     # Migrations SQL (source de vérité du schéma)
+  functions/      # Edge Functions (delete-account)
+scripts/          # Seeds de test, script E2E
+```
 
-## Join the community
+## Backend Supabase
 
-Join our community of developers creating universal apps.
+Projet dev : `trycast-dev` (`bmdzadvugtkclnqjpndr`, eu-west-3). Workflow :
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1. Nouvelle migration dans `supabase/migrations/`, appliquée via `supabase db push` (projet lié avec `supabase link`)
+2. `npm run typegen` pour mettre à jour les types TS
+3. Edge Functions déployées avec `supabase functions deploy <name>`
+
+La sécurité (deadlines de pronostic, accès aux données) est imposée côté serveur par RLS — jamais uniquement côté client.
+
+## Builds (EAS)
+
+Projet EAS initialisé (owner `cohozen`). Builds et soumission aux stores : à venir dans les lots suivants (`eas build`, `eas submit`).
