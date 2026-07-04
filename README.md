@@ -39,8 +39,8 @@ Le projet tourne dans **Expo Go** (aucun module natif custom pour l'instant) : p
 | --------------------------------- | ------------------------------------------------------------------------------ |
 | `npm run test`                    | Tests unitaires Vitest                                                         |
 | `npm run typecheck`               | `tsc --noEmit`                                                                 |
-| `npm run lint`                    | ESLint (config Expo + Prettier)                                                |
-| `npm run format` / `format:check` | Prettier                                                                       |
+| `npm run lint`                    | ESLint (config Expo, règles stylistiques désactivées)                          |
+| `npm run format` / `format:check` | Biome (formatage : 4 espaces, 100 colonnes)                                    |
 | `npm run typegen`                 | Régénère `src/lib/database.types.ts` depuis le schéma Supabase                 |
 | `bash scripts/e2e-auth.sh`        | Vérification E2E auth + RLS contre le projet Supabase (voir en-tête du script) |
 

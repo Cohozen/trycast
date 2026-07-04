@@ -23,6 +23,15 @@ Avant de considérer un lot terminé : `npm run typecheck && npm run lint && npm
 - Écrans dans `src/app/` (groupes `(auth)` et `(app)`), logique métier par domaine dans `src/features/<domaine>/` avec tests `*.test.ts` colocalisés
 - Textes UI et messages d'erreur **en français**
 - Logique de scoring : module TS pur testable unitairement + écriture atomique via une seule RPC SQL (décision actée, ne pas re-débattre)
+- **Un composant par fichier, un fichier par composant** (fichier nommé comme le composant, en kebab-case)
+- Tout composant réutilisable va dans `src/components/` (primitives UI dans `src/components/ui/`) ; un composant propre à un domaine reste dans `src/features/<domaine>/components/`
+- Types partagés dans des fichiers dédiés : `src/features/<domaine>/types.ts` par domaine (pas de fourre-tout global) ; les props d'un composant restent colocalisées avec lui tant qu'elles ne sont pas réutilisées ailleurs
+- Styles : classes NativeWind inline dans le JSX (`className`) ; dès qu'un style se répète, extraire un composant partagé ou un variant dans `src/tw/` — pas de `StyleSheet.create` sauf impossibilité Tailwind
+
+## Git
+
+- Commits petits et fréquents : un commit = un changement cohérent (config ≠ reformatage ≠ feature), messages `type: description`
+- **Jamais de `git push` sans autorisation explicite de Corentin**
 
 ## Supabase
 
