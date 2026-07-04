@@ -41,6 +41,36 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            job_runs: {
+                Row: {
+                    api_calls_used: number;
+                    detail: Json | null;
+                    finished_at: string | null;
+                    id: string;
+                    job: string;
+                    started_at: string;
+                    status: string;
+                };
+                Insert: {
+                    api_calls_used?: number;
+                    detail?: Json | null;
+                    finished_at?: string | null;
+                    id?: string;
+                    job: string;
+                    started_at?: string;
+                    status?: string;
+                };
+                Update: {
+                    api_calls_used?: number;
+                    detail?: Json | null;
+                    finished_at?: string | null;
+                    id?: string;
+                    job?: string;
+                    started_at?: string;
+                    status?: string;
+                };
+                Relationships: [];
+            };
             matches: {
                 Row: {
                     api_game_id: number;
