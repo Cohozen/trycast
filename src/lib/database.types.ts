@@ -71,6 +71,84 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            league_members: {
+                Row: {
+                    joined_at: string;
+                    league_id: string;
+                    role: Database['public']['Enums']['league_role'];
+                    user_id: string;
+                };
+                Insert: {
+                    joined_at?: string;
+                    league_id: string;
+                    role?: Database['public']['Enums']['league_role'];
+                    user_id: string;
+                };
+                Update: {
+                    joined_at?: string;
+                    league_id?: string;
+                    role?: Database['public']['Enums']['league_role'];
+                    user_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'league_members_league_id_fkey';
+                        columns: ['league_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'leagues';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'league_members_user_id_fkey';
+                        columns: ['user_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'profiles';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
+            leagues: {
+                Row: {
+                    competition_id: string;
+                    created_at: string;
+                    id: string;
+                    invite_code: string;
+                    name: string;
+                    owner_id: string;
+                };
+                Insert: {
+                    competition_id: string;
+                    created_at?: string;
+                    id?: string;
+                    invite_code: string;
+                    name: string;
+                    owner_id: string;
+                };
+                Update: {
+                    competition_id?: string;
+                    created_at?: string;
+                    id?: string;
+                    invite_code?: string;
+                    name?: string;
+                    owner_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'leagues_competition_id_fkey';
+                        columns: ['competition_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'competitions';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'leagues_owner_id_fkey';
+                        columns: ['owner_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'profiles';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             matches: {
                 Row: {
                     api_game_id: number;
@@ -346,9 +424,12 @@ export type Database = {
                 };
                 Returns: Json;
             };
+            is_league_member: { Args: { p_league_id: string }; Returns: boolean };
+            is_league_owner: { Args: { p_league_id: string }; Returns: boolean };
             username_available: { Args: { candidate: string }; Returns: boolean };
         };
         Enums: {
+            league_role: 'owner' | 'member';
             match_status: 'scheduled' | 'in_play' | 'finished' | 'postponed' | 'cancelled';
         };
         CompositeTypes: {
@@ -477,6 +558,7 @@ export type CompositeTypes<
 export const Constants = {
     public: {
         Enums: {
+            league_role: ['owner', 'member'],
             match_status: ['scheduled', 'in_play', 'finished', 'postponed', 'cancelled'],
         },
     },
