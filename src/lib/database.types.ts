@@ -441,6 +441,28 @@ export type Database = {
                     isSetofReturn: false;
                 };
             };
+            get_global_leaderboard: {
+                Args: { p_competition_id: string; p_limit?: number; p_offset?: number };
+                Returns: {
+                    exact_scores: number;
+                    predictions_scored: number;
+                    rank: number;
+                    total_points: number;
+                    user_id: string;
+                    username: string;
+                }[];
+            };
+            get_league_leaderboard: {
+                Args: { p_league_id: string; p_limit?: number; p_offset?: number };
+                Returns: {
+                    exact_scores: number;
+                    predictions_scored: number;
+                    rank: number;
+                    total_points: number;
+                    user_id: string;
+                    username: string;
+                }[];
+            };
             is_league_member: { Args: { p_league_id: string }; Returns: boolean };
             is_league_owner: { Args: { p_league_id: string }; Returns: boolean };
             join_league: {
