@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 /** Classement général de la compétition (rank + tie-breakers côté serveur). */
 export function useGlobalLeaderboard(competitionId: string | undefined, limit = 50) {
     return useQuery({
-        queryKey: ['leaderboard', 'global', competitionId],
+        queryKey: ['leaderboard', 'global', competitionId, limit],
         enabled: !!competitionId,
         queryFn: async () => {
             const { data, error } = await supabase.rpc('get_global_leaderboard', {
