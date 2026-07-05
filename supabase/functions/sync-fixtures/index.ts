@@ -3,20 +3,13 @@
 // x-sync-secret, écritures via la service_role key. Chaque run est tracé dans
 // job_runs (statut + budget API — plan Highlightly Pro : 7 500 req/jour).
 import { createClient, type SupabaseClient } from 'jsr:@supabase/supabase-js@2';
+import { fetchAllMatches, fetchOdds } from '../_shared/highlightly.ts';
 import {
-    type ApiMatch,
-    type ApiOddsMarket,
     buildMatchRows,
     buildTeamRows,
     parseOddsResponse,
     selectMatchesForOddsCapture,
 } from './transform.ts';
-
-const API_BASE = 'https://rugby.highlightly.net';
-const PAGE_SIZE = 100;
-// Garde-fou par run : bien au-delà du régime de croisière (1-2 pages /matches
-// + qq /odds par jour), protège d'un emballement (boucle de pagination, etc.)
-const MAX_API_CALLS_PER_RUN = 20;
 
 type CompetitionSummary = {
     slug: string;
@@ -187,61 +180,6 @@ async function syncCompetition(
         odds_captured: oddsCaptured,
         ...(oddsError ? { odds_error: oddsError } : {}),
     });
-}
-
-/** GET /matches paginé (offset/limit) : toutes les pages de la ligue × saison. */
-async function fetchAllMatches(
-    leagueId: number,
-    season: number,
-    state: { apiCalls: number },
-): Promise<ApiMatch[]> {
-    const all: ApiMatch[] = [];
-    let offset = 0;
-    while (true) {
-        const body = await fetchApi<{
-            data?: ApiMatch[];
-            pagination?: { totalCount?: number };
-        }>(
-            `/matches?leagueId=${leagueId}&season=${season}&limit=${PAGE_SIZE}&offset=${offset}`,
-            state,
-        );
-        const page = body.data ?? [];
-        all.push(...page);
-        const totalCount = body.pagination?.totalCount ?? all.length;
-        offset += PAGE_SIZE;
-        if (page.length < PAGE_SIZE || all.length >= totalCount) {
-            return all;
-        }
-    }
-}
-
-/** GET /odds?matchId= : marchés prematch à plat (tous bookmakers). */
-async function fetchOdds(matchId: number, state: { apiCalls: number }): Promise<ApiOddsMarket[]> {
-    const body = await fetchApi<{
-        odds?: ApiOddsMarket[];
-        data?: { odds?: ApiOddsMarket[] }[];
-    }>(`/odds?matchId=${matchId}&oddsType=prematch`, state);
-    if (Array.isArray(body.odds)) {
-        return body.odds;
-    }
-    // Tolère une réponse enveloppée en liste (un objet par match)
-    return (body.data ?? []).flatMap((entry) => entry.odds ?? []);
-}
-
-async function fetchApi<T>(path: string, state: { apiCalls: number }): Promise<T> {
-    if (state.apiCalls >= MAX_API_CALLS_PER_RUN) {
-        throw new Error(`api_budget_exceeded (${MAX_API_CALLS_PER_RUN} appels/run)`);
-    }
-    state.apiCalls += 1;
-
-    const response = await fetch(`${API_BASE}${path}`, {
-        headers: { 'x-rapidapi-key': Deno.env.get('HIGHLIGHTLY_API_KEY')! },
-    });
-    if (!response.ok) {
-        const detail = (await response.text()).slice(0, 200);
-        throw new Error(`api_http_${response.status} on ${path}: ${detail}`);
-    }
-    return (await response.json()) as T;
 }
 
 async function finishRun(

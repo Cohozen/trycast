@@ -7,12 +7,15 @@ import { findTeamMetadata } from '../_shared/team-metadata.ts';
 
 export type MatchStatus = 'scheduled' | 'in_play' | 'finished' | 'postponed' | 'cancelled';
 
-// Forme minimale d'un match dans la réponse GET /matches (data[])
+// Forme minimale d'un match dans la réponse GET /matches (data[]).
+// state.score : chaîne "34 - 32" (home - away) une fois le match joué, null
+// avant — vérifié sur la réponse réelle NC 2026 (2026-07-05). Optionnel pour
+// tolérer une absence du champ.
 export type ApiMatch = {
     id: number;
     date: string;
     week: string | number | null;
-    state: { description: string };
+    state: { description: string; score?: string | null };
     homeTeam: { id: number; name: string } | null;
     awayTeam: { id: number; name: string } | null;
 };
