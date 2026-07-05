@@ -264,6 +264,48 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            standings: {
+                Row: {
+                    competition_id: string;
+                    exact_scores: number;
+                    predictions_scored: number;
+                    total_points: number;
+                    updated_at: string;
+                    user_id: string;
+                };
+                Insert: {
+                    competition_id: string;
+                    exact_scores?: number;
+                    predictions_scored?: number;
+                    total_points?: number;
+                    updated_at?: string;
+                    user_id: string;
+                };
+                Update: {
+                    competition_id?: string;
+                    exact_scores?: number;
+                    predictions_scored?: number;
+                    total_points?: number;
+                    updated_at?: string;
+                    user_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'standings_competition_id_fkey';
+                        columns: ['competition_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'competitions';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'standings_user_id_fkey';
+                        columns: ['user_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'profiles';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             teams: {
                 Row: {
                     api_team_id: number;
