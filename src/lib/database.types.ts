@@ -243,6 +243,27 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            scoring_rules: {
+                Row: {
+                    created_at: string;
+                    is_active: boolean;
+                    rules: Json;
+                    version: number;
+                };
+                Insert: {
+                    created_at?: string;
+                    is_active?: boolean;
+                    rules: Json;
+                    version: number;
+                };
+                Update: {
+                    created_at?: string;
+                    is_active?: boolean;
+                    rules?: Json;
+                    version?: number;
+                };
+                Relationships: [];
+            };
             teams: {
                 Row: {
                     api_team_id: number;
