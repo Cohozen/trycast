@@ -80,20 +80,44 @@ lointain) ; l'onglet **Résultats** montre le score réel, le prono et les point
 - **Deadline au coup d'envoi, imposée par RLS** : après le kickoff, Postgres refuse toute
   écriture, quelle que soit l'UI. Les colonnes de points ne sont accordées qu'au rôle serveur
   (grants par colonne) — un client ne peut pas s'attribuer de points.
-- **Barème dans `src/features/scoring/`** (module TS pur, testé unitairement) : points
-  vainqueur pondérés par le multiplicateur du résultat prédit (×2.0 par défaut sans cotes),
-  +50 pour le score exact, volets écart, bonus défensif et offensif. L'aperçu « peut rapporter
-  N pts » affiché à la saisie utilise ce même module ; l'attribution officielle des points
-  (job serveur + barème versionné en base) reste à venir.
+- **Barème dans `supabase/functions/_shared/scoring/`** (module TS pur, testé unitairement,
+  ré-exporté vers l'app par `src/features/scoring/`) : points vainqueur pondérés par le
+  multiplicateur du résultat prédit (×2.0 par défaut sans cotes), +50 pour le score exact,
+  volets écart, bonus défensif et offensif. L'aperçu « peut rapporter N pts » affiché à la
+  saisie utilise ce même module ; l'attribution officielle passe par le job serveur
+  (voir §Scoring) avec le barème versionné en base (`scoring_rules`).
+
+## Scoring
+
+L'Edge Function `sync-results` tourne toutes les 10 minutes (pg_cron) et sort
+immédiatement — sans écriture ni appel API — si aucun match ne l'attend. Sinon elle :
+
+1. récupère les scores des matchs joués (1 appel Highlightly par compétition active) ;
+2. **passe 1** : dès qu'un match est terminé avec un score, calcule les points de tous
+   ses pronos (module TS pur) et les écrit en une transaction via la RPC
+   `apply_match_scores` (service_role uniquement, idempotente). Les bonus offensifs des
+   pronos restent « en attente » tant que les essais ne sont pas saisis ;
+3. **passe 2** : après la saisie admin des essais (`scripts/admin-set-tries.sql`), le
+   tick suivant re-score le match — seuls les bonus offensifs s'ajoutent.
+
+Garde-fous : un match sans résultat 48 h après son coup d'envoi passe en
+`needs_review` (correction manuelle, exclu du scoring en attendant) ; chaque run utile
+est tracé dans `job_runs`.
 
 ## Pipeline compétition
 
 Les fixtures et cotes viennent de **Highlightly** (choix du fournisseur documenté dans
-[docs/spike-highlightly.md](docs/spike-highlightly.md)). L'Edge Function `sync-fixtures`
-les synchronise chaque nuit (05:00 UTC via pg_cron + Vault) et trace chaque run dans
-`job_runs` (statut, budget API, équipes hors mapping, erreurs par compétition). Les
-essais, absents du fournisseur, sont saisis manuellement après chaque match
-(`scripts/admin-set-tries.sql`).
+[docs/spike-highlightly.md](docs/spike-highlightly.md)). Deux Edge Functions se partagent
+le travail (client API commun dans `supabase/functions/_shared/highlightly.ts`) :
+
+- **`sync-fixtures`** (chaque nuit, 05:00 UTC) : fixtures, équipes et capture des cotes ;
+- **`sync-results`** (toutes les 10 min, early-exit hors jours de match) : scores des
+  matchs joués + scoring (voir §Scoring).
+
+Chaque run utile est tracé dans `job_runs` (statut, budget API, équipes hors mapping,
+erreurs par compétition). Les essais, absents du fournisseur, sont saisis manuellement
+après chaque match (`scripts/admin-set-tries.sql`) — la passe 2 du scoring s'en charge
+au tick suivant.
 
 À savoir :
 
@@ -103,7 +127,9 @@ essais, absents du fournisseur, sont saisis manuellement après chaque match
 - **Compétition active** : Nations Championship 2026, seedée via
   `scripts/seed-competitions.sql`
 
-Déclenchement manuel (le secret reste dans Vault) — SQL editor :
+Déclenchement manuel (le secret reste dans Vault) — SQL editor, en remplaçant le nom de
+la fonction et de son secret (`sync-fixtures`/`sync_fixtures_secret` ou
+`sync-results`/`sync_results_secret`) :
 
 ```sql
 select net.http_post(
@@ -117,11 +143,12 @@ Mise en route sur un nouveau projet (ordre important, secrets jamais dans le rep
 
 1. Relever les `leagueId` (`GET /leagues?leagueName=…` avec la clé Highlightly), compléter
    et exécuter `scripts/seed-competitions.sql`
-2. `supabase secrets set HIGHLIGHTLY_API_KEY=<clé> SYNC_FIXTURES_SECRET=<aléatoire>`
-3. `supabase functions deploy sync-fixtures`
+2. `supabase secrets set HIGHLIGHTLY_API_KEY=<clé> SYNC_FIXTURES_SECRET=<aléatoire> SYNC_RESULTS_SECRET=<aléatoire>`
+3. `supabase functions deploy sync-fixtures && supabase functions deploy sync-results`
 4. Côté Postgres : `select vault.create_secret('<même valeur>', 'sync_fixtures_secret');`
-5. `supabase db push` (migrations pg_cron `20260705000300` + durcissement des grants
-   `20260705000400`) — jamais avant le deploy
+   puis idem pour `sync_results_secret`
+5. `supabase db push` (migrations pg_cron `20260705000300`/`20260707000300` + durcissement
+   des grants `20260705000400`) — jamais avant le deploy
 6. Déclenchement manuel (ci-dessus), puis vérifier `teams`, `matches` et la ligne `job_runs`
 
 ## Builds (EAS)
