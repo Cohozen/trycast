@@ -50,7 +50,7 @@ Le projet tourne dans **Expo Go** (aucun module natif custom pour l'instant) : p
 
 ```
 src/
-  app/            # Écrans Expo Router — (auth): login/signup/reset, (app): matchs, résultats, profil
+  app/            # Écrans Expo Router — (auth): login/signup/reset, (app): onglets (matchs, résultats, classement, ligues, profil) + écrans ligue
   components/     # Composants UI partagés
   features/       # Logique par domaine (auth, profile, matches, predictions, scoring…) + tests colocalisés
   lib/            # Client Supabase typé, stockage session chiffré, React Query
@@ -104,6 +104,28 @@ immédiatement — sans écriture ni appel API — si aucun match ne l'attend. S
 Garde-fous : un match sans résultat 48 h après son coup d'envoi passe en
 `needs_review` (correction manuelle, exclu du scoring en attendant) ; chaque run utile
 est tracé dans `job_runs`.
+
+## Ligues & classements
+
+Chaque joueur a un total de points par compétition dans `standings`, recalculé par
+`apply_match_scores` à chaque scoring (recalcul complet, jamais d'incrément — rejouable
+sans risque). Cette unique table sert les deux classements, via deux RPC qui portent le
+tri et les égalités (points, puis scores exacts, puis moins de pronos) :
+
+- **Classement** (général) : tous les joueurs de la compétition (`get_global_leaderboard`) ;
+- **Ligues** : classement d'une ligue = ses membres croisés avec `standings`
+  (`get_league_leaderboard`). Rejoindre une ligue en cours crédite donc automatiquement
+  les points déjà marqués.
+
+Les ligues sont privées : visibles de leurs seuls membres (RLS), on les rejoint
+uniquement par code d'invitation à 8 caractères via la RPC `join_league` — le code n'est
+jamais résoluble par une requête directe, donc pas d'énumération possible. La création
+passe par `create_league` (code généré côté serveur, créateur membre d'office). Le
+créateur peut renommer, exclure un membre ou supprimer sa ligue ; un membre peut la
+quitter. Le partage du code passe par la feuille de partage du téléphone.
+
+L'app s'abonne aux changements de `standings` (Realtime) : les classements se
+rafraîchissent seuls quand le scoring passe.
 
 ## Pipeline compétition
 
