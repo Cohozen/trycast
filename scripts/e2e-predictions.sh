@@ -78,8 +78,10 @@ RES=$(curl -s -X PATCH "$URL/rest/v1/predictions?match_id=eq.$MATCH_PASSE" \
 [ "$RES" = "[]" ] || fail "update après kickoff (attendu [], obtenu $RES)"
 ok "RLS bloque la modification après le kickoff"
 
-# RLS : les pronos de user1 sont invisibles pour user2
-RES=$(curl -s "$URL/rest/v1/predictions?select=id" -H "apikey: $KEY" -H "Authorization: Bearer $T2")
+# RLS : les pronos de user1 sont invisibles pour user2 (restreint aux matchs de
+# ce script : seed-test-scoring.sql donne un prono à user2 sur un autre match)
+RES=$(curl -s "$URL/rest/v1/predictions?select=id&match_id=in.($MATCH_FUTUR,$MATCH_PASSE)" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T2")
 [ "$RES" = "[]" ] || fail "isolation des pronos (attendu [], obtenu $RES)"
 ok "les pronos restent privés (user2 ne voit rien)"
 

@@ -44,6 +44,7 @@ Le projet tourne dans **Expo Go** (aucun module natif custom pour l'instant) : p
 | `npm run typegen`                 | Régénère `src/lib/database.types.ts` depuis le schéma Supabase                 |
 | `bash scripts/e2e-auth.sh`        | Vérification E2E auth + RLS contre le projet Supabase (voir en-tête du script) |
 | `bash scripts/e2e-predictions.sh` | Vérification E2E RLS des pronostics (deadline kickoff, colonnes de points)     |
+| `bash scripts/e2e-scoring.sh`     | Vérification E2E du scoring côté client (barème lisible, RPC verrouillée)      |
 
 ## Structure
 
