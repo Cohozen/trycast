@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { BAREME_V1 } from './bareme';
-import { computeMatchPoints, computePotentialPoints } from './compute-match-points';
-import type { MatchOdds, MatchResultInput, PredictionInput } from './types';
+import { BAREME_V1 } from './bareme.ts';
+import { computeMatchPoints, computePotentialPoints } from './compute-match-points.ts';
+import type { MatchOdds, MatchResultInput, PredictionInput } from './types.ts';
 
 function prono(
     homeScore: number,
