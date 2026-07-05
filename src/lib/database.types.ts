@@ -296,6 +296,14 @@ export type Database = {
             [_ in never]: never;
         };
         Functions: {
+            apply_match_scores: {
+                Args: {
+                    p_match_id: string;
+                    p_predictions: Json;
+                    p_rule_version: number;
+                };
+                Returns: Json;
+            };
             username_available: { Args: { candidate: string }; Returns: boolean };
         };
         Enums: {
