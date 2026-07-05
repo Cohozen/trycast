@@ -424,8 +424,42 @@ export type Database = {
                 };
                 Returns: Json;
             };
+            create_league: {
+                Args: { p_name: string };
+                Returns: {
+                    competition_id: string;
+                    created_at: string;
+                    id: string;
+                    invite_code: string;
+                    name: string;
+                    owner_id: string;
+                };
+                SetofOptions: {
+                    from: '*';
+                    to: 'leagues';
+                    isOneToOne: true;
+                    isSetofReturn: false;
+                };
+            };
             is_league_member: { Args: { p_league_id: string }; Returns: boolean };
             is_league_owner: { Args: { p_league_id: string }; Returns: boolean };
+            join_league: {
+                Args: { p_code: string };
+                Returns: {
+                    competition_id: string;
+                    created_at: string;
+                    id: string;
+                    invite_code: string;
+                    name: string;
+                    owner_id: string;
+                };
+                SetofOptions: {
+                    from: '*';
+                    to: 'leagues';
+                    isOneToOne: true;
+                    isSetofReturn: false;
+                };
+            };
             username_available: { Args: { candidate: string }; Returns: boolean };
         };
         Enums: {
