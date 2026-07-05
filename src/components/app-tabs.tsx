@@ -38,6 +38,15 @@ export default function AppTabs() {
                 />
             </NativeTabs.Trigger>
 
+            <NativeTabs.Trigger name="leagues">
+                <NativeTabs.Trigger.Label>Ligues</NativeTabs.Trigger.Label>
+                <NativeTabs.Trigger.Icon
+                    sf="person.3"
+                    src={require('@/assets/images/tabIcons/explore.png')}
+                    renderingMode="template"
+                />
+            </NativeTabs.Trigger>
+
             <NativeTabs.Trigger name="profile">
                 <NativeTabs.Trigger.Label>Profil</NativeTabs.Trigger.Label>
                 <NativeTabs.Trigger.Icon

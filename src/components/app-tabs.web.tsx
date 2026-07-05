@@ -27,6 +27,9 @@ export default function AppTabs() {
                     <TabTrigger name="leaderboard" href="/leaderboard" asChild>
                         <TabButton>Classement</TabButton>
                     </TabTrigger>
+                    <TabTrigger name="leagues" href="/leagues" asChild>
+                        <TabButton>Ligues</TabButton>
+                    </TabTrigger>
                     <TabTrigger name="profile" href="/profile" asChild>
                         <TabButton>Profil</TabButton>
                     </TabTrigger>

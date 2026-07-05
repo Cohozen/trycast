@@ -14,6 +14,15 @@ export default function AppLayout() {
     return (
         <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" />
+            <Stack.Screen
+                name="league/create"
+                options={{ headerShown: true, title: 'Créer une ligue' }}
+            />
+            <Stack.Screen
+                name="league/join"
+                options={{ headerShown: true, title: 'Rejoindre une ligue' }}
+            />
+            <Stack.Screen name="league/[id]" options={{ headerShown: true, title: 'Ligue' }} />
         </Stack>
     );
 }
