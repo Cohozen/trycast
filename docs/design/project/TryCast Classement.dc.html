@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/styles.css">
+  <script src="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/_ds_bundle.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    [data-theme="light"] {
+      --bg: var(--cream); --surface: var(--cream-100); --surface-sunken: var(--cream-200);
+      --border: var(--cream-200); --border-strong: #D8CEB8;
+      --text: var(--ink-900); --text-muted: var(--ink-600); --text-faint: var(--ink-400);
+      --brand: var(--green-800); --on-brand: var(--cream);
+      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: var(--cream);
+      --focus-ring: var(--grenat-500);
+      --shadow-sm: 0 1px 2px rgba(22,19,14,0.06); --shadow-md: 0 4px 14px rgba(22,19,14,0.08); --shadow-lg: 0 12px 32px rgba(22,19,14,0.12);
+    }
+    .tc-scroll::-webkit-scrollbar { width: 0; height: 0; }
+    @keyframes tc-live { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+    @keyframes tc-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    @keyframes tc-shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+    .tc-shim { background: linear-gradient(90deg, color-mix(in srgb, var(--text) 7%, transparent) 25%, color-mix(in srgb, var(--text) 15%, transparent) 37%, color-mix(in srgb, var(--text) 7%, transparent) 63%); background-size: 400% 100%; animation: tc-shimmer 1.4s ease infinite; border-radius: var(--radius-xs); }
+    /* Dark mode isn't defined for the DS floating TabBar: it hardcodes white glass. Retint green.
+       Scoped to the phone element itself so it doesn't leak into light-theme phones. */
+    .tc-phone[data-theme="dark"] .tc-tabbar-wrap nav {
+      border-color: color-mix(in srgb, var(--green-600) 60%, transparent) !important;
+    }
+    .tc-phone[data-theme="dark"] .tc-tabbar-wrap span[style*="rgb(255, 255, 255) 55%"] {
+      background: color-mix(in srgb, var(--green-700) 72%, transparent) !important;
+      border-color: color-mix(in srgb, var(--green-600) 70%, transparent) !important;
+    }
+  </style>
+</helmet>
+<div style="width: max-content; min-height: 100vh; padding: 48px; background: #7C776E; font-family: var(--font-body); display: flex; flex-direction: column; gap: 32px;">
+
+  <div style="display: flex; flex-direction: column; gap: 6px; color: #FBF7EF;">
+    <span style="font-family: var(--font-display); font-size: 34px; letter-spacing: 0.01em;">TryCast — Écran Classement</span>
+    <span style="font-size: 14px; color: rgba(255,255,255,0.72);">Podium &amp; classement complet · onglets Ligues / Général · ma position épinglée · thèmes clair &amp; sombre · états limites</span>
+  </div>
+
+  <div style="display: flex; flex-wrap: nowrap; gap: 40px; align-items: flex-start;">
+    <sc-for list="{{ frames }}" as="f" hint-placeholder-count="9">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+
+        <div style="display: inline-flex; align-items: center; gap: 8px; color: #FBF7EF; font-size: 13px; font-weight: 600; padding: 0 4px;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ f.dotColor }};"></span>{{ f.label }}
+        </div>
+
+        <!-- PHONE -->
+        <div class="tc-phone" data-theme="{{ f.theme }}" data-screen-label="{{ f.label }}" style="position: relative; width: 390px; height: 844px; font-family: var(--font-body); background: var(--bg); color: var(--text); border-radius: 46px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column;">
+
+          <!-- Status bar -->
+          <div style="flex: none; display: flex; justify-content: space-between; align-items: center; padding: 14px 30px 8px; font-size: 13px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums;">
+            <span>9:41</span>
+            <span style="display: flex; gap: 7px; align-items: center;">
+              <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"></rect><rect x="9" y="2" width="3" height="9" rx="1"></rect><rect x="13.5" y="0" width="3" height="11" rx="1"></rect></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M1 4.2C3 2.4 5.4 1.4 8 1.4s5 1 7 2.8"></path><path d="M3.4 7C4.7 5.9 6.3 5.3 8 5.3s3.3.6 4.6 1.7"></path><path d="M6 9.6c.6-.5 1.3-.8 2-.8s1.4.3 2 .8"></path></svg>
+              <svg width="26" height="12" viewBox="0 0 26 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity="0.4"></rect><rect x="2" y="2" width="17" height="8" rx="1.5" fill="currentColor"></rect><rect x="23" y="4" width="2" height="4" rx="1" fill="currentColor" opacity="0.4"></rect></svg>
+            </span>
+          </div>
+
+          <!-- Header -->
+          <div style="flex: none; padding: 8px 20px 12px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+              <div style="display: flex; flex-direction: column; gap: 5px;">
+                <span style="font-family: var(--font-display); font-size: 30px; line-height: 1; letter-spacing: 0.01em; color: var(--text);">Classement</span>
+                <span style="font-size: 13px; color: var(--text-muted);">{{ f.competitionLine }}</span>
+              </div>
+              <span style="flex: none; display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: var(--radius-pill); background: var(--surface-sunken); border: 1px solid var(--border); font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); margin-top: 4px; white-space: nowrap;">{{ f.phaseLabel }}</span>
+            </div>
+          </div>
+
+          <!-- Tabs: Ligues | Général -->
+          <div style="flex: none; padding: 0 20px 12px;">
+            <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.SegmentedControl" options="{{ f.tabOptions }}" value="{{ f.tabValue }}" onChange="{{ f.setTab }}" hint-size="100%,40px"></x-import>
+          </div>
+
+          <!-- Sub-header: league dropdown (Ligues) or global subtitle (Général) -->
+          <sc-if value="{{ f.showSubHeader }}" hint-placeholder-val="{{ true }}">
+            <div style="flex: none; position: relative; z-index: 30; padding: 0 20px 12px;">
+
+              <!-- LIGUES · dropdown -->
+              <sc-if value="{{ f.tabLigues }}" hint-placeholder-val="{{ true }}">
+                <div style="position: relative;">
+                  <button type="button" onClick="{{ f.onLeagueToggle }}" aria-haspopup="listbox" aria-expanded="{{ f.leagueMenuOpen }}" style="width: 100%; display: flex; align-items: center; gap: 11px; padding: 11px 14px; background: var(--surface); border: 1px solid {{ f.leagueTriggerBorder }}; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; color: var(--text); font-family: var(--font-body);">
+                    <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
+                    <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;">
+                      <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">Ligue affichée</span>
+                      <span style="font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ f.leagueLabel }}</span>
+                    </span>
+                    <span style="flex: none; font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums;">{{ f.leagueMembers }}</span>
+                    <span style="flex: none; color: var(--text-faint); transform: {{ f.leagueChevron }}; transition: transform .15s ease;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>
+                  </button>
+                  <sc-if value="{{ f.leagueMenuOpen }}" hint-placeholder-val="{{ false }}">
+                    <div role="listbox" style="position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 40; padding: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; gap: 2px; animation: tc-fade .14s ease;">
+                      <sc-for list="{{ f.leagueMenu }}" as="opt" hint-placeholder-count="3">
+                        <button type="button" role="option" aria-selected="{{ opt.active }}" onClick="{{ opt.onSelect }}" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 10px; border: none; background: {{ opt.rowBg }}; border-radius: var(--radius-sm); cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; font-family: var(--font-body);">
+                          <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></span>
+                          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;">
+                            <span style="font-size: 14px; font-weight: {{ opt.weight }}; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ opt.label }}</span>
+                            <span style="font-size: 11px; color: var(--text-faint);">{{ opt.members }}</span>
+                          </span>
+                          <sc-if value="{{ opt.active }}" hint-placeholder-val="{{ false }}"><span style="flex: none; color: var(--accent);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span></sc-if>
+                          <sc-if value="{{ opt.inactive }}" hint-placeholder-val="{{ true }}"><span style="flex: none; width: 17px;"></span></sc-if>
+                        </button>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-if>
+
+              <!-- GÉNÉRAL · subtitle -->
+              <sc-if value="{{ f.tabGeneral }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);">
+                  <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--brand) 12%, transparent); color: var(--brand);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M3.5 12h17M12 3.5c2.5 2.4 3.8 5.4 3.8 8.5s-1.3 6.1-3.8 8.5c-2.5-2.4-3.8-5.4-3.8-8.5S9.5 5.9 12 3.5z"></path></svg></span>
+                  <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;">
+                    <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">Classement global</span>
+                    <span style="font-size: 15px; font-weight: 700; color: var(--text);">Tous les joueurs</span>
+                  </span>
+                  <span style="flex: none; font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums;">{{ f.generalCount }}</span>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <!-- Scroll region -->
+          <div class="tc-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 4px 20px; padding-bottom: {{ f.scrollPadBottom }};">
+
+            <!-- ===================== LOADING ===================== -->
+            <sc-if value="{{ f.isLoading }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 20px; padding-top: 8px;">
+                <!-- podium skeleton -->
+                <div style="display: flex; align-items: flex-end; justify-content: center; gap: 10px; padding: 4px;">
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;"><div class="tc-shim" style="width: 44px; height: 44px; border-radius: 50%;"></div><div class="tc-shim" style="width: 48px; height: 11px;"></div><div class="tc-shim" style="width: 84px; height: 62px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;"></div></div>
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;"><div class="tc-shim" style="width: 58px; height: 58px; border-radius: 50%;"></div><div class="tc-shim" style="width: 54px; height: 12px;"></div><div class="tc-shim" style="width: 92px; height: 92px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;"></div></div>
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;"><div class="tc-shim" style="width: 44px; height: 44px; border-radius: 50%;"></div><div class="tc-shim" style="width: 48px; height: 11px;"></div><div class="tc-shim" style="width: 84px; height: 48px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;"></div></div>
+                </div>
+                <div class="tc-shim" style="width: 130px; height: 12px;"></div>
+                <sc-for list="{{ f.skeletons }}" as="sk" hint-placeholder-count="6">
+                  <div style="display: flex; align-items: center; gap: 12px; padding: 4px 2px;">
+                    <div class="tc-shim" style="width: 20px; height: 16px;"></div>
+                    <div class="tc-shim" style="width: 32px; height: 32px; border-radius: 50%;"></div>
+                    <div class="tc-shim" style="flex: 1; height: 14px; max-width: 150px;"></div>
+                    <div class="tc-shim" style="width: 40px; height: 20px;"></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <!-- ===================== 0 LIGUE (CTA) ===================== -->
+            <sc-if value="{{ f.isNoLeague }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding: 40px 20px 20px;">
+                <span style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent);"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
+                <span style="font-family: var(--font-display); font-size: 24px; letter-spacing: 0.01em; color: var(--text);">Aucune ligue pour l'instant</span>
+                <span style="font-size: 14px; color: var(--text-muted); max-width: 270px; line-height: 1.5; text-wrap: pretty;">Le classement se joue entre potes. Crée ta ligue ou rejoins celle de tes amis pour vous comparer sur chaque journée.</span>
+                <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 280px; margin-top: 6px;">
+                  <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="primary" full-width="{{ true }}" hint-size="100%,48px">Créer une ligue</x-import>
+                  <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="secondary" full-width="{{ true }}" hint-size="100%,48px">Rejoindre une ligue</x-import>
+                </div>
+                <button type="button" onClick="{{ f.onSeeGeneral }}" style="margin-top: 4px; background: none; border: none; cursor: pointer; font-family: var(--font-body); font-size: 13px; font-weight: 600; color: var(--text-muted); -webkit-tap-highlight-color: transparent;">Voir le classement général →</button>
+              </div>
+            </sc-if>
+
+            <!-- ===================== LIGUE PAS DÉMARRÉE / 1 MEMBRE ===================== -->
+            <sc-if value="{{ f.isNotStarted }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding: 40px 20px 20px;">
+                <span style="display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 50%; background: var(--surface-sunken); color: var(--text-faint);"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20V11"></path><path d="M12 20V4"></path><path d="M18 20v-6"></path></svg></span>
+                <span style="font-family: var(--font-display); font-size: 23px; letter-spacing: 0.01em; color: var(--text);">Le classement démarre bientôt</span>
+                <span style="font-size: 14px; color: var(--text-muted); max-width: 270px; line-height: 1.5; text-wrap: pretty;">Personne n'a encore marqué de points dans <b style="color: var(--text); font-weight: 700;">{{ f.leagueLabel }}</b>. Le classement s'affichera après la première journée du Tournoi.</span>
+                <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--surface); border: 1px dashed var(--border-strong); border-radius: var(--radius-md); margin-top: 2px;">
+                  <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.4"></circle><path d="M3.5 20c0-3 2.5-5 5.5-5s5.5 2 5.5 5"></path><path d="M18 8v6M21 11h-6"></path></svg></span>
+                  <span style="font-size: 13px; color: var(--text-muted); text-align: left;">Tu es seul dans cette ligue — invite tes potes.</span>
+                </div>
+                <div style="width: 100%; max-width: 280px; margin-top: 6px;">
+                  <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="primary" full-width="{{ true }}" hint-size="100%,48px">Inviter des amis</x-import>
+                </div>
+              </div>
+            </sc-if>
+
+            <!-- ===================== PODIUM + CLASSEMENT ===================== -->
+            <sc-if value="{{ f.showRanking }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; flex-direction: column; gap: 20px; padding-top: 6px;">
+
+                <!-- PODIUM -->
+                <div style="display: flex; align-items: flex-end; justify-content: center; gap: 8px; padding: 6px 2px 0;">
+
+                  <!-- 2e -->
+                  <div style="flex: 1; max-width: 106px; display: flex; flex-direction: column; align-items: center; gap: 7px;">
+                    <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ f.p2.name }}" size="md" ring="{{ f.p2.isMe }}" hint-size="40px,40px"></x-import>
+                    <span style="max-width: 100%; font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;">{{ f.p2.name }}</span>
+                    <span style="display: inline-flex; align-items: baseline; gap: 2px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ f.p2.pts }}</span><span style="font-size: 9px; font-weight: 700; color: var(--text-faint);">pts</span></span>
+                    <div style="width: 100%; height: 68px; border-radius: var(--radius-sm) var(--radius-sm) 0 0; background: var(--surface); border: 1px solid var(--border); border-bottom: none; display: flex; align-items: center; justify-content: center;"><span style="font-family: var(--font-display); font-size: 30px; line-height: 1; color: var(--text-muted); font-variant-numeric: tabular-nums;">2</span></div>
+                  </div>
+
+                  <!-- 1er -->
+                  <div style="flex: 1; max-width: 118px; display: flex; flex-direction: column; align-items: center; gap: 7px;">
+                    <span style="color: var(--accent); margin-bottom: -2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.7 6.3L21 9l-4.8 4.1L17.7 20 12 16.4 6.3 20l1.5-6.9L3 9l6.3-.7z"></path></svg></span>
+                    <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ f.p1.name }}" size="lg" ring="{{ f.p1.isMe }}" hint-size="56px,56px"></x-import>
+                    <span style="max-width: 100%; font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;">{{ f.p1.name }}</span>
+                    <span style="display: inline-flex; align-items: baseline; gap: 2px;"><span style="font-family: var(--font-display); font-size: 26px; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums;">{{ f.p1.pts }}</span><span style="font-size: 10px; font-weight: 700; color: var(--accent);">pts</span></span>
+                    <div style="width: 100%; height: 96px; border-radius: var(--radius-sm) var(--radius-sm) 0 0; background: color-mix(in srgb, var(--accent) 10%, var(--surface)); border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-bottom: none; box-shadow: var(--glow-accent); display: flex; align-items: center; justify-content: center;"><span style="font-family: var(--font-display); font-size: 40px; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums;">1</span></div>
+                  </div>
+
+                  <!-- 3e -->
+                  <div style="flex: 1; max-width: 106px; display: flex; flex-direction: column; align-items: center; gap: 7px;">
+                    <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ f.p3.name }}" size="md" ring="{{ f.p3.isMe }}" hint-size="40px,40px"></x-import>
+                    <span style="max-width: 100%; font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;">{{ f.p3.name }}</span>
+                    <span style="display: inline-flex; align-items: baseline; gap: 2px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ f.p3.pts }}</span><span style="font-size: 9px; font-weight: 700; color: var(--text-faint);">pts</span></span>
+                    <div style="width: 100%; height: 52px; border-radius: var(--radius-sm) var(--radius-sm) 0 0; background: var(--surface); border: 1px solid var(--border); border-bottom: none; display: flex; align-items: center; justify-content: center;"><span style="font-family: var(--font-display); font-size: 30px; line-height: 1; color: var(--text-muted); font-variant-numeric: tabular-nums;">3</span></div>
+                  </div>
+                </div>
+
+                <!-- CLASSEMENT COMPLET -->
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 0 2px;">
+                    <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text);">Classement complet</span>
+                    <span style="flex: none; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint); white-space: nowrap;">{{ f.rankingCount }}</span>
+                  </div>
+
+                  <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <sc-for list="{{ f.rows }}" as="s" hint-placeholder-count="6">
+                      <div style="display: flex; align-items: center; gap: 11px; padding: 10px 12px; background: {{ s.rowBg }}; border-left: {{ s.rowEdge }}; border-radius: var(--radius-sm);">
+                        <span style="flex: none; min-width: 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1px;">
+                          <span style="font-family: var(--font-display); font-size: 17px; line-height: 1; color: {{ s.rankColor }}; font-variant-numeric: tabular-nums;">{{ s.rank }}</span>
+                          <sc-if value="{{ s.tie }}" hint-placeholder-val="{{ false }}"><span style="font-size: 7px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint);">ex æquo</span></sc-if>
+                        </span>
+                        <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ s.name }}" size="sm" ring="{{ s.isMe }}" hint-size="32px,32px"></x-import>
+                        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                          <span style="font-size: 14px; font-weight: {{ s.nameWeight }}; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ s.displayName }}</span>
+                          <span style="display: flex; align-items: center; gap: 7px; flex-wrap: wrap;">
+                            <span style="font-size: 11px; font-weight: 600; color: var(--text-faint);">{{ s.goodStr }}</span>
+                            <sc-if value="{{ s.hasExact }}" hint-placeholder-val="{{ false }}"><span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px 1px 5px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: 0.01em;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4"></circle></svg>{{ s.exactStr }}</span></sc-if>
+                          </span>
+                        </span>
+                        <span style="flex: none; display: inline-flex; align-items: baseline; gap: 2px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: {{ s.ptsColor }}; font-variant-numeric: tabular-nums;">{{ s.pts }}</span><span style="font-size: 10px; font-weight: 700; color: var(--text-faint);">pts</span></span>
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <sc-if value="{{ f.tieNote }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; align-items: flex-start; gap: 7px; padding: 8px 4px 0; color: var(--text-muted);">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 12h1v4h1"></path></svg>
+                      <span style="font-size: 12px; line-height: 1.4; text-wrap: pretty;">Égalité de points départagée au nombre de scores exacts, puis de bons pronos.</span>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ f.hasMore }}" hint-placeholder-val="{{ false }}">
+                    <div style="text-align: center; padding: 10px 8px 2px; font-size: 12px; font-weight: 600; color: var(--text-faint);">{{ f.moreText }}</div>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-if>
+
+          </div>
+
+          <!-- PINNED "MOI" (Général, hors du top visible) -->
+          <sc-if value="{{ f.showPinned }}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; left: 0; right: 0; bottom: 112px; z-index: 6; padding: 0 14px;">
+              <div style="display: flex; align-items: center; gap: 11px; padding: 11px 14px; background: color-mix(in srgb, var(--accent) 9%, var(--surface)); border: 1.5px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: var(--radius-md); box-shadow: var(--shadow-lg);">
+                <span style="flex: none; min-width: 42px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 0;">
+                  <span style="font-family: var(--font-display); font-size: 22px; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums;">{{ f.pinned.rankNum }}</span>
+                  <span style="font-size: 8px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent);">{{ f.pinned.rankSuffix }}</span>
+                </span>
+                <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ f.pinned.name }}" size="sm" ring="{{ true }}" hint-size="32px,32px"></x-import>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-size: 14px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ f.pinned.displayName }}</span>
+                  <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">{{ f.pinned.gapStr }}</span>
+                </span>
+                <span style="flex: none; display: inline-flex; align-items: baseline; gap: 2px;"><span style="font-family: var(--font-display); font-size: 22px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ f.pinned.pts }}</span><span style="font-size: 10px; font-weight: 700; color: var(--text-faint);">pts</span></span>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- Floating tab bar -->
+          <div class="tc-tabbar-wrap" style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;">
+            <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TabBar" items="{{ f.tabItems }}" active="classement" on-change="{{ noop }}" hint-size="100%,88px"></x-import>
+          </div>
+
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:3960,&quot;height&quot;:1000},&quot;competitionName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Tournoi des 6 Nations 2027&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contenu&quot;},&quot;pinMyPosition&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Comportement&quot;}}">
+class Component extends DCLogic {
+  state = { tab: {}, league: {}, leagueOpen: {} };
+
+  setTab(fid, v) {
+    this.setState((s) => ({ tab: { ...s.tab, [fid]: v }, leagueOpen: { ...s.leagueOpen, [fid]: false } }));
+  }
+  setLeague(fid, v) {
+    this.setState((s) => ({ league: { ...s.league, [fid]: v }, leagueOpen: { ...s.leagueOpen, [fid]: false } }));
+  }
+  toggleLeague(fid) {
+    this.setState((s) => ({ leagueOpen: { ...s.leagueOpen, [fid]: !s.leagueOpen[fid] } }));
+  }
+
+  renderVals() {
+    const E = React.createElement;
+    const competitionLine = this.props.competitionName || 'Tournoi des 6 Nations 2027';
+    const phaseLabel = 'Journée 2';
+    const pinEnabled = this.props.pinMyPosition !== false;
+
+    const memberFmt = (n) => n + (n > 1 ? ' membres' : ' membre');
+    const goodFmt = (n) => n + (n > 1 ? ' bons pronos' : ' bon prono');
+    const exactFmt = (n) => n + (n > 1 ? ' scores exacts' : ' score exact');
+
+    // ---- Leagues ----
+    const leagueOptions = [
+      { label: 'Les Potes', value: 'potes', members: 6 },
+      { label: 'Le Bureau', value: 'bureau', members: 14 },
+      { label: 'Famille', value: 'famille', members: 1 },
+    ];
+    const leagueName = { potes: 'Les Potes', bureau: 'Le Bureau', famille: 'Famille' };
+    const leagueMemberCount = { potes: 6, bureau: 14, famille: 1 };
+
+    // standings: explicit rank to support ties; me flag marks current user
+    const standingsData = {
+      potes: [
+        { rank: 1, name: 'Léa Berthier', pts: 342, good: 24, exact: 5 },
+        { rank: 2, name: 'Karim Mensah', pts: 318, good: 22, exact: 3 },
+        { rank: 3, name: 'Hugo Delaunay', pts: 291, good: 20, exact: 2 },
+        { rank: 4, name: 'Sophie Lémaire', pts: 268, good: 18, exact: 0 },
+        { rank: 5, name: 'Antoine Mercier', pts: 244, good: 16, exact: 1, me: true },
+        { rank: 6, name: 'Thomas Payet', pts: 221, good: 14, exact: 0 },
+      ],
+      bureau: [
+        { rank: 1, name: 'Clément Roy', pts: 511, good: 34, exact: 7 },
+        { rank: 2, name: 'Léa Berthier', pts: 498, good: 33, exact: 6 },
+        { rank: 3, name: 'Nadia Cherif', pts: 486, good: 32, exact: 5 },
+        { rank: 4, name: 'Antoine Mercier', pts: 472, good: 31, exact: 4, me: true, tie: true },
+        { rank: 4, name: 'Paul Girard', pts: 472, good: 30, exact: 3, tie: true },
+        { rank: 6, name: 'Inès Fabre', pts: 455, good: 28, exact: 2 },
+      ],
+      famille: [],
+    };
+    const moreMap = { potes: null, bureau: '+ 8 autres membres', famille: null };
+
+    // ---- Général (global) ----
+    const generalTotal = 4134;
+    const generalRows = [
+      { rank: 1, name: 'M. Tournier', pts: 1284, good: 82, exact: 14 },
+      { rank: 2, name: 'rugbyfan_31', pts: 1251, good: 80, exact: 12 },
+      { rank: 3, name: 'La Rochelle_77', pts: 1230, good: 78, exact: 11 },
+      { rank: 4, name: 'Clément Roy', pts: 1198, good: 76, exact: 9 },
+      { rank: 5, name: 'Léa Berthier', pts: 1176, good: 74, exact: 8 },
+      { rank: 6, name: 'Nadia Cherif', pts: 1154, good: 72, exact: 7 },
+    ];
+    const generalMe = { rank: 3472, name: 'Antoine Mercier', pts: 612, aboveRank: 3471, aboveGap: 4 };
+
+    const mkRow = (r) => ({
+      rank: r.rank,
+      tie: !!r.tie,
+      name: r.name,
+      displayName: r.me ? r.name + ' · toi' : r.name,
+      isMe: !!r.me,
+      nameWeight: r.me ? 700 : 600,
+      pts: r.pts,
+      ptsColor: r.me ? 'var(--accent)' : 'var(--text)',
+      goodStr: goodFmt(r.good),
+      hasExact: (r.exact || 0) > 0,
+      exactStr: exactFmt(r.exact || 0),
+      rankColor: r.me ? 'var(--accent)' : (r.rank <= 3 ? 'var(--brand)' : 'var(--text-muted)'),
+      rowBg: r.me ? 'color-mix(in srgb, var(--accent) 8%, var(--surface))' : 'var(--surface)',
+      rowEdge: r.me ? '3px solid var(--accent)' : '3px solid transparent',
+    });
+    const mkPodium = (r) => ({ name: r.name, pts: r.pts, isMe: !!r.me });
+
+    // ---- Tab bar ----
+    const mk = (children) => (active) => E('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: active ? 2.4 : 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' }, children);
+    const tabItems = [
+      { key: 'matchs', label: 'Matchs', icon: mk([E('path', { key: 1, d: 'M4 7h16' }), E('path', { key: 2, d: 'M4 12h16' }), E('path', { key: 3, d: 'M4 17h10' })]) },
+      { key: 'resultats', label: 'Résultats', icon: mk([E('circle', { key: 1, cx: 12, cy: 12, r: 9 }), E('path', { key: 2, d: 'M8.4 12.4l2.4 2.4 4.8-5.2' })]) },
+      { key: 'classement', label: 'Classement', icon: mk([E('path', { key: 1, d: 'M6 20V11' }), E('path', { key: 2, d: 'M12 20V4' }), E('path', { key: 3, d: 'M18 20v-6' })]) },
+      { key: 'profil', label: 'Profil', icon: mk([E('circle', { key: 1, cx: 12, cy: 8, r: 3.6 }), E('path', { key: 2, d: 'M4.5 20c0-3.4 3.4-5.8 7.5-5.8s7.5 2.4 7.5 5.8' })]) },
+    ];
+    const tabOptions = [{ value: 'ligues', label: 'Ligues' }, { value: 'general', label: 'Général' }];
+
+    const frameDefs = [
+      { id: 'lig_l', theme: 'light', tab: 'ligues', league: 'potes', label: 'Ligues · clair · moi dans la liste', dotColor: '#FBF7EF' },
+      { id: 'lig_d', theme: 'dark', tab: 'ligues', league: 'potes', label: 'Ligues · sombre', dotColor: '#14432A' },
+      { id: 'lig_open', theme: 'light', tab: 'ligues', league: 'potes', open: true, label: 'Ligues · sélecteur ouvert', dotColor: 'var(--grenat-500)' },
+      { id: 'gen_l', theme: 'light', tab: 'general', label: 'Général · clair · ma position épinglée', dotColor: 'var(--grenat-500)' },
+      { id: 'gen_d', theme: 'dark', tab: 'general', label: 'Général · sombre', dotColor: '#14432A' },
+      { id: 'ties', theme: 'light', tab: 'ligues', league: 'bureau', label: 'Ligues · égalités (ex æquo)', dotColor: '#8A8071' },
+      { id: 'load', theme: 'light', tab: 'ligues', league: 'potes', variant: 'loading', label: 'Chargement (skeleton)', dotColor: '#8A8071' },
+      { id: 'empty0', theme: 'light', tab: 'ligues', variant: 'noleague', label: 'Aucune ligue · CTA', dotColor: '#8A8071' },
+      { id: 'empty1', theme: 'light', tab: 'ligues', league: 'famille', variant: 'notstarted', label: 'Ligue à 1 membre · pas démarrée', dotColor: '#8A8071' },
+    ];
+
+    const frames = frameDefs.map((fd) => {
+      const tab = this.state.tab[fd.id] || fd.tab;
+      const tabLigues = tab === 'ligues';
+      const tabGeneral = tab === 'general';
+
+      const leagueValue = this.state.league[fd.id] || fd.league || 'potes';
+      const leagueMenuOpen = fd.variant ? false : (this.state.leagueOpen[fd.id] !== undefined ? this.state.leagueOpen[fd.id] : !!fd.open);
+
+      const isLoading = fd.variant === 'loading';
+      const isNoLeague = fd.variant === 'noleague';
+      const isNotStarted = fd.variant === 'notstarted';
+      const isSpecial = isLoading || isNoLeague || isNotStarted;
+
+      // ranking source
+      let rows = [], p1 = {}, p2 = {}, p3 = {}, rankingCount = '', hasMore = false, moreText = '', tieNote = false;
+      let showPinned = false, pinned = {};
+      let showRanking = false;
+
+      if (!isSpecial) {
+        if (tabGeneral) {
+          rows = generalRows.map(mkRow);
+          p1 = mkPodium(generalRows[0]); p2 = mkPodium(generalRows[1]); p3 = mkPodium(generalRows[2]);
+          rankingCount = generalTotal.toLocaleString('fr-FR') + ' joueurs';
+          hasMore = true; moreText = '+ ' + (generalTotal - generalRows.length).toLocaleString('fr-FR') + ' joueurs · fais défiler';
+          if (pinEnabled) {
+            showPinned = true;
+            pinned = {
+              rankNum: generalMe.rank.toLocaleString('fr-FR'),
+              rankSuffix: 'e',
+              name: generalMe.name,
+              displayName: generalMe.name + ' · toi',
+              pts: generalMe.pts,
+              gapStr: 'à ' + generalMe.aboveGap + ' pts du ' + generalMe.aboveRank.toLocaleString('fr-FR') + 'e',
+            };
+          }
+          showRanking = true;
+        } else {
+          const data = standingsData[leagueValue] || [];
+          if (data.length >= 3) {
+            rows = data.map(mkRow);
+            p1 = mkPodium(data[0]); p2 = mkPodium(data[1]); p3 = mkPodium(data[2]);
+            rankingCount = memberFmt(leagueMemberCount[leagueValue] || data.length);
+            moreText = moreMap[leagueValue];
+            hasMore = !!moreText;
+            tieNote = data.some((r) => r.tie);
+            showRanking = true;
+          }
+        }
+      }
+
+      // league dropdown menu
+      const leagueMenu = leagueOptions.map((o) => {
+        const active = o.value === leagueValue;
+        return {
+          label: o.label, value: o.value, members: memberFmt(o.members),
+          active, inactive: !active,
+          weight: active ? 700 : 500,
+          rowBg: active ? 'color-mix(in srgb, var(--accent) 8%, transparent)' : 'transparent',
+          onSelect: () => this.setLeague(fd.id, o.value),
+        };
+      });
+
+      const showSubHeader = !isLoading && !isNoLeague;
+      const scrollPadBottom = showPinned ? '196px' : '120px';
+
+      return {
+        id: fd.id, label: fd.label, theme: fd.theme, dotColor: fd.dotColor,
+        competitionLine, phaseLabel,
+
+        tabItems, tabOptions,
+        tabValue: tab, tabLigues, tabGeneral,
+        setTab: (v) => this.setTab(fd.id, v),
+
+        showSubHeader,
+        leagueLabel: leagueName[leagueValue] || 'Les Potes',
+        leagueMembers: memberFmt(leagueMemberCount[leagueValue] || 0),
+        leagueMenu, leagueMenuOpen,
+        leagueChevron: leagueMenuOpen ? 'rotate(180deg)' : 'none',
+        leagueTriggerBorder: leagueMenuOpen ? 'var(--accent)' : 'var(--border)',
+        onLeagueToggle: () => this.toggleLeague(fd.id),
+        generalCount: generalTotal.toLocaleString('fr-FR'),
+
+        isLoading, isNoLeague, isNotStarted,
+        showRanking,
+        skeletons: [0, 1, 2, 3, 4, 5],
+        onSeeGeneral: () => this.setTab(fd.id, 'general'),
+
+        p1, p2, p3,
+        rows, rankingCount, hasMore, moreText, tieNote,
+        showPinned, pinned,
+        scrollPadBottom,
+
+        noop: () => {},
+      };
+    });
+
+    return { frames, noop: () => {} };
+  }
+}
+</script>
+</body>
+</html>

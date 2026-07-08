@@ -1,0 +1,69 @@
+/* TryCast — Color tokens
+ * Source of truth: uploads/trycast-colors.ts (Direction B · Grenat)
+ * Grenat is a SPARK, never a fill: CTA, live, and selected prediction only.
+ * Surfaces are green / cream. */
+
+:root {
+  /* ---- Primitive palette ---- */
+  --green-900: #0E3320; /* deepest bg / pressed */
+  --green-800: #14432A; /* brand green (dark surfaces) */
+  --green-700: #1C5638; /* raised surface (dark) */
+  --green-600: #26694A; /* borders / discreet accents (dark) */
+
+  --grenat-600: #C82E52; /* accent pressed */
+  --grenat-500: #E63E63; /* ACCENT — the spark (CTA, live, selected) */
+  --grenat-400: #F06485; /* accent hover / light (logo trail) */
+
+  --cream:      #F1EBDD; /* paper / light bg */
+  --cream-100:  #FBF7EF; /* raised surface (light) */
+  --cream-200:  #E7DFCC; /* deeper cream surface / separators */
+
+  --ink-900: #16130E; /* primary text on light (warm black) */
+  --ink-600: #5A5245; /* secondary text */
+  --ink-400: #8A8071; /* discreet text / placeholders */
+
+  /* Muted text on dark green */
+  --mist-300: #A9C0B2;
+
+  /* ---- Status (derived, IP-neutral, muted to respect the spark rule) ---- */
+  --status-live:    var(--grenat-500);
+  --success-500:    #2E8B57;
+  --warning-500:    #D8A23A;
+  --info-500:       #3C7DA6;
+
+  /* ---- Semantic aliases: LIGHT theme (default, cream base) ---- */
+  --bg:            var(--cream);
+  --surface:       var(--cream-100);
+  --surface-sunken:var(--cream-200);
+  --border:        var(--cream-200);
+  --border-strong: #D8CEB8;
+  --text:          var(--ink-900);
+  --text-muted:    var(--ink-600);
+  --text-faint:    var(--ink-400);
+  --brand:         var(--green-800);
+  --on-brand:      var(--cream);
+  --accent:        var(--grenat-500);
+  --accent-hover:  var(--grenat-400);
+  --accent-press:  var(--grenat-600);
+  --on-accent:     var(--cream);
+  --focus-ring:    var(--grenat-500);
+}
+
+/* ---- Semantic aliases: DARK theme (green base) ---- */
+[data-theme="dark"] {
+  --bg:            var(--green-900);
+  --surface:       var(--green-800);
+  --surface-sunken:#0B2A19;
+  --border:        var(--green-700);
+  --border-strong: var(--green-600);
+  --text:          var(--cream);
+  --text-muted:    var(--mist-300);
+  --text-faint:    #7E9587;
+  --brand:         var(--cream);
+  --on-brand:      var(--green-900);
+  --accent:        var(--grenat-500);
+  --accent-hover:  var(--grenat-400);
+  --accent-press:  var(--grenat-600);
+  --on-accent:     var(--cream);
+  --focus-ring:    var(--grenat-400);
+}

@@ -1,0 +1,47 @@
+/* TryCast — Spacing, radii, shadows, motion
+ * Spacing base = 4px */
+
+:root {
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radii — soft, friendly, mobile-first */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;   /* default card */
+  --radius-lg: 20px;   /* sheets, big cards */
+  --radius-xl: 28px;   /* app icon corner feel */
+  --radius-pill: 999px;
+
+  /* Shadows — low, warm, never harsh (mobile = subtle elevation) */
+  --shadow-sm: 0 1px 2px rgba(22, 19, 14, 0.06);
+  --shadow-md: 0 4px 14px rgba(22, 19, 14, 0.08);
+  --shadow-lg: 0 12px 32px rgba(22, 19, 14, 0.12);
+  /* Grenat glow — reserved for the live/selected spark */
+  --glow-accent: 0 4px 18px rgba(230, 62, 99, 0.35);
+
+  /* Hit target (mobile) */
+  --touch-min: 44px; /* @kind spacing */
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1); /* @kind other */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1); /* @kind other */
+  --dur-fast: 120ms; /* @kind other */
+  --dur: 200ms; /* @kind other */
+  --dur-slow: 320ms; /* @kind other */
+}
+
+[data-theme="dark"] {
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
+}

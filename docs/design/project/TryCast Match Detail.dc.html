@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/styles.css">
+  <script src="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/_ds_bundle.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    [data-theme="light"] {
+      --bg: var(--cream); --surface: var(--cream-100); --surface-sunken: var(--cream-200);
+      --border: var(--cream-200); --border-strong: #D8CEB8;
+      --text: var(--ink-900); --text-muted: var(--ink-600); --text-faint: var(--ink-400);
+      --brand: var(--green-800); --on-brand: var(--cream);
+      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: var(--cream);
+      --focus-ring: var(--grenat-500);
+      --shadow-sm: 0 1px 2px rgba(22,19,14,0.06); --shadow-md: 0 4px 14px rgba(22,19,14,0.08); --shadow-lg: 0 12px 32px rgba(22,19,14,0.12);
+    }
+    .tc-scroll::-webkit-scrollbar { width: 0; height: 0; }
+    @keyframes tc-live { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    @keyframes tc-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    @keyframes tc-shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+    .tc-shim { background: linear-gradient(90deg, color-mix(in srgb, var(--text) 7%, transparent) 25%, color-mix(in srgb, var(--text) 15%, transparent) 37%, color-mix(in srgb, var(--text) 7%, transparent) 63%); background-size: 400% 100%; animation: tc-shimmer 1.4s ease infinite; border-radius: var(--radius-xs); }
+  </style>
+</helmet>
+<div style="width: max-content; min-height: 100vh; padding: 48px; background: #7C776E; font-family: var(--font-body); display: flex; flex-direction: column; gap: 32px;">
+
+  <div style="display: flex; flex-direction: column; gap: 6px; color: #FBF7EF;">
+    <span style="font-family: var(--font-display); font-size: 34px; letter-spacing: 0.01em;">TryCast — Match détail</span>
+    <span style="font-size: 14px; color: rgba(255,255,255,0.72);">France – Irlande · les 3 statuts (à venir · live · terminé) · thèmes clair &amp; sombre · états limites</span>
+  </div>
+
+  <div style="display: flex; flex-wrap: nowrap; gap: 40px; align-items: flex-start;">
+    <sc-for list="{{ frames }}" as="f" hint-placeholder-count="9">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+
+        <div style="display: inline-flex; align-items: center; gap: 8px; color: #FBF7EF; font-size: 13px; font-weight: 600; padding: 0 4px;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ f.dotColor }};"></span>{{ f.label }}
+        </div>
+
+        <!-- PHONE -->
+        <div class="tc-phone" data-theme="{{ f.theme }}" data-screen-label="{{ f.label }}" style="position: relative; width: 390px; height: 844px; font-family: var(--font-body); background: var(--bg); color: var(--text); border-radius: 46px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column;">
+
+          <!-- Status bar -->
+          <div style="flex: none; display: flex; justify-content: space-between; align-items: center; padding: 14px 30px 6px; font-size: 13px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums;">
+            <span>9:41</span>
+            <span style="display: flex; gap: 7px; align-items: center;">
+              <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"></rect><rect x="9" y="2" width="3" height="9" rx="1"></rect><rect x="13.5" y="0" width="3" height="11" rx="1"></rect></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M1 4.2C3 2.4 5.4 1.4 8 1.4s5 1 7 2.8"></path><path d="M3.4 7C4.7 5.9 6.3 5.3 8 5.3s3.3.6 4.6 1.7"></path><path d="M6 9.6c.6-.5 1.3-.8 2-.8s1.4.3 2 .8"></path></svg>
+              <svg width="26" height="12" viewBox="0 0 26 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity="0.4"></rect><rect x="2" y="2" width="17" height="8" rx="1.5" fill="currentColor"></rect><rect x="23" y="4" width="2" height="4" rx="1" fill="currentColor" opacity="0.4"></rect></svg>
+            </span>
+          </div>
+
+          <!-- Top bar: back + status chip -->
+          <div style="flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 14px 6px;">
+            <button type="button" aria-label="Retour" onClick="{{ f.onBack }}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: none; background: transparent; color: var(--text); cursor: pointer; border-radius: var(--radius-pill); -webkit-tap-highlight-color: transparent;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+            </button>
+            <span style="flex: 1; text-align: center; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint);">Match</span>
+            <span style="flex: none; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border-radius: var(--radius-pill); background: {{ f.chipBg }}; color: {{ f.chipColor }}; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">
+              <sc-if value="{{ f.chipPulse }}" hint-placeholder-val="{{ false }}"><span style="width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: tc-live 1.4s ease-in-out infinite;"></span></sc-if>
+              {{ f.chipText }}
+            </span>
+          </div>
+
+          <!-- Scroll region -->
+          <div class="tc-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 4px 20px 40px;">
+
+            <!-- ===================== LOADING ===================== -->
+            <sc-if value="{{ f.isLoading }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 20px; padding-top: 6px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 6px;">
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;"><div class="tc-shim" style="width: 54px; height: 54px; border-radius: var(--radius-sm);"></div><div class="tc-shim" style="width: 40px; height: 12px;"></div></div>
+                  <div class="tc-shim" style="width: 96px; height: 42px;"></div>
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;"><div class="tc-shim" style="width: 54px; height: 54px; border-radius: var(--radius-sm);"></div><div class="tc-shim" style="width: 40px; height: 12px;"></div></div>
+                </div>
+                <div class="tc-shim" style="width: 160px; height: 12px; margin: 0 auto;"></div>
+                <div class="tc-shim" style="width: 100%; height: 1px;"></div>
+                <div class="tc-shim" style="width: 120px; height: 14px;"></div>
+                <sc-for list="{{ f.skeletons }}" as="sk" hint-placeholder-count="4">
+                  <div style="display: flex; align-items: center; gap: 14px;">
+                    <div class="tc-shim" style="width: 34px; height: 12px;"></div>
+                    <div class="tc-shim" style="width: 9px; height: 9px; border-radius: 50%;"></div>
+                    <div class="tc-shim" style="flex: 1; height: 14px; max-width: 170px;"></div>
+                    <div class="tc-shim" style="width: 40px; height: 20px;"></div>
+                  </div>
+                </sc-for>
+                <div class="tc-shim" style="width: 100%; height: 172px; border-radius: var(--radius-lg); margin-top: 6px;"></div>
+              </div>
+            </sc-if>
+
+            <!-- ===================== CONTENT ===================== -->
+            <sc-if value="{{ f.isContent }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; flex-direction: column; gap: 22px;">
+
+                <!-- HERO -->
+                <div style="display: flex; flex-direction: column; gap: 12px; position: sticky; top: 0; z-index: 10; margin: -4px -20px 0; padding: 8px 20px 12px; background: var(--bg); border-bottom: 1px solid var(--border); margin-top: -6px">
+                  <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; column-gap: 6px; padding-top: 4px;">
+                    <!-- home -->
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0;">
+                      <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TeamFlag" abbr="{{ f.home.abbr }}" color="{{ f.home.color }}" size="lg" hint-size="62px,55px"></x-import>
+                      <span style="font-size: 14px; font-weight: 700; color: {{ f.homeNameColor }}; text-align: center; line-height: 1.15;">{{ f.home.name }}</span>
+                    </div>
+                    <!-- center -->
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 0 4px;">
+                      <sc-if value="{{ f.centerIsScore }}" hint-placeholder-val="{{ true }}">
+                        <span style="font-family: var(--font-display); font-size: 46px; line-height: 1; letter-spacing: 0.01em; color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap;">{{ f.scoreStr }}</span>
+                      </sc-if>
+                      <sc-if value="{{ f.centerIsKickoff }}" hint-placeholder-val="{{ false }}">
+                        <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); white-space: nowrap; margin-bottom: 2px;">Coup d'envoi</span>
+                        <span style="font-family: var(--font-display); font-size: 40px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ f.kickoffStr }}</span>
+                        <span style="font-size: 12px; color: var(--text-muted);">{{ f.kickoffDate }}</span>
+                      </sc-if>
+                    </div>
+                    <!-- away -->
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0;">
+                      <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TeamFlag" abbr="{{ f.away.abbr }}" color="{{ f.away.color }}" size="lg" hint-size="62px,55px"></x-import>
+                      <span style="font-size: 14px; font-weight: 700; color: {{ f.awayNameColor }}; text-align: center; line-height: 1.15;">{{ f.away.name }}</span>
+                    </div>
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <span style="font-size: 12px; color: var(--text-muted); text-align: center;">{{ f.competitionLine }}</span>
+                    <!-- odds, discreet -->
+                    <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 4px; font-variant-numeric: tabular-nums;">
+                      
+                      <span style="display: inline-flex; align-items: baseline; gap: 4px; padding: 2px 8px; border-radius: var(--radius-pill); background: var(--surface-sunken); font-size: 11px; color: var(--text-muted);"><b style="font-weight: 700; color: var(--text);">{{ f.home.abbr }}</b>{{ f.odds.home }}</span>
+                      <span style="display: inline-flex; align-items: baseline; gap: 4px; padding: 2px 8px; border-radius: var(--radius-pill); background: var(--surface-sunken); font-size: 11px; color: var(--text-muted);"><b style="font-weight: 700; color: var(--text);">N</b>{{ f.odds.draw }}</span>
+                      <span style="display: inline-flex; align-items: baseline; gap: 4px; padding: 2px 8px; border-radius: var(--radius-pill); background: var(--surface-sunken); font-size: 11px; color: var(--text-muted);"><b style="font-weight: 700; color: var(--text);">{{ f.away.abbr }}</b>{{ f.odds.away }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ===== TIMELINE (live / terminé) ===== -->
+                <sc-if value="{{ f.showTimeline }}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                      <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text);">Déroulé du match</span>
+                      <sc-if value="{{ f.timelineLiveTag }}" hint-placeholder-val="{{ false }}"><span style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: var(--accent);"><span style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: tc-live 1.4s ease-in-out infinite;"></span>{{ f.liveMinuteText }}</span></sc-if>
+                    </div>
+
+                    <!-- empty timeline -->
+                    <sc-if value="{{ f.emptyTimeline }}" hint-placeholder-val="{{ false }}">
+                      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 24px 16px; border: 1px dashed var(--border-strong); border-radius: var(--radius-md);">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+                        <span style="font-size: 13px; color: var(--text-muted); text-wrap: pretty; max-width: 240px;">Le déroulé détaillé n'est pas disponible pour cette compétition. Le score reste à jour ci-dessus.</span>
+                      </div>
+                    </sc-if>
+
+                    <!-- events -->
+                    <sc-if value="{{ f.hasEvents }}" hint-placeholder-val="{{ true }}">
+                      <div style="display: flex; flex-direction: column; gap: 2px; position: relative;">
+                        <sc-for list="{{ f.events }}" as="ev" hint-placeholder-count="6">
+                          <div style="display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border);">
+                            <span style="flex: none; width: 30px; text-align: right; font-family: var(--font-body); font-weight: 700; font-size: 12px; color: var(--text-faint); font-variant-numeric: tabular-nums;">{{ ev.minute }}</span>
+                            <span style="flex: none; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: {{ ev.iconBg }}; color: {{ ev.iconColor }};">{{ ev.icon }}</span>
+                            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;">
+                              <span style="font-size: 13px; font-weight: 600; color: var(--text);">{{ ev.label }} · <span style="color: {{ ev.teamColor }}; font-weight: 700;">{{ ev.abbr }}</span></span>
+                              <span style="font-size: 12px; color: var(--text-muted);">{{ ev.scorer }}</span>
+                            </div>
+                            <span style="flex: none; font-family: var(--font-body); font-weight: 700; font-size: 13px; color: var(--text-muted); font-variant-numeric: tabular-nums;">{{ ev.runScore }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+
+                <!-- ===== MON PRONO ===== -->
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                    <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text);">Ton prono</span>
+                    <sc-if value="{{ f.savedShown }}" hint-placeholder-val="{{ false }}">
+                      <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: {{ f.savedColor }};">
+                        <sc-if value="{{ f.savedIsTick }}" hint-placeholder-val="{{ true }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></sc-if>
+                        {{ f.savedText }}
+                      </span>
+                    </sc-if>
+                  </div>
+
+                  <!-- editable (à venir, non verrouillé) -->
+                  <sc-if value="{{ f.pronoEditable }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                      <div style="display: flex; flex-direction: column; gap: 14px; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+
+                        <!-- score row: team name on top, flag+input below -->
+                        <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; column-gap: 2px; row-gap: 8px;">
+                          <span style="font-size: 18px; font-weight: 700; color: var(--text); text-align: center; line-height: 1.15; margin-bottom: 4px;">{{ f.home.name }}</span>
+                          <span></span>
+                          <span style="font-size: 18px; font-weight: 700; color: var(--text); text-align: center; line-height: 1.15; margin-bottom: 4px;">{{ f.away.name }}</span>
+                          <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <span style="display: inline-flex; transform: translateX(3px) scale(1.18); transform-origin: center;">
+                              <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TeamFlag" abbr="{{ f.home.abbr }}" color="{{ f.home.color }}" size="lg" hint-size="62px,55px"></x-import>
+                            </span>
+                            <input type="text" inputmode="numeric" aria-label="Score domicile" value="{{ f.editDisplayHome }}" placeholder="" onChange="{{ f.onEditHome }}" onFocus="{{ f.selectAll }}" style="width: 56px; text-align: center; font-family: var(--font-display); font-size: 32px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums; background: var(--surface-sunken); border: 2px solid transparent; border-radius: var(--radius-md); outline: none; padding: 6px 2px; -webkit-tap-highlight-color: transparent">
+                          </div>
+                          <span style="font-family: var(--font-display); font-size: 24px; color: var(--text-faint);">–</span>
+                          <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            <input type="text" inputmode="numeric" aria-label="Score extérieur" value="{{ f.editDisplayAway }}" placeholder="" onChange="{{ f.onEditAway }}" onFocus="{{ f.selectAll }}" style="width: 56px; text-align: center; font-family: var(--font-display); font-size: 32px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums; background: var(--surface-sunken); border: 2px solid transparent; border-radius: var(--radius-md); outline: none; padding: 6px 2px; -webkit-tap-highlight-color: transparent">
+                            <span style="display: inline-flex; transform: translateX(3px) scale(1.18); transform-origin: center;">
+                              <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TeamFlag" abbr="{{ f.away.abbr }}" color="{{ f.away.color }}" size="lg" hint-size="62px,55px"></x-import>
+                            </span>
+                          </div>
+                        </div>
+
+                        <!-- offensive bonus -->
+                        <div style="display: grid; grid-template-columns: auto 1fr auto 1fr auto; align-items: center; gap: 12px;">
+                          <span style="justify-self: center; display: flex; flex-direction: column; align-items: center; line-height: 1;">
+                            <span style="font-family: var(--font-display); font-size: 16px; color: var(--accent); font-variant-numeric: tabular-nums;">+3</span>
+                            <span style="margin-top: 2px; font-family: var(--font-body); font-weight: 600; font-size: 8px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">pts</span>
+                          </span>
+                          <button type="button" role="switch" aria-label="Bonus offensif domicile" onClick="{{ f.toggleEditHome }}" style="justify-self: center; display: flex; align-items: center; padding: 2px; background: transparent; border: none; cursor: pointer; -webkit-tap-highlight-color: transparent;">
+                            <span style="position: relative; display: inline-block; width: 38px; height: 22px; border-radius: 11px; background: {{ f.editHomeTrackBg }}; transition: background var(--dur) var(--ease-out);">
+                              <span style="position: absolute; top: 2px; left: {{ f.editHomeKnobLeft }}; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: var(--shadow-sm); transition: left var(--dur) var(--ease-out);"></span>
+                            </span>
+                          </button>
+                          <span style="text-align: center; font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); white-space: nowrap;">Bonus offensif</span>
+                          <button type="button" role="switch" aria-label="Bonus offensif extérieur" onClick="{{ f.toggleEditAway }}" style="justify-self: center; display: flex; align-items: center; padding: 2px; background: transparent; border: none; cursor: pointer; -webkit-tap-highlight-color: transparent;">
+                            <span style="position: relative; display: inline-block; width: 38px; height: 22px; border-radius: 11px; background: {{ f.editAwayTrackBg }}; transition: background var(--dur) var(--ease-out);">
+                              <span style="position: absolute; top: 2px; left: {{ f.editAwayKnobLeft }}; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: var(--shadow-sm); transition: left var(--dur) var(--ease-out);"></span>
+                            </span>
+                          </button>
+                          <span style="justify-self: center; display: flex; flex-direction: column; align-items: center; line-height: 1;">
+                            <span style="font-family: var(--font-display); font-size: 16px; color: var(--accent); font-variant-numeric: tabular-nums;">+3</span>
+                            <span style="margin-top: 2px; font-family: var(--font-body); font-weight: 600; font-size: 8px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">pts</span>
+                          </span>
+                        </div>
+
+                        <!-- potential points · 1 N 2 -->
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                          <span style="text-align: center; font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">Points potentiels</span>
+                          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; background: {{ f.pt1Bg }}; border: 1.5px solid {{ f.pt1Border }}; border-radius: var(--radius-sm);">
+                              <span style="font-family: var(--font-body); font-weight: 700; font-size: 11px; color: {{ f.pt1kColor }};">1</span>
+                              <span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ f.pts1 }}</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; background: {{ f.ptNBg }}; border: 1.5px solid {{ f.ptNBorder }}; border-radius: var(--radius-sm);">
+                              <span style="font-family: var(--font-body); font-weight: 700; font-size: 11px; color: {{ f.ptNkColor }};">N</span>
+                              <span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ f.ptsN }}</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; background: {{ f.pt2Bg }}; border: 1.5px solid {{ f.pt2Border }}; border-radius: var(--radius-sm);">
+                              <span style="font-family: var(--font-body); font-weight: 700; font-size: 11px; color: {{ f.pt2kColor }};">2</span>
+                              <span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ f.pts2 }}</span>
+                            </div>
+                          </div>
+                          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 0 4px;">
+                              <span style="width: 100%; height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--text) 10%, transparent); overflow: hidden;"><span style="display: block; height: 100%; border-radius: 2px; width: {{ f.pct1 }}; background: {{ f.pct1Color }}; transition: width var(--dur) var(--ease-out);"></span></span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 0 4px;">
+                              <span style="width: 100%; height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--text) 10%, transparent); overflow: hidden;"><span style="display: block; height: 100%; border-radius: 2px; width: {{ f.pctN }}; background: {{ f.pctNColor }}; transition: width var(--dur) var(--ease-out);"></span></span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 0 4px;">
+                              <span style="width: 100%; height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--text) 10%, transparent); overflow: hidden;"><span style="display: block; height: 100%; border-radius: 2px; width: {{ f.pct2 }}; background: {{ f.pct2Color }}; transition: width var(--dur) var(--ease-out);"></span></span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <span style="font-size: 12px; color: var(--text-muted); text-align: center; text-wrap: pretty;">Pondéré par la cote — un score exact rapporte le plus. Ta saisie s'enregistre toute seule.</span>
+                    </div>
+                  </sc-if>
+
+                  <!-- read-only (verrouillé / live) — reprend la card "En cours" de Mes Matchs, sans indicateur live -->
+                  <sc-if value="{{ f.pronoReadonly }}" hint-placeholder-val="{{ false }}">
+                    <div style="padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); display: flex; flex-direction: column;">
+                      <!-- header: lock + verrouillé (remplace le chrono LIVE) -->
+                      <div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 14px;">
+                        <span style="display: inline-flex; align-items: center; gap: 6px; color: var(--text-faint); font-family: var(--font-body); font-weight: 700; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"></rect><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"></path></svg>Prono verrouillé
+                        </span>
+                      </div>
+                      <!-- teams -->
+                      <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                          <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TeamFlag" abbr="{{ f.home.abbr }}" color="{{ f.home.color }}" size="md" hint-size="46px,41px"></x-import>
+                          <span style="flex: 1; font-family: var(--font-body); font-weight: 600; font-size: 16px; color: var(--text);">{{ f.home.name }}</span>
+                          <span style="font-family: var(--font-display); font-size: 26px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ f.roScoreHome }}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                          <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TeamFlag" abbr="{{ f.away.abbr }}" color="{{ f.away.color }}" size="md" hint-size="46px,41px"></x-import>
+                          <span style="flex: 1; font-family: var(--font-body); font-weight: 600; font-size: 16px; color: var(--text);">{{ f.away.name }}</span>
+                          <span style="font-family: var(--font-display); font-size: 26px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ f.roScoreAway }}</span>
+                        </div>
+                      </div>
+                      <!-- prono + highlighted potential points -->
+                      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border);">
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                          <span style="font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint);">Ton prono</span>
+                          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); font-family: var(--font-body); font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums;">{{ f.pronoStr }}</span>
+                          <sc-if value="{{ f.roShowBonusHome }}" hint-placeholder-val="{{ false }}">
+                            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: var(--radius-pill); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); color: var(--accent); font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: 0.02em;"><span style="width: 5px; height: 5px; border-radius: 50%; background: var(--accent);"></span>{{ f.home.abbr }} bonus</span>
+                          </sc-if>
+                          <sc-if value="{{ f.roShowBonusAway }}" hint-placeholder-val="{{ false }}">
+                            <span style="display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: var(--radius-pill); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); color: var(--accent); font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: 0.02em;"><span style="width: 5px; height: 5px; border-radius: 50%; background: var(--accent);"></span>{{ f.away.abbr }} bonus</span>
+                          </sc-if>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                          <span style="font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint);">Points potentiels</span>
+                          <span style="display: inline-flex; align-items: baseline; gap: 4px; padding: 5px 13px; border-radius: var(--radius-pill); background: var(--accent); color: var(--on-accent); box-shadow: var(--shadow-sm);"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; font-variant-numeric: tabular-nums;">{{ f.roPoints }}</span><span style="font-family: var(--font-body); font-weight: 700; font-size: 11px; letter-spacing: 0.03em;">pts</span></span>
+                        </div>
+                      </div>
+                    </div>
+                  </sc-if>
+
+                  <!-- reconciliation (terminé) -->
+                  <sc-if value="{{ f.pronoReconciled }}" hint-placeholder-val="{{ false }}">
+                    <div style="padding: 16px; background: var(--surface); border: {{ f.reconBorder }}; border-radius: var(--radius-md); box-shadow: {{ f.reconShadow }}; display: flex; flex-direction: column; gap: 14px;">
+                      <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--surface-sunken);">
+                          <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">Ton prono</span>
+                          <span style="font-family: var(--font-display); font-size: 24px; line-height: 1; color: var(--text-muted); font-variant-numeric: tabular-nums;">{{ f.pronoStr }}</span>
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border-radius: var(--radius-sm); background: var(--surface-sunken);">
+                          <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">Score final</span>
+                          <span style="font-family: var(--font-display); font-size: 24px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ f.scoreStr }}</span>
+                        </div>
+                      </div>
+                      <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <sc-for list="{{ f.reconRows }}" as="r" hint-placeholder-count="3">
+                          <div style="display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border);">
+                            <span style="flex: none; width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: {{ r.markBg }}; border: {{ r.markBorder }}; color: {{ r.markColor }}; font-size: 11px; font-weight: 700;">{{ r.mark }}</span>
+                            <span style="flex: 1; font-size: 13px; color: var(--text);">{{ r.label }}</span>
+                            <span style="flex: none; font-weight: 700; font-size: 13px; color: {{ r.valColor }}; font-variant-numeric: tabular-nums;">{{ r.valStr }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
+                      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                        <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text);">Points sur ce match</span>
+                        <span style="display: inline-flex; align-items: baseline; gap: 4px;"><span style="font-family: var(--font-display); font-size: 34px; line-height: 1; color: {{ f.matchPtsColor }}; font-variant-numeric: tabular-nums;">{{ f.matchPtsStr }}</span><span style="font-weight: 700; font-size: 13px; color: {{ f.matchPtsColor }};">pts</span></span>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+
+                <!-- ===== LIGUE SELECTOR ===== -->
+                <sc-if value="{{ f.showLeagueSel }}" hint-placeholder-val="{{ true }}">
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                      <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text);">Ligues</span>
+                      <sc-if value="{{ f.leagueDisabled }}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; color: var(--text-faint);">Une seule ligue</span></sc-if>
+                    </div>
+                    <div style="position: relative; opacity: {{ f.leagueSelOpacity }}; pointer-events: {{ f.leagueSelEvents }};">
+                      <!-- trigger -->
+                      <button type="button" onClick="{{ f.onLeagueToggle }}" aria-haspopup="listbox" aria-expanded="{{ f.leagueMenuOpen }}" style="width: 100%; display: flex; align-items: center; gap: 11px; padding: 11px 14px; background: var(--surface); border: 1px solid {{ f.leagueTriggerBorder }}; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; color: var(--text); font-family: var(--font-body);">
+                        <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
+                        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;">
+                          <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">Ligue affichée</span>
+                          <span style="font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ f.leagueLabel }}</span>
+                        </span>
+                        <span style="flex: none; font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums;">{{ f.leagueMembers }}</span>
+                        <span style="flex: none; color: var(--text-faint); transform: {{ f.leagueChevron }}; transition: transform .15s ease;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>
+                      </button>
+                      <!-- menu -->
+                      <sc-if value="{{ f.leagueMenuOpen }}" hint-placeholder-val="{{ false }}">
+                        <div role="listbox" style="position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 20; padding: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; gap: 2px; animation: tc-fade .14s ease;">
+                          <sc-for list="{{ f.leagueMenu }}" as="opt" hint-placeholder-count="3">
+                            <button type="button" role="option" aria-selected="{{ opt.active }}" onClick="{{ opt.onSelect }}" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 10px; border: none; background: {{ opt.rowBg }}; border-radius: var(--radius-sm); cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; font-family: var(--font-body);">
+                              <span style="flex: 1; min-width: 0; font-size: 14px; font-weight: {{ opt.weight }}; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ opt.label }}</span>
+                              <span style="flex: none; font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums;">{{ opt.members }}</span>
+                              <sc-if value="{{ opt.active }}" hint-placeholder-val="{{ false }}"><span style="flex: none; color: var(--accent);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span></sc-if>
+                              <sc-if value="{{ opt.inactive }}" hint-placeholder-val="{{ true }}"><span style="flex: none; width: 17px;"></span></sc-if>
+                            </button>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <!-- ===== AUTRES JOUEURS / CLASSEMENT ===== -->
+                <div style="display: flex; flex-direction: column; gap: 12px; padding-bottom: 8px;">
+
+                  <!-- ligue présente : segmented control + vues -->
+                  <sc-if value="{{ f.hasLeagueSection }}" hint-placeholder-val="{{ true }}">
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+
+                      <!-- segmented control (DS) -->
+                      <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.SegmentedControl" options="{{ f.segOptions }}" value="{{ f.viewValue }}" onChange="{{ f.setViewValue }}" hint-size="100%,40px"></x-import>
+
+                      <!-- context subtitle -->
+                      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 0 2px;">
+                        <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">{{ f.leagueLabel }}</span>
+                        <span style="flex: none; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint); white-space: nowrap;">{{ f.sectionCount }}</span>
+                      </div>
+
+                      <!-- ===== VUE PRONOS ===== -->
+                      <sc-if value="{{ f.viewPronos }}" hint-placeholder-val="{{ true }}">
+
+                        <!-- masked (avant verrouillage) -->
+                        <sc-if value="{{ f.othersMasked }}" hint-placeholder-val="{{ false }}">
+                          <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 30px 20px; border: 1px dashed var(--border-strong); border-radius: var(--radius-lg);">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 50%; background: var(--surface-sunken); color: var(--text-faint);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"></rect><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"></path></svg></span>
+                            <span style="font-size: 14px; font-weight: 700; color: var(--text);">Pronos masqués</span>
+                            <span style="font-size: 13px; color: var(--text-muted); max-width: 250px; text-wrap: pretty;">Les pronos des autres joueurs seront visibles au coup d'envoi. Pas de triche possible.</span>
+                          </div>
+                        </sc-if>
+
+                        <!-- list (après verrouillage) -->
+                        <sc-if value="{{ f.othersList }}" hint-placeholder-val="{{ true }}">
+                          <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <sc-for list="{{ f.players }}" as="p" hint-placeholder-count="6">
+                              <div style="display: flex; align-items: center; gap: 11px; padding: 10px 12px; background: {{ p.rowBg }}; border-left: {{ p.rowEdge }}; border-radius: var(--radius-sm);">
+                                <sc-if value="{{ p.showRank }}" hint-placeholder-val="{{ false }}"><span style="flex: none; min-width: 18px; text-align: center; font-family: var(--font-display); font-size: 16px; line-height: 1; color: var(--text-muted); font-variant-numeric: tabular-nums;">{{ p.rank }}</span></sc-if>
+                                <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ p.name }}" size="sm" ring="{{ p.isMe }}" hint-size="32px,32px"></x-import>
+                                <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                                  <span style="font-size: 14px; font-weight: {{ p.nameWeight }}; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ p.name }}</span>
+                                  <sc-if value="{{ p.hasMarkers }}" hint-placeholder-val="{{ false }}">
+                                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                      <sc-for list="{{ p.markers }}" as="mk" hint-placeholder-count="0">
+                                        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; border-radius: var(--radius-pill); background: {{ mk.bg }}; color: {{ mk.color }}; font-size: 10px; font-weight: 700; letter-spacing: 0.02em;">{{ mk.text }}</span>
+                                      </sc-for>
+                                    </div>
+                                  </sc-if>
+                                </div>
+                                <span style="flex: none; display: inline-flex; align-items: center; padding: 3px 10px; border-radius: var(--radius-pill); background: var(--surface-sunken); color: var(--text-muted); font-family: var(--font-body); font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums;">{{ p.pronoStr }}</span>
+                                <sc-if value="{{ p.showPts }}" hint-placeholder-val="{{ false }}">
+                                  <span style="flex: none; min-width: 46px; text-align: right; display: inline-flex; align-items: baseline; justify-content: flex-end; gap: 2px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: {{ p.ptsColor }}; font-variant-numeric: tabular-nums;">{{ p.ptsStr }}</span><span style="font-size: 10px; font-weight: 700; color: {{ p.ptsColor }};">pts</span></span>
+                                </sc-if>
+                              </div>
+                            </sc-for>
+                          </div>
+                          <sc-if value="{{ f.othersMore }}" hint-placeholder-val="{{ false }}">
+                            <div style="text-align: center; padding: 8px; font-size: 12px; font-weight: 600; color: var(--text-faint);">{{ f.othersMoreText }}</div>
+                          </sc-if>
+                        </sc-if>
+                      </sc-if>
+
+                      <!-- ===== VUE CLASSEMENT ===== -->
+                      <sc-if value="{{ f.viewClassement }}" hint-placeholder-val="{{ false }}">
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                          <sc-for list="{{ f.standings }}" as="s" hint-placeholder-count="6">
+                            <div style="display: flex; align-items: center; gap: 11px; padding: 10px 12px; background: {{ s.rowBg }}; border-left: {{ s.rowEdge }}; border-radius: var(--radius-sm);">
+                              <span style="flex: none; min-width: 22px; text-align: center; font-family: var(--font-display); font-size: 17px; line-height: 1; color: {{ s.rankColor }}; font-variant-numeric: tabular-nums;">{{ s.rank }}</span>
+                              <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ s.name }}" size="sm" ring="{{ s.isMe }}" hint-size="32px,32px"></x-import>
+                              <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;"><span style="font-size: 14px; font-weight: {{ s.nameWeight }}; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ s.name }}</span><span style="display: flex; align-items: center; gap: 7px; flex-wrap: wrap;"><span style="font-size: 11px; font-weight: 600; color: var(--text-faint);">{{ s.goodStr }} pronos</span><sc-if value="{{ s.hasExact }}" hint-placeholder-val="{{ false }}"><span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px 1px 5px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: 0.01em;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4"></circle></svg>{{ s.exactStr }}</span></sc-if></span></span>
+                              <span style="flex: none; display: inline-flex; align-items: baseline; gap: 2px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ s.pts }}</span><span style="font-size: 10px; font-weight: 700; color: var(--text-faint);">pts</span></span>
+                            </div>
+                          </sc-for>
+                        </div>
+                        <sc-if value="{{ f.standMore }}" hint-placeholder-val="{{ false }}">
+                          <div style="text-align: center; padding: 8px; font-size: 12px; font-weight: 600; color: var(--text-faint);">{{ f.standMoreText }}</div>
+                        </sc-if>
+                      </sc-if>
+                    </div>
+                  </sc-if>
+
+                  <!-- CTA (0 ligue) -->
+                  <sc-if value="{{ f.othersCta }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding: 26px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+                      <span style="font-family: var(--font-display); font-size: 22px; letter-spacing: 0.01em; color: var(--text);">Joue avec tes potes</span>
+                      <span style="font-size: 13px; color: var(--text-muted); max-width: 260px; text-wrap: pretty;">Tu n'es dans aucune ligue. Crée la tienne ou rejoins celle de tes amis pour comparer vos pronos sur chaque match.</span>
+                      <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 280px; margin-top: 4px;">
+                        <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="primary" full-width="{{ true }}" hint-size="100%,48px">Créer une ligue</x-import>
+                        <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="secondary" full-width="{{ true }}" hint-size="100%,48px">Rejoindre une ligue</x-import>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+
+              </div>
+            </sc-if>
+
+          </div>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:3900,&quot;height&quot;:1000}}">
+class Component extends DCLogic {
+  state = { preds: {}, saveStatus: {}, league: {}, leagueOpen: {}, view: {} };
+
+  setView(fid, v) {
+    this.setState((s) => ({ view: { ...s.view, [fid]: v } }));
+  }
+
+  ensure(fid) {
+    if (this.state.preds[fid]) return;
+    this.state.preds[fid] = { home: 24, away: 18, bonusHome: true, bonusAway: false };
+  }
+
+  onPred(fid, val) {
+    this.setState((s) => ({
+      preds: { ...s.preds, [fid]: val },
+      saveStatus: { ...s.saveStatus, [fid]: 'saving' },
+    }));
+    clearTimeout(this['_t' + fid]);
+    this['_t' + fid] = setTimeout(() => {
+      this.setState((s) => ({ saveStatus: { ...s.saveStatus, [fid]: 'saved' } }));
+    }, 650);
+  }
+
+  setLeague(fid, v) {
+    this.setState((s) => ({ league: { ...s.league, [fid]: v }, leagueOpen: { ...s.leagueOpen, [fid]: false } }));
+  }
+
+  toggleLeague(fid) {
+    this.setState((s) => ({ leagueOpen: { ...s.leagueOpen, [fid]: !s.leagueOpen[fid] } }));
+  }
+
+  renderVals() {
+    const E = React.createElement;
+    const FRA = { abbr: 'FRA', name: 'France', color: '#2C5697' };
+    const IRL = { abbr: 'IRL', name: 'Irlande', color: '#159B5E' };
+
+    const finalHome = 29, finalAway = 18;
+    const liveHome = 17, liveAway = 13, liveMin = "58'";
+    const odds = { home: '1,75', draw: '21', away: '2,10' };
+    const competitionLine = 'Tournoi des 6 Nations · Journée 2';
+
+    // timeline events with running score; liveTo marks the live cutoff index
+    const allEvents = [
+      { minute: "8'", type: 'try',    team: FRA, label: 'Essai',          scorer: 'A. Dupont',   hs: 5,  as: 0 },
+      { minute: "9'", type: 'conv',   team: FRA, label: 'Transformation', scorer: 'T. Ramos',    hs: 7,  as: 0 },
+      { minute: "22'", type: 'pen',   team: IRL, label: 'Pénalité',       scorer: 'J. Crowley',  hs: 7,  as: 3 },
+      { minute: "31'", type: 'try',   team: FRA, label: 'Essai',          scorer: 'D. Penaud',   hs: 12, as: 3 },
+      { minute: "33'", type: 'conv',  team: FRA, label: 'Transformation', scorer: 'T. Ramos',    hs: 14, as: 3 },
+      { minute: "39'", type: 'try',   team: IRL, label: 'Essai',          scorer: 'J. Lowe',     hs: 14, as: 8 },
+      { minute: "41'", type: 'conv',  team: IRL, label: 'Transformation', scorer: 'J. Crowley',  hs: 14, as: 10 },
+      { minute: "45'", type: 'pen',   team: FRA, label: 'Pénalité',       scorer: 'T. Ramos',    hs: 17, as: 10 },
+      { minute: "57'", type: 'pen',   team: IRL, label: 'Pénalité',       scorer: 'J. Crowley',  hs: 17, as: 13 },
+      { minute: "63'", type: 'try',   team: FRA, label: 'Essai',          scorer: 'L. Bielle-Biarrey', hs: 22, as: 13 },
+      { minute: "65'", type: 'conv',  team: FRA, label: 'Transformation', scorer: 'T. Ramos',    hs: 24, as: 13 },
+      { minute: "70'", type: 'yellow',team: IRL, label: 'Carton jaune',   scorer: 'C. Doris',    hs: 24, as: 13 },
+      { minute: "74'", type: 'try',   team: FRA, label: 'Essai',          scorer: 'D. Penaud',   hs: 29, as: 13 },
+      { minute: "79'", type: 'try',   team: IRL, label: 'Essai',          scorer: 'M. Hansen',   hs: 29, as: 18 },
+    ];
+    const liveCount = 9; // events up to 57'
+
+    const iconFor = (type) => {
+      // small linear glyph, 12px
+      const svg = (children) => E('svg', { width: 12, height: 12, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }, children);
+      if (type === 'try') return svg([E('ellipse', { key: 1, cx: 12, cy: 12, rx: 9, ry: 6, transform: 'rotate(-30 12 12)' }), E('path', { key: 2, d: 'M9 15l6-6' })]);
+      if (type === 'conv') return svg([E('path', { key: 1, d: 'M6 21V9' }), E('path', { key: 2, d: 'M18 21V9' }), E('path', { key: 3, d: 'M4 9h16' })]);
+      if (type === 'pen') return svg([E('path', { key: 1, d: 'M12 3v13' }), E('path', { key: 2, d: 'M12 3l7 3-7 3' })]);
+      if (type === 'yellow') return svg([E('rect', { key: 1, x: 7, y: 4, width: 10, height: 16, rx: 2 })]);
+      return svg([E('circle', { key: 1, cx: 12, cy: 12, r: 8 })]);
+    };
+    const iconColorFor = (type) => {
+      if (type === 'try') return { iconBg: 'color-mix(in srgb, var(--brand) 14%, transparent)', iconColor: 'var(--brand)' };
+      if (type === 'yellow') return { iconBg: 'color-mix(in srgb, var(--warning-500) 20%, transparent)', iconColor: 'var(--warning-500)' };
+      return { iconBg: 'var(--surface-sunken)', iconColor: 'var(--text-muted)' };
+    };
+
+    const buildEvents = (upTo) => allEvents.slice(0, upTo).slice().reverse().map((ev) => {
+      const ic = iconColorFor(ev.type);
+      return {
+        minute: ev.minute,
+        label: ev.label,
+        abbr: ev.team.abbr,
+        teamColor: ev.team.color,
+        scorer: ev.scorer,
+        runScore: ev.hs + '–' + ev.as,
+        icon: iconFor(ev.type),
+        iconBg: ic.iconBg,
+        iconColor: ic.iconColor,
+      };
+    });
+
+    // my prono (fixed for locked/live/finished)
+    const myFixed = { home: 24, away: 18, bonusHome: true, bonusAway: false };
+
+    // players in league "Les Potes"
+    const playersFinished = [
+      { name: 'Léa Berthier', ph: 29, pa: 18, exact: true,  bonus: true,  pts: 18 },
+      { name: 'Antoine Mercier', ph: 24, pa: 18, exact: false, bonus: true,  pts: 9,  me: true },
+      { name: 'Karim Mensah', ph: 27, pa: 15, exact: false, bonus: false, pts: 6 },
+      { name: 'Hugo Delaunay', ph: 22, pa: 16, exact: false, bonus: false, pts: 5 },
+      { name: 'Thomas Payet', ph: 20, pa: 20, exact: false, bonus: false, pts: 0 },
+      { name: 'Sophie Lémaire', ph: 15, pa: 24, exact: false, bonus: false, pts: 0 },
+    ];
+    const playersLive = [
+      { name: 'Antoine Mercier', ph: 24, pa: 18, bonus: 1, me: true },
+      { name: 'Léa Berthier', ph: 29, pa: 18, bonus: 1 },
+      { name: 'Karim Mensah', ph: 27, pa: 15, bonus: 0 },
+      { name: 'Hugo Delaunay', ph: 22, pa: 16, bonus: 0 },
+      { name: 'Thomas Payet', ph: 20, pa: 20, bonus: 0 },
+      { name: 'Sophie Lémaire', ph: 15, pa: 24, bonus: 1 },
+    ];
+
+    const leagueOptions = [
+      { label: 'Les Potes', value: 'potes', members: 6 },
+      { label: 'Bureau', value: 'bureau', members: 14 },
+      { label: 'Général', value: 'general', members: 128 },
+    ];
+    const leagueName = { potes: 'Les Potes', bureau: 'Bureau', general: 'Général' };
+    const memberFmt = (n) => n + (n > 1 ? ' membres' : ' membre');
+
+    // season standings per league (classement actuel de la ligue)
+    const standingsData = {
+      potes: [
+        { name: 'Léa Berthier', pts: 342, good: 24, exact: 5 },
+        { name: 'Karim Mensah', pts: 318, good: 22, exact: 3 },
+        { name: 'Antoine Mercier', pts: 305, me: true, good: 21, exact: 4 },
+        { name: 'Hugo Delaunay', pts: 291, good: 20, exact: 2 },
+        { name: 'Sophie Lémaire', pts: 268, good: 18, exact: 0 },
+        { name: 'Thomas Payet', pts: 244, good: 16, exact: 1 },
+      ],
+      bureau: [
+        { name: 'Clément Roy', pts: 511, good: 34, exact: 7 },
+        { name: 'Léa Berthier', pts: 498, good: 33, exact: 6 },
+        { name: 'Nadia Cherif', pts: 486, good: 32, exact: 5 },
+        { name: 'Antoine Mercier', pts: 472, me: true, good: 31, exact: 4 },
+        { name: 'Paul Girard', pts: 455, good: 29, exact: 3 },
+        { name: 'Inès Fabre', pts: 441, good: 28, exact: 0 },
+      ],
+      general: [
+        { name: 'M. Tournier', pts: 1284, good: 82, exact: 14 },
+        { name: 'rugbyfan_31', pts: 1251, good: 80, exact: 12 },
+        { name: 'La Rochelle77', pts: 1230, good: 78, exact: 11 },
+        { name: 'Clément Roy', pts: 1198, good: 76, exact: 9 },
+        { name: 'Léa Berthier', pts: 1176, good: 74, exact: 8 },
+        { name: 'Nadia Cherif', pts: 1154, good: 72, exact: 7 },
+      ],
+    };
+    const standMoreMap = {
+      potes: null,
+      bureau: '+ 8 autres membres',
+      general: '+ 122 membres · Toi 42e · 612 pts',
+    };
+
+    const frameDefs = [
+      { id: 'up_l',   theme: 'light', status: 'upcoming', label: 'À venir · clair',        dotColor: '#FBF7EF' },
+      { id: 'up_d',   theme: 'dark',  status: 'upcoming', label: 'À venir · sombre',       dotColor: '#14432A' },
+      { id: 'live_l', theme: 'light', status: 'live',     label: 'Live · clair',           dotColor: 'var(--grenat-500)' },
+      { id: 'live_d', theme: 'dark',  status: 'live',     label: 'Live · sombre',          dotColor: 'var(--grenat-500)' },
+      { id: 'fin_l',  theme: 'light', status: 'finished', label: 'Terminé · clair',        dotColor: '#FBF7EF' },
+      { id: 'fin_d',  theme: 'dark',  status: 'finished', label: 'Terminé · sombre',       dotColor: '#14432A' },
+      { id: 'noleag', theme: 'light', status: 'finished', label: 'Terminé · 0 ligue (CTA)', dotColor: '#8A8071', variant: 'no-league' },
+      { id: 'load',   theme: 'light', status: 'finished', label: 'Chargement (skeleton)',  dotColor: '#8A8071', variant: 'loading' },
+      { id: 'noevt',  theme: 'dark',  status: 'live',     label: 'Live · déroulé vide',    dotColor: '#8A8071', variant: 'empty-timeline' },
+    ];
+
+    const chipFor = (status) => {
+      if (status === 'upcoming') return { chipText: 'À venir', chipBg: 'var(--surface-sunken)', chipColor: 'var(--text-muted)', chipPulse: false };
+      if (status === 'live')     return { chipText: 'Live ' + liveMin, chipBg: 'color-mix(in srgb, var(--accent) 14%, transparent)', chipColor: 'var(--accent)', chipPulse: true };
+      return { chipText: 'Terminé', chipBg: 'var(--surface-sunken)', chipColor: 'var(--text-muted)', chipPulse: false };
+    };
+
+    const frames = frameDefs.map((fd) => {
+      const isLoading = fd.variant === 'loading';
+      const emptyTimeline = fd.variant === 'empty-timeline';
+      const noLeague = fd.variant === 'no-league';
+      const status = fd.status;
+      this.ensure(fd.id);
+
+      // hero center
+      const centerIsScore = status !== 'upcoming';
+      const hs = status === 'finished' ? finalHome : liveHome;
+      const as = status === 'finished' ? finalAway : liveAway;
+      const scoreStr = (status === 'finished' ? finalHome + ' – ' + finalAway : liveHome + ' – ' + liveAway);
+      const winner = hs > as ? 'home' : (hs < as ? 'away' : 'draw');
+
+      // timeline
+      const showTimeline = status === 'live' || status === 'finished';
+      const events = emptyTimeline ? [] : buildEvents(status === 'finished' ? allEvents.length : liveCount);
+
+      // mon prono
+      const pronoEditable = status === 'upcoming';
+      const pronoReadonly = status === 'live';
+      const pronoReconciled = status === 'finished';
+      const pv = pronoEditable ? this.state.preds[fd.id] : myFixed;
+      const pronoStr = pv.home + ' – ' + pv.away;
+      const bonusTags = [];
+      if (pv.bonusHome) bonusTags.push({ abbr: FRA.abbr, dot: 'var(--text-muted)' });
+      if (pv.bonusAway) bonusTags.push({ abbr: IRL.abbr, dot: 'var(--text-muted)' });
+
+      // readonly (live) card: current live score + potential points for the locked prono
+      let roScoreHome = hs, roScoreAway = as, roPoints = 0, roShowBonusHome = false, roShowBonusAway = false;
+      if (pronoReadonly) {
+        const outc = pv.home > pv.away ? '1' : (pv.home < pv.away ? '2' : 'N');
+        const liveOutc = hs > as ? '1' : (hs < as ? '2' : 'N');
+        const bp = (pv.bonusHome ? 1 : 0) + (pv.bonusAway ? 1 : 0);
+        roPoints = (outc === liveOutc ? 8 : 0) + bp;
+        roShowBonusHome = !!pv.bonusHome;
+        roShowBonusAway = !!pv.bonusAway;
+      }
+
+      // editable card (same as Mes Matchs, minus the kickoff-time header)
+      let edit = {};
+      if (pronoEditable) {
+        const ev = this.state.preds[fd.id];
+        const clamp = (raw) => {
+          const d = String(raw).replace(/\D/g, '').slice(0, 3);
+          return d === '' ? 0 : Math.min(199, parseInt(d, 10));
+        };
+        const outcome = ev.home > ev.away ? '1' : (ev.home < ev.away ? '2' : 'N');
+        const bonusPts = (ev.bonusHome ? 1 : 0) + (ev.bonusAway ? 1 : 0);
+        const potFor = (br) => (br === outcome ? 8 : 0) + bonusPts;
+        const cell = (br) => {
+          const active = br === outcome;
+          return {
+            v: potFor(br),
+            bg: active ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'var(--surface-sunken)',
+            border: active ? 'var(--accent)' : 'transparent',
+            kColor: active ? 'var(--accent)' : 'var(--text-faint)',
+          };
+        };
+        const c1 = cell('1'), cN = cell('N'), c2 = cell('2');
+        const dist = [57, 16, 27];
+        const pctColor = (v) => {
+          const p = Math.max(0, Math.min(100, v));
+          const hue = p < 60 ? (p / 60) * 40 : 40 + ((p - 60) / 40) * 100;
+          return 'hsl(' + hue.toFixed(0) + ' 72% 45%)';
+        };
+        const trackBg = (on) => on ? 'var(--accent)' : 'color-mix(in srgb, var(--text) 18%, transparent)';
+        edit = {
+          editDisplayHome: ev.home, editDisplayAway: ev.away,
+          onEditHome: (e) => this.onPred(fd.id, { ...ev, home: clamp(e.target.value) }),
+          onEditAway: (e) => this.onPred(fd.id, { ...ev, away: clamp(e.target.value) }),
+          toggleEditHome: () => this.onPred(fd.id, { ...ev, bonusHome: !ev.bonusHome }),
+          toggleEditAway: () => this.onPred(fd.id, { ...ev, bonusAway: !ev.bonusAway }),
+          editHomeTrackBg: trackBg(ev.bonusHome), editHomeKnobLeft: ev.bonusHome ? '18px' : '2px',
+          editAwayTrackBg: trackBg(ev.bonusAway), editAwayKnobLeft: ev.bonusAway ? '18px' : '2px',
+          pt1Bg: c1.bg, pt1Border: c1.border, pt1kColor: c1.kColor, pts1: c1.v,
+          ptNBg: cN.bg, ptNBorder: cN.border, ptNkColor: cN.kColor, ptsN: cN.v,
+          pt2Bg: c2.bg, pt2Border: c2.border, pt2kColor: c2.kColor, pts2: c2.v,
+          pct1: dist[0] + '%', pctN: dist[1] + '%', pct2: dist[2] + '%',
+          pct1Color: pctColor(dist[0]), pctNColor: pctColor(dist[1]), pct2Color: pctColor(dist[2]),
+          selectAll: (e) => e.target.select(),
+        };
+      }
+
+      // saved status (editable only)
+      let savedShown = false, savedText = '', savedColor = 'var(--text-muted)', savedIsTick = false;
+      if (pronoEditable) {
+        const st = this.state.saveStatus[fd.id];
+        if (st === 'saving') { savedShown = true; savedText = 'Enregistrement…'; savedColor = 'var(--text-muted)'; savedIsTick = false; }
+        else { savedShown = true; savedText = 'Enregistré'; savedColor = 'var(--success-500)'; savedIsTick = true; }
+      }
+
+      // reconciliation rows (finished)
+      let reconRows = [], matchPts = 0, matchPtsColor = 'var(--text-faint)', reconBorder = '1px solid var(--border)', reconShadow = 'var(--shadow-sm)';
+      if (pronoReconciled) {
+        const goodWinner = (pv.home > pv.away) === (finalHome > finalAway) && (pv.home < pv.away) === (finalHome < finalAway);
+        const exact = pv.home === finalHome && pv.away === finalAway;
+        // FRA scored 4 tries -> offensive bonus valid; my bonusHome (FRA) correct
+        const bonusOk = pv.bonusHome === true;
+        const mk = (ok) => ok
+          ? { mark: '✓', markBg: 'var(--success-500)', markColor: '#fff', markBorder: 'none' }
+          : { mark: '✕', markBg: 'transparent', markColor: 'var(--text-faint)', markBorder: '1.5px solid var(--border-strong)' };
+        const exactMk = exact
+          ? { mark: '✓', markBg: 'var(--accent)', markColor: 'var(--on-accent)', markBorder: 'none' }
+          : mk(false);
+        reconRows = [
+          { label: 'Bon vainqueur · ' + FRA.abbr, ...mk(goodWinner), valStr: goodWinner ? '+5' : '—', valColor: goodWinner ? 'var(--text)' : 'var(--text-faint)' },
+          { label: 'Score exact', ...exactMk, valStr: exact ? '+8' : '—', valColor: exact ? 'var(--accent)' : 'var(--text-faint)' },
+          { label: 'Bonus offensif · ' + FRA.abbr, ...mk(bonusOk), valStr: bonusOk ? '+3' : '—', valColor: bonusOk ? 'var(--text)' : 'var(--text-faint)' },
+          { label: 'Pondération cote (×1,1)', mark: '×', markBg: 'var(--surface-sunken)', markColor: 'var(--text-muted)', markBorder: 'none', valStr: '+1', valColor: 'var(--text)' },
+        ];
+        matchPts = (goodWinner ? 5 : 0) + (exact ? 8 : 0) + (bonusOk ? 3 : 0) + 1;
+        matchPtsColor = matchPts > 0 ? 'var(--accent)' : 'var(--text-faint)';
+        if (exact) { reconBorder = '1.5px solid color-mix(in srgb, var(--accent) 45%, var(--border))'; reconShadow = 'var(--glow-accent)'; }
+      }
+
+      // league selector
+      const showLeagueSel = !noLeague;
+      const leagueValue = this.state.league[fd.id] || 'potes';
+      const curLeague = leagueName[leagueValue] || 'Les Potes';
+      const leagueMenuOpen = !!this.state.leagueOpen[fd.id];
+      const curOpt = leagueOptions.find((o) => o.value === leagueValue) || leagueOptions[0];
+      const leagueMenu = leagueOptions.map((o) => {
+        const active = o.value === leagueValue;
+        return {
+          label: o.label, value: o.value, members: memberFmt(o.members),
+          active, inactive: !active,
+          weight: active ? 700 : 500,
+          rowBg: active ? 'color-mix(in srgb, var(--accent) 8%, transparent)' : 'transparent',
+          onSelect: () => this.setLeague(fd.id, o.value),
+        };
+      });
+
+      // others section
+      const beforeLock = status === 'upcoming';
+      const othersMasked = beforeLock && !noLeague;
+      const othersCta = noLeague;
+      const othersList = !beforeLock && !noLeague;
+
+      // segmented control: pronos vs classement
+      const hasLeagueSection = !noLeague;
+      const view = this.state.view[fd.id] || 'pronos';
+      const viewPronos = view === 'pronos';
+      const viewClassement = view === 'classement';
+      const sectionCount = viewClassement ? memberFmt(curOpt.members) : (curOpt.members + ' joueurs');
+
+      // classement rows
+      const stRows = standingsData[leagueValue] || standingsData.potes;
+      const standings = stRows.map((r, i) => ({
+        rank: i + 1,
+        name: r.name,
+        isMe: !!r.me,
+        nameWeight: r.me ? 700 : 600,
+        pts: r.pts,
+        goodStr: r.good + (r.good > 1 ? ' bons' : ' bon'),
+        hasExact: (r.exact || 0) > 0,
+        exactStr: (r.exact || 0) + ' exact' + ((r.exact || 0) > 1 ? 's' : ''),
+        rankColor: r.me ? 'var(--accent)' : 'var(--text-muted)',
+        rowBg: r.me ? 'color-mix(in srgb, var(--accent) 8%, var(--surface))' : 'var(--surface)',
+        rowEdge: r.me ? '3px solid var(--accent)' : '3px solid transparent',
+      }));
+      const standMoreText = standMoreMap[leagueValue];
+      const standMore = !!standMoreText;
+
+      let players = [];
+      let othersTitle = '', othersCount = '';
+      if (othersList) {
+        if (status === 'finished') {
+          const sorted = playersFinished.slice().sort((a, b) => b.pts - a.pts);
+          players = sorted.map((p, i) => {
+            const markers = [];
+            if (p.exact) markers.push({ text: 'Score exact', bg: 'var(--accent)', color: 'var(--on-accent)' });
+            else if (p.bonus) markers.push({ text: 'Bonus', bg: 'color-mix(in srgb, var(--success-500) 16%, transparent)', color: 'var(--success-500)' });
+            return {
+              rank: i + 1, showRank: false,
+              name: p.name, isMe: !!p.me,
+              nameWeight: 600,
+              pronoStr: p.ph + ' – ' + p.pa,
+              hasMarkers: markers.length > 0, markers,
+              showPts: true,
+              ptsStr: p.pts > 0 ? '+' + p.pts : '0',
+              ptsColor: p.pts > 0 ? (p.exact ? 'var(--accent)' : 'var(--text)') : 'var(--text-faint)',
+              rowBg: p.me ? 'color-mix(in srgb, var(--accent) 8%, var(--surface))' : 'var(--surface)',
+              rowEdge: p.me ? '3px solid var(--accent)' : '3px solid transparent',
+            };
+          });
+          othersTitle = 'Pronos';
+          othersCount = playersFinished.length + ' joueurs';
+        } else {
+          const liveOutc = liveHome > liveAway ? '1' : (liveHome < liveAway ? '2' : 'N');
+          players = playersLive.map((p) => {
+            const outc = p.ph > p.pa ? '1' : (p.ph < p.pa ? '2' : 'N');
+            const pot = (outc === liveOutc ? 8 : 0) + (p.bonus || 0);
+            return {
+            showRank: false, rank: '',
+            name: p.name, isMe: !!p.me,
+            nameWeight: 600,
+            pronoStr: p.ph + ' – ' + p.pa,
+            hasMarkers: false, markers: [],
+            showPts: true, ptsStr: String(pot), ptsColor: pot > 0 ? 'var(--text-muted)' : 'var(--text-faint)',
+            rowBg: p.me ? 'color-mix(in srgb, var(--accent) 8%, var(--surface))' : 'var(--surface)',
+            rowEdge: p.me ? '3px solid var(--accent)' : '3px solid transparent',
+          }; });
+          othersTitle = 'Pronos';
+          othersCount = playersLive.length + ' joueurs';
+        }
+      }
+
+      return {
+        id: fd.id, label: fd.label, theme: fd.theme, dotColor: fd.dotColor,
+        isLoading, isContent: !isLoading,
+        skeletons: [0, 1, 2, 3],
+        onBack: () => {},
+        ...chipFor(status),
+
+        home: FRA, away: IRL,
+        homeNameColor: winner === 'away' ? 'var(--text-muted)' : 'var(--text)',
+        awayNameColor: winner === 'home' ? 'var(--text-muted)' : 'var(--text)',
+        centerIsScore, centerIsKickoff: !centerIsScore,
+        scoreStr,
+        kickoffStr: '21h00', kickoffDate: 'sam. 6 févr.',
+        competitionLine,
+        odds,
+
+        showTimeline, emptyTimeline,
+        timelineLiveTag: status === 'live' && !emptyTimeline,
+        liveMinuteText: 'Live ' + liveMin,
+        hasEvents: showTimeline && !emptyTimeline,
+        events,
+
+        pronoEditable, pronoReadonly, pronoReconciled,
+        pronoValue: this.state.preds[fd.id],
+        onPronoChange: (v) => this.onPred(fd.id, v),
+        ...edit,
+        pronoStr, bonusTags,
+        roScoreHome, roScoreAway, roPoints, roShowBonusHome, roShowBonusAway,
+        savedShown, savedText, savedColor, savedIsTick,
+        reconRows, reconBorder, reconShadow,
+        matchPtsStr: matchPts > 0 ? '+' + matchPts : '0',
+        matchPtsColor,
+
+        showLeagueSel,
+        leagueValue,
+        leagueLabel: curLeague,
+        leagueMembers: memberFmt(curOpt.members),
+        leagueMenu, leagueMenuOpen,
+        leagueChevron: leagueMenuOpen ? 'rotate(180deg)' : 'none',
+        leagueTriggerBorder: leagueMenuOpen ? 'var(--accent)' : 'var(--border)',
+        onLeagueToggle: () => this.toggleLeague(fd.id),
+        leagueDisabled: false,
+        leagueSelOpacity: 1, leagueSelEvents: 'auto',
+
+        othersMasked, othersCta, othersList,
+        othersTitle, othersCount,
+        players,
+        othersMore: othersList && status === 'finished',
+        othersMoreText: 'Virtualisé · fais défiler pour voir les 128 membres',
+
+        hasLeagueSection, viewPronos, viewClassement, sectionCount,
+        viewValue: view,
+        segOptions: [{ value: 'pronos', label: 'Pronos' }, { value: 'classement', label: 'Classement' }],
+        setViewValue: (v) => this.setView(fd.id, v),
+        standings, standMore, standMoreText,
+      };
+    });
+
+    return { frames };
+  }
+}
+</script>
+</body>
+</html>

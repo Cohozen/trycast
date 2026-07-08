@@ -1,0 +1,5 @@
+/* TryCast — Webfonts
+ * Anton (display) + Inter (body). Loaded from Google Fonts CDN.
+ * If self-hosting later, replace with local @font-face src: url(...) rules. */
+
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap');

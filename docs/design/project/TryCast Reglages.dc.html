@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/styles.css">
+  <script src="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/_ds_bundle.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    /* LIGHT theme semantic overrides (matches sibling screens) + dedicated DANGER red.
+       Danger (#C4362B brick) is intentionally distinct from grenat (#E63E63): grenat stays
+       reserved for positive/active accents; brick-red is the ONLY destruction color. */
+    [data-theme="light"] {
+      --bg: var(--cream); --surface: var(--cream-100); --surface-sunken: var(--cream-200);
+      --border: var(--cream-200); --border-strong: #D8CEB8;
+      --text: var(--ink-900); --text-muted: var(--ink-600); --text-faint: var(--ink-400);
+      --brand: var(--green-800); --on-brand: var(--cream);
+      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: var(--cream);
+      --focus-ring: var(--grenat-500);
+      --danger: #C4362B; --danger-press: #A82C22; --on-danger: #FBF7EF;
+      --shadow-sm: 0 1px 2px rgba(22,19,14,0.06); --shadow-md: 0 4px 14px rgba(22,19,14,0.08); --shadow-lg: 0 12px 32px rgba(22,19,14,0.12);
+    }
+    [data-theme="dark"] { --danger: #F0685A; --danger-press: #D8564A; --on-danger: #2A0F0C; }
+    .tc-scroll::-webkit-scrollbar { width: 0; height: 0; }
+    @keyframes tc-fade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes tc-slideup { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    @keyframes tc-pop { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+    @keyframes tc-spin { to { transform: rotate(360deg); } }
+  </style>
+</helmet>
+<div style="width: max-content; min-height: 100vh; padding: 48px; background: #7C776E; font-family: var(--font-body); display: flex; flex-direction: column; gap: 32px;">
+
+  <div style="display: flex; flex-direction: column; gap: 6px; color: #FBF7EF;">
+    <span style="font-family: var(--font-display); font-size: 34px; letter-spacing: 0.01em;">TryCast — Écran Réglages</span>
+    <span style="font-size: 14px; color: rgba(255,255,255,0.72);">Compte · préférences · légal &amp; RGPD · à propos · zone danger · thèmes clair &amp; sombre · feuilles &amp; modale destructive · états d'erreur</span>
+  </div>
+
+  <div style="display: flex; flex-wrap: nowrap; gap: 40px; align-items: flex-start;">
+    <sc-for list="{{ frames }}" as="f" hint-placeholder-count="11">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+
+        <div style="display: inline-flex; align-items: center; gap: 8px; color: #FBF7EF; font-size: 13px; font-weight: 600; padding: 0 4px; max-width: 390px;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ f.dot }}; flex: none;"></span>{{ f.label }}
+        </div>
+
+        <!-- PHONE -->
+        <div class="tc-phone" data-theme="{{ f.theme }}" data-screen-label="{{ f.label }}" style="position: relative; width: 390px; height: 844px; font-family: var(--font-body); background: var(--bg); color: var(--text); border-radius: 46px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column;">
+
+          <!-- Status bar -->
+          <div style="flex: none; display: flex; justify-content: space-between; align-items: center; padding: 14px 30px 8px; font-size: 13px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums;">
+            <span>9:41</span>
+            <span style="display: flex; gap: 7px; align-items: center;">
+              <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"></rect><rect x="9" y="2" width="3" height="9" rx="1"></rect><rect x="13.5" y="0" width="3" height="11" rx="1"></rect></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M1 4.2C3 2.4 5.4 1.4 8 1.4s5 1 7 2.8"></path><path d="M3.4 7C4.7 5.9 6.3 5.3 8 5.3s3.3.6 4.6 1.7"></path><path d="M6 9.6c.6-.5 1.3-.8 2-.8s1.4.3 2 .8"></path></svg>
+              <svg width="26" height="12" viewBox="0 0 26 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity="0.4"></rect><rect x="2" y="2" width="17" height="8" rx="1.5" fill="currentColor"></rect><rect x="23" y="4" width="2" height="4" rx="1" fill="currentColor" opacity="0.4"></rect></svg>
+            </span>
+          </div>
+
+          <!-- HEADER: back + title (no tab bar) -->
+          <div style="flex: none; display: flex; align-items: center; gap: 10px; padding: 2px 14px 12px;">
+            <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.IconButton" variant="ghost" ariaLabel="Retour" onClick="{{ f.noop }}" hint-size="44px,44px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></x-import>
+            <span style="font-family: var(--font-display); font-size: 30px; line-height: 1; letter-spacing: 0.01em; color: var(--text);">Réglages</span>
+          </div>
+
+          <!-- SCROLL REGION -->
+          <div class="tc-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 4px 18px 40px; display: flex; flex-direction: column; gap: 22px;">
+
+            <!-- ============ COMPTE ============ -->
+            <div style="display: flex; flex-direction: column; gap: 9px;">
+              <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); padding: 0 6px;">Compte</span>
+
+              <!-- photo -->
+              <div style="display: flex; align-items: center; gap: 14px; padding: 13px 15px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+                <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="Antoine Mercier" size="lg" ring="{{ true }}" hint-size="56px,56px"></x-import>
+                <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px;">
+                  <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-faint);">Photo de profil</span>
+                  <div style="display: flex; gap: 8px;">
+                    <button type="button" onClick="{{ f.noop }}" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: var(--radius-pill); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font-family: var(--font-body); font-weight: 600; font-size: 12.5px; cursor: pointer; -webkit-tap-highlight-color: transparent;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>Changer</button>
+                    <button type="button" onClick="{{ f.noop }}" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: var(--radius-pill); border: 1px solid transparent; background: transparent; color: var(--text-muted); font-family: var(--font-body); font-weight: 600; font-size: 12.5px; cursor: pointer; -webkit-tap-highlight-color: transparent;">Supprimer</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- account card: pseudo / email / password -->
+              <div style="display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;">
+
+                <!-- PSEUDO — display OR edit -->
+                <sc-if value="{{ f.pseudoEditing }}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; flex-direction: column; gap: 10px; padding: 14px 15px;">
+                    <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Input" label="Pseudo" value="Antoine" error="Ce pseudo est déjà pris. Essaie autre chose." hint-size="100%,74px"></x-import>
+                    <span style="font-size: 11.5px; color: var(--text-faint); line-height: 1.4;">3–20 caractères · lettres, chiffres et « _ » · doit être unique.</span>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                      <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="ghost" size="sm" onClick="{{ f.noop }}" hint-size="auto,36px">Annuler</x-import>
+                      <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="primary" size="sm" disabled="{{ true }}" onClick="{{ f.noop }}" hint-size="auto,36px">Enregistrer</x-import>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ f.pseudoDisplay }}" hint-placeholder-val="{{ true }}">
+                  <button type="button" onClick="{{ f.noop }}" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 15px; border: none; background: transparent; cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; font-family: var(--font-body);">
+                    <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                      <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-faint);">Pseudo</span>
+                      <span style="font-size: 15.5px; font-weight: 700; color: var(--text);">Antoine M.</span>
+                    </span>
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-faint);"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"></path></svg>
+                  </button>
+                </sc-if>
+
+                <!-- EMAIL -->
+                <div style="border-top: 1px solid var(--border);">
+                  <sc-if value="{{ f.emailEditable }}" hint-placeholder-val="{{ true }}">
+                    <button type="button" onClick="{{ f.noop }}" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 15px; border: none; background: transparent; cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; font-family: var(--font-body);">
+                      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                        <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-faint);">E-mail</span>
+                        <span style="font-size: 15px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">antoine.mercier@email.fr</span>
+                      </span>
+                      <span style="font-size: 13px; font-weight: 600; color: var(--accent);">Modifier</span>
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-faint);"><path d="M9 6l6 6-6 6"></path></svg>
+                    </button>
+                  </sc-if>
+                  <sc-if value="{{ f.emailLocked }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 13px 15px;">
+                      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                        <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-faint);">E-mail</span>
+                        <span style="font-size: 15px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">antoine.mercier@icloud.com</span>
+                      </span>
+                      <span style="flex: none; display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 9px; border-radius: var(--radius-pill); background: var(--surface-sunken); color: var(--text-muted); font-size: 10.5px; font-weight: 700; letter-spacing: 0.02em;">Géré par Apple</span>
+                    </div>
+                  </sc-if>
+                </div>
+
+                <!-- PASSWORD — nav row OR social-only note -->
+                <div style="border-top: 1px solid var(--border);">
+                  <sc-if value="{{ f.hasPassword }}" hint-placeholder-val="{{ true }}">
+                    <button type="button" onClick="{{ f.noop }}" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 15px; border: none; background: transparent; cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; font-family: var(--font-body);">
+                      <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--brand) 12%, transparent); color: var(--brand);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+                      <span style="flex: 1; font-size: 15px; font-weight: 600; color: var(--text);">Modifier le mot de passe</span>
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-faint);"><path d="M9 6l6 6-6 6"></path></svg>
+                    </button>
+                  </sc-if>
+                  <sc-if value="{{ f.socialOnly }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 13px 15px;">
+                      <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--brand) 12%, transparent); color: var(--brand);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M16.4 12.8c0-2 1.6-3 1.7-3-.9-1.4-2.4-1.5-2.9-1.6-1.2-.1-2.4.7-3 .7-.6 0-1.6-.7-2.6-.7-1.3 0-2.6.8-3.2 2-1.4 2.4-.4 6 1 8 .7.9 1.4 2 2.5 1.9 1-.04 1.4-.6 2.6-.6s1.5.6 2.6.6 1.7-.9 2.4-1.8c.7-1 1-2 1-2-0 0-1.9-.7-2-2.7zM14.5 6.4c.5-.7.9-1.6.8-2.5-.8 0-1.7.5-2.3 1.2-.5.6-.9 1.5-.8 2.4.9.06 1.8-.4 2.3-1.1z"></path></svg></span>
+                      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                        <span style="font-size: 15px; font-weight: 600; color: var(--text);">Connecté via Apple</span>
+                        <span style="font-size: 12px; color: var(--text-muted); line-height: 1.35;">Pas de mot de passe : ce compte se connecte avec Apple.</span>
+                      </span>
+                    </div>
+                  </sc-if>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- ============ PRÉFÉRENCES ============ -->
+            <div style="display: flex; flex-direction: column; gap: 9px;">
+              <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); padding: 0 6px;">Préférences</span>
+
+              <!-- Thème -->
+              <div style="display: flex; flex-direction: column; gap: 11px; padding: 14px 15px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                  <span style="font-size: 15px; font-weight: 600; color: var(--text);">Thème</span>
+                  <span style="font-size: 11px; font-weight: 600; color: var(--text-faint);">Auto-enregistré</span>
+                </div>
+                <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.SegmentedControl" options="{{ f.themeOptions }}" value="{{ f.themeValue }}" onChange="{{ f.setTheme }}" hint-size="100%,40px"></x-import>
+              </div>
+
+              <!-- Notifications -->
+              <div style="display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;">
+                <!-- master -->
+                <div style="display: flex; align-items: center; gap: 12px; padding: 13px 15px;">
+                  <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                    <span style="font-size: 15px; font-weight: 600; color: {{ f.master.labelColor }};">Notifications</span>
+                    <span style="font-size: 12px; color: var(--text-muted); line-height: 1.35;">{{ f.master.sub }}</span>
+                  </span>
+                  <button type="button" role="switch" aria-checked="{{ f.master.checked }}" onClick="{{ f.master.onClick }}" style="flex: none; position: relative; width: 46px; height: 28px; border-radius: var(--radius-pill); border: none; padding: 0; cursor: {{ f.master.cursor }}; background: {{ f.master.track }}; transition: background var(--dur) var(--ease-out); opacity: {{ f.master.opacity }}; -webkit-tap-highlight-color: transparent;">
+                    <span style="position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #FBF7EF; box-shadow: 0 1px 3px rgba(0,0,0,0.28); transform: {{ f.master.thumb }}; transition: transform var(--dur) var(--ease-out);"></span>
+                  </button>
+                </div>
+
+                <!-- OS refused banner -->
+                <sc-if value="{{ f.osRefused }}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; align-items: flex-start; gap: 10px; margin: 0 15px 13px; padding: 11px 12px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--warning-500) 14%, transparent); border: 1px solid color-mix(in srgb, var(--warning-500) 34%, transparent);">
+                    <span style="flex: none; color: var(--warning-500); margin-top: 1px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path><path d="M12 9v4M12 17h.01"></path></svg></span>
+                    <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px;">
+                      <span style="font-size: 12.5px; color: var(--text); line-height: 1.4;">Les notifications sont bloquées dans les réglages iOS. Active-les pour recevoir tes rappels.</span>
+                      <button type="button" onClick="{{ f.noop }}" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 5px; padding: 0; border: none; background: transparent; color: var(--accent); font-family: var(--font-body); font-weight: 700; font-size: 12.5px; cursor: pointer;">Ouvrir les réglages système<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"></path></svg></button>
+                    </span>
+                  </div>
+                </sc-if>
+
+                <!-- per-type detail -->
+                <sc-if value="{{ f.notifDetail }}" hint-placeholder-val="{{ true }}">
+                  <div style="border-top: 1px solid var(--border);">
+                    <sc-for list="{{ f.notifTypes }}" as="n" hint-placeholder-count="4">
+                      <div style="display: flex; align-items: center; gap: 12px; padding: 12px 15px; border-top: {{ n.edge }};">
+                        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                          <span style="font-size: 14px; font-weight: 500; color: {{ n.labelColor }};">{{ n.label }}</span>
+                          <span style="font-size: 11.5px; color: var(--text-faint); line-height: 1.3;">{{ n.desc }}</span>
+                        </span>
+                        <button type="button" role="switch" aria-checked="{{ n.checked }}" onClick="{{ n.onClick }}" style="flex: none; position: relative; width: 46px; height: 28px; border-radius: var(--radius-pill); border: none; padding: 0; cursor: {{ n.cursor }}; background: {{ n.track }}; transition: background var(--dur) var(--ease-out); opacity: {{ n.opacity }}; -webkit-tap-highlight-color: transparent;">
+                          <span style="position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #FBF7EF; box-shadow: 0 1px 3px rgba(0,0,0,0.28); transform: {{ n.thumb }}; transition: transform var(--dur) var(--ease-out);"></span>
+                        </button>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+
+              <!-- Langue -->
+              <button type="button" onClick="{{ f.noop }}" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 15px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; font-family: var(--font-body);">
+                <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--brand) 12%, transparent); color: var(--brand);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"></path></svg></span>
+                <span style="flex: 1; font-size: 15px; font-weight: 600; color: var(--text);">Langue</span>
+                <span style="font-size: 14px; font-weight: 500; color: var(--text-muted);">Français</span>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-faint);"><path d="M9 6l6 6-6 6"></path></svg>
+              </button>
+            </div>
+
+            <!-- ============ LÉGAL & CONFIDENTIALITÉ ============ -->
+            <div style="display: flex; flex-direction: column; gap: 9px;">
+              <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); padding: 0 6px;">Légal &amp; confidentialité</span>
+              <div style="display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;">
+                <sc-for list="{{ f.legalRows }}" as="r" hint-placeholder-count="5">
+                  <button type="button" onClick="{{ r.onClick }}" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 15px; border: none; border-top: {{ r.edge }}; background: transparent; cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; font-family: var(--font-body);">
+                    <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--brand) 12%, transparent); color: var(--brand);">{{ r.icon }}</span>
+                    <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                      <span style="font-size: 15px; font-weight: 600; color: var(--text);">{{ r.label }}</span>
+                      <sc-if value="{{ r.hasSub }}" hint-placeholder-val="{{ false }}"><span style="font-size: 11.5px; color: var(--text-faint); line-height: 1.3;">{{ r.sub }}</span></sc-if>
+                    </span>
+                    <span style="flex: none; color: var(--text-faint);">{{ r.trail }}</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- ============ À PROPOS ============ -->
+            <div style="display: flex; flex-direction: column; gap: 9px;">
+              <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); padding: 0 6px;">À propos</span>
+              <div style="display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;">
+                <div style="display: flex; align-items: center; gap: 12px; padding: 13px 15px;">
+                  <span style="flex: 1; font-size: 15px; font-weight: 600; color: var(--text);">Version</span>
+                  <span style="font-size: 14px; font-weight: 500; color: var(--text-muted); font-variant-numeric: tabular-nums;">1.4.2 (build 240)</span>
+                </div>
+                <button type="button" onClick="{{ f.noop }}" style="display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 15px; border: none; border-top: 1px solid var(--border); background: transparent; cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; font-family: var(--font-body);">
+                  <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--brand) 12%, transparent); color: var(--brand);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
+                  <span style="flex: 1; font-size: 15px; font-weight: 600; color: var(--text);">Aide &amp; contact</span>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-faint);"><path d="M9 6l6 6-6 6"></path></svg>
+                </button>
+              </div>
+              <!-- Se déconnecter (secondary, NOT red) -->
+              <div style="margin-top: 3px;">
+                <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="secondary" full-width="{{ true }}" onClick="{{ f.noop }}" hint-size="100%,48px">Se déconnecter</x-import>
+              </div>
+            </div>
+
+            <!-- ============ ZONE DANGER ============ -->
+            <div style="display: flex; flex-direction: column; gap: 9px; margin-top: 6px; padding-top: 20px; border-top: 1px dashed var(--border-strong);">
+              <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--danger); padding: 0 6px;">Zone de danger</span>
+              <div style="display: flex; flex-direction: column; gap: 13px; padding: 15px; background: color-mix(in srgb, var(--danger) 6%, var(--surface)); border: 1px solid color-mix(in srgb, var(--danger) 32%, var(--border)); border-radius: var(--radius-md);">
+                <div style="display: flex; flex-direction: column; gap: 3px;">
+                  <span style="font-size: 15px; font-weight: 700; color: var(--text);">Supprimer mon compte</span>
+                  <span style="font-size: 12.5px; color: var(--text-muted); line-height: 1.45; text-wrap: pretty;">Action irréversible : pronos, historique, points et ligues seront définitivement perdus.</span>
+                </div>
+                <button type="button" onClick="{{ f.noop }}" style="width: 100%; height: 48px; border-radius: var(--radius-pill); border: none; background: transparent; color: var(--danger); border: 1.5px solid var(--danger); font-family: var(--font-body); font-weight: 700; font-size: 15px; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-hover="background: color-mix(in srgb, var(--danger) 10%, transparent);">Supprimer mon compte</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ============ TOAST (micro-feedback) ============ -->
+          <sc-if value="{{ f.showToast }}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; left: 16px; right: 16px; bottom: 28px; z-index: 20; animation: tc-slideup var(--dur) var(--ease-out);">
+              <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Toast" tone="success" icon="{{ f.toastIcon }}" message="Modifications enregistrées" hint-size="100%,56px"></x-import>
+            </div>
+          </sc-if>
+
+          <!-- ============ BOTTOM SHEET ============ -->
+          <sc-if value="{{ f.showSheet }}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; inset: 0; z-index: 40; background: rgba(11,26,17,0.44); animation: tc-fade var(--dur) var(--ease-out); display: flex; flex-direction: column; justify-content: flex-end;">
+              <div style="background: var(--surface); border-radius: var(--radius-lg) var(--radius-lg) 0 0; box-shadow: var(--shadow-lg); animation: tc-slideup var(--dur) var(--ease-out); max-height: 90%; display: flex; flex-direction: column; overflow: hidden;">
+                <div style="flex: none; display: flex; justify-content: center; padding: 10px 0 2px;"><span style="width: 38px; height: 5px; border-radius: 3px; background: var(--border-strong);"></span></div>
+
+                <!-- PASSWORD SHEET -->
+                <sc-if value="{{ f.sheetPwd }}" hint-placeholder-val="{{ false }}">
+                  <div class="tc-scroll" style="overflow-y: auto; padding: 8px 20px 24px; display: flex; flex-direction: column; gap: 16px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                      <span style="font-family: var(--font-display); font-size: 24px; letter-spacing: 0.01em; color: var(--text);">Mot de passe</span>
+                      <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.IconButton" variant="soft" ariaLabel="Fermer" onClick="{{ f.noop }}" hint-size="40px,40px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></x-import>
+                    </div>
+                    <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Input" label="Mot de passe actuel" type="password" value="········" hint-size="100%,74px"></x-import>
+                    <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Input" label="Nouveau mot de passe" type="password" value="········" helper="8 caractères minimum, dont un chiffre." hint-size="100%,74px"></x-import>
+                    <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Input" label="Confirmer le nouveau mot de passe" type="password" value="······" error="Les mots de passe ne concordent pas." hint-size="100%,74px"></x-import>
+                    <div style="display: flex; gap: 10px; margin-top: 2px;">
+                      <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="ghost" full-width="{{ true }}" onClick="{{ f.noop }}" hint-size="100%,48px">Annuler</x-import>
+                      <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="primary" full-width="{{ true }}" disabled="{{ true }}" onClick="{{ f.noop }}" hint-size="100%,48px">Enregistrer</x-import>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <!-- RGPD CONSENT SHEET -->
+                <sc-if value="{{ f.sheetRgpd }}" hint-placeholder-val="{{ false }}">
+                  <div class="tc-scroll" style="overflow-y: auto; padding: 8px 20px 24px; display: flex; flex-direction: column; gap: 16px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                      <div style="display: flex; flex-direction: column; gap: 3px;">
+                        <span style="font-family: var(--font-display); font-size: 24px; letter-spacing: 0.01em; color: var(--text);">Confidentialité</span>
+                        <span style="font-size: 12.5px; color: var(--text-muted);">Gère tes consentements. Tu peux les modifier à tout moment.</span>
+                      </div>
+                      <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.IconButton" variant="soft" ariaLabel="Fermer" onClick="{{ f.noop }}" hint-size="40px,40px"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></x-import>
+                    </div>
+                    <div style="display: flex; flex-direction: column; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden;">
+                      <sc-for list="{{ f.consents }}" as="c" hint-placeholder-count="2">
+                        <div style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 15px; border-top: {{ c.edge }};">
+                          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                            <span style="font-size: 15px; font-weight: 600; color: var(--text);">{{ c.label }}</span>
+                            <span style="font-size: 12px; color: var(--text-muted); line-height: 1.4; text-wrap: pretty;">{{ c.desc }}</span>
+                            <span style="font-size: 11px; color: var(--text-faint); margin-top: 2px;">{{ c.date }}</span>
+                          </span>
+                          <button type="button" role="switch" aria-checked="{{ c.checked }}" onClick="{{ c.onClick }}" style="flex: none; margin-top: 2px; position: relative; width: 46px; height: 28px; border-radius: var(--radius-pill); border: none; padding: 0; cursor: pointer; background: {{ c.track }}; transition: background var(--dur) var(--ease-out); -webkit-tap-highlight-color: transparent;">
+                            <span style="position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #FBF7EF; box-shadow: 0 1px 3px rgba(0,0,0,0.28); transform: {{ c.thumb }}; transition: transform var(--dur) var(--ease-out);"></span>
+                          </button>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <button type="button" onClick="{{ f.noop }}" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; border-radius: var(--radius-md); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font-family: var(--font-body); font-weight: 600; font-size: 14px; cursor: pointer; -webkit-tap-highlight-color: transparent;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="M7 10l5 5 5-5M12 15V3"></path></svg>Exporter mes données</button>
+                    <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="primary" full-width="{{ true }}" onClick="{{ f.noop }}" hint-size="100%,48px">Enregistrer mes choix</x-import>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ============ DELETE MODAL ============ -->
+          <sc-if value="{{ f.showModal }}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; inset: 0; z-index: 50; background: rgba(11,26,17,0.5); animation: tc-fade var(--dur) var(--ease-out); display: flex; align-items: center; justify-content: center; padding: 16px;">
+              <div style="width: 100%; max-height: calc(100% - 24px); background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; animation: tc-pop var(--dur) var(--ease-out); display: flex; flex-direction: column;">
+                <div class="tc-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 22px 20px 16px; display: flex; flex-direction: column; gap: 14px;">
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger);"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6M14 11v6"></path></svg></span>
+                    <span style="font-family: var(--font-display); font-size: 25px; line-height: 1.05; letter-spacing: 0.01em; color: var(--text);">Supprimer ton compte ?</span>
+                    <span style="font-size: 13px; color: var(--text-muted); line-height: 1.45; text-wrap: pretty;">Cette action est <strong style="color: var(--danger);">irréversible</strong>. Tu perdras définitivement :</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 8px; padding: 13px 15px; background: color-mix(in srgb, var(--danger) 6%, var(--surface-sunken)); border-radius: var(--radius-sm);">
+                    <sc-for list="{{ f.deleteLosses }}" as="l" hint-placeholder-count="4">
+                      <div style="display: flex; align-items: center; gap: 9px;">
+                        <span style="flex: none; color: var(--danger);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></span>
+                        <span style="font-size: 13px; color: var(--text);">{{ l.t }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+
+                  <!-- strong confirmation: retype pseudo -->
+                  <div style="display: flex; flex-direction: column; gap: 7px;">
+                    <span style="font-size: 12.5px; color: var(--text-muted); line-height: 1.4;">Pour confirmer, retape ton pseudo <strong style="color: var(--text);">Antoine M.</strong></span>
+                    <div style="display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 14px; background: var(--surface); border: 1.5px solid {{ f.confirmBorder }}; border-radius: var(--radius-sm);">
+                      <input type="text" value="{{ f.confirmValue }}" placeholder="Antoine M." readonly style="flex: 1; min-width: 0; border: none; outline: none; background: transparent; font-family: var(--font-body); font-size: 15px; color: var(--text);">
+                      <sc-if value="{{ f.confirmMatch }}" hint-placeholder-val="{{ false }}"><span style="flex: none; color: var(--success-500);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span></sc-if>
+                    </div>
+                  </div>
+
+                  <!-- checkbox -->
+                  <button type="button" onClick="{{ f.noop }}" style="display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: 0; border: none; background: transparent; cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; font-family: var(--font-body);">
+                    <span style="flex: none; margin-top: 1px; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 6px; border: 1.8px solid {{ f.checkBorder }}; background: {{ f.checkBg }}; color: var(--on-brand);"><sc-if value="{{ f.checked }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></sc-if></span>
+                    <span style="flex: 1; font-size: 13px; color: var(--text); line-height: 1.4;">Je comprends que cette action est définitive.</span>
+                  </button>
+                </div>
+
+                <!-- actions -->
+                <div style="flex: none; display: flex; flex-direction: column; gap: 10px; padding: 14px 20px 18px; border-top: 1px solid var(--border); background: var(--surface);">
+                  <button type="button" onClick="{{ f.noop }}" disabled="{{ f.confirmDisabledAttr }}" style="display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; height: 50px; border-radius: var(--radius-pill); border: none; background: {{ f.confirmBg }}; color: {{ f.confirmColor }}; font-family: var(--font-body); font-weight: 700; font-size: 15px; cursor: {{ f.confirmCursor }}; -webkit-tap-highlight-color: transparent; opacity: {{ f.confirmOpacity }};">
+                    <sc-if value="{{ f.deleteLoading }}" hint-placeholder-val="{{ false }}"><span style="display: inline-flex; width: 18px; height: 18px; animation: tc-spin 0.7s linear infinite;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9" opacity="0.9"></path></svg></span></sc-if>
+                    {{ f.confirmLabel }}
+                  </button>
+                  <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="ghost" full-width="{{ true }}" disabled="{{ f.deleteLoading }}" onClick="{{ f.noop }}" hint-size="100%,44px">Annuler</x-import>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:4840,&quot;height&quot;:1000}}">
+class Component extends DCLogic {
+  state = { theme: {}, master: {}, types: {}, consent: {} };
+
+  setTheme(fid, v) { this.setState((s) => ({ theme: { ...s.theme, [fid]: v } })); }
+  toggleMaster(fid, cur) { this.setState((s) => ({ master: { ...s.master, [fid]: !cur } })); }
+  toggleType(fid, idx, arr) {
+    const next = arr.slice(); next[idx] = !next[idx];
+    this.setState((s) => ({ types: { ...s.types, [fid]: next } }));
+  }
+  toggleConsent(fid, idx, arr) {
+    const next = arr.slice(); next[idx] = !next[idx];
+    this.setState((s) => ({ consent: { ...s.consent, [fid]: next } }));
+  }
+
+  renderVals() {
+    const E = React.createElement;
+    const icon = (children, sw) => E('svg', { width: 17, height: 17, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: sw || 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' }, children);
+    const chevron = E('svg', { width: 17, height: 17, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2.2, strokeLinecap: 'round', strokeLinejoin: 'round' }, E('path', { d: 'M9 6l6 6-6 6' }));
+    const extlink = E('svg', { width: 15, height: 15, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2.1, strokeLinecap: 'round', strokeLinejoin: 'round' }, [E('path', { key: 1, d: 'M7 17 17 7' }), E('path', { key: 2, d: 'M8 7h9v9' })]);
+
+    // toggle view-model
+    const tog = (on, disabled) => ({
+      checked: !!on,
+      track: disabled ? 'var(--surface-sunken)' : (on ? 'var(--accent)' : 'var(--border-strong)'),
+      thumb: on ? 'translateX(18px)' : 'translateX(0)',
+      opacity: disabled ? 0.55 : 1,
+      cursor: disabled ? 'default' : 'pointer',
+    });
+
+    const notifDefs = [
+      { label: 'Rappel de prono', desc: "Avant chaque coup d'envoi si tu n'as pas pronostiqué." },
+      { label: 'Résultats & points', desc: 'Quand un match est terminé et tes points calculés.' },
+      { label: 'Activité de ligue', desc: 'Classements et mouvements dans tes ligues.' },
+      { label: 'Invitations', desc: 'Quand un ami t\u2019invite dans une ligue.' },
+    ];
+    const legalIcons = {
+      cgu: icon([E('path', { key: 1, d: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z' }), E('path', { key: 2, d: 'M14 2v6h6M8 13h8M8 17h5' })]),
+      priv: icon([E('path', { key: 1, d: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z' })]),
+      legal: icon([E('path', { key: 1, d: 'M3 6l9-4 9 4M4 10h16M4 10v8M20 10v8M4 18h16M9 10v8M15 10v8' })]),
+      rgpd: icon([E('circle', { key: 1, cx: 12, cy: 12, r: 9 }), E('path', { key: 2, d: 'M12 8v4M12 16h.01' })]),
+    };
+
+    const check = E('svg', { width: 17, height: 17, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2.6, strokeLinecap: 'round', strokeLinejoin: 'round' }, E('path', { d: 'M20 6L9 17l-5-5' }));
+
+    const frameDefs = [
+      { id: 'full_l', theme: 'light', label: 'Réglages complet · clair', dot: '#FBF7EF', themeDef: 'system' },
+      { id: 'full_d', theme: 'dark', label: 'Réglages complet · sombre', dot: '#14432A', themeDef: 'dark' },
+      { id: 'social', theme: 'light', label: 'Compte social-only (Apple) · mot de passe masqué', dot: '#8A8071', social: true },
+      { id: 'pseudo', theme: 'light', label: 'Pseudo en édition · erreur « déjà pris »', dot: 'var(--grenat-500)', pseudoEdit: true },
+      { id: 'pwd', theme: 'light', label: 'Feuille · modifier le mot de passe (erreur)', dot: 'var(--grenat-500)', sheet: 'pwd' },
+      { id: 'rgpd', theme: 'light', label: 'Feuille · consentements RGPD', dot: '#8A8071', sheet: 'rgpd' },
+      { id: 'notif', theme: 'light', label: 'Notifications · permission OS refusée', dot: '#8A8071', osRefused: true },
+      { id: 'del_r', theme: 'light', label: 'Suppression · repos (confirmer désactivé)', dot: '#C4362B', modal: 'rest' },
+      { id: 'del_a', theme: 'light', label: 'Suppression · confirmation active', dot: '#C4362B', modal: 'active' },
+      { id: 'del_l', theme: 'light', label: 'Suppression · chargement', dot: '#C4362B', modal: 'loading' },
+      { id: 'toast', theme: 'light', label: 'Micro-feedback · enregistré', dot: '#2E8B57', toast: true },
+    ];
+
+    const themeOptions = [
+      { value: 'system', label: 'Système' },
+      { value: 'light', label: 'Clair' },
+      { value: 'dark', label: 'Sombre' },
+    ];
+
+    const frames = frameDefs.map((fd) => {
+      const social = !!fd.social;
+      // notifications
+      const osRefused = !!fd.osRefused;
+      const masterOn = osRefused ? false : (this.state.master[fd.id] !== undefined ? this.state.master[fd.id] : true);
+      const typesArr = this.state.types[fd.id] || [true, true, false, true];
+      const notifTypes = notifDefs.map((n, i) => {
+        const t = tog(!osRefused && masterOn && typesArr[i], osRefused || !masterOn);
+        return {
+          label: n.label, desc: n.desc,
+          labelColor: (osRefused || !masterOn) ? 'var(--text-faint)' : 'var(--text)',
+          edge: i === 0 ? 'none' : '1px solid var(--border)',
+          checked: t.checked, track: t.track, thumb: t.thumb, opacity: t.opacity, cursor: t.cursor,
+          onClick: (osRefused || !masterOn) ? (() => {}) : (() => this.toggleType(fd.id, i, typesArr)),
+        };
+      });
+      const masterTog = tog(masterOn, osRefused);
+
+      // legal rows
+      const legalRows = [
+        { key: 'cgu', label: "Conditions d'utilisation", icon: legalIcons.cgu, trail: extlink, hasSub: false },
+        { key: 'priv', label: 'Politique de confidentialité', icon: legalIcons.priv, trail: extlink, hasSub: false },
+        { key: 'legal', label: 'Mentions légales', icon: legalIcons.legal, trail: extlink, hasSub: false },
+        { key: 'rgpd', label: 'Gestion du consentement', sub: 'Analytics & communications', icon: legalIcons.rgpd, trail: chevron, hasSub: true },
+        { key: 'export', label: 'Exporter mes données', sub: 'Reçois une copie par e-mail (RGPD)', icon: icon([E('path', { key: 1, d: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' }), E('path', { key: 2, d: 'M7 10l5 5 5-5M12 15V3' })]), trail: chevron, hasSub: true },
+      ].map((r, i) => ({ ...r, edge: i === 0 ? 'none' : '1px solid var(--border)', onClick: () => {} }));
+
+      // consents (rgpd sheet)
+      const consentDefs = [
+        { label: 'Mesure d\u2019audience', desc: 'Statistiques anonymes pour améliorer l\u2019app.', date: 'Recueilli le 12 janv. 2026' },
+        { label: 'Communications', desc: 'E-mails sur les nouveautés et temps forts.', date: 'Recueilli le 12 janv. 2026' },
+      ];
+      const consentArr = this.state.consent[fd.id] || [true, false];
+      const consents = consentDefs.map((c, i) => {
+        const t = tog(consentArr[i], false);
+        return { label: c.label, desc: c.desc, date: c.date, edge: i === 0 ? 'none' : '1px solid var(--border)', checked: t.checked, track: t.track, thumb: t.thumb, onClick: () => this.toggleConsent(fd.id, i, consentArr) };
+      });
+
+      // delete modal
+      const modal = fd.modal || null;
+      const deleteLoading = modal === 'loading';
+      const confirmActive = modal === 'active' || deleteLoading;
+      const confirmValue = confirmActive ? 'Antoine M.' : '';
+      const confirmMatch = confirmActive;
+      const checked = confirmActive;
+      const confirmEnabled = confirmActive;
+      const confirmBg = confirmEnabled ? 'var(--danger)' : 'color-mix(in srgb, var(--danger) 28%, var(--surface-sunken))';
+      const confirmColor = confirmEnabled ? 'var(--on-danger)' : 'color-mix(in srgb, var(--danger) 55%, var(--text-faint))';
+
+      const themeValue = this.state.theme[fd.id] || fd.themeDef || 'system';
+
+      return {
+        id: fd.id, label: fd.label, theme: fd.theme, dot: fd.dot,
+        noop: () => {},
+
+        // pseudo
+        pseudoEditing: !!fd.pseudoEdit,
+        pseudoDisplay: !fd.pseudoEdit,
+        // email / password
+        emailEditable: !social,
+        emailLocked: social,
+        hasPassword: !social,
+        socialOnly: social,
+
+        // theme
+        themeOptions, themeValue,
+        setTheme: (v) => this.setTheme(fd.id, v),
+
+        // notifications
+        master: {
+          checked: masterTog.checked, track: masterTog.track, thumb: masterTog.thumb,
+          opacity: masterTog.opacity, cursor: masterTog.cursor,
+          labelColor: osRefused ? 'var(--text-faint)' : 'var(--text)',
+          sub: osRefused ? 'Bloquées au niveau du système' : (masterOn ? 'Choisis ce que tu veux recevoir' : 'Toutes les notifications sont coupées'),
+          onClick: osRefused ? (() => {}) : (() => this.toggleMaster(fd.id, masterOn)),
+        },
+        osRefused,
+        notifDetail: masterOn && !osRefused,
+        notifTypes,
+
+        // legal
+        legalRows,
+
+        // toast
+        showToast: !!fd.toast,
+        toastIcon: check,
+
+        // sheet
+        showSheet: !!fd.sheet,
+        sheetPwd: fd.sheet === 'pwd',
+        sheetRgpd: fd.sheet === 'rgpd',
+        consents,
+
+        // modal
+        showModal: !!modal,
+        deleteLoading,
+        deleteLosses: [
+          { t: 'Tous tes pronos et leur historique' },
+          { t: 'Ton total de points et tes classements' },
+          { t: 'Ta place dans toutes tes ligues' },
+          { t: 'Ton profil et tes préférences' },
+        ],
+        confirmValue, confirmMatch, checked,
+        confirmBorder: confirmMatch ? 'var(--success-500)' : 'var(--border-strong)',
+        checkBorder: checked ? 'var(--brand)' : 'var(--border-strong)',
+        checkBg: checked ? 'var(--brand)' : 'transparent',
+        confirmBg, confirmColor,
+        confirmCursor: confirmEnabled ? 'pointer' : 'default',
+        confirmOpacity: deleteLoading ? 0.9 : 1,
+        confirmDisabledAttr: !confirmEnabled,
+        confirmLabel: deleteLoading ? 'Suppression…' : 'Supprimer définitivement',
+      };
+    });
+
+    return { frames };
+  }
+}
+</script>
+</body>
+</html>

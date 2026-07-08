@@ -1,0 +1,67 @@
+/* TryCast — Typography tokens
+ * Display / scores: Anton (condensed, Google Fonts)
+ * Body / UI / data: Inter */
+
+:root {
+  --font-display: 'Anton', 'Arial Narrow', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Weights (Anton ships single weight 400; Inter has the range) */
+  --fw-regular: 400;  /* @kind font */
+  --fw-medium:  500;  /* @kind font */
+  --fw-semibold:600;  /* @kind font */
+  --fw-bold:    700;  /* @kind font */
+
+  /* ---- Type scale (sizes) ----
+   * display — hero numbers, big scores (Anton)
+   * h1 / h2 — section + screen titles (Anton)
+   * body    — default UI text (Inter)
+   * data    — tabular numerals: points, ranks, scores (Inter)
+   * caption — labels, meta, timestamps (Inter) */
+  --display-size: 56px;
+  --h1-size:      32px;
+  --h2-size:      22px;
+  --title-size:   17px;
+  --body-size:    15px;
+  --body-sm-size: 13px;
+  --data-size:    15px;
+  --caption-size: 12px;
+  --overline-size:11px;
+
+  /* Line heights */
+  --display-lh: 0.92; /* @kind font */
+  --h1-lh:      1.02; /* @kind font */
+  --h2-lh:      1.1;  /* @kind font */
+  --title-lh:   1.25; /* @kind font */
+  --body-lh:    1.5;  /* @kind font */
+  --body-sm-lh: 1.45; /* @kind font */
+  --data-lh:    1.1;  /* @kind font */
+  --caption-lh: 1.35; /* @kind font */
+  --overline-lh:1.2;  /* @kind font */
+
+  /* Letter spacing */
+  --display-track: 0.01em; /* @kind font */
+  --h1-track:      0.01em; /* @kind font */
+  --h2-track:      0.02em; /* @kind font */
+  --caption-track: 0.02em; /* @kind font */
+  --overline-track:0.14em; /* @kind font */
+}
+
+/* Utility text roles — used by cards & components */
+.tc-display { font-family: var(--font-display); font-weight: var(--fw-regular);
+  font-size: var(--display-size); line-height: var(--display-lh); letter-spacing: var(--display-track); }
+.tc-h1 { font-family: var(--font-display); font-weight: var(--fw-regular);
+  font-size: var(--h1-size); line-height: var(--h1-lh); letter-spacing: var(--h1-track); }
+.tc-h2 { font-family: var(--font-display); font-weight: var(--fw-regular);
+  font-size: var(--h2-size); line-height: var(--h2-lh); letter-spacing: var(--h2-track); }
+.tc-title { font-family: var(--font-body); font-weight: var(--fw-semibold);
+  font-size: var(--title-size); line-height: var(--title-lh); }
+.tc-body { font-family: var(--font-body); font-weight: var(--fw-regular);
+  font-size: var(--body-size); line-height: var(--body-lh); }
+.tc-data { font-family: var(--font-body); font-weight: var(--fw-semibold);
+  font-size: var(--data-size); line-height: var(--data-lh); font-variant-numeric: tabular-nums; }
+.tc-caption { font-family: var(--font-body); font-weight: var(--fw-medium);
+  font-size: var(--caption-size); line-height: var(--caption-lh); letter-spacing: var(--caption-track); }
+.tc-overline { font-family: var(--font-body); font-weight: var(--fw-semibold);
+  font-size: var(--overline-size); line-height: var(--overline-lh); letter-spacing: var(--overline-track);
+  text-transform: uppercase; }
