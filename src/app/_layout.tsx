@@ -1,6 +1,14 @@
 import '@/global.css';
 
+import { Anton_400Regular } from '@expo-google-fonts/anton';
+import {
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+} from '@expo-google-fonts/inter';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme } from 'react-native';
@@ -13,9 +21,17 @@ SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
     const { session, isLoading } = useSession();
+    const [fontsLoaded] = useFonts({
+        Anton_400Regular,
+        Inter_400Regular,
+        Inter_500Medium,
+        Inter_600SemiBold,
+        Inter_700Bold,
+    });
 
     // Le splash overlay reste affiché tant que la session n'est pas restaurée
-    if (isLoading) {
+    // et que les polices du design system ne sont pas prêtes
+    if (isLoading || !fontsLoaded) {
         return null;
     }
 

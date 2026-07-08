@@ -2,13 +2,187 @@
 @import "tailwindcss/preflight.css" layer(base);
 @import "tailwindcss/utilities.css";
 
-:root {
-    --font-display:
-        Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-        Segoe UI Symbol, Noto Color Emoji;
+/* ============================================================
+ * TryCast — design system V0
+ * Source de vérité : docs/design/project/_ds/…/tokens/*.css
+ * Grenat = étincelle, jamais un fond (CTA, live, sélection).
+ * Light = base crème, dark = base verte ; bascule via light-dark()
+ * (pilotée par le color scheme système / Appearance).
+ * ============================================================ */
+
+@layer base {
+    :root {
+        color-scheme: light dark;
+    }
 }
 
-/* Platform-specific font families */
+:root {
+    /* ---- Palette primitive (stable, ne bascule pas) ---- */
+    --green-900: #0e3320;
+    --green-800: #14432a;
+    --green-700: #1c5638;
+    --green-600: #26694a;
+
+    --grenat-600: #c82e52;
+    --grenat-500: #e63e63;
+    --grenat-400: #f06485;
+
+    --cream: #f1ebdd;
+    --cream-100: #fbf7ef;
+    --cream-200: #e7dfcc;
+
+    --ink-900: #16130e;
+    --ink-600: #5a5245;
+    --ink-400: #8a8071;
+
+    --mist-300: #a9c0b2;
+
+    /* ---- Alias sémantiques (light, dark) ---- */
+    --bg: light-dark(var(--cream), var(--green-900));
+    --surface: light-dark(var(--cream-100), var(--green-800));
+    --surface-sunken: light-dark(var(--cream-200), #0b2a19);
+    --border: light-dark(var(--cream-200), var(--green-700));
+    --border-strong: light-dark(#d8ceb8, var(--green-600));
+    --text: light-dark(var(--ink-900), var(--cream));
+    --text-muted: light-dark(var(--ink-600), var(--mist-300));
+    --text-faint: light-dark(var(--ink-400), #7e9587);
+    --brand: light-dark(var(--green-800), var(--cream));
+    --on-brand: light-dark(var(--cream), var(--green-900));
+    --accent: var(--grenat-500);
+    --accent-hover: var(--grenat-400);
+    --accent-press: var(--grenat-600);
+    --on-accent: var(--cream);
+    --focus-ring: light-dark(var(--grenat-500), var(--grenat-400));
+
+    /* Danger (brique) : distinct du grenat, seule couleur de destruction */
+    --danger: light-dark(#c4362b, #f0685a);
+    --danger-press: light-dark(#a82c22, #d8564a);
+    --on-danger: light-dark(#fbf7ef, #2a0f0c);
+
+    /* Statuts (dérivés, neutres IP) */
+    --success: #2e8b57;
+    --warning: #d8a23a;
+    --info: #3c7da6;
+    --live: var(--grenat-500);
+
+    /* Ombres — basses et chaudes en light, noires en dark */
+    --tc-shadow-sm: 0 1px 2px rgba(22, 19, 14, 0.06);
+    --tc-shadow-md: 0 4px 14px rgba(22, 19, 14, 0.08);
+    --tc-shadow-lg: 0 12px 32px rgba(22, 19, 14, 0.12);
+    /* Glow grenat — réservé à l'étincelle live/sélection */
+    --glow-accent: 0 4px 18px rgba(230, 62, 99, 0.35);
+
+    /* Motion */
+    --dur-fast: 120ms;
+    --dur: 200ms;
+    --dur-slow: 320ms;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --tc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+        --tc-shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35);
+        --tc-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
+    }
+}
+
+@layer theme {
+    @theme {
+        /* ---- Couleurs → utilitaires (bg-surface, text-text-muted, border-border…) ---- */
+        --color-bg: var(--bg);
+        --color-surface: var(--surface);
+        --color-surface-sunken: var(--surface-sunken);
+        --color-border: var(--border);
+        --color-border-strong: var(--border-strong);
+        --color-text: var(--text);
+        --color-text-muted: var(--text-muted);
+        --color-text-faint: var(--text-faint);
+        --color-brand: var(--brand);
+        --color-on-brand: var(--on-brand);
+        --color-accent: var(--accent);
+        --color-accent-hover: var(--accent-hover);
+        --color-accent-press: var(--accent-press);
+        --color-on-accent: var(--on-accent);
+        --color-focus-ring: var(--focus-ring);
+        --color-danger: var(--danger);
+        --color-danger-press: var(--danger-press);
+        --color-on-danger: var(--on-danger);
+        --color-success: var(--success);
+        --color-warning: var(--warning);
+        --color-info: var(--info);
+        --color-live: var(--live);
+
+        /* Primitives exposées pour les cas ciblés (ex. retinter la TabBar en dark) */
+        --color-green-900: var(--green-900);
+        --color-green-800: var(--green-800);
+        --color-green-700: var(--green-700);
+        --color-green-600: var(--green-600);
+        --color-grenat-600: var(--grenat-600);
+        --color-grenat-500: var(--grenat-500);
+        --color-grenat-400: var(--grenat-400);
+        --color-cream: var(--cream);
+        --color-cream-100: var(--cream-100);
+        --color-cream-200: var(--cream-200);
+        --color-ink-900: var(--ink-900);
+        --color-ink-600: var(--ink-600);
+        --color-ink-400: var(--ink-400);
+        --color-mist-300: var(--mist-300);
+
+        /* ---- Typo : Anton (display) + Inter (corps) chargées via expo-font.
+         * En natif, font-weight ne sélectionne pas la graisse d'une police
+         * custom : utiliser la famille dédiée (font-body-semibold), pas font-semibold. */
+        --font-display: "Anton_400Regular";
+        --font-body: "Inter_400Regular";
+        --font-body-medium: "Inter_500Medium";
+        --font-body-semibold: "Inter_600SemiBold";
+        --font-body-bold: "Inter_700Bold";
+
+        /* ---- Échelle de texte (line-heights en px pour React Native) ---- */
+        --text-display: 56px;
+        --text-display--line-height: 52px;
+        --text-display--letter-spacing: 0.5px;
+        --text-h1: 32px;
+        --text-h1--line-height: 33px;
+        --text-h1--letter-spacing: 0.3px;
+        --text-h2: 22px;
+        --text-h2--line-height: 24px;
+        --text-h2--letter-spacing: 0.44px;
+        --text-title: 17px;
+        --text-title--line-height: 21px;
+        --text-body: 15px;
+        --text-body--line-height: 22px;
+        --text-body-sm: 13px;
+        --text-body-sm--line-height: 19px;
+        --text-data: 15px;
+        --text-data--line-height: 17px;
+        --text-caption: 12px;
+        --text-caption--line-height: 16px;
+        --text-caption--letter-spacing: 0.24px;
+        --text-overline: 11px;
+        --text-overline--line-height: 13px;
+        --text-overline--letter-spacing: 1.54px;
+
+        /* ---- Radii — doux, mobile-first (rounded-xs … rounded-pill) ---- */
+        --radius-xs: 6px;
+        --radius-sm: 10px;
+        --radius-md: 14px; /* carte par défaut */
+        --radius-lg: 20px; /* sheets, grandes cartes */
+        --radius-xl: 28px;
+        --radius-pill: 999px;
+
+        /* ---- Ombres (shadow-sm/md/lg, shadow-glow) ---- */
+        --shadow-sm: var(--tc-shadow-sm);
+        --shadow-md: var(--tc-shadow-md);
+        --shadow-lg: var(--tc-shadow-lg);
+        --shadow-glow: var(--glow-accent);
+
+        /* ---- Motion (ease-out par défaut du DS) ---- */
+        --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+        --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    }
+}
+
+/* Familles système par plateforme (fallbacks hors DS) */
 @media android {
     :root {
         --font-mono: monospace;
