@@ -38,8 +38,7 @@ export default function LeaguesScreen() {
                 <View className="items-center gap-2 py-10">
                     <Text className="text-3xl">🤝</Text>
                     <Text className="text-center text-base text-gray-500">
-                        Crée une ligue avec tes amis ou rejoins-en une avec un code
-                        d’invitation.
+                        Crée une ligue avec tes amis ou rejoins-en une avec un code d’invitation.
                     </Text>
                 </View>
             ) : (

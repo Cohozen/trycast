@@ -56,9 +56,7 @@ export default function LeaderboardScreen() {
     return (
         <ScrollView className="flex-1" contentContainerClassName="gap-2 p-6 pt-16">
             <Text className="text-2xl font-bold text-gray-900">Classement</Text>
-            <Text className="mb-2 text-sm text-gray-500">
-                Général — {competition.data.name}
-            </Text>
+            <Text className="mb-2 text-sm text-gray-500">Général — {competition.data.name}</Text>
             {entries.map((entry) => (
                 <LeaderboardRow
                     key={entry.user_id}

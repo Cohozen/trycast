@@ -7,10 +7,7 @@ export function useMyLeagues() {
     return useQuery({
         queryKey: ['leagues'],
         queryFn: async () => {
-            const { data, error } = await supabase
-                .from('leagues')
-                .select('*')
-                .order('created_at');
+            const { data, error } = await supabase.from('leagues').select('*').order('created_at');
             if (error) throw error;
             return data;
         },

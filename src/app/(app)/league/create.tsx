@@ -40,8 +40,8 @@ export default function CreateLeagueScreen() {
                 contentContainerClassName="gap-6 p-6"
                 keyboardShouldPersistTaps="handled">
                 <Text className="text-base text-gray-500">
-                    Donne un nom à ta ligue — tu recevras un code d’invitation à partager
-                    avec tes amis.
+                    Donne un nom à ta ligue — tu recevras un code d’invitation à partager avec tes
+                    amis.
                 </Text>
 
                 {error ? <FormBanner message={error} tone="error" /> : null}
