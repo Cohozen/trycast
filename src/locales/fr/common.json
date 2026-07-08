@@ -1,0 +1,18 @@
+{
+    "tabs": {
+        "matches": "Matchs",
+        "results": "Résultats",
+        "leaderboard": "Classement",
+        "profile": "Profil"
+    },
+    "actions": {
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "retry": "Réessayer",
+        "back": "Retour",
+        "close": "Fermer"
+    },
+    "errors": {
+        "generic": "Une erreur est survenue. Réessaie."
+    }
+}
