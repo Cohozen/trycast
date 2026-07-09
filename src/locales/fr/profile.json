@@ -12,6 +12,7 @@
     "settings": {
         "title": "Réglages",
         "sections": {
+            "account": "Compte",
             "preferences": "Préférences",
             "about": "À propos",
             "danger": "Zone de danger"

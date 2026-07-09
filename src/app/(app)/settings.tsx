@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { IconButton } from '@/components/ui/icon-button';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { DeleteAccountModal } from '@/features/profile/components/delete-account-modal';
+import { UsernameEditor } from '@/features/profile/components/username-editor';
 import { useSession } from '@/features/auth/session-context';
 import {
     loadThemePreference,
@@ -80,6 +81,12 @@ export default function SettingsScreen() {
                 <Text className="font-display text-[30px] leading-[30px] tracking-[0.3px] text-text">
                     {t('profile:settings.title')}
                 </Text>
+            </View>
+
+            {/* Compte — photo, e-mail et mot de passe arrivent avec leurs lots */}
+            <View className="gap-2.5">
+                <SectionLabel>{t('profile:settings.sections.account')}</SectionLabel>
+                <UsernameEditor userId={session?.user.id ?? ''} />
             </View>
 
             {/* Préférences */}
