@@ -1,13 +1,17 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 
-import { FormBanner, FormField, PrimaryButton } from '@/components/form';
-import { toFrenchAuthMessage } from '@/features/auth/errors';
+import { Button } from '@/components/ui/button';
+import { TextField } from '@/components/ui/text-field';
+import { Toast } from '@/components/ui/toast';
+import { toAuthMessageKey } from '@/features/auth/errors';
 import { validateEmail } from '@/features/auth/validation';
 import { supabase } from '@/lib/supabase';
 import { Link, ScrollView, Text, View } from '@/tw';
 
 export default function ForgotPasswordScreen() {
+    const { t } = useTranslation(['auth', 'common']);
     const [email, setEmail] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [sent, setSent] = useState(false);
@@ -17,14 +21,14 @@ export default function ForgotPasswordScreen() {
         setError(null);
         const emailError = validateEmail(email);
         if (emailError) {
-            setError(emailError);
+            setError(t(emailError));
             return;
         }
         setSubmitting(true);
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim());
         setSubmitting(false);
         if (resetError) {
-            setError(toFrenchAuthMessage(resetError));
+            setError(t(toAuthMessageKey(resetError)));
             return;
         }
         setSent(true);
@@ -35,41 +39,43 @@ export default function ForgotPasswordScreen() {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             style={{ flex: 1 }}>
             <ScrollView
-                className="flex-1 bg-white"
-                contentContainerClassName="flex-grow justify-center gap-6 p-6"
+                className="flex-1 bg-bg"
+                contentContainerClassName="w-full max-w-[440px] flex-grow justify-center gap-5 self-center px-6 py-8"
                 keyboardShouldPersistTaps="handled">
-                <View className="gap-1">
-                    <Text className="text-3xl font-bold text-gray-900">Mot de passe oublié</Text>
-                    <Text className="text-base text-gray-500">
-                        On t’envoie un lien de réinitialisation par email.
+                <View className="gap-1.5">
+                    <Text className="font-display text-h1 text-text">{t('auth:forgot.title')}</Text>
+                    <Text className="font-body text-body text-text-muted">
+                        {t('auth:forgot.subtitle')}
                     </Text>
                 </View>
 
-                {error ? <FormBanner message={error} tone="error" /> : null}
-                {sent ? (
-                    <FormBanner message="Email envoyé ! Vérifie ta boîte mail." tone="success" />
-                ) : null}
+                {error ? <Toast message={error} tone="accent" /> : null}
+                {sent ? <Toast message={t('auth:forgot.sent')} tone="success" /> : null}
 
-                <View className="gap-4">
-                    <FormField
-                        label="Email"
+                <View className="gap-3.5">
+                    <TextField
                         autoCapitalize="none"
                         autoComplete="email"
                         keyboardType="email-address"
-                        placeholder="toi@exemple.fr"
-                        value={email}
+                        label={t('auth:fields.email.label')}
                         onChangeText={setEmail}
+                        placeholder={t('auth:fields.email.placeholder')}
+                        value={email}
                     />
-                    <PrimaryButton
-                        title="Envoyer le lien"
-                        loading={submitting}
+                    <Button
                         disabled={!email || sent}
+                        fullWidth
+                        loading={submitting}
                         onPress={onSubmit}
+                        size="lg"
+                        title={t('auth:actions.sendResetLink')}
                     />
                 </View>
 
-                <Link href="/login" className="text-center text-sm text-blue-600">
-                    Retour à la connexion
+                <Link
+                    className="text-center font-body-medium text-[13px] text-text-muted"
+                    href="/login">
+                    {t('auth:links.backToLogin')}
                 </Link>
             </ScrollView>
         </KeyboardAvoidingView>

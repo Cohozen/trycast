@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { validateEmail, validatePassword, validateUsername } from './validation';
+import {
+    validateEmail,
+    validatePassword,
+    validatePasswordConfirmation,
+    validateUsername,
+} from './validation';
 
 describe('validateUsername', () => {
     it.each([
@@ -58,5 +63,17 @@ describe('validatePassword', () => {
     it('refuse moins de 8 caractères', () => {
         expect(validatePassword('1234567')).not.toBeNull();
         expect(validatePassword('')).not.toBeNull();
+    });
+});
+
+describe('validatePasswordConfirmation', () => {
+    it('accepte deux mots de passe identiques', () => {
+        expect(validatePasswordConfirmation('12345678', '12345678')).toBeNull();
+    });
+
+    it('refuse une vérification différente', () => {
+        expect(validatePasswordConfirmation('12345678', '1234567')).toBe(
+            'auth:validation.passwordMismatch',
+        );
     });
 });

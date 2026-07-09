@@ -1,1 +1,46 @@
-{}
+{
+    "title": "Profil",
+    "username": {
+        "label": "Pseudo",
+        "hint": "3–20 caractères · lettres, chiffres et « _ » · doit être unique.",
+        "updated": "Pseudo mis à jour !",
+        "taken": "Ce pseudo est déjà pris. Essaie autre chose."
+    },
+    "settings": {
+        "title": "Réglages",
+        "sections": {
+            "preferences": "Préférences",
+            "about": "À propos",
+            "danger": "Zone de danger"
+        },
+        "theme": {
+            "label": "Thème",
+            "autoSaved": "Auto-enregistré",
+            "system": "Système",
+            "light": "Clair",
+            "dark": "Sombre"
+        },
+        "language": {
+            "label": "Langue",
+            "current": "Français"
+        },
+        "version": "Version",
+        "logout": "Se déconnecter",
+        "delete": {
+            "rowTitle": "Supprimer mon compte",
+            "rowSubtitle": "Action irréversible : pronos, historique, points et ligues seront définitivement perdus.",
+            "modalTitle": "Supprimer ton compte ?",
+            "modalIntro": "Cette action est irréversible. Tu perdras définitivement :",
+            "losses": {
+                "predictions": "Tous tes pronos et leur historique",
+                "points": "Ton total de points et tes classements",
+                "leagues": "Ta place dans toutes tes ligues",
+                "profile": "Ton profil et tes préférences"
+            },
+            "confirmPrompt": "Pour confirmer, retape ton pseudo {{username}}",
+            "acknowledge": "Je comprends que cette action est définitive.",
+            "confirm": "Supprimer définitivement",
+            "deleting": "Suppression…"
+        }
+    }
+}

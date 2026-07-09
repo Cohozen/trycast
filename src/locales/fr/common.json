@@ -13,6 +13,7 @@
         "close": "Fermer"
     },
     "errors": {
-        "generic": "Une erreur est survenue. Réessaie."
+        "generic": "Une erreur est survenue. Réessaie.",
+        "network": "Connexion impossible. Vérifie ta connexion internet."
     }
 }

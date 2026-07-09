@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Pressable, Text, useCSSVariable } from '@/tw';
 import { cn } from '@/tw/variants';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'danger-outline';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 type ButtonProps = {
@@ -51,6 +51,12 @@ const variantClasses: Record<
         boxPressed: 'bg-danger-press',
         text: 'text-on-danger',
         spinner: '--on-danger',
+    },
+    'danger-outline': {
+        box: 'border-[1.5px] border-danger bg-transparent',
+        boxPressed: 'bg-danger/10',
+        text: 'text-danger',
+        spinner: '--danger',
     },
 };
 

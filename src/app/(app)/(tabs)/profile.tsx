@@ -1,126 +1,146 @@
+import { useRouter } from 'expo-router';
+import { Pencil, Settings } from 'lucide-react-native';
 import { useState } from 'react';
-import { Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
-import { FormBanner, FormField, PrimaryButton } from '@/components/form';
-import { toFrenchAuthMessage } from '@/features/auth/errors';
+import { Avatar } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { IconButton } from '@/components/ui/icon-button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { TextField } from '@/components/ui/text-field';
+import { Toast } from '@/components/ui/toast';
+import { toAuthMessageKey } from '@/features/auth/errors';
 import { useSession } from '@/features/auth/session-context';
 import { validateUsername } from '@/features/auth/validation';
-import { useDeleteAccount, useProfile, useUpdateUsername } from '@/features/profile/use-profile';
-import { supabase } from '@/lib/supabase';
-import { ActivityIndicator, ScrollView, Text, View } from '@/tw';
+import { useProfile, useUpdateUsername } from '@/features/profile/use-profile';
+import { Pressable, ScrollView, Text, useCSSVariable, View } from '@/tw';
 
 export default function ProfileScreen() {
+    const { t } = useTranslation(['profile', 'auth', 'common']);
+    const router = useRouter();
     const { session } = useSession();
     const userId = session?.user.id ?? '';
 
     const { data: profile, isPending } = useProfile(userId);
     const updateUsername = useUpdateUsername(userId);
-    const deleteAccount = useDeleteAccount();
 
-    const [username, setUsername] = useState<string | null>(null);
+    const [editing, setEditing] = useState(false);
+    const [username, setUsername] = useState('');
+    const [fieldError, setFieldError] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [saved, setSaved] = useState(false);
+    const textColor = useCSSVariable('--text');
+    const textFaintColor = useCSSVariable('--text-faint');
 
-    const editedUsername = username ?? profile?.username ?? '';
-    const isDirty = profile != null && editedUsername !== profile.username;
+    const startEditing = () => {
+        setUsername(profile?.username ?? '');
+        setFieldError(null);
+        setError(null);
+        setSaved(false);
+        setEditing(true);
+    };
 
     const onSave = async () => {
         setError(null);
-        setSaved(false);
-        const validationError = validateUsername(editedUsername);
+        const validationError = validateUsername(username);
         if (validationError) {
-            setError(validationError);
+            setFieldError(t(validationError));
             return;
         }
+        setFieldError(null);
         try {
-            await updateUsername.mutateAsync(editedUsername);
-            setUsername(null);
+            await updateUsername.mutateAsync(username);
+            setEditing(false);
             setSaved(true);
         } catch (err) {
             if (isPostgrestError(err) && err.code === '23505') {
-                setError('Ce pseudo est déjà pris.');
+                setFieldError(t('profile:username.taken'));
             } else {
-                setError(toFrenchAuthMessage(err));
+                setError(t(toAuthMessageKey(err)));
             }
         }
     };
 
-    const onDeleteAccount = () => {
-        Alert.alert(
-            'Supprimer ton compte ?',
-            'Toutes tes données (profil, pronostics, ligues) seront définitivement supprimées. Cette action est irréversible.',
-            [
-                { text: 'Annuler', style: 'cancel' },
-                {
-                    text: 'Supprimer',
-                    style: 'destructive',
-                    onPress: async () => {
-                        try {
-                            await deleteAccount.mutateAsync();
-                            // signOut inclus dans la mutation : Stack.Protected renvoie sur (auth)
-                        } catch (err) {
-                            Alert.alert('Erreur', toFrenchAuthMessage(err));
-                        }
-                    },
-                },
-            ],
-        );
-    };
-
-    if (isPending) {
-        return (
-            <View className="flex-1 items-center justify-center">
-                <ActivityIndicator />
-            </View>
-        );
-    }
-
     return (
-        <ScrollView className="flex-1" contentContainerClassName="gap-8 p-6 pt-16">
-            <View className="gap-1">
-                <Text className="text-2xl font-bold text-gray-900">Mon profil</Text>
-                <Text className="text-base text-gray-500">{session?.user.email}</Text>
-            </View>
-
-            {error ? <FormBanner message={error} tone="error" /> : null}
-            {saved ? <FormBanner message="Pseudo mis à jour !" tone="success" /> : null}
-
-            <View className="gap-4">
-                <FormField
-                    label="Pseudo"
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    value={editedUsername}
-                    onChangeText={(value) => {
-                        setUsername(value);
-                        setSaved(false);
-                    }}
-                />
-                {isDirty ? (
-                    <PrimaryButton
-                        title="Enregistrer"
-                        loading={updateUsername.isPending}
-                        onPress={onSave}
-                    />
-                ) : null}
-            </View>
-
-            <View className="gap-3">
-                <PrimaryButton title="Se déconnecter" onPress={() => supabase.auth.signOut()} />
-            </View>
-
-            <View className="gap-3 rounded-2xl border border-red-200 bg-red-50/50 p-4">
-                <Text className="text-base font-semibold text-red-700">Zone danger</Text>
-                <Text className="text-sm text-gray-600">
-                    La suppression de ton compte est immédiate et irréversible.
+        <ScrollView
+            className="flex-1 bg-bg"
+            contentContainerClassName="w-full max-w-[800px] gap-[18px] self-center px-5 pb-32 pt-14">
+            <View className="flex-row items-start justify-between gap-3">
+                <Text className="font-display text-[30px] leading-[30px] tracking-[0.3px] text-text">
+                    {t('profile:title')}
                 </Text>
-                <PrimaryButton
-                    title="Supprimer mon compte"
-                    variant="danger"
-                    loading={deleteAccount.isPending}
-                    onPress={onDeleteAccount}
-                />
+                <IconButton
+                    accessibilityLabel={t('profile:settings.title')}
+                    onPress={() => router.push('/settings')}
+                    variant="soft">
+                    <Settings color={textColor as string} size={20} strokeWidth={1.9} />
+                </IconButton>
             </View>
+
+            {error ? <Toast message={error} tone="accent" /> : null}
+            {saved ? <Toast message={t('profile:username.updated')} tone="success" /> : null}
+
+            {isPending ? (
+                <Skeleton className="h-[88px]" variant="block" />
+            ) : (
+                <Card className="flex-row items-center gap-3.5 px-4 py-3.5">
+                    <Avatar name={profile?.username ?? '?'} ring size="lg" />
+                    <View className="min-w-0 flex-1 gap-0.5">
+                        <Text className="font-body-bold text-[16px] text-text">
+                            {profile?.username}
+                        </Text>
+                        <Text className="font-body text-[13px] text-text-muted" numberOfLines={1}>
+                            {session?.user.email}
+                        </Text>
+                    </View>
+                </Card>
+            )}
+
+            {editing ? (
+                <Card className="gap-2.5 px-4 py-3.5">
+                    <TextField
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        error={fieldError}
+                        label={t('profile:username.label')}
+                        onChangeText={setUsername}
+                        value={username}
+                    />
+                    <Text className="font-body text-[11.5px] leading-[16px] text-text-faint">
+                        {t('profile:username.hint')}
+                    </Text>
+                    <View className="flex-row justify-end gap-2">
+                        <Button
+                            onPress={() => setEditing(false)}
+                            size="sm"
+                            title={t('common:actions.cancel')}
+                            variant="ghost"
+                        />
+                        <Button
+                            disabled={!username || username === profile?.username}
+                            loading={updateUsername.isPending}
+                            onPress={onSave}
+                            size="sm"
+                            title={t('common:actions.save')}
+                        />
+                    </View>
+                </Card>
+            ) : (
+                <Pressable onPress={startEditing}>
+                    <Card className="flex-row items-center gap-3 px-4 py-3.5">
+                        <View className="min-w-0 flex-1 gap-0.5">
+                            <Text className="font-body-bold text-[11px] uppercase tracking-[0.55px] text-text-faint">
+                                {t('profile:username.label')}
+                            </Text>
+                            <Text className="font-body-bold text-[15.5px] text-text">
+                                {profile?.username}
+                            </Text>
+                        </View>
+                        <Pencil color={textFaintColor as string} size={17} strokeWidth={1.9} />
+                    </Card>
+                </Pressable>
+            )}
         </ScrollView>
     );
 }

@@ -1,29 +1,48 @@
+/** Clé i18n d'une erreur de validation auth, à passer à t() côté écran. */
+export type AuthValidationKey =
+    | 'auth:validation.usernameTooShort'
+    | 'auth:validation.usernameTooLong'
+    | 'auth:validation.usernameCharset'
+    | 'auth:validation.invalidEmail'
+    | 'auth:validation.passwordTooShort'
+    | 'auth:validation.passwordMismatch';
+
 // Miroir de la contrainte SQL username_format (profiles)
 export const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,20}$/;
 
-export function validateUsername(username: string): string | null {
+export function validateUsername(username: string): AuthValidationKey | null {
     if (username.length < 3) {
-        return 'Ton pseudo doit faire au moins 3 caractères.';
+        return 'auth:validation.usernameTooShort';
     }
     if (username.length > 20) {
-        return 'Ton pseudo doit faire au plus 20 caractères.';
+        return 'auth:validation.usernameTooLong';
     }
     if (!USERNAME_PATTERN.test(username)) {
-        return 'Lettres, chiffres et _ uniquement (pas d’espaces ni d’accents).';
+        return 'auth:validation.usernameCharset';
     }
     return null;
 }
 
-export function validateEmail(email: string): string | null {
+export function validateEmail(email: string): AuthValidationKey | null {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-        return 'Adresse email invalide.';
+        return 'auth:validation.invalidEmail';
     }
     return null;
 }
 
-export function validatePassword(password: string): string | null {
+export function validatePassword(password: string): AuthValidationKey | null {
     if (password.length < 8) {
-        return 'Ton mot de passe doit faire au moins 8 caractères.';
+        return 'auth:validation.passwordTooShort';
+    }
+    return null;
+}
+
+export function validatePasswordConfirmation(
+    password: string,
+    confirmation: string,
+): AuthValidationKey | null {
+    if (password !== confirmation) {
+        return 'auth:validation.passwordMismatch';
     }
     return null;
 }

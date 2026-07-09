@@ -12,10 +12,12 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { SessionProvider, useSession } from '@/features/auth/session-context';
+import { applyStoredThemePreference } from '@/features/profile/theme-preference';
 import { useSyncLocale } from '@/features/profile/use-sync-locale';
 import { queryClient } from '@/lib/query';
 
@@ -52,6 +54,13 @@ function RootNavigator() {
 
 export default function RootLayout() {
     const colorScheme = useColorScheme();
+
+    // Ré-applique le thème choisi dans Réglages (effet : AsyncStorage n'existe
+    // pas pendant le rendu SSR web, et Appearance n'est utile qu'au client)
+    useEffect(() => {
+        applyStoredThemePreference();
+    }, []);
+
     return (
         <QueryClientProvider client={queryClient}>
             <SessionProvider>
