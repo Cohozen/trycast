@@ -9,6 +9,8 @@ type LeaderboardRowProps = {
     entry: LeaderboardEntry;
     /** Met en évidence la ligne de l'utilisateur connecté. */
     isMe: boolean;
+    /** Rang partagé avec au moins une autre entrée (mention « ex æquo »). */
+    tie?: boolean;
 };
 
 /**
@@ -16,7 +18,7 @@ type LeaderboardRowProps = {
  * avatar initiales, pseudo + stats, points Anton. Ma ligne porte la bordure
  * accent (l'étincelle marque ma position).
  */
-export function LeaderboardRow({ entry, isMe }: LeaderboardRowProps) {
+export function LeaderboardRow({ entry, isMe, tie = false }: LeaderboardRowProps) {
     const { t } = useTranslation(['leagues']);
     const sub = [
         t('leagues:leaderboard.row.predictions', { count: entry.predictions_scored }),
@@ -33,13 +35,20 @@ export function LeaderboardRow({ entry, isMe }: LeaderboardRowProps) {
                 'flex-row items-center gap-3 rounded-md border bg-surface px-3.5 py-3',
                 isMe ? 'border-accent/40 bg-accent/10' : 'border-border',
             )}>
-            <Text
-                className={cn(
-                    'w-8 text-center font-display text-[17px]',
-                    isMe ? 'text-accent' : 'text-text-faint',
-                )}>
-                {entry.rank}
-            </Text>
+            <View className="w-8 items-center gap-px">
+                <Text
+                    className={cn(
+                        'text-center font-display text-[17px]',
+                        isMe ? 'text-accent' : 'text-text-faint',
+                    )}>
+                    {entry.rank}
+                </Text>
+                {tie ? (
+                    <Text className="font-body-bold text-[7px] uppercase tracking-[0.28px] text-text-faint">
+                        {t('leagues:leaderboard.tie')}
+                    </Text>
+                ) : null}
+            </View>
             <Avatar name={entry.username} ring={isMe} size="sm" />
             <View className="min-w-0 flex-1 gap-px">
                 <Text

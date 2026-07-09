@@ -8,6 +8,8 @@ export type MyRank = {
     rank: number | null;
     /** Nombre total de joueurs classés sur la compétition. */
     total: number;
+    /** Écart de points avec le joueur juste au-dessus (null si premier). */
+    gapToAbove: number | null;
 };
 
 /**
@@ -37,7 +39,7 @@ export function useMyRank(
                 .eq('competition_id', competitionId as string);
             if (total.error) throw total.error;
 
-            if (!standing) return { rank: null, total: total.count ?? 0 };
+            if (!standing) return { rank: null, total: total.count ?? 0, gapToAbove: null };
 
             const better = await supabase
                 .from('standings')
@@ -46,7 +48,24 @@ export function useMyRank(
                 .or(betterThanFilter(standing));
             if (better.error) throw better.error;
 
-            return { rank: (better.count ?? 0) + 1, total: total.count ?? 0 };
+            // Le joueur juste au-dessus = le moins bon des meilleurs
+            const above = await supabase
+                .from('standings')
+                .select('total_points')
+                .eq('competition_id', competitionId as string)
+                .or(betterThanFilter(standing))
+                .order('total_points', { ascending: true })
+                .order('exact_scores', { ascending: true })
+                .order('predictions_scored', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+            if (above.error) throw above.error;
+
+            return {
+                rank: (better.count ?? 0) + 1,
+                total: total.count ?? 0,
+                gapToAbove: above.data ? above.data.total_points - standing.total_points : null,
+            };
         },
     });
 }

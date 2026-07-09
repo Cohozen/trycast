@@ -17,6 +17,22 @@
         "empty": "Le classement apparaîtra après les premiers matchs scorés.",
         "loadMore": "Charger plus",
         "manage": "Gérer la ligue",
+        "select": {
+            "overline": "Ligue affichée"
+        },
+        "general": {
+            "overline": "Classement global",
+            "title": "Tous les joueurs"
+        },
+        "players_one": "{{count}} joueur",
+        "players_other": "{{count}} joueurs",
+        "full": "Classement complet",
+        "tie": "ex æquo",
+        "tieNote": "Égalité de points départagée au nombre de scores exacts, puis de bons pronos.",
+        "pinned": {
+            "rankSuffix": "e",
+            "gap": "à {{gap}} pts du {{rank}}ᵉ"
+        },
         "row": {
             "predictions_one": "{{count}} prono",
             "predictions_other": "{{count}} pronos",

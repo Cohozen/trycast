@@ -1,3 +1,15 @@
+/** Marque les entrées qui partagent leur rang avec une autre (la RPC émet
+ * des rangs partagés via rank()) : affichage « ex æquo » + note explicative. */
+export function markTies<T extends { rank: number }>(
+    entries: readonly T[],
+): (T & { tie: boolean })[] {
+    const byRank = new Map<number, number>();
+    for (const entry of entries) {
+        byRank.set(entry.rank, (byRank.get(entry.rank) ?? 0) + 1);
+    }
+    return entries.map((entry) => ({ ...entry, tie: (byRank.get(entry.rank) ?? 0) > 1 }));
+}
+
 /** Colonnes de standings qui départagent le classement. */
 export type StandingScore = {
     total_points: number;
