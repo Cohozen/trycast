@@ -11,8 +11,18 @@
         "message": "Tu es à jour ! Reviens à l'ouverture de la prochaine journée.",
         "noCompetition": "Aucun match au programme pour le moment."
     },
+    "results": {
+        "title": "Résultats",
+        "count_one": "{{count}} match",
+        "count_other": "{{count}} matchs",
+        "empty": {
+            "title": "Aucun match joué",
+            "message": "Les résultats et tes points apparaîtront ici après les premiers coups d'envoi."
+        }
+    },
     "errors": {
-        "load": "Impossible de charger les matchs."
+        "load": "Impossible de charger les matchs.",
+        "loadResults": "Impossible de charger les résultats."
     },
     "status": {
         "inPlay": "En cours",

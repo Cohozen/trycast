@@ -23,6 +23,31 @@
         "bonusHome": "Bonus offensif domicile",
         "bonusAway": "Bonus offensif extérieur"
     },
+    "verdict": {
+        "exact": "Score exact",
+        "good": "Bon résultat",
+        "missed": "Raté",
+        "pending": "Points à venir"
+    },
+    "reconciliation": {
+        "yourProno": "Ton prono",
+        "pointsWon": "Points gagnés",
+        "notPredicted": "Tu n'avais pas pronostiqué ce match.",
+        "seeDetails": "Voir le détail des points",
+        "bonusTag": "{{code}} bonus"
+    },
+    "breakdown": {
+        "winner": "Bon vainqueur · {{code}}",
+        "winnerDraw": "Bon résultat · match nul",
+        "exactScore": "Score exact",
+        "gap": "Bonus écart",
+        "defensive": "Bonus défensif",
+        "offensive": "Bonus offensif",
+        "offensivePending": "Bonus offensif · en attente des essais",
+        "odds": "Pondération cote (×{{odds}})",
+        "finalScore": "Score final",
+        "totalWon": "Total gagné"
+    },
     "errors": {
         "deadline": "Trop tard : le coup d'envoi est passé, le prono est verrouillé.",
         "invalidScore": "Score invalide : entre un nombre entier positif.",

@@ -24,11 +24,11 @@ describe('statusLabel', () => {
     });
 
     it.each([
-        ['in_play', 'En cours'],
-        ['finished', 'Terminé'],
-        ['postponed', 'Reporté'],
-        ['cancelled', 'Annulé'],
-    ] as const)('libelle %s → %s', (status, expected) => {
+        ['in_play', 'matches:status.inPlay'],
+        ['finished', 'matches:status.finished'],
+        ['postponed', 'matches:status.postponed'],
+        ['cancelled', 'matches:status.cancelled'],
+    ] as const)('mappe %s → %s', (status, expected) => {
         expect(statusLabel(status)).toBe(expected);
     });
 });

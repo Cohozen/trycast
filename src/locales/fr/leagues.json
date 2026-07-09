@@ -7,5 +7,25 @@
         "title": "Rejoins la partie",
         "message": "Crée ta ligue ou rejoins celle de tes potes pour commencer à pronostiquer ensemble.",
         "footnote": "Tu peux aussi pronostiquer sans ligue — tes points comptent au général."
+    },
+    "leaderboard": {
+        "title": "Classement",
+        "tabs": {
+            "leagues": "Ligues",
+            "global": "Général"
+        },
+        "empty": "Le classement apparaîtra après les premiers matchs scorés.",
+        "loadMore": "Charger plus",
+        "manage": "Gérer la ligue",
+        "row": {
+            "predictions_one": "{{count}} prono",
+            "predictions_other": "{{count}} pronos",
+            "exacts_one": "{{count}} score exact",
+            "exacts_other": "{{count}} scores exacts"
+        }
+    },
+    "owner": "Ta ligue",
+    "errors": {
+        "load": "Impossible de charger le classement."
     }
 }

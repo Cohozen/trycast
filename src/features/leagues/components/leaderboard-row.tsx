@@ -1,5 +1,9 @@
+import { useTranslation } from 'react-i18next';
+
+import { Avatar } from '@/components/ui/avatar';
 import type { LeaderboardEntry } from '@/features/leagues/types';
 import { Text, View } from '@/tw';
+import { cn } from '@/tw/variants';
 
 type LeaderboardRowProps = {
     entry: LeaderboardEntry;
@@ -7,27 +11,53 @@ type LeaderboardRowProps = {
     isMe: boolean;
 };
 
-/** Ligne de classement (général ou ligue) : rang, pseudo, points. */
+/**
+ * Ligne de classement du design system (général ou ligue) : rang tabulaire,
+ * avatar initiales, pseudo + stats, points Anton. Ma ligne porte la bordure
+ * accent (l'étincelle marque ma position).
+ */
 export function LeaderboardRow({ entry, isMe }: LeaderboardRowProps) {
+    const { t } = useTranslation(['leagues']);
+    const sub = [
+        t('leagues:leaderboard.row.predictions', { count: entry.predictions_scored }),
+        entry.exact_scores > 0
+            ? t('leagues:leaderboard.row.exacts', { count: entry.exact_scores })
+            : null,
+    ]
+        .filter(Boolean)
+        .join(' · ');
+
     return (
         <View
-            className={`flex-row items-center gap-3 rounded-xl px-4 py-3 ${
-                isMe ? 'bg-emerald-50' : 'bg-white'
-            }`}>
-            <Text className="w-8 text-base font-bold text-gray-500">{entry.rank}</Text>
-            <View className="flex-1">
+            className={cn(
+                'flex-row items-center gap-3 rounded-md border bg-surface px-3.5 py-3',
+                isMe ? 'border-accent/40 bg-accent/10' : 'border-border',
+            )}>
+            <Text
+                className={cn(
+                    'w-8 text-center font-display text-[17px]',
+                    isMe ? 'text-accent' : 'text-text-faint',
+                )}>
+                {entry.rank}
+            </Text>
+            <Avatar name={entry.username} ring={isMe} size="sm" />
+            <View className="min-w-0 flex-1 gap-px">
                 <Text
-                    className={`text-base ${isMe ? 'font-bold text-emerald-900' : 'text-gray-900'}`}>
+                    className={cn(
+                        'text-[15px]',
+                        isMe ? 'font-body-bold text-text' : 'font-body-semibold text-text',
+                    )}
+                    numberOfLines={1}>
                     {entry.username}
                 </Text>
-                <Text className="text-xs text-gray-500">
-                    {entry.predictions_scored} prono{entry.predictions_scored > 1 ? 's' : ''}
-                    {entry.exact_scores > 0
-                        ? ` · ${entry.exact_scores} score${entry.exact_scores > 1 ? 's' : ''} exact${entry.exact_scores > 1 ? 's' : ''}`
-                        : ''}
-                </Text>
+                <Text className="font-body text-[12px] text-text-faint">{sub}</Text>
             </View>
-            <Text className="text-base font-semibold text-gray-900">{entry.total_points} pts</Text>
+            <View className="flex-row items-baseline gap-1">
+                <Text className="font-display text-[20px] leading-[21px] text-text">
+                    {entry.total_points}
+                </Text>
+                <Text className="font-body-bold text-[11px] text-text-muted">pts</Text>
+            </View>
         </View>
     );
 }
