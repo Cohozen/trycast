@@ -54,7 +54,7 @@ export function buildDayRange(options: DayRangeOptions): StripDay[] {
     if (start > end) return [];
 
     const days: StripDay[] = [];
-    for (const cursor = new Date(end); cursor >= start; cursor.setDate(cursor.getDate() - 1)) {
+    for (const cursor = new Date(start); cursor <= end; cursor.setDate(cursor.getDate() + 1)) {
         const date = new Date(cursor);
         const key = dayKeyOf(date);
         days.push({ key, date, hasMatches: matchDayKeys.has(key), isToday: key === todayKey });
