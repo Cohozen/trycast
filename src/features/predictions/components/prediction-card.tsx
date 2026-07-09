@@ -13,6 +13,11 @@ import { useUpsertPrediction } from '@/features/predictions/use-upsert-predictio
 import { parsePredictedScore, validatePredictedScore } from '@/features/predictions/validation';
 import { BAREME_V1 } from '@/features/scoring/bareme';
 import { computePotentialPoints } from '@/features/scoring/compute-match-points';
+import {
+    impliedProbabilities,
+    probabilityTone,
+    winnerPointsByOutcome,
+} from '@/features/scoring/potential-by-outcome';
 import { i18n } from '@/lib/i18n';
 import { Text, View } from '@/tw';
 import { cn } from '@/tw/variants';
@@ -30,6 +35,12 @@ const STATUS_CLASSES: Record<SaveStatus, { pill: string; text: string; dot: stri
     saving: { pill: 'bg-text/10', text: 'text-text-muted', dot: 'bg-text-muted' },
     saved: { pill: 'bg-success/15', text: 'text-success', dot: 'bg-success' },
 };
+
+const TONE_CLASSES = {
+    success: 'bg-success',
+    warning: 'bg-warning',
+    danger: 'bg-danger',
+} as const;
 
 /**
  * Carte de prono d'un match à venir (maquette MesMatchs) : saisie du score
@@ -86,6 +97,7 @@ export function PredictionCard({ match, prediction, userId }: PredictionCardProp
         // draft est dérivé de ces quatre états — les lister évite un objet neuf par rendu
     }, [homeRaw, awayRaw, bonusHome, bonusAway, saved, mutate]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    const odds = { home: match.odds_home, draw: match.odds_draw, away: match.odds_away };
     const potential = draft
         ? computePotentialPoints(
               {
@@ -94,10 +106,12 @@ export function PredictionCard({ match, prediction, userId }: PredictionCardProp
                   bonusOffHome: draft.predicted_bonus_off_home,
                   bonusOffAway: draft.predicted_bonus_off_away,
               },
-              { home: match.odds_home, draw: match.odds_draw, away: match.odds_away },
+              odds,
               BAREME_V1,
           )
         : null;
+    const winnerPoints = winnerPointsByOutcome(odds, BAREME_V1);
+    const probabilities = impliedProbabilities(odds);
 
     const predictedOutcome = potential?.breakdown.predictedOutcome ?? null;
     const bonusValue = potential
@@ -219,12 +233,31 @@ export function PredictionCard({ match, prediction, userId }: PredictionCardProp
                                     {key}
                                 </Text>
                                 <Text className="font-display text-[20px] leading-[21px] text-text">
-                                    {potential ? (active ? potential.total : 0) : '–'}
+                                    {active && potential ? potential.total : winnerPoints[outcome]}
                                 </Text>
                             </View>
                         );
                     })}
                 </View>
+                {probabilities ? (
+                    <View className="flex-row gap-2">
+                        {cells.map(({ key, outcome }) => (
+                            <View className="flex-1 px-1" key={key}>
+                                <View className="h-1 overflow-hidden rounded-pill bg-text/10">
+                                    <View
+                                        className={cn(
+                                            'h-full rounded-pill',
+                                            TONE_CLASSES[probabilityTone(probabilities[outcome])],
+                                        )}
+                                        style={{
+                                            width: `${Math.round(probabilities[outcome] * 100)}%`,
+                                        }}
+                                    />
+                                </View>
+                            </View>
+                        ))}
+                    </View>
+                ) : null}
             </View>
 
             {upsert.isError ? (
