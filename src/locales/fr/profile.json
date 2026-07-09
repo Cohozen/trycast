@@ -1,5 +1,53 @@
 {
     "title": "Profil",
+    "memberSince": "Membre depuis {{date}}",
+    "figures": {
+        "points": "Points",
+        "rank": "Rang",
+        "precision": "Précision"
+    },
+    "competition": {
+        "overline": "Compétition",
+        "current": "En cours"
+    },
+    "tabs": {
+        "stats": "Stats",
+        "predictions": "Pronos",
+        "leagues": "Ligues"
+    },
+    "stats": {
+        "cards": {
+            "points": "Points",
+            "played": "Pronos joués",
+            "good": "Bons pronos",
+            "exact": "Pronos exacts"
+        },
+        "rank": {
+            "overline": "Classement général",
+            "of": "sur {{count}} joueurs",
+            "noneTitle": "Pas encore classé",
+            "noneHint": "Le rang s'affiche après ton premier prono scoré."
+        },
+        "precision": {
+            "title": "Précision",
+            "center": "bons",
+            "good_one": "{{count}} bon prono",
+            "good_other": "{{count}} bons pronos",
+            "exact_one": "{{count}} score exact",
+            "exact_other": "{{count}} scores exacts",
+            "missed_one": "{{count}} raté",
+            "missed_other": "{{count}} ratés",
+            "empty": "Aucun prono scoré sur cette compétition pour l'instant."
+        },
+        "trend": {
+            "title": "Points par journée",
+            "empty": "Ta progression s'affichera après ta première journée de pronos."
+        }
+    },
+    "predictions": {
+        "emptyTitle": "Aucun prono terminé",
+        "emptyMessage": "Tes pronos apparaîtront ici une fois les matchs joués et scorés."
+    },
     "username": {
         "label": "Pseudo",
         "hint": "3–20 caractères · lettres, chiffres et « _ » · doit être unique.",
