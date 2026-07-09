@@ -1,14 +1,18 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 
-import { FormBanner, FormField, PrimaryButton } from '@/components/form';
-import { toFrenchLeagueMessage } from '@/features/leagues/errors';
+import { Button } from '@/components/ui/button';
+import { TextField } from '@/components/ui/text-field';
+import { Toast } from '@/components/ui/toast';
+import { toLeagueMessageKey } from '@/features/leagues/errors';
 import { useCreateLeague } from '@/features/leagues/use-create-league';
 import { validateLeagueName } from '@/features/leagues/validation';
 import { ScrollView, Text, View } from '@/tw';
 
 export default function CreateLeagueScreen() {
+    const { t } = useTranslation(['leagues']);
     const router = useRouter();
     const createLeague = useCreateLeague();
     const [name, setName] = useState('');
@@ -18,7 +22,7 @@ export default function CreateLeagueScreen() {
     const onSubmit = () => {
         setError(null);
         const nameError = validateLeagueName(name);
-        setFieldError(nameError);
+        setFieldError(nameError && t(nameError));
         if (nameError) return;
 
         createLeague.mutate(name.trim(), {
@@ -26,7 +30,7 @@ export default function CreateLeagueScreen() {
                 router.replace({ pathname: '/league/[id]', params: { id: league.id } });
             },
             onError: (mutationError) => {
-                setError(toFrenchLeagueMessage(mutationError));
+                setError(t(toLeagueMessageKey(mutationError)));
             },
         });
     };
@@ -36,29 +40,29 @@ export default function CreateLeagueScreen() {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             style={{ flex: 1 }}>
             <ScrollView
-                className="flex-1 bg-white"
-                contentContainerClassName="gap-6 p-6"
+                className="flex-1 bg-bg"
+                contentContainerClassName="w-full max-w-[800px] gap-5 self-center p-6"
                 keyboardShouldPersistTaps="handled">
-                <Text className="text-base text-gray-500">
-                    Donne un nom à ta ligue — tu recevras un code d’invitation à partager avec tes
-                    amis.
+                <Text className="font-body text-body text-text-muted">
+                    {t('leagues:create.intro')}
                 </Text>
 
-                {error ? <FormBanner message={error} tone="error" /> : null}
+                {error ? <Toast message={error} tone="accent" /> : null}
 
                 <View className="gap-4">
-                    <FormField
-                        label="Nom de la ligue"
-                        placeholder="Les copains du rugby"
-                        value={name}
+                    <TextField
                         error={fieldError}
+                        label={t('leagues:create.nameLabel')}
                         onChangeText={setName}
+                        placeholder={t('leagues:create.namePlaceholder')}
+                        value={name}
                     />
-                    <PrimaryButton
-                        title="Créer la ligue"
-                        loading={createLeague.isPending}
+                    <Button
                         disabled={!name}
+                        fullWidth
+                        loading={createLeague.isPending}
                         onPress={onSubmit}
+                        title={t('leagues:create.submit')}
                     />
                 </View>
             </ScrollView>

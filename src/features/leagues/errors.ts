@@ -1,20 +1,28 @@
 import { PostgrestError } from '@supabase/supabase-js';
 
+/** Clé i18n d'une erreur d'action de ligue, à passer à t() côté écran. */
+export type LeagueMessageKey =
+    | 'leagues:errors.invalidCode'
+    | 'leagues:errors.invalidName'
+    | 'leagues:errors.notAllowed'
+    | 'leagues:errors.server';
+
 /**
- * Traduit les erreurs Postgres des actions de ligue. Le P0002 vient des RPC
- * (code d'invitation inconnu, aucune compétition active) ; le 23514 du check
- * sur le nom ; le 42501 d'une écriture refusée par la RLS ou les grants.
+ * Traduit les erreurs Postgres des actions de ligue en clé i18n. Le P0002
+ * vient des RPC (code d'invitation inconnu, aucune compétition active) ; le
+ * 23514 du check sur le nom ; le 42501 d'une écriture refusée par la RLS ou
+ * les grants.
  */
-export function toFrenchLeagueMessage(error: unknown): string {
+export function toLeagueMessageKey(error: unknown): LeagueMessageKey {
     const code = error instanceof PostgrestError ? error.code : undefined;
     switch (code) {
         case 'P0002':
-            return 'Code d’invitation invalide.';
+            return 'leagues:errors.invalidCode';
         case '23514':
-            return 'Nom de ligue invalide (3 à 40 caractères).';
+            return 'leagues:errors.invalidName';
         case '42501':
-            return 'Action non autorisée.';
+            return 'leagues:errors.notAllowed';
         default:
-            return 'Impossible de contacter le serveur. Réessaie dans un instant.';
+            return 'leagues:errors.server';
     }
 }

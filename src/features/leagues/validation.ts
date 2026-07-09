@@ -1,12 +1,17 @@
 // Miroir des contraintes SQL de leagues (nom 3-40, code 8 chars sans 0/O/1/I/L)
 
-export function validateLeagueName(raw: string): string | null {
+/** Clé i18n d'une erreur de validation de ligue, à passer à t() côté écran. */
+export type LeagueValidationKey =
+    | 'leagues:validation.nameRequired'
+    | 'leagues:validation.nameLength';
+
+export function validateLeagueName(raw: string): LeagueValidationKey | null {
     const name = raw.trim();
     if (name === '') {
-        return 'Donne un nom à ta ligue.';
+        return 'leagues:validation.nameRequired';
     }
     if (name.length < 3 || name.length > 40) {
-        return 'Le nom doit faire entre 3 et 40 caractères.';
+        return 'leagues:validation.nameLength';
     }
     return null;
 }

@@ -24,8 +24,56 @@
             "exacts_other": "{{count}} scores exacts"
         }
     },
+    "create": {
+        "screenTitle": "Créer une ligue",
+        "intro": "Donne un nom à ta ligue — tu recevras un code d'invitation à partager avec tes amis.",
+        "nameLabel": "Nom de la ligue",
+        "namePlaceholder": "Les copains du rugby",
+        "submit": "Créer la ligue"
+    },
+    "join": {
+        "screenTitle": "Rejoindre une ligue",
+        "intro": "Entre le code d'invitation reçu de l'organisateur de la ligue.",
+        "codeLabel": "Code d'invitation",
+        "codePlaceholder": "ABCD2345",
+        "submit": "Rejoindre la ligue"
+    },
+    "detail": {
+        "screenTitle": "Ligue",
+        "members_one": "{{count}} membre",
+        "members_other": "{{count}} membres",
+        "code": "code {{code}}",
+        "kickHint": "Appui long sur un membre pour l'exclure.",
+        "invite": "Inviter des amis",
+        "shareMessage": "Rejoins ma ligue « {{name}} » sur TryCast avec le code {{code}} !",
+        "notFound": "Ligue introuvable.",
+        "leave": {
+            "title": "Quitter la ligue",
+            "message": "Tu ne verras plus le classement de « {{name}} ».",
+            "confirm": "Quitter"
+        },
+        "delete": {
+            "title": "Supprimer la ligue",
+            "message": "« {{name}} » et ses membres seront supprimés. Cette action est définitive.",
+            "confirm": "Supprimer"
+        },
+        "kick": {
+            "title": "Exclure ce membre",
+            "message": "Retirer {{username}} de la ligue ?",
+            "confirm": "Exclure"
+        }
+    },
     "owner": "Ta ligue",
+    "validation": {
+        "nameRequired": "Donne un nom à ta ligue.",
+        "nameLength": "Le nom doit faire entre 3 et 40 caractères.",
+        "codeFormat": "Le code fait 8 caractères (lettres et chiffres)."
+    },
     "errors": {
-        "load": "Impossible de charger le classement."
+        "load": "Impossible de charger le classement.",
+        "invalidCode": "Code d'invitation invalide.",
+        "invalidName": "Nom de ligue invalide (3 à 40 caractères).",
+        "notAllowed": "Action non autorisée.",
+        "server": "Impossible de contacter le serveur. Réessaie dans un instant."
     }
 }

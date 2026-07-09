@@ -1,19 +1,19 @@
 import { PostgrestError } from '@supabase/supabase-js';
 import { describe, expect, it } from 'vitest';
 
-import { toFrenchLeagueMessage } from './errors';
+import { toLeagueMessageKey } from './errors';
 
 function pgError(code: string): PostgrestError {
     return new PostgrestError({ code, message: '', details: '', hint: '' });
 }
 
-describe('toFrenchLeagueMessage', () => {
+describe('toLeagueMessageKey', () => {
     it.each([
-        ['P0002', 'Code d’invitation invalide.'],
-        ['23514', 'Nom de ligue invalide (3 à 40 caractères).'],
-        ['42501', 'Action non autorisée.'],
-        ['XX000', 'Impossible de contacter le serveur. Réessaie dans un instant.'],
-    ])('traduit %s', (code, expected) => {
-        expect(toFrenchLeagueMessage(pgError(code))).toBe(expected);
+        ['P0002', 'leagues:errors.invalidCode'],
+        ['23514', 'leagues:errors.invalidName'],
+        ['42501', 'leagues:errors.notAllowed'],
+        ['XX000', 'leagues:errors.server'],
+    ])('mappe %s', (code, expected) => {
+        expect(toLeagueMessageKey(pgError(code))).toBe(expected);
     });
 });

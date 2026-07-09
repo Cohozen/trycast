@@ -1,7 +1,10 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Alert, Share } from 'react-native';
 
-import { PrimaryButton } from '@/components/form';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useSession } from '@/features/auth/session-context';
 import { LeaderboardRow } from '@/features/leagues/components/leaderboard-row';
 import type { LeaderboardEntry } from '@/features/leagues/types';
@@ -10,9 +13,10 @@ import { useKickMember } from '@/features/leagues/use-kick-member';
 import { useLeagueLeaderboard } from '@/features/leagues/use-league-leaderboard';
 import { useLeaveLeague } from '@/features/leagues/use-leave-league';
 import { useMyLeagues } from '@/features/leagues/use-my-leagues';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from '@/tw';
+import { Pressable, ScrollView, Text, View } from '@/tw';
 
 export default function LeagueScreen() {
+    const { t } = useTranslation(['leagues', 'common']);
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const { session } = useSession();
@@ -29,8 +33,11 @@ export default function LeagueScreen() {
 
     if (leagues.isPending || leaderboard.isPending) {
         return (
-            <View className="flex-1 items-center justify-center">
-                <ActivityIndicator />
+            <View className="flex-1 gap-2.5 bg-bg p-6">
+                <Skeleton className="h-5 w-52" variant="line" />
+                <Skeleton className="h-12" variant="block" />
+                <Skeleton className="h-16" variant="block" />
+                <Skeleton className="h-16" variant="block" />
             </View>
         );
     }
@@ -38,37 +45,45 @@ export default function LeagueScreen() {
     // RLS : un non-membre (exclu, parti) ne voit ni la ligue ni son classement
     if (!league || leaderboard.isError || !leaderboard.data) {
         return (
-            <View className="flex-1 items-center justify-center gap-2 p-6">
-                <Text className="text-center text-base text-gray-500">Ligue introuvable.</Text>
+            <View className="flex-1 items-center justify-center bg-bg p-6">
+                <EmptyState title={t('leagues:detail.notFound')} />
             </View>
         );
     }
 
     const onShare = () => {
         void Share.share({
-            message: `Rejoins ma ligue « ${league.name} » sur TryCast avec le code ${league.invite_code} !`,
+            message: t('leagues:detail.shareMessage', {
+                name: league.name,
+                code: league.invite_code,
+            }),
         });
     };
 
     const onLeave = () => {
-        Alert.alert('Quitter la ligue', `Tu ne verras plus le classement de « ${league.name} ».`, [
-            { text: 'Annuler', style: 'cancel' },
-            {
-                text: 'Quitter',
-                style: 'destructive',
-                onPress: () => leaveLeague.mutate(league.id, { onSuccess: () => router.back() }),
-            },
-        ]);
+        Alert.alert(
+            t('leagues:detail.leave.title'),
+            t('leagues:detail.leave.message', { name: league.name }),
+            [
+                { text: t('common:actions.cancel'), style: 'cancel' },
+                {
+                    text: t('leagues:detail.leave.confirm'),
+                    style: 'destructive',
+                    onPress: () =>
+                        leaveLeague.mutate(league.id, { onSuccess: () => router.back() }),
+                },
+            ],
+        );
     };
 
     const onDelete = () => {
         Alert.alert(
-            'Supprimer la ligue',
-            `« ${league.name} » et ses membres seront supprimés. Cette action est définitive.`,
+            t('leagues:detail.delete.title'),
+            t('leagues:detail.delete.message', { name: league.name }),
             [
-                { text: 'Annuler', style: 'cancel' },
+                { text: t('common:actions.cancel'), style: 'cancel' },
                 {
-                    text: 'Supprimer',
+                    text: t('leagues:detail.delete.confirm'),
                     style: 'destructive',
                     onPress: () =>
                         deleteLeague.mutate(league.id, { onSuccess: () => router.back() }),
@@ -79,40 +94,47 @@ export default function LeagueScreen() {
 
     const onKick = (entry: LeaderboardEntry) => {
         if (!isOwner || entry.user_id === userId) return;
-        Alert.alert('Exclure ce membre', `Retirer ${entry.username} de la ligue ?`, [
-            { text: 'Annuler', style: 'cancel' },
-            {
-                text: 'Exclure',
-                style: 'destructive',
-                onPress: () => kickMember.mutate(entry.user_id),
-            },
-        ]);
+        Alert.alert(
+            t('leagues:detail.kick.title'),
+            t('leagues:detail.kick.message', { username: entry.username }),
+            [
+                { text: t('common:actions.cancel'), style: 'cancel' },
+                {
+                    text: t('leagues:detail.kick.confirm'),
+                    style: 'destructive',
+                    onPress: () => kickMember.mutate(entry.user_id),
+                },
+            ],
+        );
     };
 
     const memberCount = leaderboard.data.length;
 
     return (
-        <ScrollView className="flex-1" contentContainerClassName="gap-4 p-6">
+        <ScrollView
+            className="flex-1 bg-bg"
+            contentContainerClassName="w-full max-w-[800px] gap-4 self-center p-6">
             <Stack.Screen options={{ title: league.name }} />
 
             <View className="gap-1">
-                <Text className="text-sm text-gray-500">
-                    {memberCount} membre{memberCount > 1 ? 's' : ''} · code {league.invite_code}
+                <Text className="font-body text-[13px] text-text-muted">
+                    {t('leagues:detail.members', { count: memberCount })} ·{' '}
+                    {t('leagues:detail.code', { code: league.invite_code })}
                 </Text>
                 {isOwner ? (
-                    <Text className="text-xs text-gray-400">
-                        Appui long sur un membre pour l’exclure.
+                    <Text className="font-body text-[12px] text-text-faint">
+                        {t('leagues:detail.kickHint')}
                     </Text>
                 ) : null}
             </View>
 
-            <PrimaryButton title="Inviter des amis" onPress={onShare} />
+            <Button fullWidth onPress={onShare} title={t('leagues:detail.invite')} />
 
             <View className="gap-2">
                 {leaderboard.data.map((entry) => (
                     <Pressable
-                        key={entry.user_id}
                         accessibilityRole="button"
+                        key={entry.user_id}
                         onLongPress={() => onKick(entry)}>
                         <LeaderboardRow entry={entry} isMe={entry.user_id === userId} />
                     </Pressable>
@@ -121,18 +143,20 @@ export default function LeagueScreen() {
 
             <View className="pt-4">
                 {isOwner ? (
-                    <PrimaryButton
-                        title="Supprimer la ligue"
-                        variant="danger"
+                    <Button
+                        fullWidth
                         loading={deleteLeague.isPending}
                         onPress={onDelete}
+                        title={t('leagues:detail.delete.title')}
+                        variant="danger-outline"
                     />
                 ) : (
-                    <PrimaryButton
-                        title="Quitter la ligue"
-                        variant="danger"
+                    <Button
+                        fullWidth
                         loading={leaveLeague.isPending}
                         onPress={onLeave}
+                        title={t('leagues:detail.leave.title')}
+                        variant="danger-outline"
                     />
                 )}
             </View>
