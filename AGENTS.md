@@ -21,12 +21,13 @@ Avant de considérer un lot terminé : `npm run typecheck && npm run lint && npm
 
 - Alias d'import `@/` → `src/`
 - Écrans dans `src/app/` (groupes `(auth)` et `(app)`), logique métier par domaine dans `src/features/<domaine>/` avec tests `*.test.ts` colocalisés
-- Textes UI et messages d'erreur **en français**
+- **i18n : FR = langue source, jamais de chaîne UI en dur.** Toute chaîne visible passe par i18next : ressources dans `src/locales/fr/<namespace>.json` (un namespace par domaine, calqué sur `src/features/` + `common`), clés typées (une clé manquante casse `tsc`). Les fonctions de domaine (`errors.ts`, `validation.ts`) retournent des **clés i18n**, la traduction se fait dans l'écran via `t()` avec `useTranslation(['<ns>', 'common'])`. Dates/nombres via `Intl` avec `i18n.language`
 - Logique de scoring : module TS pur testable unitairement + écriture atomique via une seule RPC SQL (décision actée, ne pas re-débattre)
 - **Un composant par fichier, un fichier par composant** (fichier nommé comme le composant, en kebab-case)
 - Tout composant réutilisable va dans `src/components/` (primitives UI dans `src/components/ui/`) ; un composant propre à un domaine reste dans `src/features/<domaine>/components/`
 - Types partagés dans des fichiers dédiés : `src/features/<domaine>/types.ts` par domaine (pas de fourre-tout global) ; les props d'un composant restent colocalisées avec lui tant qu'elles ne sont pas réutilisées ailleurs
-- Styles : classes NativeWind inline dans le JSX (`className`) ; dès qu'un style se répète, extraire un composant partagé ou un variant dans `src/tw/` — pas de `StyleSheet.create` sauf impossibilité Tailwind
+- **Design system (Lot 5.5)** : tokens dans `src/global.css` (`@theme` Tailwind v4 — couleurs sémantiques `bg-bg`/`bg-surface`/`text-text`/`text-text-muted`/`bg-accent`…, light + dark via `light-dark()`, typo Anton/Inter, radius, ombres `tc-shadow-*`). Référence complète : `docs/design/` (livrable Claude Design) et le skill `trycast-design-system`. Le grenat (`accent`) est une étincelle, jamais un fond ; light = base crème, dark = base verte
+- Styles : classes NativeWind inline dans le JSX (`className`) via les **tokens du DS** (jamais de couleur Tailwind brute type `bg-blue-600`, ni de hex en dur hors cas documenté) ; dès qu'un style se répète, extraire une primitive `src/components/ui/` ou un variant ; composition conditionnelle via `cn()` de `src/tw/variants.ts` — pas de `StyleSheet.create` sauf impossibilité Tailwind. Polices : `font-display` (Anton) pour titres/scores, `font-body[-medium|-semibold|-bold]` (Inter) pour le reste — en natif, `font-semibold` seul ne change pas la graisse d'une police custom
 
 ## Git
 

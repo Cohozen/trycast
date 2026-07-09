@@ -1,11 +1,11 @@
 ---
 name: trycast-domain-feature
-description: Ajouter ou étendre un domaine métier TryCast dans src/features/<domaine>/ (hooks TanStack Query, validation, traduction d'erreurs FR, types dérivés de Database, composants colocalisés, écrans Expo Router). À utiliser dès qu'on crée/modifie une feature (leagues, matches, predictions, scoring, profile…) ou un écran qui la consomme.
+description: Ajouter ou étendre un domaine métier TryCast dans src/features/<domaine>/ (hooks TanStack Query, validation et erreurs en clés i18n, types dérivés de Database, composants colocalisés, écrans Expo Router). À utiliser dès qu'on crée/modifie une feature (leagues, matches, predictions, scoring, profile…) ou un écran qui la consomme.
 ---
 
 # TryCast — ajouter/étendre un domaine métier
 
-Squelette de référence : `src/features/leagues/`. Reproduire **exactement** cette structure. Textes UI et messages d'erreur **en français** (guillemets typographiques `’`).
+Squelette de référence : `src/features/leagues/`. Reproduire **exactement** cette structure. **Aucune chaîne UI en dur** : tout texte visible vit dans `src/locales/fr/<domaine>.json` (FR = langue source, guillemets typographiques `’`) et passe par i18next.
 
 ## Structure d'un domaine (`src/features/<domaine>/`)
 
@@ -15,15 +15,16 @@ Squelette de référence : `src/features/leagues/`. Reproduire **exactement** ce
   export type LeaderboardEntry =
       Database['public']['Functions']['get_global_leaderboard']['Returns'][number];
   ```
-- `validation.ts` — **miroir client** des contraintes SQL (pas la source de vérité, la RLS l'est). Retourne `string | null` (message FR ou `null` si OK). Commenter que la contrainte réelle est côté serveur.
-- `errors.ts` — `toFrench<Domaine>Message(error: unknown): string` : `switch` sur `error instanceof PostgrestError ? error.code : undefined`. Mapper les `errcode` que **tes RPC/migrations** lèvent (`P0002`, `23514`, `42501`, `23505`…) vers un message FR ; `default` = message générique réseau.
+- `validation.ts` — **miroir client** des contraintes SQL (pas la source de vérité, la RLS l'est). Retourne une **clé i18n ou `null`** : type union de clés littérales (ex. `'auth:validation.usernameTooShort' | …`), jamais un template type `` `ns:${string}` `` (t() exige des littéraux). Commenter que la contrainte réelle est côté serveur.
+- `errors.ts` — `to<Domaine>MessageKey(error: unknown): <Domaine>MessageKey` : mapper les `errcode` que **tes RPC/migrations** lèvent (`P0002`, `23514`, `42501`, `23505`…) vers des clés `'<ns>:errors.*'` ; fallback `'common:errors.network'` / `'common:errors.generic'`. Modèle : `src/features/auth/errors.ts`. L'écran traduit : `t(toXMessageKey(err))`.
+- `src/locales/fr/<domaine>.json` — le namespace du domaine (sections `errors`, `validation`, + sections d'écran). Une clé ajoutée ici est immédiatement typée (une clé manquante casse `tsc`). Pluriels : suffixes `_one`/`_other` + `t('…', { count })`.
 - `use-*.ts` — **un hook par fichier**, un fichier par hook. TanStack Query v5 :
   - Lecture : `useQuery({ queryKey: ['<domaine>', …], queryFn })`
   - Écriture : `useMutation({ mutationFn, onSuccess: () => queryClient.invalidateQueries({ queryKey: ['<domaine>'] }) })`
   - Toujours `const { data, error } = await supabase.rpc(...)` / `.from(...)` puis `if (error) throw error;`
   - Privilégier une **RPC** pour toute écriture multi-tables/atomique (décision actée) plutôt que des inserts client.
   - JSDoc en tête expliquant le *pourquoi* (atomicité, sécurité), comme dans le repo.
-- `components/` — composants **propres au domaine** (kebab-case, un composant/fichier). Styling NativeWind inline via `className`.
+- `components/` — composants **propres au domaine** (kebab-case, un composant/fichier). Styling NativeWind inline via les **tokens du design system** et les primitives `src/components/ui/` (voir la skill **trycast-design-system**).
 - `*.test.ts` — tests Vitest **colocalisés** pour la logique pure (`validation`, `errors`, formatage). Pas de test pour les hooks réseau.
 
 Un composant **réutilisable** (multi-domaines) va dans `src/components/` (primitives dans `src/components/ui/`), pas dans la feature.
@@ -31,7 +32,8 @@ Un composant **réutilisable** (multi-domaines) va dans `src/components/` (primi
 ## Écrans (Expo Router, `src/app/`)
 
 - Groupes `(auth)` et `(app)` ; onglets dans `src/app/(app)/(tabs)/`. Routes dynamiques : `src/app/(app)/<domaine>/[id].tsx`, actions dédiées `create.tsx` / `join.tsx`.
-- L'écran consomme les hooks du domaine et affiche `toFrench<Domaine>Message(error)` sur échec. Le client n'est qu'une UX : jamais de règle de sécurité côté client, la RLS tranche.
+- L'écran monte `const { t } = useTranslation(['<ns>', 'common'])` et affiche `t(to<Domaine>MessageKey(error))` sur échec. Le client n'est qu'une UX : jamais de règle de sécurité côté client, la RLS tranche.
+- Vérifier chaque écran en **light et dark** (les tokens basculent seuls, mais un oubli de token se voit tout de suite en dark).
 
 ## Vérification (obligatoire avant de clore un lot)
 
