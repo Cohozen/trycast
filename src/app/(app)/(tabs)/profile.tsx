@@ -10,9 +10,9 @@ import { IconButton } from '@/components/ui/icon-button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TextField } from '@/components/ui/text-field';
 import { Toast } from '@/components/ui/toast';
-import { toAuthMessageKey } from '@/features/auth/errors';
 import { useSession } from '@/features/auth/session-context';
 import { validateUsername } from '@/features/auth/validation';
+import { toProfileMessageKey } from '@/features/profile/errors';
 import { useProfile, useUpdateUsername } from '@/features/profile/use-profile';
 import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
 
@@ -54,10 +54,11 @@ export default function ProfileScreen() {
             setEditing(false);
             setSaved(true);
         } catch (err) {
-            if (isPostgrestError(err) && err.code === '23505') {
-                setFieldError(t('profile:username.taken'));
+            const key = toProfileMessageKey(err);
+            if (key === 'common:errors.generic') {
+                setError(t(key));
             } else {
-                setError(t(toAuthMessageKey(err)));
+                setFieldError(t(key));
             }
         }
     };
@@ -143,8 +144,4 @@ export default function ProfileScreen() {
             )}
         </ScrollView>
     );
-}
-
-function isPostgrestError(err: unknown): err is { code: string } {
-    return typeof err === 'object' && err !== null && 'code' in err;
 }

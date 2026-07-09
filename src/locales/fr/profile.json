@@ -6,6 +6,9 @@
         "updated": "Pseudo mis à jour !",
         "taken": "Ce pseudo est déjà pris. Essaie autre chose."
     },
+    "errors": {
+        "invalid": "Pseudo invalide : 3–20 caractères, lettres, chiffres et « _ »."
+    },
     "settings": {
         "title": "Réglages",
         "sections": {
