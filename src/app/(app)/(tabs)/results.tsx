@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
-import { DayStrip, type StripDay } from '@/features/matches/components/day-strip';
-import type { MatchWithTeams } from '@/features/matches/types';
+import { DayStrip } from '@/features/matches/components/day-strip';
+import { buildDayRange, dayKeyOf } from '@/features/matches/day-range';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
 import { useMatches } from '@/features/matches/use-matches';
 import { ResultCard } from '@/features/predictions/components/result-card';
@@ -13,23 +13,6 @@ import { splitMatches } from '@/features/predictions/split-matches';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
 import { i18n } from '@/lib/i18n';
 import { ScrollView, Text, View } from '@/tw';
-
-function dayKeyOf(iso: string): string {
-    const date = new Date(iso);
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-}
-
-/** Jours distincts des résultats, du plus récent au plus ancien. */
-function buildDays(results: MatchWithTeams[]): StripDay[] {
-    const days: StripDay[] = [];
-    for (const match of results) {
-        const key = dayKeyOf(match.kickoff_at);
-        if (days.at(-1)?.key !== key) {
-            days.push({ key, date: new Date(match.kickoff_at) });
-        }
-    }
-    return days;
-}
 
 export default function ResultsScreen() {
     const { t } = useTranslation(['matches', 'predictions', 'common']);
@@ -74,8 +57,14 @@ export default function ResultsScreen() {
     }
 
     const results = matches.data ? splitMatches(matches.data, new Date()).results : [];
-    const days = buildDays(results);
-    const currentDay = selectedDay ?? days[0]?.key ?? null;
+    const days = competition.data
+        ? buildDayRange({
+              startsOn: competition.data.starts_on,
+              endsOn: competition.data.ends_on,
+              matchDayKeys: new Set(results.map((match) => dayKeyOf(match.kickoff_at))),
+          })
+        : [];
+    const currentDay = selectedDay ?? days.find((day) => day.hasMatches)?.key ?? null;
     const dayResults = results.filter((m) => dayKeyOf(m.kickoff_at) === currentDay);
     const dayTitle =
         dayResults.length > 0
@@ -110,7 +99,7 @@ export default function ResultsScreen() {
                 </View>
             ) : (
                 <>
-                    {days.length > 1 ? (
+                    {days.length > 0 ? (
                         <DayStrip
                             days={days}
                             onSelect={setSelectedDay}

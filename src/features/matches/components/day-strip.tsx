@@ -1,9 +1,7 @@
+import type { StripDay } from '@/features/matches/day-range';
+import { i18n } from '@/lib/i18n';
 import { Pressable, ScrollView, Text, View } from '@/tw';
 import { cn } from '@/tw/variants';
-
-import { i18n } from '@/lib/i18n';
-
-export type StripDay = { key: string; date: Date };
 
 type DayStripProps = {
     days: StripDay[];
@@ -13,7 +11,8 @@ type DayStripProps = {
 
 /**
  * Bande horizontale de sélection de jour (maquette Résultats) : pilules
- * jour/numéro, la sélection porte l'étincelle grenat.
+ * jour/numéro sur la plage continue de la compétition — sélection grenat
+ * avec glow, aujourd'hui cerclé, jours sans match estompés et inertes.
  */
 export function DayStrip({ days, selected, onSelect }: DayStripProps) {
     const weekdayFormatter = new Intl.DateTimeFormat(i18n.language, { weekday: 'short' });
@@ -26,20 +25,24 @@ export function DayStrip({ days, selected, onSelect }: DayStripProps) {
             showsHorizontalScrollIndicator={false}>
             {days.map((day) => {
                 const active = day.key === selected;
+                const disabled = !day.hasMatches;
                 return (
                     <Pressable
                         accessibilityRole="button"
-                        accessibilityState={{ selected: active }}
+                        accessibilityState={{ selected: active, disabled }}
                         className={cn(
-                            'w-12 items-center justify-center gap-1.5 rounded-pill py-2.5',
-                            active ? 'bg-surface tc-shadow-sm' : 'bg-transparent',
+                            'w-12 items-center justify-center gap-1.5 rounded-pill border-[1.5px] border-transparent py-2.5',
+                            active && 'bg-accent tc-glow-accent',
+                            !active && day.isToday && 'border-border-strong bg-surface',
+                            disabled && 'opacity-40',
                         )}
+                        disabled={disabled}
                         key={day.key}
                         onPress={() => onSelect(day.key)}>
                         <Text
                             className={cn(
                                 'font-body-bold text-[11px] uppercase tracking-[0.88px]',
-                                active ? 'text-accent' : 'text-text-faint',
+                                active ? 'text-on-accent/80' : 'text-text-faint',
                             )}>
                             {weekdayFormatter.format(day.date).replace('.', '')}
                         </Text>
@@ -47,7 +50,7 @@ export function DayStrip({ days, selected, onSelect }: DayStripProps) {
                             className={cn(
                                 'text-[15px]',
                                 active
-                                    ? 'font-body-bold text-text'
+                                    ? 'font-body-bold text-on-accent'
                                     : 'font-body-medium text-text-muted',
                             )}>
                             {day.date.getDate()}
@@ -55,7 +58,11 @@ export function DayStrip({ days, selected, onSelect }: DayStripProps) {
                         <View
                             className={cn(
                                 'h-[5px] w-[5px] rounded-pill',
-                                active ? 'bg-accent' : 'bg-border-strong',
+                                active
+                                    ? 'bg-on-accent'
+                                    : day.hasMatches
+                                      ? 'bg-accent'
+                                      : 'bg-transparent',
                             )}
                         />
                     </Pressable>
