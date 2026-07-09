@@ -1,11 +1,16 @@
 // Miroir des contraintes SQL de predictions (scores entiers ≥ 0)
 
-export function validatePredictedScore(raw: string): string | null {
+/** Clé i18n d'une erreur de validation de score, à passer à t() côté écran. */
+export type ScoreValidationKey =
+    | 'predictions:validation.missingScore'
+    | 'predictions:validation.invalidScore';
+
+export function validatePredictedScore(raw: string): ScoreValidationKey | null {
     if (raw.trim() === '') {
-        return 'Indique un score.';
+        return 'predictions:validation.missingScore';
     }
     if (!/^\d+$/.test(raw.trim())) {
-        return 'Le score doit être un nombre entier positif.';
+        return 'predictions:validation.invalidScore';
     }
     return null;
 }

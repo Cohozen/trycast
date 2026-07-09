@@ -1,1 +1,35 @@
-{}
+{
+    "dashboard": {
+        "points": "Points cumulés",
+        "played": "pronos joués",
+        "globalRank": "au général"
+    },
+    "toPredict": {
+        "label_one": "match à pronostiquer",
+        "label_other": "matchs à pronostiquer",
+        "autoSave": "Ta saisie s'enregistre toute seule."
+    },
+    "status": {
+        "toPredict": "À pronostiquer",
+        "saving": "Enregistrement…",
+        "saved": "Enregistré",
+        "locked": "Verrouillé"
+    },
+    "form": {
+        "bonusLabel": "Bonus offensif",
+        "potentialLabel": "Points potentiels",
+        "homeScore": "Score de l'équipe à domicile",
+        "awayScore": "Score de l'équipe à l'extérieur",
+        "bonusHome": "Bonus offensif domicile",
+        "bonusAway": "Bonus offensif extérieur"
+    },
+    "errors": {
+        "deadline": "Trop tard : le coup d'envoi est passé, le prono est verrouillé.",
+        "invalidScore": "Score invalide : entre un nombre entier positif.",
+        "saveFailed": "Impossible d'enregistrer ton prono. Réessaie dans un instant."
+    },
+    "validation": {
+        "missingScore": "Indique un score.",
+        "invalidScore": "Le score doit être un nombre entier positif."
+    }
+}

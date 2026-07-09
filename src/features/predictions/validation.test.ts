@@ -9,12 +9,12 @@ describe('validatePredictedScore', () => {
     });
 
     it('refuse le vide', () => {
-        expect(validatePredictedScore('')).toBe('Indique un score.');
-        expect(validatePredictedScore('   ')).toBe('Indique un score.');
+        expect(validatePredictedScore('')).toBe('predictions:validation.missingScore');
+        expect(validatePredictedScore('   ')).toBe('predictions:validation.missingScore');
     });
 
     it.each([['-3'], ['3.5'], ['abc'], ['12a'], ['+5']])('refuse %s', (raw) => {
-        expect(validatePredictedScore(raw)).toBe('Le score doit être un nombre entier positif.');
+        expect(validatePredictedScore(raw)).toBe('predictions:validation.invalidScore');
     });
 });
 

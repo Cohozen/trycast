@@ -1,1 +1,24 @@
-{}
+{
+    "header": {
+        "overline": "Compétition en cours"
+    },
+    "dates": {
+        "today": "Aujourd'hui",
+        "tomorrow": "Demain"
+    },
+    "empty": {
+        "title": "Aucun match à venir",
+        "message": "Tu es à jour ! Reviens à l'ouverture de la prochaine journée.",
+        "noCompetition": "Aucun match au programme pour le moment."
+    },
+    "errors": {
+        "load": "Impossible de charger les matchs."
+    },
+    "status": {
+        "inPlay": "En cours",
+        "finished": "Terminé",
+        "postponed": "Reporté",
+        "cancelled": "Annulé"
+    },
+    "teamTbd": "À déterminer"
+}

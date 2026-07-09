@@ -1,1 +1,11 @@
-{}
+{
+    "actions": {
+        "create": "Créer une ligue",
+        "join": "Rejoindre une ligue"
+    },
+    "hero": {
+        "title": "Rejoins la partie",
+        "message": "Crée ta ligue ou rejoins celle de tes potes pour commencer à pronostiquer ensemble.",
+        "footnote": "Tu peux aussi pronostiquer sans ligue — tes points comptent au général."
+    }
+}

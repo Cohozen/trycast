@@ -1,4 +1,5 @@
 import { TextInput } from '@/tw';
+import { cn } from '@/tw/variants';
 
 type ScoreInputProps = {
     value: string;
@@ -7,20 +8,23 @@ type ScoreInputProps = {
     invalid?: boolean;
 };
 
-/** Champ de score compact (entier positif), une case par équipe. */
+/**
+ * Champ de score du design system : chiffres Anton sur fond sunken, une case
+ * par équipe. L'erreur borde en accent (grenat = erreur de saisie dans le DS).
+ */
 export function ScoreInput({ value, onChangeText, accessibilityLabel, invalid }: ScoreInputProps) {
     return (
         <TextInput
-            className={`w-16 rounded-xl border bg-white px-2 py-2 text-center text-lg font-bold text-gray-900 ${
-                invalid ? 'border-red-400' : 'border-gray-300'
-            }`}
-            value={value}
-            onChangeText={onChangeText}
+            accessibilityLabel={accessibilityLabel}
+            className={cn(
+                'w-14 rounded-md border-2 border-transparent bg-surface-sunken px-0.5 py-1.5 text-center font-display text-[32px] leading-[34px] text-text',
+                invalid && 'border-accent',
+            )}
             keyboardType="number-pad"
             maxLength={3}
-            placeholder="–"
-            placeholderTextColor="#9CA3AF"
-            accessibilityLabel={accessibilityLabel}
+            onChangeText={onChangeText}
+            placeholder=""
+            value={value}
         />
     );
 }
