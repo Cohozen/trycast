@@ -110,10 +110,9 @@ export function Select<V extends string>({
                 statusBarTranslucent
                 transparent
                 visible={open}>
-                <Pressable
-                    accessibilityRole="button"
-                    className="flex-1"
-                    onPress={() => setAnchor(null)}>
+                {/* Scrim sans rôle : un <button> web ne peut pas contenir les
+                 * options ; la fermeture accessible passe par onRequestClose */}
+                <Pressable className="flex-1" onPress={() => setAnchor(null)}>
                     {anchor ? (
                         <View
                             className="absolute gap-0.5 rounded-md border border-border bg-surface p-1.5 tc-shadow-lg"
