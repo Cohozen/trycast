@@ -14,7 +14,7 @@ import { toAuthMessageKey } from '@/features/auth/errors';
 import { useSession } from '@/features/auth/session-context';
 import { validateUsername } from '@/features/auth/validation';
 import { useProfile, useUpdateUsername } from '@/features/profile/use-profile';
-import { Pressable, ScrollView, Text, useCSSVariable, View } from '@/tw';
+import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
 
 export default function ProfileScreen() {
     const { t } = useTranslation(['profile', 'auth', 'common']);
@@ -30,8 +30,8 @@ export default function ProfileScreen() {
     const [fieldError, setFieldError] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [saved, setSaved] = useState(false);
-    const textColor = useCSSVariable('--text');
-    const textFaintColor = useCSSVariable('--text-faint');
+    const textColor = useThemeColor('text');
+    const textFaintColor = useThemeColor('text-faint');
 
     const startEditing = () => {
         setUsername(profile?.username ?? '');
@@ -74,7 +74,7 @@ export default function ProfileScreen() {
                     accessibilityLabel={t('profile:settings.title')}
                     onPress={() => router.push('/settings')}
                     variant="soft">
-                    <Settings color={textColor as string} size={20} strokeWidth={1.9} />
+                    <Settings color={textColor} size={20} strokeWidth={1.9} />
                 </IconButton>
             </View>
 
@@ -137,7 +137,7 @@ export default function ProfileScreen() {
                                 {profile?.username}
                             </Text>
                         </View>
-                        <Pencil color={textFaintColor as string} size={17} strokeWidth={1.9} />
+                        <Pencil color={textFaintColor} size={17} strokeWidth={1.9} />
                     </Card>
                 </Pressable>
             )}

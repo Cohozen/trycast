@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Text, TextInput, View } from '@/tw';
+import { Text, TextInput, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
 type TextFieldProps = React.ComponentProps<typeof TextInput> & {
@@ -27,6 +27,7 @@ export function TextField({
     ...inputProps
 }: TextFieldProps) {
     const [focused, setFocused] = useState(false);
+    const placeholderColor = useThemeColor('text-faint');
 
     return (
         <View className="w-full gap-1.5">
@@ -44,7 +45,7 @@ export function TextField({
                 <TextInput
                     className="min-w-0 flex-1 font-body text-[15px] text-text"
                     editable={!disabled}
-                    placeholderTextColor="var(--text-faint)"
+                    placeholderTextColor={placeholderColor}
                     {...inputProps}
                     onBlur={(e) => {
                         setFocused(false);

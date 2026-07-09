@@ -8,7 +8,7 @@ import {
     TextInput as RNTextInput,
     View as RNView,
 } from 'react-native';
-import { useCssElement, useNativeVariable as useFunctionalVariable } from 'react-native-css';
+import { useCssElement } from 'react-native-css';
 
 // CSS-enabled Link (cast: typed-routes prop unions are too complex for tsc)
 export const Link = (props: React.ComponentProps<typeof RouterLink> & { className?: string }) => {
@@ -26,11 +26,9 @@ Link.Menu = RouterLink.Menu;
 Link.MenuAction = RouterLink.MenuAction;
 Link.Preview = RouterLink.Preview;
 
-// CSS Variable hook
-export const useCSSVariable =
-    process.env.EXPO_OS !== 'web'
-        ? useFunctionalVariable
-        : (variable: string) => `var(${variable})`;
+// Couleurs du DS lues côté JS (icônes, placeholders, spinners…)
+export { useThemeColor } from './use-theme-color';
+export type { ThemeColorToken } from './palette';
 
 export type ViewProps = React.ComponentProps<typeof RNView> & { className?: string };
 

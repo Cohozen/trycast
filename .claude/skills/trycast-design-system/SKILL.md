@@ -33,12 +33,13 @@ Source de vérité : `src/global.css` (tokens `@theme`) + le livrable Claude Des
 
 - Press = **rétrécir** (`scale-[0.97]` boutons, 0.92 icon-buttons) + assombrir (`*-press`) — géré dans les primitives, ne pas réinventer.
 - Composition conditionnelle : `cn()` de `src/tw/variants.ts` (clsx + tailwind-merge).
-- Icônes : **lucide-react-native** (linéaire 2px, arrondi — conforme au DS). Couleur du trait via `useCSSVariable('--text')` (les icônes ne lisent pas `className`).
+- Icônes : **lucide-react-native** (linéaire 2px, arrondi — conforme au DS). Couleur du trait via `useThemeColor('text')` de `@/tw` (les icônes ne lisent pas `className` ; `useCSSVariable` a été supprimé — il retournait `undefined` en natif). Même hook pour `placeholderTextColor` et les spinners.
 - Le symbole de marque = `src/components/brand-mark.tsx` (ne jamais redessiner).
 
 ## Thème light/dark
 
 - Tout token sémantique bascule seul ; vérifier **chaque écran dans les deux thèmes**.
+- **Contrainte native** : react-native-css n'enregistre pas les variables `:root`/`@theme` au runtime — chaque `--color-*` de `global.css` doit rester un hex littéral ou `light-dark(hex, hex)` **sans `var()` interne** (sinon la branche dark ne se résout pas en natif). Les mêmes hex vivent dans `src/tw/palette.ts` pour le JS ; `palette.test.ts` casse la CI si les deux fichiers divergent — toute retouche de couleur se fait donc **dans les deux fichiers**.
 - Préférence manuelle : `src/features/profile/theme-preference.ts` (écran Réglages). Natif = `Appearance.setColorScheme` ; web = bascule des variables du polyfill lightningcss (`--lightningcss-light/dark`, « space toggle ») — ne pas toucher sans relire ce fichier.
 - En dark, si un composant réfléchit du blanc (ex. verre de tab bar), retinter en `green-600/700` (consigne du livrable, `docs/design/project/CLAUDE.md`).
 

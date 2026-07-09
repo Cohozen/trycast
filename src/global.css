@@ -8,6 +8,13 @@
  * Grenat = étincelle, jamais un fond (CTA, live, sélection).
  * Light = base crème, dark = base verte ; bascule via light-dark()
  * (pilotée par le color scheme système / Appearance).
+ *
+ * IMPORTANT (natif) : react-native-css n'enregistre pas les variables
+ * :root/@theme au runtime — toute valeur doit être un littéral ou un
+ * light-dark(littéral, littéral) SANS var() interne, sinon la branche
+ * dark ne se résout pas. Les hex sont dupliqués dans src/tw/palette.ts
+ * (source TS pour les couleurs lues en JS) ; le test palette.test.ts
+ * garantit la synchronisation des deux fichiers.
  * ============================================================ */
 
 @layer base {
@@ -16,117 +23,56 @@
     }
 }
 
-:root {
-    /* ---- Palette primitive (stable, ne bascule pas) ---- */
-    --green-900: #0e3320;
-    --green-800: #14432a;
-    --green-700: #1c5638;
-    --green-600: #26694a;
-
-    --grenat-600: #c82e52;
-    --grenat-500: #e63e63;
-    --grenat-400: #f06485;
-
-    --cream: #f1ebdd;
-    --cream-100: #fbf7ef;
-    --cream-200: #e7dfcc;
-
-    --ink-900: #16130e;
-    --ink-600: #5a5245;
-    --ink-400: #8a8071;
-
-    --mist-300: #a9c0b2;
-
-    /* ---- Alias sémantiques (light, dark) ---- */
-    --bg: light-dark(var(--cream), var(--green-900));
-    --surface: light-dark(var(--cream-100), var(--green-800));
-    --surface-sunken: light-dark(var(--cream-200), #0b2a19);
-    --border: light-dark(var(--cream-200), var(--green-700));
-    --border-strong: light-dark(#d8ceb8, var(--green-600));
-    --text: light-dark(var(--ink-900), var(--cream));
-    --text-muted: light-dark(var(--ink-600), var(--mist-300));
-    --text-faint: light-dark(var(--ink-400), #7e9587);
-    --brand: light-dark(var(--green-800), var(--cream));
-    --on-brand: light-dark(var(--cream), var(--green-900));
-    --accent: var(--grenat-500);
-    --accent-hover: var(--grenat-400);
-    --accent-press: var(--grenat-600);
-    --on-accent: var(--cream);
-    --focus-ring: light-dark(var(--grenat-500), var(--grenat-400));
-
-    /* Danger (brique) : distinct du grenat, seule couleur de destruction */
-    --danger: light-dark(#c4362b, #f0685a);
-    --danger-press: light-dark(#a82c22, #d8564a);
-    --on-danger: light-dark(#fbf7ef, #2a0f0c);
-
-    /* Statuts (dérivés, neutres IP) */
-    --success: #2e8b57;
-    --warning: #d8a23a;
-    --info: #3c7da6;
-    --live: var(--grenat-500);
-
-    /* Ombres — basses et chaudes en light, noires en dark */
-    --tc-shadow-sm: 0 1px 2px rgba(22, 19, 14, 0.06);
-    --tc-shadow-md: 0 4px 14px rgba(22, 19, 14, 0.08);
-    --tc-shadow-lg: 0 12px 32px rgba(22, 19, 14, 0.12);
-    /* Glow grenat — réservé à l'étincelle live/sélection */
-    --glow-accent: 0 4px 18px rgba(230, 62, 99, 0.35);
-
-    /* Motion */
-    --dur-fast: 120ms;
-    --dur: 200ms;
-    --dur-slow: 320ms;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --tc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-        --tc-shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35);
-        --tc-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
-    }
-}
-
 @layer theme {
     @theme {
-        /* ---- Couleurs → utilitaires (bg-surface, text-text-muted, border-border…) ---- */
-        --color-bg: var(--bg);
-        --color-surface: var(--surface);
-        --color-surface-sunken: var(--surface-sunken);
-        --color-border: var(--border);
-        --color-border-strong: var(--border-strong);
-        --color-text: var(--text);
-        --color-text-muted: var(--text-muted);
-        --color-text-faint: var(--text-faint);
-        --color-brand: var(--brand);
-        --color-on-brand: var(--on-brand);
-        --color-accent: var(--accent);
-        --color-accent-hover: var(--accent-hover);
-        --color-accent-press: var(--accent-press);
-        --color-on-accent: var(--on-accent);
-        --color-focus-ring: var(--focus-ring);
-        --color-danger: var(--danger);
-        --color-danger-press: var(--danger-press);
-        --color-on-danger: var(--on-danger);
-        --color-success: var(--success);
-        --color-warning: var(--warning);
-        --color-info: var(--info);
-        --color-live: var(--live);
+        /* ---- Couleurs sémantiques → utilitaires (bg-surface, text-text-muted…).
+         * Palette primitive de référence :
+         * green-900 #0e3320 · green-800 #14432a · green-700 #1c5638 · green-600 #26694a
+         * grenat-600 #c82e52 · grenat-500 #e63e63 · grenat-400 #f06485
+         * cream #f1ebdd · cream-100 #fbf7ef · cream-200 #e7dfcc
+         * ink-900 #16130e · ink-600 #5a5245 · ink-400 #8a8071 · mist-300 #a9c0b2 */
+        --color-bg: light-dark(#f1ebdd, #0e3320);
+        --color-surface: light-dark(#fbf7ef, #14432a);
+        --color-surface-sunken: light-dark(#e7dfcc, #0b2a19);
+        --color-border: light-dark(#e7dfcc, #1c5638);
+        --color-border-strong: light-dark(#d8ceb8, #26694a);
+        --color-text: light-dark(#16130e, #f1ebdd);
+        --color-text-muted: light-dark(#5a5245, #a9c0b2);
+        --color-text-faint: light-dark(#8a8071, #7e9587);
+        --color-brand: light-dark(#14432a, #f1ebdd);
+        --color-on-brand: light-dark(#f1ebdd, #0e3320);
+        --color-accent: #e63e63;
+        --color-accent-hover: #f06485;
+        --color-accent-press: #c82e52;
+        --color-on-accent: #f1ebdd;
+        --color-focus-ring: light-dark(#e63e63, #f06485);
+
+        /* Danger (brique) : distinct du grenat, seule couleur de destruction */
+        --color-danger: light-dark(#c4362b, #f0685a);
+        --color-danger-press: light-dark(#a82c22, #d8564a);
+        --color-on-danger: light-dark(#fbf7ef, #2a0f0c);
+
+        /* Statuts (dérivés, neutres IP) */
+        --color-success: #2e8b57;
+        --color-warning: #d8a23a;
+        --color-info: #3c7da6;
+        --color-live: #e63e63;
 
         /* Primitives exposées pour les cas ciblés (ex. retinter la TabBar en dark) */
-        --color-green-900: var(--green-900);
-        --color-green-800: var(--green-800);
-        --color-green-700: var(--green-700);
-        --color-green-600: var(--green-600);
-        --color-grenat-600: var(--grenat-600);
-        --color-grenat-500: var(--grenat-500);
-        --color-grenat-400: var(--grenat-400);
-        --color-cream: var(--cream);
-        --color-cream-100: var(--cream-100);
-        --color-cream-200: var(--cream-200);
-        --color-ink-900: var(--ink-900);
-        --color-ink-600: var(--ink-600);
-        --color-ink-400: var(--ink-400);
-        --color-mist-300: var(--mist-300);
+        --color-green-900: #0e3320;
+        --color-green-800: #14432a;
+        --color-green-700: #1c5638;
+        --color-green-600: #26694a;
+        --color-grenat-600: #c82e52;
+        --color-grenat-500: #e63e63;
+        --color-grenat-400: #f06485;
+        --color-cream: #f1ebdd;
+        --color-cream-100: #fbf7ef;
+        --color-cream-200: #e7dfcc;
+        --color-ink-900: #16130e;
+        --color-ink-600: #5a5245;
+        --color-ink-400: #8a8071;
+        --color-mist-300: #a9c0b2;
 
         /* ---- Typo : Anton (display) + Inter (corps) chargées via expo-font.
          * En natif, font-weight ne sélectionne pas la graisse d'une police
@@ -170,33 +116,51 @@
         --radius-xl: 28px;
         --radius-pill: 999px;
 
-        /* ---- Ombres (shadow-sm/md/lg, shadow-glow) ---- */
-        --shadow-sm: var(--tc-shadow-sm);
-        --shadow-md: var(--tc-shadow-md);
-        --shadow-lg: var(--tc-shadow-lg);
-        --shadow-glow: var(--glow-accent);
+        /* ---- Ombres : littéraux light (le dark passe par les classes
+         * .tc-shadow-* ci-dessous — light-dark() ne couvre que les couleurs) ---- */
+        --shadow-sm: 0 1px 2px rgba(22, 19, 14, 0.06);
+        --shadow-md: 0 4px 14px rgba(22, 19, 14, 0.08);
+        --shadow-lg: 0 12px 32px rgba(22, 19, 14, 0.12);
+        --shadow-glow: 0 4px 18px rgba(230, 62, 99, 0.35);
 
         /* ---- Motion (ease-out par défaut du DS) ---- */
         --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
         --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+        --dur-fast: 120ms;
+        --dur: 200ms;
+        --dur-slow: 320ms;
     }
 }
 
 /* Ombres en classes dédiées : les utilitaires shadow-* de Tailwind composent
  * plusieurs variables internes que react-native-css digère mal en natif —
- * ces classes émettent un box-shadow simple, sûr des deux côtés. */
+ * ces classes émettent un box-shadow littéral, basses et chaudes en light,
+ * noires en dark (light-dark() ne s'applique pas aux ombres complètes). */
 @layer utilities {
     .tc-shadow-sm {
-        box-shadow: var(--tc-shadow-sm);
+        box-shadow: 0 1px 2px rgba(22, 19, 14, 0.06);
     }
     .tc-shadow-md {
-        box-shadow: var(--tc-shadow-md);
+        box-shadow: 0 4px 14px rgba(22, 19, 14, 0.08);
     }
     .tc-shadow-lg {
-        box-shadow: var(--tc-shadow-lg);
+        box-shadow: 0 12px 32px rgba(22, 19, 14, 0.12);
     }
+    /* Glow grenat — réservé à l'étincelle live/sélection */
     .tc-glow-accent {
-        box-shadow: var(--glow-accent);
+        box-shadow: 0 4px 18px rgba(230, 62, 99, 0.35);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .tc-shadow-sm {
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        .tc-shadow-md {
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        }
+        .tc-shadow-lg {
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+        }
     }
 }
 

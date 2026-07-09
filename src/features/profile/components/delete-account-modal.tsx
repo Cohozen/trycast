@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Modal } from 'react-native';
 
 import { Button } from '@/components/ui/button';
-import { Pressable, Text, TextInput, useCSSVariable, View } from '@/tw';
+import { Pressable, Text, TextInput, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
 type DeleteAccountModalProps = {
@@ -39,9 +39,10 @@ export function DeleteAccountModal({
     const [typed, setTyped] = useState('');
     const [acknowledged, setAcknowledged] = useState(false);
 
-    const dangerColor = useCSSVariable('--danger');
-    const successColor = useCSSVariable('--success');
-    const onBrandColor = useCSSVariable('--on-brand');
+    const dangerColor = useThemeColor('danger');
+    const successColor = useThemeColor('success');
+    const onBrandColor = useThemeColor('on-brand');
+    const placeholderColor = useThemeColor('text-faint');
 
     const matches = typed.trim() === username;
     const armed = matches && acknowledged && !deleting;
@@ -59,7 +60,7 @@ export function DeleteAccountModal({
                     <View className="gap-3.5 px-5 pb-4 pt-6">
                         <View className="items-center gap-3">
                             <View className="h-[52px] w-[52px] items-center justify-center rounded-pill bg-danger/15">
-                                <Trash2 color={dangerColor as string} size={26} strokeWidth={1.9} />
+                                <Trash2 color={dangerColor} size={26} strokeWidth={1.9} />
                             </View>
                             <Text className="text-center font-display text-[25px] leading-[27px] tracking-[0.25px] text-text">
                                 {t('profile:settings.delete.modalTitle')}
@@ -72,7 +73,7 @@ export function DeleteAccountModal({
                         <View className="gap-2 rounded-sm bg-danger/10 px-4 py-3">
                             {LOSS_KEYS.map((key) => (
                                 <View className="flex-row items-center gap-2" key={key}>
-                                    <X color={dangerColor as string} size={15} strokeWidth={2.4} />
+                                    <X color={dangerColor} size={15} strokeWidth={2.4} />
                                     <Text className="font-body text-[13px] text-text">
                                         {t(key)}
                                     </Text>
@@ -95,15 +96,11 @@ export function DeleteAccountModal({
                                     className="min-w-0 flex-1 font-body text-[15px] text-text"
                                     onChangeText={setTyped}
                                     placeholder={username}
-                                    placeholderTextColor="var(--text-faint)"
+                                    placeholderTextColor={placeholderColor}
                                     value={typed}
                                 />
                                 {matches ? (
-                                    <Check
-                                        color={successColor as string}
-                                        size={18}
-                                        strokeWidth={2.6}
-                                    />
+                                    <Check color={successColor} size={18} strokeWidth={2.6} />
                                 ) : null}
                             </View>
                         </View>
@@ -121,11 +118,7 @@ export function DeleteAccountModal({
                                         : 'border-border-strong bg-transparent',
                                 )}>
                                 {acknowledged ? (
-                                    <Check
-                                        color={onBrandColor as string}
-                                        size={14}
-                                        strokeWidth={3}
-                                    />
+                                    <Check color={onBrandColor} size={14} strokeWidth={3} />
                                 ) : null}
                             </View>
                             <Text className="flex-1 font-body text-[13px] leading-[18px] text-text">

@@ -10,7 +10,7 @@ import { BarChart3, CheckCircle, List, User } from 'lucide-react-native';
 import type { LucideIcon } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Pressable, Text, useCSSVariable, View } from '@/tw';
+import { Pressable, Text, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
 /**
@@ -58,8 +58,8 @@ function FloatingTabList(props: TabListProps) {
 type TabButtonProps = TabTriggerSlotProps & { icon: LucideIcon; label: string };
 
 export function TabButton({ icon: Icon, label, isFocused, ...props }: TabButtonProps) {
-    const accent = useCSSVariable('--accent');
-    const faint = useCSSVariable('--text-faint');
+    const accent = useThemeColor('accent');
+    const faint = useThemeColor('text-faint');
 
     return (
         <Pressable {...props} className="flex-1">
@@ -70,7 +70,7 @@ export function TabButton({ icon: Icon, label, isFocused, ...props }: TabButtonP
                         'border-white/50 bg-white/55 tc-shadow-sm dark:border-green-600/70 dark:bg-green-700/70',
                 )}>
                 <Icon
-                    color={(isFocused ? accent : faint) as string}
+                    color={isFocused ? accent : faint}
                     size={24}
                     strokeWidth={isFocused ? 2.4 : 1.9}
                 />

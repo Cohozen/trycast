@@ -17,7 +17,7 @@ import {
 } from '@/features/profile/theme-preference';
 import { useDeleteAccount, useProfile } from '@/features/profile/use-profile';
 import { supabase } from '@/lib/supabase';
-import { ScrollView, Text, useCSSVariable, View } from '@/tw';
+import { ScrollView, Text, useThemeColor, View } from '@/tw';
 
 function SectionLabel({ children, danger = false }: { children: string; danger?: boolean }) {
     return (
@@ -46,8 +46,8 @@ export default function SettingsScreen() {
 
     const [theme, setTheme] = useState<ThemePreference>('system');
     const [confirmingDelete, setConfirmingDelete] = useState(false);
-    const textColor = useCSSVariable('--text');
-    const brandColor = useCSSVariable('--brand');
+    const textColor = useThemeColor('text');
+    const brandColor = useThemeColor('brand');
 
     useEffect(() => {
         loadThemePreference().then(setTheme);
@@ -75,7 +75,7 @@ export default function SettingsScreen() {
                 <IconButton
                     accessibilityLabel={t('common:actions.back')}
                     onPress={() => router.back()}>
-                    <ChevronLeft color={textColor as string} size={22} strokeWidth={2.1} />
+                    <ChevronLeft color={textColor} size={22} strokeWidth={2.1} />
                 </IconButton>
                 <Text className="font-display text-[30px] leading-[30px] tracking-[0.3px] text-text">
                     {t('profile:settings.title')}
@@ -106,7 +106,7 @@ export default function SettingsScreen() {
                 </Card>
                 <Card className="flex-row items-center gap-3 px-4 py-3.5">
                     <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">
-                        <Globe color={brandColor as string} size={17} strokeWidth={1.9} />
+                        <Globe color={brandColor} size={17} strokeWidth={1.9} />
                     </View>
                     <Text className="flex-1 font-body-semibold text-[15px] text-text">
                         {t('profile:settings.language.label')}

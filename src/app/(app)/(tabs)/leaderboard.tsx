@@ -14,7 +14,7 @@ import { useGlobalLeaderboard } from '@/features/leagues/use-global-leaderboard'
 import { useLeagueLeaderboard } from '@/features/leagues/use-league-leaderboard';
 import { useMyLeagues } from '@/features/leagues/use-my-leagues';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
-import { Pressable, ScrollView, Text, useCSSVariable, View } from '@/tw';
+import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
 
 const PAGE_SIZE = 50;
 
@@ -35,7 +35,7 @@ export default function LeaderboardScreen() {
     const [scope, setScope] = useState<Scope>('leagues');
     const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(null);
     const [limit, setLimit] = useState(PAGE_SIZE);
-    const textMuted = useCSSVariable('--text-muted');
+    const textMuted = useThemeColor('text-muted');
 
     const leagues = myLeagues.data ?? [];
     const currentLeagueId = selectedLeagueId ?? leagues[0]?.id;
@@ -131,7 +131,7 @@ export default function LeaderboardScreen() {
                                     params: { id: currentLeagueId },
                                 })
                             }>
-                            <Settings2 color={textMuted as string} size={14} strokeWidth={2} />
+                            <Settings2 color={textMuted} size={14} strokeWidth={2} />
                             <Text className="font-body-semibold text-[12.5px] text-text-muted">
                                 {t('leagues:leaderboard.manage')}
                             </Text>

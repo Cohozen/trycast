@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
-import { ActivityIndicator, Pressable, Text, useCSSVariable } from '@/tw';
+import { ActivityIndicator, Pressable, Text, useThemeColor } from '@/tw';
+import type { ThemeColorToken } from '@/tw';
 import { cn } from '@/tw/variants';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'danger-outline';
@@ -26,37 +27,37 @@ const sizeClasses: Record<ButtonSize, { box: string; text: string }> = {
 
 const variantClasses: Record<
     ButtonVariant,
-    { box: string; boxPressed: string; text: string; spinner: string }
+    { box: string; boxPressed: string; text: string; spinner: ThemeColorToken }
 > = {
     primary: {
         box: 'bg-accent tc-glow-accent',
         boxPressed: 'bg-accent-press',
         text: 'text-on-accent',
-        spinner: '--on-accent',
+        spinner: 'on-accent',
     },
     secondary: {
         box: 'border-[1.5px] border-border-strong bg-transparent',
         boxPressed: 'bg-text/10',
         text: 'text-text',
-        spinner: '--text',
+        spinner: 'text',
     },
     ghost: {
         box: 'bg-transparent',
         boxPressed: 'bg-text/10',
         text: 'text-text',
-        spinner: '--text',
+        spinner: 'text',
     },
     danger: {
         box: 'bg-danger',
         boxPressed: 'bg-danger-press',
         text: 'text-on-danger',
-        spinner: '--on-danger',
+        spinner: 'on-danger',
     },
     'danger-outline': {
         box: 'border-[1.5px] border-danger bg-transparent',
         boxPressed: 'bg-danger/10',
         text: 'text-danger',
-        spinner: '--danger',
+        spinner: 'danger',
     },
 };
 
@@ -78,7 +79,7 @@ export function Button({
     const isDisabled = disabled || loading;
     const s = sizeClasses[size];
     const v = variantClasses[variant];
-    const spinnerColor = useCSSVariable(v.spinner);
+    const spinnerColor = useThemeColor(v.spinner);
 
     return (
         <Pressable
@@ -97,7 +98,7 @@ export function Button({
             onPressIn={() => setPressed(true)}
             onPressOut={() => setPressed(false)}>
             {loading ? (
-                <ActivityIndicator color={spinnerColor as string} />
+                <ActivityIndicator color={spinnerColor} />
             ) : (
                 <>
                     {leadingIcon}
