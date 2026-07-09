@@ -182,6 +182,24 @@
     }
 }
 
+/* Ombres en classes dédiées : les utilitaires shadow-* de Tailwind composent
+ * plusieurs variables internes que react-native-css digère mal en natif —
+ * ces classes émettent un box-shadow simple, sûr des deux côtés. */
+@layer utilities {
+    .tc-shadow-sm {
+        box-shadow: var(--tc-shadow-sm);
+    }
+    .tc-shadow-md {
+        box-shadow: var(--tc-shadow-md);
+    }
+    .tc-shadow-lg {
+        box-shadow: var(--tc-shadow-lg);
+    }
+    .tc-glow-accent {
+        box-shadow: var(--glow-accent);
+    }
+}
+
 /* Familles système par plateforme (fallbacks hors DS) */
 @media android {
     :root {
