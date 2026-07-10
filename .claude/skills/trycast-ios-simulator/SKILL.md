@@ -60,7 +60,7 @@ Après chaque interaction : `sleep 1-2` puis vérifier (screenshot ou describe-u
 
 ## Pièges connus (vécus)
 
-- **Clavier AZERTY** : si `axe type "TESTAXE1"` produit `TESTQXE&`, le clavier iOS actif est le français (AZERTY) — les keycodes HID d'AXe sont interprétés comme des positions QWERTY. Correctif appliqué et persistant sur le simulateur de référence (clavier QWERTY seul) ; à rejouer sur un simulateur neuf :
+- **Clavier AZERTY** : si `axe type "TESTAXE1"` produit `TESTQXE&`, le clavier iOS actif est le français (AZERTY) — les keycodes HID d'AXe sont interprétés comme des positions QWERTY. ⚠️ Le correctif ne persiste **pas** de façon fiable (constaté le 10/07/2026 : AZERTY revenu sur le simulateur de référence) — **vérifier la première saisie de chaque session** (screenshot après `axe type`) et rejouer le correctif au besoin :
   ```bash
   xcrun simctl spawn booted defaults write .GlobalPreferences AppleKeyboards -array "en_US@sw=QWERTY;hw=Automatic" "emoji@sw=Emoji"
   xcrun simctl spawn booted launchctl stop com.apple.SpringBoard   # respring ~8 s, l'app doit être rouverte ensuite
