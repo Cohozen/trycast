@@ -40,7 +40,8 @@ Source de vérité : `src/global.css` (tokens `@theme`) + le livrable Claude Des
 
 - Tout token sémantique bascule seul ; vérifier **chaque écran dans les deux thèmes**.
 - **Contrainte native** : react-native-css n'enregistre pas les variables `:root`/`@theme` au runtime — chaque `--color-*` de `global.css` doit rester un hex littéral ou `light-dark(hex, hex)` **sans `var()` interne** (sinon la branche dark ne se résout pas en natif). Les mêmes hex vivent dans `src/tw/palette.ts` pour le JS ; `palette.test.ts` casse la CI si les deux fichiers divergent — toute retouche de couleur se fait donc **dans les deux fichiers**.
-- Préférence manuelle : `src/features/profile/theme-preference.ts` (écran Réglages). Natif = `Appearance.setColorScheme` ; web = bascule des variables du polyfill lightningcss (`--lightningcss-light/dark`, « space toggle ») — ne pas toucher sans relire ce fichier.
+- **Contrainte browserslist** : `light-dark()` ne marche en natif que s'il **survit** à la passe Lightning CSS d'`@expo/metro-config`, dont les cibles viennent du champ `browserslist` de `package.json`. Le plancher (Chrome 123 / Safari 17.5 / Firefox 120 = support natif de `light-dark()`) ne doit jamais baisser ni disparaître — sinon chaque token est réécrit en « space toggle » `var(--lightningcss-*)` irrésoluble par react-native-css et **toute l'app reste en light, silencieusement**.
+- Préférence manuelle : `src/features/profile/theme-preference.ts` (écran Réglages). Natif = `Appearance.setColorScheme` ; web = propriété `color-scheme` posée/retirée en inline sur `:root` (pilote `light-dark()` nativement) — ne pas toucher sans relire ce fichier.
 - En dark, si un composant réfléchit du blanc (ex. verre de tab bar), retinter en `green-600/700` (consigne du livrable, `docs/design/project/CLAUDE.md`).
 
 ## Vérification
