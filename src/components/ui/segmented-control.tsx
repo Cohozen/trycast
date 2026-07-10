@@ -23,8 +23,8 @@ export function SegmentedControl<V extends string>({
     return (
         <View
             className={cn(
-                'flex-row gap-0.5 rounded-pill bg-surface-sunken p-[3px]',
-                size === 'sm' ? 'h-[34px]' : 'h-10',
+                'flex-row gap-0.5 rounded-pill bg-surface-sunken p-0.75',
+                size === 'sm' ? 'h-8.5' : 'h-14',
             )}>
             {options.map((option) => {
                 const active = option.value === value;

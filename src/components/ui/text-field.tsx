@@ -36,7 +36,7 @@ export function TextField({
             ) : null}
             <View
                 className={cn(
-                    'h-12 flex-row items-center gap-2 rounded-sm border-[1.5px] border-border-strong bg-surface px-3.5',
+                    'h-14 flex-row items-center gap-2 rounded-sm border-[1.5px] border-border-strong bg-surface px-3.5',
                     focused && !error && 'border-brand',
                     error && 'border-accent',
                     disabled && 'bg-surface-sunken opacity-60',

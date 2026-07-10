@@ -124,7 +124,7 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
                 keyboardShouldPersistTaps="handled">
                 <View className="items-center gap-2.5 pt-3.5">
                     <BrandMark />
-                    <Text className="font-display text-[38px] leading-[34px] tracking-[0.5px] text-text">
+                    <Text className="font-display text-[38px] leading-8.5 tracking-[0.5px] text-text">
                         TryCast
                     </Text>
                     <Text className="text-center font-body text-[14px] text-text-muted">
