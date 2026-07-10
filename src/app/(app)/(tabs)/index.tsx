@@ -47,8 +47,8 @@ function groupByDate(matches: MatchWithTeams[], t: (key: RelativeDateKey) => str
                 key === dayKey(today)
                     ? `${t('matches:dates.today')} · `
                     : key === dayKey(tomorrow)
-                        ? `${t('matches:dates.tomorrow')} · `
-                        : '';
+                      ? `${t('matches:dates.tomorrow')} · `
+                      : '';
             group = {
                 key,
                 label: relative + formatter.format(kickoff),
@@ -209,9 +209,7 @@ export default function MatchesScreen() {
             <View
                 className="flex-row items-center gap-3 rounded-md border border-accent/25 bg-accent/10 px-3.5 py-3"
                 key="to-predict">
-                <Text className="font-display text-[30px] leading-7 text-accent">
-                    {toPredict}
-                </Text>
+                <Text className="font-display text-[30px] leading-7 text-accent">{toPredict}</Text>
                 <View className="gap-px">
                     <Text className="font-body-bold text-[14px] text-text">
                         {t('predictions:toPredict.label', { count: toPredict })}
