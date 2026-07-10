@@ -32,8 +32,9 @@ type DayRangeOptions = {
 };
 
 /**
- * Plage continue de jours de la bande Résultats, du plus récent au plus
- * ancien : du début de la compétition à aujourd'hui (borné à sa fin), les
+ * Plage continue de jours de la bande Résultats, en ordre chronologique
+ * (plus ancien à gauche, plus récent à droite — décision UX Corentin) :
+ * du début de la compétition à aujourd'hui (borné à sa fin), les
  * jours sans match restant affichés mais désactivés. Les bornes s'étendent
  * si un jour de match tombe dehors (fuseau, données) — aucun résultat ne
  * doit devenir inatteignable.
