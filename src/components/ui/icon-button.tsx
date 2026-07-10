@@ -53,7 +53,8 @@ export function IconButton({
             accessibilityRole="button"
             accessibilityState={{ disabled }}
             className={cn(
-                'items-center justify-center',
+                // will-change-variable : cf. button.tsx (scale-[0.92] au press)
+                'will-change-variable items-center justify-center',
                 round ? 'rounded-pill' : 'rounded-sm',
                 sizeClasses[size],
                 v.box,

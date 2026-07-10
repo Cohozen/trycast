@@ -86,7 +86,10 @@ export function Button({
             accessibilityRole="button"
             accessibilityState={{ disabled: isDisabled, busy: loading }}
             className={cn(
-                'flex-row items-center justify-center rounded-pill',
+                // will-change-variable : le press ajoute des classes à variables CSS
+                // (--tw-scale-*, --tw-shadow) ; sans ce hint react-native-css
+                // remonterait le composant au premier press
+                'will-change-variable flex-row items-center justify-center rounded-pill',
                 s.box,
                 v.box,
                 pressed && !isDisabled && cn(v.boxPressed, 'scale-[0.97] shadow-none'),

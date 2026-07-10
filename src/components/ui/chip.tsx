@@ -30,7 +30,8 @@ export function Chip({
             accessibilityRole="button"
             accessibilityState={{ selected, disabled }}
             className={cn(
-                'h-[34px] flex-row items-center gap-1.5 rounded-pill px-3.5',
+                // will-change-variable : cf. button.tsx (scale-95 au press)
+                'will-change-variable h-[34px] flex-row items-center gap-1.5 rounded-pill px-3.5',
                 selected
                     ? 'border-[1.5px] border-transparent bg-accent'
                     : 'border-[1.5px] border-border-strong bg-transparent',
