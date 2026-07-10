@@ -47,8 +47,8 @@ function groupByDate(matches: MatchWithTeams[], t: (key: RelativeDateKey) => str
                 key === dayKey(today)
                     ? `${t('matches:dates.today')} · `
                     : key === dayKey(tomorrow)
-                      ? `${t('matches:dates.tomorrow')} · `
-                      : '';
+                        ? `${t('matches:dates.tomorrow')} · `
+                        : '';
             group = {
                 key,
                 label: relative + formatter.format(kickoff),
@@ -178,10 +178,10 @@ export default function MatchesScreen() {
                 <Text className="text-center font-display text-h2 text-text">
                     {t('leagues:hero.title')}
                 </Text>
-                <Text className="max-w-[280px] text-center font-body text-[14px] leading-[21px] text-text-muted">
+                <Text className="max-w-70 text-center font-body text-[14px] leading-5.25 text-text-muted">
                     {t('leagues:hero.message')}
                 </Text>
-                <View className="mt-2 w-full max-w-[300px] gap-2.5">
+                <View className="mt-2 w-full max-w-75 gap-2.5">
                     <Button
                         fullWidth
                         onPress={() => router.push('/league/create')}
@@ -209,7 +209,7 @@ export default function MatchesScreen() {
             <View
                 className="flex-row items-center gap-3 rounded-md border border-accent/25 bg-accent/10 px-3.5 py-3"
                 key="to-predict">
-                <Text className="font-display text-[30px] leading-[28px] text-accent">
+                <Text className="font-display text-[30px] leading-7 text-accent">
                     {toPredict}
                 </Text>
                 <View className="gap-px">
@@ -243,7 +243,7 @@ export default function MatchesScreen() {
                         </Text>
                         {group.round ? (
                             <Text className="font-body-bold text-[11px] uppercase tracking-[0.66px] text-text-faint">
-                                {group.round}
+                                {t('matches:results.number_day', { count: group.round })}
                             </Text>
                         ) : null}
                     </View>
@@ -266,7 +266,7 @@ export default function MatchesScreen() {
         <View className="flex-1 bg-bg">
             {/* Bloc épinglé : en-tête + mini-dashboard */}
             <View
-                className="w-full max-w-[800px] flex-none gap-[18px] self-center px-5 pb-1"
+                className="w-full max-w-200 flex-none gap-4.5 self-center px-5 pb-1"
                 style={{ paddingTop: screenInsets.top }}>
                 {/* En-tête : compétition + journée */}
                 <View className="flex-row items-start justify-between gap-3">
@@ -274,14 +274,14 @@ export default function MatchesScreen() {
                         <Text className="font-body-bold text-[11px] uppercase tracking-[1.54px] text-text-faint">
                             {t('matches:header.overline')}
                         </Text>
-                        <Text className="font-display text-[27px] leading-[28px] tracking-[0.27px] text-text">
+                        <Text className="font-display text-[27px] leading-7 tracking-[0.27px] text-text">
                             {competition.data.name}
                         </Text>
                     </View>
                     {currentRound ? (
                         <View className="mt-5 h-6 justify-center rounded-pill border border-border bg-surface-sunken px-2.5">
                             <Text className="font-body-bold text-[11px] uppercase tracking-[0.44px] text-text-muted">
-                                {currentRound}
+                                {t('matches:results.number_day_short', { count: currentRound })}
                             </Text>
                         </View>
                     ) : null}
@@ -289,22 +289,22 @@ export default function MatchesScreen() {
 
                 {/* Mini-dashboard */}
                 {hasLeagues ? (
-                    <View className="flex-row items-stretch justify-between gap-4 rounded-md border border-border bg-surface p-[18px] tc-shadow-sm">
+                    <View className="flex-row items-stretch justify-between gap-4 rounded-md border border-border bg-surface p-4.5 tc-shadow-sm">
                         <View className="gap-0.5">
                             <View className="flex-row items-center gap-1.5">
-                                <View className="h-[7px] w-[7px] rounded-pill bg-accent" />
+                                <View className="h-1.75 w-1.75 rounded-pill bg-accent" />
                                 <Text className="font-body-bold text-[11px] uppercase tracking-[1.1px] text-text-faint">
                                     {t('predictions:dashboard.points')}
                                 </Text>
                             </View>
-                            <Text className="font-display text-[52px] leading-[50px] text-text">
+                            <Text className="font-display text-[52px] leading-12.5 text-text">
                                 {totalPoints}
                             </Text>
                         </View>
                         <View className="w-px bg-border" />
-                        <View className="min-w-[116px] justify-center gap-3.5">
+                        <View className="min-w-29 justify-center gap-3.5">
                             <View className="gap-px">
-                                <Text className="font-display text-[22px] leading-[22px] text-text">
+                                <Text className="font-display text-[22px] leading-5.5 text-text">
                                     {played}
                                 </Text>
                                 <Text className="font-body text-[12px] text-text-muted">
@@ -313,7 +313,7 @@ export default function MatchesScreen() {
                             </View>
                             {myRank !== null ? (
                                 <View className="gap-px">
-                                    <Text className="font-display text-[22px] leading-[22px] text-text">
+                                    <Text className="font-display text-[22px] leading-5.5 text-text">
                                         {myRank === 1 ? '1ᵉʳ' : `${myRank}ᵉ`}
                                     </Text>
                                     <Text className="font-body text-[12px] text-text-muted">

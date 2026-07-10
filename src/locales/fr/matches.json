@@ -15,6 +15,8 @@
         "title": "Résultats",
         "count_one": "{{count}} match",
         "count_other": "{{count}} matchs",
+        "number_day": "Journée {{count}}",
+        "number_day_short": "J{{count}}",
         "empty": {
             "title": "Aucun match joué",
             "message": "Les résultats et tes points apparaîtront ici après les premiers coups d'envoi."
