@@ -9,6 +9,7 @@ import {
 import { BarChart3, CheckCircle, List, User } from 'lucide-react-native';
 import type { LucideIcon } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
@@ -46,8 +47,13 @@ export default function AppTabs() {
 }
 
 function FloatingTabList(props: TabListProps) {
+    // Marge basse dynamique : au-dessus de l'indicateur home / barre gestuelle,
+    // plancher 16px sur les appareils sans inset (valeur runtime → prop style).
+    const insets = useSafeAreaInsets();
     return (
-        <View className="absolute inset-x-0 bottom-0 items-center px-4 pb-4">
+        <View
+            className="absolute inset-x-0 bottom-0 items-center px-4"
+            style={{ paddingBottom: Math.max(insets.bottom, 16) }}>
             <View className="w-full max-w-[500px] flex-row gap-1 rounded-[34px] border border-white/70 bg-surface/95 p-2 tc-shadow-lg dark:border-green-600/60">
                 {props.children}
             </View>
