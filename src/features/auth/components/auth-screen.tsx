@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Platform } from 'react-native';
 
 import { BrandMark } from '@/components/brand-mark';
 import { Button } from '@/components/ui/button';
@@ -115,127 +114,125 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
     const isLogin = mode === 'login';
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            style={{ flex: 1 }}>
-            <ScrollView
-                className="flex-1 bg-bg"
-                contentContainerClassName="w-full max-w-[440px] gap-5 self-center px-6 pb-8 pt-14"
-                keyboardShouldPersistTaps="handled">
-                <View className="items-center gap-2.5 pt-3.5">
-                    <BrandMark />
-                    <Text className="font-display text-[38px] leading-8.5 tracking-[0.5px] text-text">
-                        TryCast
-                    </Text>
-                    <Text className="text-center font-body text-[14px] text-text-muted">
-                        {t('auth:brand.tagline')}
-                    </Text>
+        <ScrollView
+            automaticallyAdjustKeyboardInsets
+            className="flex-1 bg-bg"
+            contentContainerClassName="w-full max-w-[440px] gap-5 self-center px-6 pb-8 pt-14"
+            keyboardDismissMode="interactive"
+            keyboardShouldPersistTaps="handled">
+            <View className="items-center gap-2.5 pt-3.5">
+                <BrandMark />
+                <Text className="font-display text-[38px] leading-8.5 tracking-[0.5px] text-text">
+                    TryCast
+                </Text>
+                <Text className="text-center font-body text-[14px] text-text-muted">
+                    {t('auth:brand.tagline')}
+                </Text>
+            </View>
+
+            <SegmentedControl
+                onChange={switchMode}
+                options={[
+                    { value: 'login', label: t('auth:mode.login') },
+                    { value: 'signup', label: t('auth:mode.signup') },
+                ]}
+                value={mode}
+            />
+
+            {error ? <Toast message={error} tone="accent" /> : null}
+            {info ? <Toast message={info} tone="success" /> : null}
+
+            {isLogin ? (
+                <View className="gap-3.5">
+                    <TextField
+                        autoCapitalize="none"
+                        autoComplete="email"
+                        keyboardType="email-address"
+                        label={t('auth:fields.email.label')}
+                        onChangeText={setEmail}
+                        placeholder={t('auth:fields.email.placeholder')}
+                        value={email}
+                    />
+                    <TextField
+                        autoCapitalize="none"
+                        autoComplete="current-password"
+                        label={t('auth:fields.password.label')}
+                        onChangeText={setPassword}
+                        placeholder={t('auth:fields.password.placeholder')}
+                        secureTextEntry
+                        value={password}
+                    />
+                    <View className="-mt-1 items-end">
+                        <Link
+                            className="font-body-medium text-[13px] text-text-muted"
+                            href="/forgot-password">
+                            {t('auth:links.forgotPassword')}
+                        </Link>
+                    </View>
+                    <View className="mt-1">
+                        <Button
+                            disabled={!email || !password}
+                            fullWidth
+                            loading={submitting}
+                            onPress={onLogin}
+                            size="lg"
+                            title={t('auth:actions.login')}
+                        />
+                    </View>
                 </View>
-
-                <SegmentedControl
-                    onChange={switchMode}
-                    options={[
-                        { value: 'login', label: t('auth:mode.login') },
-                        { value: 'signup', label: t('auth:mode.signup') },
-                    ]}
-                    value={mode}
-                />
-
-                {error ? <Toast message={error} tone="accent" /> : null}
-                {info ? <Toast message={info} tone="success" /> : null}
-
-                {isLogin ? (
-                    <View className="gap-3.5">
-                        <TextField
-                            autoCapitalize="none"
-                            autoComplete="email"
-                            keyboardType="email-address"
-                            label={t('auth:fields.email.label')}
-                            onChangeText={setEmail}
-                            placeholder={t('auth:fields.email.placeholder')}
-                            value={email}
+            ) : (
+                <View className="gap-3.5">
+                    <TextField
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        error={fieldErrors.username}
+                        label={t('auth:fields.username.label')}
+                        onChangeText={setUsername}
+                        placeholder={t('auth:fields.username.placeholder')}
+                        value={username}
+                    />
+                    <TextField
+                        autoCapitalize="none"
+                        autoComplete="email"
+                        error={fieldErrors.email}
+                        keyboardType="email-address"
+                        label={t('auth:fields.email.label')}
+                        onChangeText={setEmail}
+                        placeholder={t('auth:fields.email.placeholder')}
+                        value={email}
+                    />
+                    <TextField
+                        autoCapitalize="none"
+                        autoComplete="new-password"
+                        error={fieldErrors.password}
+                        label={t('auth:fields.newPassword.label')}
+                        onChangeText={setPassword}
+                        placeholder={t('auth:fields.newPassword.placeholder')}
+                        secureTextEntry
+                        value={password}
+                    />
+                    <TextField
+                        autoCapitalize="none"
+                        autoComplete="new-password"
+                        error={fieldErrors.confirm}
+                        label={t('auth:fields.confirmPassword.label')}
+                        onChangeText={setConfirm}
+                        placeholder={t('auth:fields.confirmPassword.placeholder')}
+                        secureTextEntry
+                        value={confirm}
+                    />
+                    <View className="mt-1">
+                        <Button
+                            disabled={!username || !email || !password || !confirm}
+                            fullWidth
+                            loading={submitting}
+                            onPress={onSignup}
+                            size="lg"
+                            title={t('auth:actions.signup')}
                         />
-                        <TextField
-                            autoCapitalize="none"
-                            autoComplete="current-password"
-                            label={t('auth:fields.password.label')}
-                            onChangeText={setPassword}
-                            placeholder={t('auth:fields.password.placeholder')}
-                            secureTextEntry
-                            value={password}
-                        />
-                        <View className="-mt-1 items-end">
-                            <Link
-                                className="font-body-medium text-[13px] text-text-muted"
-                                href="/forgot-password">
-                                {t('auth:links.forgotPassword')}
-                            </Link>
-                        </View>
-                        <View className="mt-1">
-                            <Button
-                                disabled={!email || !password}
-                                fullWidth
-                                loading={submitting}
-                                onPress={onLogin}
-                                size="lg"
-                                title={t('auth:actions.login')}
-                            />
-                        </View>
                     </View>
-                ) : (
-                    <View className="gap-3.5">
-                        <TextField
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            error={fieldErrors.username}
-                            label={t('auth:fields.username.label')}
-                            onChangeText={setUsername}
-                            placeholder={t('auth:fields.username.placeholder')}
-                            value={username}
-                        />
-                        <TextField
-                            autoCapitalize="none"
-                            autoComplete="email"
-                            error={fieldErrors.email}
-                            keyboardType="email-address"
-                            label={t('auth:fields.email.label')}
-                            onChangeText={setEmail}
-                            placeholder={t('auth:fields.email.placeholder')}
-                            value={email}
-                        />
-                        <TextField
-                            autoCapitalize="none"
-                            autoComplete="new-password"
-                            error={fieldErrors.password}
-                            label={t('auth:fields.newPassword.label')}
-                            onChangeText={setPassword}
-                            placeholder={t('auth:fields.newPassword.placeholder')}
-                            secureTextEntry
-                            value={password}
-                        />
-                        <TextField
-                            autoCapitalize="none"
-                            autoComplete="new-password"
-                            error={fieldErrors.confirm}
-                            label={t('auth:fields.confirmPassword.label')}
-                            onChangeText={setConfirm}
-                            placeholder={t('auth:fields.confirmPassword.placeholder')}
-                            secureTextEntry
-                            value={confirm}
-                        />
-                        <View className="mt-1">
-                            <Button
-                                disabled={!username || !email || !password || !confirm}
-                                fullWidth
-                                loading={submitting}
-                                onPress={onSignup}
-                                size="lg"
-                                title={t('auth:actions.signup')}
-                            />
-                        </View>
-                    </View>
-                )}
-            </ScrollView>
-        </KeyboardAvoidingView>
+                </View>
+            )}
+        </ScrollView>
     );
 }
