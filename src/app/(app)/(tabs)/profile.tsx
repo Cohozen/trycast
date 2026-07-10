@@ -105,184 +105,192 @@ export default function ProfileScreen() {
         matches.isPending || predictions.isPending || standing.isPending || myLeagues.isPending;
 
     return (
-        <ScrollView
-            className="flex-1 bg-bg"
-            contentContainerClassName="w-full max-w-[800px] gap-3.5 self-center px-5 pb-32 pt-14">
-            {/* Action row + identité */}
-            <View className="flex-row items-center justify-end">
-                <IconButton
-                    accessibilityLabel={t('profile:settings.title')}
-                    onPress={() => router.push('/settings')}
-                    variant="soft">
-                    <Settings color={textColor} size={20} strokeWidth={1.9} />
-                </IconButton>
+        <View className="flex-1 bg-bg">
+            {/* Bloc épinglé : identité, chiffres clés, compétition, onglets */}
+            <View className="w-full max-w-[800px] flex-none gap-3.5 self-center px-5 pt-14">
+                {/* Action row + identité */}
+                <View className="flex-row items-center justify-end">
+                    <IconButton
+                        accessibilityLabel={t('profile:settings.title')}
+                        onPress={() => router.push('/settings')}
+                        variant="soft">
+                        <Settings color={textColor} size={20} strokeWidth={1.9} />
+                    </IconButton>
+                </View>
+
+                {profilePending ? (
+                    <Skeleton className="h-[56px]" variant="block" />
+                ) : (
+                    <View className="flex-row items-center gap-3.5">
+                        <Avatar name={profile?.username ?? '?'} ring size="lg" />
+                        <View className="min-w-0 flex-1 gap-1">
+                            <Text className="font-display text-[27px] leading-[27px] text-text">
+                                {profile?.username}
+                            </Text>
+                            {memberSince ? (
+                                <Text className="font-body text-[12.5px] text-text-muted">
+                                    {t('profile:memberSince', { date: memberSince })}
+                                </Text>
+                            ) : null}
+                        </View>
+                    </View>
+                )}
+
+                {/* Chiffres clés */}
+                <Card className="flex-row overflow-hidden p-0">
+                    {figures.map((figure, index) => (
+                        <View
+                            className={`flex-1 items-center gap-1 px-1 py-3 ${index > 0 ? 'border-l border-border' : ''}`}
+                            key={figure.key}>
+                            <Text className="font-display text-[23px] leading-[23px] text-text">
+                                {figure.value}
+                            </Text>
+                            <Text className="font-body-bold text-[9.5px] uppercase tracking-[0.57px] text-text-faint">
+                                {figure.label}
+                            </Text>
+                        </View>
+                    ))}
+                </Card>
+
+                {/* Sélecteur de compétition */}
+                {competitionList.length > 0 && competitionId ? (
+                    <Select
+                        icon={<Trophy color={brandColor} size={18} strokeWidth={1.9} />}
+                        onChange={setSelectedCompetitionId}
+                        options={competitionList.map((competition) => ({
+                            value: competition.id,
+                            label: competition.name,
+                            badge: competition.is_active
+                                ? t('profile:competition.current')
+                                : undefined,
+                        }))}
+                        overline={t('profile:competition.overline')}
+                        value={competitionId}
+                    />
+                ) : null}
+
+                <SegmentedControl
+                    onChange={setTab}
+                    options={[
+                        { value: 'stats', label: t('profile:tabs.stats') },
+                        { value: 'predictions', label: t('profile:tabs.predictions') },
+                        { value: 'leagues', label: t('profile:tabs.leagues') },
+                    ]}
+                    value={tab}
+                />
             </View>
 
-            {profilePending ? (
-                <Skeleton className="h-[56px]" variant="block" />
-            ) : (
-                <View className="flex-row items-center gap-3.5">
-                    <Avatar name={profile?.username ?? '?'} ring size="lg" />
-                    <View className="min-w-0 flex-1 gap-1">
-                        <Text className="font-display text-[27px] leading-[27px] text-text">
-                            {profile?.username}
-                        </Text>
-                        {memberSince ? (
-                            <Text className="font-body text-[12.5px] text-text-muted">
-                                {t('profile:memberSince', { date: memberSince })}
-                            </Text>
-                        ) : null}
+            {/* Seul le contenu de l'onglet défile */}
+            <ScrollView
+                className="flex-1"
+                contentContainerClassName="w-full max-w-[800px] gap-3.5 self-center px-5 pb-32 pt-3.5">
+                {tabsLoading ? (
+                    <View className="gap-2.5">
+                        <Skeleton className="h-24" variant="block" />
+                        <Skeleton className="h-24" variant="block" />
                     </View>
-                </View>
-            )}
-
-            {/* Chiffres clés */}
-            <Card className="flex-row overflow-hidden p-0">
-                {figures.map((figure, index) => (
-                    <View
-                        className={`flex-1 items-center gap-1 px-1 py-3 ${index > 0 ? 'border-l border-border' : ''}`}
-                        key={figure.key}>
-                        <Text className="font-display text-[23px] leading-[23px] text-text">
-                            {figure.value}
-                        </Text>
-                        <Text className="font-body-bold text-[9.5px] uppercase tracking-[0.57px] text-text-faint">
-                            {figure.label}
-                        </Text>
-                    </View>
-                ))}
-            </Card>
-
-            {/* Sélecteur de compétition */}
-            {competitionList.length > 0 && competitionId ? (
-                <Select
-                    icon={<Trophy color={brandColor} size={18} strokeWidth={1.9} />}
-                    onChange={setSelectedCompetitionId}
-                    options={competitionList.map((competition) => ({
-                        value: competition.id,
-                        label: competition.name,
-                        badge: competition.is_active ? t('profile:competition.current') : undefined,
-                    }))}
-                    overline={t('profile:competition.overline')}
-                    value={competitionId}
-                />
-            ) : null}
-
-            <SegmentedControl
-                onChange={setTab}
-                options={[
-                    { value: 'stats', label: t('profile:tabs.stats') },
-                    { value: 'predictions', label: t('profile:tabs.predictions') },
-                    { value: 'leagues', label: t('profile:tabs.leagues') },
-                ]}
-                value={tab}
-            />
-
-            {tabsLoading ? (
-                <View className="gap-2.5">
-                    <Skeleton className="h-24" variant="block" />
-                    <Skeleton className="h-24" variant="block" />
-                </View>
-            ) : tab === 'stats' ? (
-                <ProfileStatsPanel
-                    points={standing.data?.total_points ?? null}
-                    rank={myRank.data?.rank ?? null}
-                    stats={stats}
-                    totalPlayers={myRank.data?.total ?? null}
-                />
-            ) : tab === 'predictions' ? (
-                scoredMatches.length === 0 ? (
+                ) : tab === 'stats' ? (
+                    <ProfileStatsPanel
+                        points={standing.data?.total_points ?? null}
+                        rank={myRank.data?.rank ?? null}
+                        stats={stats}
+                        totalPlayers={myRank.data?.total ?? null}
+                    />
+                ) : tab === 'predictions' ? (
+                    scoredMatches.length === 0 ? (
+                        <EmptyState
+                            message={t('profile:predictions.emptyMessage')}
+                            title={t('profile:predictions.emptyTitle')}
+                        />
+                    ) : (
+                        <View className="gap-3">
+                            {scoredMatches.map((match, index) => {
+                                const dayTitle = dayTitleOf(match.kickoff_at);
+                                const newDay =
+                                    index === 0 ||
+                                    dayTitle !== dayTitleOf(scoredMatches[index - 1].kickoff_at);
+                                return (
+                                    <View className="gap-3" key={match.id}>
+                                        {newDay ? (
+                                            <Text className="px-0.5 font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
+                                                {dayTitle}
+                                            </Text>
+                                        ) : null}
+                                        <ResultCard
+                                            match={match}
+                                            prediction={predictions.data?.get(match.id)}
+                                        />
+                                    </View>
+                                );
+                            })}
+                        </View>
+                    )
+                ) : leagues.length === 0 ? (
                     <EmptyState
-                        message={t('profile:predictions.emptyMessage')}
-                        title={t('profile:predictions.emptyTitle')}
+                        action={
+                            <View className="w-full min-w-[240px] gap-2.5">
+                                <Button
+                                    fullWidth
+                                    onPress={() => router.push('/league/create')}
+                                    title={t('leagues:actions.create')}
+                                />
+                                <Button
+                                    fullWidth
+                                    onPress={() => router.push('/league/join')}
+                                    title={t('leagues:actions.join')}
+                                    variant="secondary"
+                                />
+                            </View>
+                        }
+                        message={t('leagues:hero.message')}
+                        title={t('leagues:hero.title')}
                     />
                 ) : (
-                    <View className="gap-3">
-                        {scoredMatches.map((match, index) => {
-                            const dayTitle = dayTitleOf(match.kickoff_at);
-                            const newDay =
-                                index === 0 ||
-                                dayTitle !== dayTitleOf(scoredMatches[index - 1].kickoff_at);
-                            return (
-                                <View className="gap-3" key={match.id}>
-                                    {newDay ? (
-                                        <Text className="px-0.5 font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
-                                            {dayTitle}
-                                        </Text>
-                                    ) : null}
-                                    <ResultCard
-                                        match={match}
-                                        prediction={predictions.data?.get(match.id)}
-                                    />
-                                </View>
-                            );
-                        })}
-                    </View>
-                )
-            ) : leagues.length === 0 ? (
-                <EmptyState
-                    action={
-                        <View className="w-full min-w-[240px] gap-2.5">
-                            <Button
-                                fullWidth
-                                onPress={() => router.push('/league/create')}
-                                title={t('leagues:actions.create')}
-                            />
-                            <Button
-                                fullWidth
-                                onPress={() => router.push('/league/join')}
-                                title={t('leagues:actions.join')}
-                                variant="secondary"
-                            />
-                        </View>
-                    }
-                    message={t('leagues:hero.message')}
-                    title={t('leagues:hero.title')}
-                />
-            ) : (
-                <View className="gap-2.5">
-                    {leagues.map((league) => (
-                        <Pressable
-                            accessibilityRole="button"
-                            key={league.id}
-                            onPress={() =>
-                                router.push({
-                                    pathname: '/league/[id]',
-                                    params: { id: league.id },
-                                })
-                            }>
-                            <Card className="flex-row items-center gap-3 px-4 py-3.5">
-                                <View className="h-[34px] w-[34px] items-center justify-center rounded-sm bg-accent/10">
-                                    <Users color={accentColor} size={17} strokeWidth={1.9} />
-                                </View>
-                                <Text className="min-w-0 flex-1 font-body-bold text-[15px] text-text">
-                                    {league.name}
-                                </Text>
-                                <ChevronRight color={faintColor} size={18} strokeWidth={2} />
-                            </Card>
-                        </Pressable>
-                    ))}
-                    <View className="mt-1 flex-row gap-2.5">
-                        <View className="flex-1">
-                            <Button
-                                fullWidth
-                                onPress={() => router.push('/league/create')}
-                                size="sm"
-                                title={t('leagues:actions.create')}
-                                variant="secondary"
-                            />
-                        </View>
-                        <View className="flex-1">
-                            <Button
-                                fullWidth
-                                onPress={() => router.push('/league/join')}
-                                size="sm"
-                                title={t('leagues:actions.join')}
-                                variant="secondary"
-                            />
+                    <View className="gap-2.5">
+                        {leagues.map((league) => (
+                            <Pressable
+                                accessibilityRole="button"
+                                key={league.id}
+                                onPress={() =>
+                                    router.push({
+                                        pathname: '/league/[id]',
+                                        params: { id: league.id },
+                                    })
+                                }>
+                                <Card className="flex-row items-center gap-3 px-4 py-3.5">
+                                    <View className="h-[34px] w-[34px] items-center justify-center rounded-sm bg-accent/10">
+                                        <Users color={accentColor} size={17} strokeWidth={1.9} />
+                                    </View>
+                                    <Text className="min-w-0 flex-1 font-body-bold text-[15px] text-text">
+                                        {league.name}
+                                    </Text>
+                                    <ChevronRight color={faintColor} size={18} strokeWidth={2} />
+                                </Card>
+                            </Pressable>
+                        ))}
+                        <View className="mt-1 flex-row gap-2.5">
+                            <View className="flex-1">
+                                <Button
+                                    fullWidth
+                                    onPress={() => router.push('/league/create')}
+                                    size="sm"
+                                    title={t('leagues:actions.create')}
+                                    variant="secondary"
+                                />
+                            </View>
+                            <View className="flex-1">
+                                <Button
+                                    fullWidth
+                                    onPress={() => router.push('/league/join')}
+                                    size="sm"
+                                    title={t('leagues:actions.join')}
+                                    variant="secondary"
+                                />
+                            </View>
                         </View>
                     </View>
-                </View>
-            )}
-        </ScrollView>
+                )}
+            </ScrollView>
+        </View>
     );
 }
