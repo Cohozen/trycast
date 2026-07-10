@@ -20,7 +20,7 @@ Source de vérité : `src/global.css` (tokens `@theme`) + le livrable Claude Des
 - Teintes translucides : modificateur d'opacité (`bg-accent/15`, `bg-text/10`) — compile en `color-mix`, OK natif + web.
 - Radius : `rounded-xs|sm|md|lg|xl|pill` (6/10/14/20/28/999 px). Carte par défaut = `rounded-md`, boutons/chips = `rounded-pill`, sheets = `rounded-lg`.
 - Ombres : classes dédiées `tc-shadow-sm|md|lg` et `tc-glow-accent` (PAS les `shadow-*` Tailwind : leurs variables composées passent mal en natif).
-- Texte : `text-h1|h2|title|body|body-sm|data|caption|overline` (tailles + line-height px). `text-[Npx]` pour les valeurs ponctuelles des maquettes.
+- Texte : `text-h1|h2|title|body|body-sm|data|caption|overline` (taille px + line-height). **Piège natif** : les `--text-*--line-height` de `global.css` doivent rester des **ratios sans unité** (react-native-css résout `line-height: var(…)` au runtime en multipliant le nombre par la taille de police — une valeur `22px` y devient le multiplicateur 22 et éclate les lignes sur toute la hauteur de l'écran). `text-[Npx]` (+ `leading-[Npx]`, littéral OK) pour les valeurs ponctuelles des maquettes.
 - Jamais de couleur Tailwind brute (`bg-blue-600`, `text-gray-500`) ni de hex en dur (exceptions documentées : logo/brand-mark, backdrop modal).
 
 ## Polices (piège natif)
