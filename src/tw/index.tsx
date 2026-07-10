@@ -42,15 +42,39 @@ export const Text = (props: React.ComponentProps<typeof RNText> & { className?: 
 };
 Text.displayName = 'CSS(Text)';
 
-export const ScrollView = (
-    props: React.ComponentProps<typeof RNScrollView> & {
-        className?: string;
-        contentContainerClassName?: string;
-    },
-) => {
-    return useCssElement(RNScrollView as React.ComponentType<Record<string, unknown>>, props, {
-        className: 'style',
-        contentContainerClassName: 'contentContainerStyle',
+export const ScrollView = ({
+    contentContainerStyle,
+    ...props
+}: React.ComponentProps<typeof RNScrollView> & {
+    className?: string;
+    contentContainerClassName?: string;
+}) => {
+    const element = useCssElement(
+        RNScrollView as React.ComponentType<Record<string, unknown>>,
+        props,
+        {
+            className: 'style',
+            contentContainerClassName: 'contentContainerStyle',
+        },
+    );
+    if (contentContainerStyle == null) {
+        return element;
+    }
+    // react-native-css ne fusionne classes + inline que pour la cible `style` :
+    // un contentContainerStyle inline écraserait tout le style dérivé de
+    // contentContainerClassName. On fusionne donc ici, après résolution des classes.
+    if (element.type !== RNScrollView) {
+        // Élément enveloppé (provider de variables/containers) : cas non prévu.
+        if (__DEV__) {
+            console.warn(
+                'tw/ScrollView : contentContainerStyle ignoré (élément enveloppé par react-native-css)',
+            );
+        }
+        return element;
+    }
+    const resolved = (element.props as { contentContainerStyle?: unknown }).contentContainerStyle;
+    return React.cloneElement(element as React.ReactElement<Record<string, unknown>>, {
+        contentContainerStyle: [resolved, contentContainerStyle],
     });
 };
 ScrollView.displayName = 'CSS(ScrollView)';
