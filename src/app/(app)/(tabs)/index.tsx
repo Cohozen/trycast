@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BrandMark } from '@/components/brand-mark';
@@ -136,32 +137,150 @@ export default function MatchesScreen() {
     const played = standing.data?.predictions_scored ?? 0;
     const currentRound = upcoming[0]?.round ?? null;
 
-    return (
-        <ScrollView
-            className="flex-1 bg-bg"
-            contentContainerClassName="w-full max-w-[800px] gap-[18px] self-center px-5 pb-32 pt-14">
-            {/* En-tête : compétition + journée */}
-            <View className="flex-row items-start justify-between gap-3">
-                <View className="flex-1 gap-1.5">
-                    <Text className="font-body-bold text-[11px] uppercase tracking-[1.54px] text-text-faint">
-                        {t('matches:header.overline')}
+    // Contenu défilant aplati : stickyHeaderIndices exige que les en-têtes de
+    // date soient des enfants directs du ScrollView.
+    const listChildren: ReactNode[] = [];
+    const stickyIndices: number[] = [];
+
+    if (hasLeagues) {
+        listChildren.push(
+            // Actions de ligue
+            <View className="flex-row gap-2.5" key="league-actions">
+                <View className="flex-1">
+                    <Button
+                        fullWidth
+                        onPress={() => router.push('/league/create')}
+                        title={t('leagues:actions.create')}
+                        variant="secondary"
+                    />
+                </View>
+                <View className="flex-1">
+                    <Button
+                        fullWidth
+                        onPress={() => router.push('/league/join')}
+                        title={t('leagues:actions.join')}
+                        variant="ghost"
+                    />
+                </View>
+            </View>,
+        );
+    } else {
+        listChildren.push(
+            // Aucune ligue : les CTA deviennent le héros
+            <View className="items-center gap-3.5 px-5 pb-1 pt-6" key="league-hero">
+                <BrandMark size={72} />
+                <Text className="text-center font-display text-h2 text-text">
+                    {t('leagues:hero.title')}
+                </Text>
+                <Text className="max-w-[280px] text-center font-body text-[14px] leading-[21px] text-text-muted">
+                    {t('leagues:hero.message')}
+                </Text>
+                <View className="mt-2 w-full max-w-[300px] gap-2.5">
+                    <Button
+                        fullWidth
+                        onPress={() => router.push('/league/create')}
+                        size="lg"
+                        title={t('leagues:actions.create')}
+                    />
+                    <Button
+                        fullWidth
+                        onPress={() => router.push('/league/join')}
+                        size="lg"
+                        title={t('leagues:actions.join')}
+                        variant="secondary"
+                    />
+                </View>
+                <Text className="mt-1.5 font-body text-[13px] text-text-faint">
+                    {t('leagues:hero.footnote')}
+                </Text>
+            </View>,
+        );
+    }
+
+    if (toPredict > 0) {
+        listChildren.push(
+            // Compteur à pronostiquer
+            <View
+                className="flex-row items-center gap-3 rounded-md border border-accent/25 bg-accent/10 px-3.5 py-3"
+                key="to-predict">
+                <Text className="font-display text-[30px] leading-[28px] text-accent">
+                    {toPredict}
+                </Text>
+                <View className="gap-px">
+                    <Text className="font-body-bold text-[14px] text-text">
+                        {t('predictions:toPredict.label', { count: toPredict })}
                     </Text>
-                    <Text className="font-display text-[27px] leading-[28px] tracking-[0.27px] text-text">
-                        {competition.data.name}
+                    <Text className="font-body text-[12px] text-text-muted">
+                        {t('predictions:toPredict.autoSave')}
                     </Text>
                 </View>
-                {currentRound ? (
-                    <View className="mt-5 h-6 justify-center rounded-pill border border-border bg-surface-sunken px-2.5">
-                        <Text className="font-body-bold text-[11px] uppercase tracking-[0.44px] text-text-muted">
-                            {currentRound}
+            </View>,
+        );
+    }
+
+    // Matchs à venir groupés par date ; chaque en-tête de jour est sticky
+    // jusqu'à être poussé par le suivant (fond opaque bg-bg obligatoire).
+    if (upcoming.length === 0) {
+        listChildren.push(
+            <View className="rounded-lg border border-dashed border-border-strong p-3" key="empty">
+                <EmptyState message={t('matches:empty.message')} title={t('matches:empty.title')} />
+            </View>,
+        );
+    } else {
+        for (const group of groups) {
+            stickyIndices.push(listChildren.length);
+            listChildren.push(
+                <View className="bg-bg py-1.5" key={group.key}>
+                    <View className="flex-row items-baseline justify-between gap-3">
+                        <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
+                            {group.label}
+                        </Text>
+                        {group.round ? (
+                            <Text className="font-body-bold text-[11px] uppercase tracking-[0.66px] text-text-faint">
+                                {group.round}
+                            </Text>
+                        ) : null}
+                    </View>
+                </View>,
+            );
+            for (const match of group.matches) {
+                listChildren.push(
+                    <PredictionCard
+                        key={match.id}
+                        match={match}
+                        prediction={predictions.data?.get(match.id)}
+                        userId={userId}
+                    />,
+                );
+            }
+        }
+    }
+
+    return (
+        <View className="flex-1 bg-bg">
+            {/* Bloc épinglé : en-tête + mini-dashboard */}
+            <View className="w-full max-w-[800px] flex-none gap-[18px] self-center px-5 pb-1 pt-14">
+                {/* En-tête : compétition + journée */}
+                <View className="flex-row items-start justify-between gap-3">
+                    <View className="flex-1 gap-1.5">
+                        <Text className="font-body-bold text-[11px] uppercase tracking-[1.54px] text-text-faint">
+                            {t('matches:header.overline')}
+                        </Text>
+                        <Text className="font-display text-[27px] leading-[28px] tracking-[0.27px] text-text">
+                            {competition.data.name}
                         </Text>
                     </View>
-                ) : null}
-            </View>
+                    {currentRound ? (
+                        <View className="mt-5 h-6 justify-center rounded-pill border border-border bg-surface-sunken px-2.5">
+                            <Text className="font-body-bold text-[11px] uppercase tracking-[0.44px] text-text-muted">
+                                {currentRound}
+                            </Text>
+                        </View>
+                    ) : null}
+                </View>
 
-            {hasLeagues ? (
-                <>
-                    {/* Mini-dashboard */}
+                {/* Mini-dashboard */}
+                {hasLeagues ? (
                     <View className="flex-row items-stretch justify-between gap-4 rounded-md border border-border bg-surface p-[18px] tc-shadow-sm">
                         <View className="gap-0.5">
                             <View className="flex-row items-center gap-1.5">
@@ -196,107 +315,15 @@ export default function MatchesScreen() {
                             ) : null}
                         </View>
                     </View>
+                ) : null}
+            </View>
 
-                    {/* Actions de ligue */}
-                    <View className="flex-row gap-2.5">
-                        <View className="flex-1">
-                            <Button
-                                fullWidth
-                                onPress={() => router.push('/league/create')}
-                                title={t('leagues:actions.create')}
-                                variant="secondary"
-                            />
-                        </View>
-                        <View className="flex-1">
-                            <Button
-                                fullWidth
-                                onPress={() => router.push('/league/join')}
-                                title={t('leagues:actions.join')}
-                                variant="ghost"
-                            />
-                        </View>
-                    </View>
-                </>
-            ) : (
-                // Aucune ligue : les CTA deviennent le héros
-                <View className="items-center gap-3.5 px-5 pb-1 pt-6">
-                    <BrandMark size={72} />
-                    <Text className="text-center font-display text-h2 text-text">
-                        {t('leagues:hero.title')}
-                    </Text>
-                    <Text className="max-w-[280px] text-center font-body text-[14px] leading-[21px] text-text-muted">
-                        {t('leagues:hero.message')}
-                    </Text>
-                    <View className="mt-2 w-full max-w-[300px] gap-2.5">
-                        <Button
-                            fullWidth
-                            onPress={() => router.push('/league/create')}
-                            size="lg"
-                            title={t('leagues:actions.create')}
-                        />
-                        <Button
-                            fullWidth
-                            onPress={() => router.push('/league/join')}
-                            size="lg"
-                            title={t('leagues:actions.join')}
-                            variant="secondary"
-                        />
-                    </View>
-                    <Text className="mt-1.5 font-body text-[13px] text-text-faint">
-                        {t('leagues:hero.footnote')}
-                    </Text>
-                </View>
-            )}
-
-            {/* Compteur à pronostiquer */}
-            {toPredict > 0 ? (
-                <View className="flex-row items-center gap-3 rounded-md border border-accent/25 bg-accent/10 px-3.5 py-3">
-                    <Text className="font-display text-[30px] leading-[28px] text-accent">
-                        {toPredict}
-                    </Text>
-                    <View className="gap-px">
-                        <Text className="font-body-bold text-[14px] text-text">
-                            {t('predictions:toPredict.label', { count: toPredict })}
-                        </Text>
-                        <Text className="font-body text-[12px] text-text-muted">
-                            {t('predictions:toPredict.autoSave')}
-                        </Text>
-                    </View>
-                </View>
-            ) : null}
-
-            {/* Matchs à venir groupés par date */}
-            {upcoming.length === 0 ? (
-                <View className="rounded-lg border border-dashed border-border-strong p-3">
-                    <EmptyState
-                        message={t('matches:empty.message')}
-                        title={t('matches:empty.title')}
-                    />
-                </View>
-            ) : (
-                groups.map((group) => (
-                    <View className="gap-3" key={group.key}>
-                        <View className="flex-row items-baseline justify-between gap-3 pt-1">
-                            <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
-                                {group.label}
-                            </Text>
-                            {group.round ? (
-                                <Text className="font-body-bold text-[11px] uppercase tracking-[0.66px] text-text-faint">
-                                    {group.round}
-                                </Text>
-                            ) : null}
-                        </View>
-                        {group.matches.map((match) => (
-                            <PredictionCard
-                                key={match.id}
-                                match={match}
-                                prediction={predictions.data?.get(match.id)}
-                                userId={userId}
-                            />
-                        ))}
-                    </View>
-                ))
-            )}
-        </ScrollView>
+            <ScrollView
+                className="flex-1"
+                contentContainerClassName="w-full max-w-[800px] gap-3 self-center px-5 pb-32 pt-3"
+                stickyHeaderIndices={stickyIndices}>
+                {listChildren}
+            </ScrollView>
+        </View>
     );
 }
