@@ -15,6 +15,14 @@
  * dark ne se résout pas. Les hex sont dupliqués dans src/tw/palette.ts
  * (source TS pour les couleurs lues en JS) ; le test palette.test.ts
  * garantit la synchronisation des deux fichiers.
+ *
+ * IMPORTANT (browserslist) : la branche dark ne fonctionne que si
+ * light-dark() survit à la passe Lightning CSS d'@expo/metro-config,
+ * qui lit ses cibles dans le champ browserslist de package.json. Ce
+ * plancher ne doit jamais descendre sous Chrome 123 / Safari 17.5 /
+ * Firefox 120 (support natif de light-dark()), sinon chaque token est
+ * réécrit en var(--lightningcss-*) irrésoluble en natif → toute l'app
+ * reste en light, silencieusement.
  * ============================================================ */
 
 @layer base {

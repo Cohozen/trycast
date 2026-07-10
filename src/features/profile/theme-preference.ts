@@ -18,19 +18,15 @@ export async function loadThemePreference(): Promise<ThemePreference> {
 function applyScheme(preference: ThemePreference): void {
     if (Platform.OS === 'web') {
         if (typeof document === 'undefined') return;
-        // react-native-web n'implémente pas Appearance.setColorScheme, et
-        // lightningcss compile light-dark() en « space toggle » piloté par
-        // prefers-color-scheme : --lightningcss-light/dark ('initial' =
-        // inactif, ' ' = actif). Forcer un thème = poser ces deux variables
-        // en inline sur :root ; system = les retirer (la media query reprend).
+        // react-native-web n'implémente pas Appearance.setColorScheme. Le
+        // plancher browserslist (package.json) préserve light-dark() tel quel,
+        // et light-dark() se pilote par la propriété standard color-scheme :
+        // la poser en inline sur :root force le thème, la retirer rend la
+        // main au `color-scheme: light dark` de global.css (scheme système).
         const root = document.documentElement.style;
         if (preference === 'system') {
-            root.removeProperty('--lightningcss-light');
-            root.removeProperty('--lightningcss-dark');
             root.removeProperty('color-scheme');
         } else {
-            root.setProperty('--lightningcss-light', preference === 'light' ? 'initial' : ' ');
-            root.setProperty('--lightningcss-dark', preference === 'dark' ? 'initial' : ' ');
             root.setProperty('color-scheme', preference);
         }
         return;

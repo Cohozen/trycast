@@ -7,8 +7,8 @@ import { palette, type ThemeColorToken } from './palette';
  * spinners…) — className reste la voie normale pour tout le reste.
  *
  * Web : on renvoie la variable CSS, seule à suivre la bascule manuelle
- * de thème (space toggle lightningcss) que useColorScheme ne voit pas.
- * Natif : littéral depuis la palette, piloté par Appearance.
+ * de thème (color-scheme sur :root → light-dark()) que useColorScheme
+ * ne voit pas. Natif : littéral depuis la palette, piloté par Appearance.
  */
 export function useThemeColor(token: ThemeColorToken): string {
     const scheme = useColorScheme();
