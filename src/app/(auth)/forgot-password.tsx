@@ -40,7 +40,7 @@ export default function ForgotPasswordScreen() {
             style={{ flex: 1 }}>
             <ScrollView
                 className="flex-1 bg-bg"
-                contentContainerClassName="w-full max-w-[440px] flex-grow justify-center gap-5 self-center px-6 py-8"
+                contentContainerClassName="w-full max-w-[440px] gap-5 self-center px-6 pb-8 pt-14"
                 keyboardShouldPersistTaps="handled">
                 <View className="gap-1.5">
                     <Text className="font-display text-h1 text-text">{t('auth:forgot.title')}</Text>
