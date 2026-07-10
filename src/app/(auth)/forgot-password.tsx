@@ -8,6 +8,7 @@ import { toAuthMessageKey } from '@/features/auth/errors';
 import { validateEmail } from '@/features/auth/validation';
 import { supabase } from '@/lib/supabase';
 import { Link, ScrollView, Text, View } from '@/tw';
+import { useScreenInsets } from '@/tw/use-screen-insets';
 
 export default function ForgotPasswordScreen() {
     const { t } = useTranslation(['auth', 'common']);
@@ -15,6 +16,7 @@ export default function ForgotPasswordScreen() {
     const [error, setError] = useState<string | null>(null);
     const [sent, setSent] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const screenInsets = useScreenInsets();
 
     const onSubmit = async () => {
         setError(null);
@@ -37,7 +39,8 @@ export default function ForgotPasswordScreen() {
         <ScrollView
             automaticallyAdjustKeyboardInsets
             className="flex-1 bg-bg"
-            contentContainerClassName="w-full max-w-[440px] gap-5 self-center px-6 pb-8 pt-14"
+            contentContainerClassName="w-full max-w-[440px] gap-5 self-center px-6 pb-8"
+            contentContainerStyle={{ paddingTop: screenInsets.top }}
             keyboardDismissMode="interactive"
             keyboardShouldPersistTaps="handled">
             <View className="gap-1.5">

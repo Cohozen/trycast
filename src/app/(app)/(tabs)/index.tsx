@@ -18,6 +18,7 @@ import { splitMatches } from '@/features/predictions/split-matches';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
 import { i18n } from '@/lib/i18n';
 import { ScrollView, Text, View } from '@/tw';
+import { useScreenInsets } from '@/tw/use-screen-insets';
 
 type DateGroup = { key: string; label: string; round: string | null; matches: MatchWithTeams[] };
 
@@ -73,6 +74,7 @@ export default function MatchesScreen() {
     const myLeagues = useMyLeagues();
     const standing = useMyStanding(competition.data?.id, userId);
     const leaderboard = useGlobalLeaderboard(competition.data?.id);
+    const screenInsets = useScreenInsets();
 
     const loading =
         !userId ||
@@ -83,7 +85,11 @@ export default function MatchesScreen() {
         return (
             <ScrollView
                 className="flex-1 bg-bg"
-                contentContainerClassName="w-full max-w-[800px] gap-[18px] self-center px-5 pb-32 pt-14">
+                contentContainerClassName="w-full max-w-[800px] gap-[18px] self-center px-5"
+                contentContainerStyle={{
+                    paddingTop: screenInsets.top,
+                    paddingBottom: screenInsets.bottomTabBar,
+                }}>
                 <Skeleton className="h-24" variant="block" />
                 <View className="flex-row gap-2.5">
                     <Skeleton className="h-12 flex-1" variant="block" />
@@ -259,7 +265,9 @@ export default function MatchesScreen() {
     return (
         <View className="flex-1 bg-bg">
             {/* Bloc épinglé : en-tête + mini-dashboard */}
-            <View className="w-full max-w-[800px] flex-none gap-[18px] self-center px-5 pb-1 pt-14">
+            <View
+                className="w-full max-w-[800px] flex-none gap-[18px] self-center px-5 pb-1"
+                style={{ paddingTop: screenInsets.top }}>
                 {/* En-tête : compétition + journée */}
                 <View className="flex-row items-start justify-between gap-3">
                     <View className="flex-1 gap-1.5">
@@ -320,7 +328,8 @@ export default function MatchesScreen() {
 
             <ScrollView
                 className="flex-1"
-                contentContainerClassName="w-full max-w-[800px] gap-3 self-center px-5 pb-32 pt-3"
+                contentContainerClassName="w-full max-w-[800px] gap-3 self-center px-5 pt-3"
+                contentContainerStyle={{ paddingBottom: screenInsets.bottomTabBar }}
                 stickyHeaderIndices={stickyIndices}>
                 {listChildren}
             </ScrollView>

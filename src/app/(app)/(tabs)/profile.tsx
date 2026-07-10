@@ -24,6 +24,7 @@ import { ProfileStatsPanel } from '@/features/profile/components/profile-stats';
 import { useProfile } from '@/features/profile/use-profile';
 import { i18n } from '@/lib/i18n';
 import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
+import { useScreenInsets } from '@/tw/use-screen-insets';
 
 type ProfileTab = 'stats' | 'predictions' | 'leagues';
 
@@ -60,6 +61,7 @@ export default function ProfileScreen() {
     const brandColor = useThemeColor('brand');
     const accentColor = useThemeColor('accent');
     const faintColor = useThemeColor('text-faint');
+    const screenInsets = useScreenInsets();
 
     const stats = computeProfileStats([...(predictions.data?.values() ?? [])]);
     const memberSince = profile
@@ -107,7 +109,9 @@ export default function ProfileScreen() {
     return (
         <View className="flex-1 bg-bg">
             {/* Bloc épinglé : identité, chiffres clés, compétition, onglets */}
-            <View className="w-full max-w-[800px] flex-none gap-3.5 self-center px-5 pt-14">
+            <View
+                className="w-full max-w-[800px] flex-none gap-3.5 self-center px-5"
+                style={{ paddingTop: screenInsets.top }}>
                 {/* Action row + identité */}
                 <View className="flex-row items-center justify-end">
                     <IconButton
@@ -183,7 +187,8 @@ export default function ProfileScreen() {
             {/* Seul le contenu de l'onglet défile */}
             <ScrollView
                 className="flex-1"
-                contentContainerClassName="w-full max-w-[800px] gap-3.5 self-center px-5 pb-32 pt-3.5">
+                contentContainerClassName="w-full max-w-[800px] gap-3.5 self-center px-5 pt-3.5"
+                contentContainerStyle={{ paddingBottom: screenInsets.bottomTabBar }}>
                 {tabsLoading ? (
                     <View className="gap-2.5">
                         <Skeleton className="h-24" variant="block" />

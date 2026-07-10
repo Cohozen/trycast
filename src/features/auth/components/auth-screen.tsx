@@ -15,6 +15,7 @@ import {
 } from '@/features/auth/validation';
 import { supabase } from '@/lib/supabase';
 import { Link, ScrollView, Text, View } from '@/tw';
+import { useScreenInsets } from '@/tw/use-screen-insets';
 
 type AuthMode = 'login' | 'signup';
 
@@ -29,6 +30,7 @@ type FieldErrors = Partial<Record<'username' | 'email' | 'password' | 'confirm',
 export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
     const { t } = useTranslation(['auth', 'common']);
     const [mode, setMode] = useState<AuthMode>(initialMode);
+    const screenInsets = useScreenInsets();
 
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -117,7 +119,8 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
         <ScrollView
             automaticallyAdjustKeyboardInsets
             className="flex-1 bg-bg"
-            contentContainerClassName="w-full max-w-[440px] gap-5 self-center px-6 pb-8 pt-14"
+            contentContainerClassName="w-full max-w-[440px] gap-5 self-center px-6 pb-8"
+            contentContainerStyle={{ paddingTop: screenInsets.top }}
             keyboardDismissMode="interactive"
             keyboardShouldPersistTaps="handled">
             <View className="items-center gap-2.5 pt-3.5">

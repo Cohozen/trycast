@@ -19,6 +19,7 @@ import {
 import { useDeleteAccount, useProfile } from '@/features/profile/use-profile';
 import { supabase } from '@/lib/supabase';
 import { ScrollView, Text, useThemeColor, View } from '@/tw';
+import { useScreenInsets } from '@/tw/use-screen-insets';
 
 function SectionLabel({ children, danger = false }: { children: string; danger?: boolean }) {
     return (
@@ -49,6 +50,7 @@ export default function SettingsScreen() {
     const [confirmingDelete, setConfirmingDelete] = useState(false);
     const textColor = useThemeColor('text');
     const brandColor = useThemeColor('brand');
+    const screenInsets = useScreenInsets();
 
     useEffect(() => {
         loadThemePreference().then(setTheme);
@@ -71,7 +73,8 @@ export default function SettingsScreen() {
     return (
         <ScrollView
             className="flex-1 bg-bg"
-            contentContainerClassName="w-full max-w-[800px] gap-[22px] self-center px-[18px] pb-10 pt-14">
+            contentContainerClassName="w-full max-w-[800px] gap-[22px] self-center px-[18px] pb-10"
+            contentContainerStyle={{ paddingTop: screenInsets.top }}>
             <View className="flex-row items-center gap-2.5">
                 <IconButton
                     accessibilityLabel={t('common:actions.back')}

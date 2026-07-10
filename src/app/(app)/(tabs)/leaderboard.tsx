@@ -22,6 +22,7 @@ import { useMyStanding } from '@/features/leagues/use-my-standing';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
 import { useProfile } from '@/features/profile/use-profile';
 import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
+import { useScreenInsets } from '@/tw/use-screen-insets';
 
 const PAGE_SIZE = 50;
 
@@ -47,6 +48,7 @@ export default function LeaderboardScreen() {
     const textMuted = useThemeColor('text-muted');
     const accentColor = useThemeColor('accent');
     const brandColor = useThemeColor('brand');
+    const screenInsets = useScreenInsets();
 
     const leagues = myLeagues.data ?? [];
     const currentLeagueId = selectedLeagueId ?? leagues[0]?.id;
@@ -107,7 +109,11 @@ export default function LeaderboardScreen() {
         <View className="flex-1 bg-bg">
             <ScrollView
                 className="flex-1"
-                contentContainerClassName="w-full max-w-[800px] gap-4 self-center px-5 pb-32 pt-14">
+                contentContainerClassName="w-full max-w-[800px] gap-4 self-center px-5"
+                contentContainerStyle={{
+                    paddingTop: screenInsets.top,
+                    paddingBottom: screenInsets.bottomTabBar,
+                }}>
                 <View className="gap-1">
                     <Text className="font-display text-[30px] leading-[30px] tracking-[0.3px] text-text">
                         {t('leagues:leaderboard.title')}

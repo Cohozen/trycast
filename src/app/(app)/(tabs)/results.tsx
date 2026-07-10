@@ -13,6 +13,7 @@ import { splitMatches } from '@/features/predictions/split-matches';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
 import { i18n } from '@/lib/i18n';
 import { ScrollView, Text, View } from '@/tw';
+import { useScreenInsets } from '@/tw/use-screen-insets';
 
 export default function ResultsScreen() {
     const { t } = useTranslation(['matches', 'predictions', 'common']);
@@ -20,13 +21,19 @@ export default function ResultsScreen() {
     const matches = useMatches(competition.data?.id);
     const predictions = useMyPredictions(competition.data?.id);
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
+    const screenInsets = useScreenInsets();
 
     if (
         competition.isPending ||
         (competition.data && (matches.isPending || predictions.isPending))
     ) {
         return (
-            <View className="flex-1 gap-3 bg-bg px-5 pb-32 pt-14">
+            <View
+                className="flex-1 gap-3 bg-bg px-5"
+                style={{
+                    paddingTop: screenInsets.top,
+                    paddingBottom: screenInsets.bottomTabBar,
+                }}>
                 <Skeleton className="h-9 w-44" variant="block" />
                 <Skeleton className="h-[74px]" variant="block" />
                 <Skeleton className="h-52" variant="block" />
@@ -77,7 +84,7 @@ export default function ResultsScreen() {
 
     return (
         <View className="flex-1 bg-bg">
-            <View className="flex-none px-5 pb-3 pt-14">
+            <View className="flex-none px-5 pb-3" style={{ paddingTop: screenInsets.top }}>
                 <View className="gap-1">
                     <Text className="font-display text-[30px] leading-[30px] tracking-[0.3px] text-text">
                         {t('matches:results.title')}
@@ -108,7 +115,8 @@ export default function ResultsScreen() {
                     ) : null}
                     <ScrollView
                         className="flex-1"
-                        contentContainerClassName="w-full max-w-[800px] gap-3 self-center px-5 pb-32 pt-4">
+                        contentContainerClassName="w-full max-w-[800px] gap-3 self-center px-5 pt-4"
+                        contentContainerStyle={{ paddingBottom: screenInsets.bottomTabBar }}>
                         <View className="flex-row items-baseline justify-between gap-3 px-0.5">
                             <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
                                 {dayTitle}
