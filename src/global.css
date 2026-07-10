@@ -83,29 +83,33 @@
         --font-body-semibold: "Inter_600SemiBold";
         --font-body-bold: "Inter_700Bold";
 
-        /* ---- Échelle de texte (line-heights en px pour React Native) ---- */
+        /* ---- Échelle de texte. Line-heights en ratio SANS unité : en natif,
+         * react-native-css résout `line-height: var(…)` au runtime en multipliant
+         * le nombre par la taille de police (une valeur `22px` y serait lue comme
+         * le multiplicateur 22 → lignes éclatées) ; en web, le ratio donne les
+         * mêmes px. Cible px = taille × ratio (ex. body 15 × 1.4667 ≈ 22). ---- */
         --text-display: 56px;
-        --text-display--line-height: 52px;
+        --text-display--line-height: 0.9286; /* 52px */
         --text-display--letter-spacing: 0.5px;
         --text-h1: 32px;
-        --text-h1--line-height: 33px;
+        --text-h1--line-height: 1.03125; /* 33px */
         --text-h1--letter-spacing: 0.3px;
         --text-h2: 22px;
-        --text-h2--line-height: 24px;
+        --text-h2--line-height: 1.0909; /* 24px */
         --text-h2--letter-spacing: 0.44px;
         --text-title: 17px;
-        --text-title--line-height: 21px;
+        --text-title--line-height: 1.2353; /* 21px */
         --text-body: 15px;
-        --text-body--line-height: 22px;
+        --text-body--line-height: 1.4667; /* 22px */
         --text-body-sm: 13px;
-        --text-body-sm--line-height: 19px;
+        --text-body-sm--line-height: 1.4615; /* 19px */
         --text-data: 15px;
-        --text-data--line-height: 17px;
+        --text-data--line-height: 1.1333; /* 17px */
         --text-caption: 12px;
-        --text-caption--line-height: 16px;
+        --text-caption--line-height: 1.3333; /* 16px */
         --text-caption--letter-spacing: 0.24px;
         --text-overline: 11px;
-        --text-overline--line-height: 13px;
+        --text-overline--line-height: 1.1818; /* 13px */
         --text-overline--letter-spacing: 1.54px;
 
         /* ---- Radii — doux, mobile-first (rounded-xs … rounded-pill) ---- */
