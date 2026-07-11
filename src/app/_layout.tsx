@@ -1,5 +1,6 @@
 import '@/global.css';
 import '@/lib/i18n';
+import '@/features/notifications/notification-handler';
 
 import { Anton_400Regular } from '@expo-google-fonts/anton';
 import {
@@ -17,6 +18,8 @@ import { useColorScheme } from 'react-native';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { SessionProvider, useSession } from '@/features/auth/session-context';
+import { useNotificationObserver } from '@/features/notifications/use-notification-observer';
+import { useRegisterPushToken } from '@/features/notifications/use-register-push-token';
 import { applyStoredThemePreference } from '@/features/profile/theme-preference';
 import { useSyncLocale } from '@/features/profile/use-sync-locale';
 import { queryClient } from '@/lib/query';
@@ -26,6 +29,8 @@ SplashScreen.preventAutoHideAsync();
 function RootNavigator() {
     const { session, isLoading } = useSession();
     useSyncLocale(session?.user.id);
+    useRegisterPushToken(session?.user.id);
+    useNotificationObserver();
     const [fontsLoaded] = useFonts({
         Anton_400Regular,
         Inter_400Regular,
