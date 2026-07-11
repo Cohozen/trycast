@@ -45,5 +45,8 @@ example
 # env
 .env
 
+# Firebase (identifiants projet, fourni via env var EAS GOOGLE_SERVICES_JSON)
+google-services.json
+
 # claude local settings
 .claude/settings.local.json
