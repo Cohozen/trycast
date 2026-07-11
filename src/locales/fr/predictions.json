@@ -37,6 +37,7 @@
         "bonusTag": "{{code}} bonus"
     },
     "breakdown": {
+        "basePoints": "Points de base",
         "winner": "Bon vainqueur · {{code}}",
         "winnerDraw": "Bon résultat · match nul",
         "exactScore": "Score exact",

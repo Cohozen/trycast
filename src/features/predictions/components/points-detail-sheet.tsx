@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import type { MatchWithTeams } from '@/features/matches/types';
 import type { PredictionRow } from '@/features/predictions/types';
 import { parseBreakdown, verdictOf } from '@/features/predictions/verdict';
+import { BAREME_V1 } from '@/features/scoring/bareme';
+import { winnerPointsByOutcome } from '@/features/scoring/potential-by-outcome';
 import { i18n } from '@/lib/i18n';
 import { Pressable, Text, View } from '@/tw';
 import { cn } from '@/tw/variants';
@@ -22,7 +24,8 @@ type Row = { key: string; label: string; mark: 'ok' | 'ko' | 'info'; points: num
 
 /**
  * Bottom sheet « détail des points » (maquette Résultats) : score final vs
- * prono, lignes du barème (✓/✗) depuis le breakdown persisté, total gagné.
+ * prono, points de base 1/N/2 (rappel de la carte de prono), lignes du
+ * barème (✓/✗) depuis le breakdown persisté, total gagné.
  */
 export function PointsDetailSheet({ match, prediction, visible, onClose }: PointsDetailSheetProps) {
     const { t } = useTranslation(['predictions', 'common']);
@@ -32,6 +35,17 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
     }
 
     const oddsFormatter = new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 2 });
+    // Rappel des points de base 1/N/2 vus pendant la phase de prono (même
+    // calcul que la carte de prono : bon 1/N/2 seul, cote avec repli).
+    const winnerPoints = winnerPointsByOutcome(
+        { home: match.odds_home, draw: match.odds_draw, away: match.odds_away },
+        BAREME_V1,
+    );
+    const cells: { key: '1' | 'N' | '2'; outcome: 'home' | 'draw' | 'away' }[] = [
+        { key: '1', outcome: 'home' },
+        { key: 'N', outcome: 'draw' },
+        { key: '2', outcome: 'away' },
+    ];
     const winnerCode =
         breakdown.predictedOutcome === 'home'
             ? (match.home_team?.code ?? match.home_team?.name ?? '?')
@@ -130,6 +144,37 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
                                 {prediction.predicted_home_score} –{' '}
                                 {prediction.predicted_away_score}
                             </Text>
+                        </View>
+                    </View>
+
+                    {/* Points de base · 1 N 2, issue pronostiquée en avant */}
+                    <View className="mb-3 gap-2">
+                        <Text className="text-center font-body-semibold text-[11px] uppercase tracking-[0.66px] text-text-faint">
+                            {t('predictions:breakdown.basePoints')}
+                        </Text>
+                        <View className="flex-row gap-2">
+                            {cells.map(({ key, outcome }) => {
+                                const active = breakdown.predictedOutcome === outcome;
+                                return (
+                                    <View
+                                        className={cn(
+                                            'flex-1 items-center gap-0.5 rounded-sm border-[1.5px] border-transparent bg-surface-sunken px-1 py-2',
+                                            active && 'border-accent bg-accent/10',
+                                        )}
+                                        key={key}>
+                                        <Text
+                                            className={cn(
+                                                'font-body-bold text-[11px]',
+                                                active ? 'text-accent' : 'text-text-faint',
+                                            )}>
+                                            {key}
+                                        </Text>
+                                        <Text className="font-display text-[20px] leading-[21px] text-text">
+                                            {winnerPoints[outcome]}
+                                        </Text>
+                                    </View>
+                                );
+                            })}
                         </View>
                     </View>
 
