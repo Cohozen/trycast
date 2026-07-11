@@ -11,6 +11,7 @@ import { SegmentedControl } from '@/components/ui/segmented-control';
 import { DeleteAccountModal } from '@/features/profile/components/delete-account-modal';
 import { UsernameEditor } from '@/features/profile/components/username-editor';
 import { useSession } from '@/features/auth/session-context';
+import { NotificationSettings } from '@/features/notifications/components/notification-settings';
 import { unregisterPushToken } from '@/features/notifications/register-push-token';
 import {
     loadThemePreference,
@@ -134,6 +135,12 @@ export default function SettingsScreen() {
                         {t('profile:settings.language.current')}
                     </Text>
                 </Card>
+            </View>
+
+            {/* Notifications */}
+            <View className="gap-2.5">
+                <SectionLabel>{t('profile:settings.sections.notifications')}</SectionLabel>
+                <NotificationSettings userId={session?.user.id ?? ''} />
             </View>
 
             {/* À propos */}

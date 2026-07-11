@@ -96,7 +96,7 @@
                 "description": "Quand un match est terminé et tes points calculés."
             },
             "blockedBanner": "Les notifications sont bloquées dans les réglages {{os}}. Active-les pour recevoir tes rappels.",
-            "openSettings": "Ouvrir les réglages"
+            "openSettings": "Ouvrir les réglages système"
         },
         "version": "Version",
         "logout": "Se déconnecter",
