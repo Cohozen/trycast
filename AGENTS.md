@@ -42,7 +42,7 @@ Avant de considérer un lot terminé : `npm run typecheck && npm run lint && npm
 - Schéma : uniquement par migrations dans `supabase/migrations/`, puis `supabase db push` + `npm run typegen`
 - Toute règle de sécurité (deadline prono au kickoff, accès données) est imposée par RLS côté serveur, le client n'est qu'une UX
 - Edge Functions dans `supabase/functions/`, déploiement `supabase functions deploy <name>`
-- Vérification E2E auth/RLS : `bash scripts/e2e-auth.sh` (utilisateurs de test : `scripts/seed-test-users.sql`), `bash scripts/e2e-predictions.sh` (matchs de test : `scripts/seed-test-predictions.sql`, à seeder après les users), `bash scripts/e2e-scoring.sh` + `scripts/e2e-scoring.sql` côté serveur (seed : `scripts/seed-test-scoring.sql`, à rejouer avant chaque exécution du .sql) et `bash scripts/e2e-leagues.sh` (seed : `scripts/seed-test-leagues.sql`, à rejouer avant chaque exécution)
+- Vérification E2E auth/RLS : `bash scripts/e2e-auth.sh` (utilisateurs de test : `scripts/seed-test-users.sql`), `bash scripts/e2e-predictions.sh` (matchs de test : `scripts/seed-test-predictions.sql`, à seeder après les users), `bash scripts/e2e-scoring.sh` + `scripts/e2e-scoring.sql` côté serveur (seed : `scripts/seed-test-scoring.sql`, à rejouer avant chaque exécution du .sql) , `bash scripts/e2e-leagues.sh` (seed : `scripts/seed-test-leagues.sql`, à rejouer avant chaque exécution) et `bash scripts/e2e-notifications.sh` (tokens push par RPC, préférences, tables serveur — seuls les users de test sont requis)
 
 ## Secrets
 
