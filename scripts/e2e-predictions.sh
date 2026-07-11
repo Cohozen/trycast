@@ -93,5 +93,29 @@ RES=$(curl -s -X PATCH "$URL/rest/v1/predictions?match_id=eq.$MATCH_FUTUR" \
 echo "$RES" | grep -q '42501' || fail "écriture points_awarded (attendu 42501, obtenu $RES)"
 ok "les colonnes de points sont inviolables côté client"
 
+# Distribution communautaire : user2 ne voit aucun prono brut de user1 (vérifié
+# ci-dessus) mais la RPC security definer lui sert l'agrégat 1/N/2. user1 a
+# pronostiqué home>away sur les deux matchs (futur 30-3, passé 10-5) → un vote
+# domicile attendu sur chacun, aucun nul/extérieur.
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/get_prediction_distributions" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T2" \
+  -H "Content-Type: application/json" \
+  -d "{\"p_competition_id\":\"$COMP\"}")
+echo "$RES" | python3 -c "
+import json,sys
+rows={r['match_id']:r for r in json.load(sys.stdin)}
+f=rows['$MATCH_FUTUR']; p=rows['$MATCH_PASSE']
+assert f['home_count']==1 and f['draw_count']==0 and f['away_count']==0, f
+assert p['home_count']==1 and p['draw_count']==0 and p['away_count']==0, p
+" || fail "distribution communautaire incorrecte ($RES)"
+ok "la RPC de distribution agrège les pronos sans fuiter les lignes"
+
+# La RPC reste réservée aux connectés : anon → 401/403
+RES=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$URL/rest/v1/rpc/get_prediction_distributions" \
+  -H "apikey: $KEY" -H "Content-Type: application/json" \
+  -d "{\"p_competition_id\":\"$COMP\"}")
+[ "$RES" = "401" ] || [ "$RES" = "403" ] || fail "distribution accessible en anon (attendu 401/403, obtenu $RES)"
+ok "la RPC de distribution est refusée aux non authentifiés"
+
 echo
 echo "Tous les tests E2E predictions sont passés."

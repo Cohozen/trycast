@@ -581,6 +581,15 @@ export type Database = {
                     username: string;
                 }[];
             };
+            get_prediction_distributions: {
+                Args: { p_competition_id: string };
+                Returns: {
+                    away_count: number;
+                    draw_count: number;
+                    home_count: number;
+                    match_id: string;
+                }[];
+            };
             is_league_member: { Args: { p_league_id: string }; Returns: boolean };
             is_league_owner: { Args: { p_league_id: string }; Returns: boolean };
             join_league: {
