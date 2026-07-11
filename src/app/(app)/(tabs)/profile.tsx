@@ -109,10 +109,27 @@ export default function ProfileScreen() {
         <View className="flex-1 bg-bg">
             {/* Bloc épinglé : identité, chiffres clés, compétition, onglets */}
             <View
-                className="w-full max-w-[800px] flex-none gap-3.5 self-center px-5"
+                className="w-full max-w-[800px] flex-none gap-3.5 self-center px-5 pb-2"
                 style={{ paddingTop: screenInsets.top }}>
-                {/* Action row + identité */}
-                <View className="flex-row items-center justify-end">
+                {/* Identité + accès réglages */}
+                <View className="flex-row items-center gap-3.5">
+                    {profilePending ? (
+                        <Skeleton className="h-[56px] flex-1" variant="block" />
+                    ) : (
+                        <>
+                            <Avatar name={profile?.username ?? '?'} ring size="lg" />
+                            <View className="min-w-0 flex-1 gap-1">
+                                <Text className="font-display text-[27px] leading-[27px] text-text">
+                                    {profile?.username}
+                                </Text>
+                                {memberSince ? (
+                                    <Text className="font-body text-[12.5px] text-text-muted">
+                                        {t('profile:memberSince', { date: memberSince })}
+                                    </Text>
+                                ) : null}
+                            </View>
+                        </>
+                    )}
                     <IconButton
                         accessibilityLabel={t('profile:settings.title')}
                         onPress={() => router.push('/settings')}
@@ -120,24 +137,6 @@ export default function ProfileScreen() {
                         <Settings color={textColor} size={20} strokeWidth={1.9} />
                     </IconButton>
                 </View>
-
-                {profilePending ? (
-                    <Skeleton className="h-[56px]" variant="block" />
-                ) : (
-                    <View className="flex-row items-center gap-3.5">
-                        <Avatar name={profile?.username ?? '?'} ring size="lg" />
-                        <View className="min-w-0 flex-1 gap-1">
-                            <Text className="font-display text-[27px] leading-[27px] text-text">
-                                {profile?.username}
-                            </Text>
-                            {memberSince ? (
-                                <Text className="font-body text-[12.5px] text-text-muted">
-                                    {t('profile:memberSince', { date: memberSince })}
-                                </Text>
-                            ) : null}
-                        </View>
-                    </View>
-                )}
 
                 {/* Chiffres clés */}
                 <Card className="flex-row overflow-hidden p-0">
