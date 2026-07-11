@@ -1,8 +1,11 @@
 import { Globe } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 
+import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import type { ProfileStats } from '@/features/profile/compute-profile-stats';
+import type { RoundPoints } from '@/features/profile/compute-points-by-round';
+import { PointsTrendChart } from '@/features/profile/components/points-trend-chart';
 import { PrecisionDonut } from '@/features/profile/components/precision-donut';
 import { Text, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
@@ -13,6 +16,8 @@ type ProfileStatsPanelProps = {
     points: number | null;
     rank: number | null;
     totalPlayers: number | null;
+    /** Série « Points par journée » (vide tant qu'aucune journée entamée). */
+    trend: readonly RoundPoints[];
 };
 
 function StatCard({
@@ -42,10 +47,16 @@ function StatCard({
 
 /**
  * Onglet Stats du Profil (maquette Profil) : cartes 2×2, rang au général,
- * donut de précision. La courbe « Points par journée » reste un état vide
- * tant que le backend ne sert pas de série par journée.
+ * donut de précision, courbe « Points par journée » (état vide tant
+ * qu'aucune journée n'est entamée).
  */
-export function ProfileStatsPanel({ stats, points, rank, totalPlayers }: ProfileStatsPanelProps) {
+export function ProfileStatsPanel({
+    stats,
+    points,
+    rank,
+    totalPlayers,
+    trend,
+}: ProfileStatsPanelProps) {
     const { t } = useTranslation(['profile']);
     const brandColor = useThemeColor('brand');
 
@@ -121,15 +132,28 @@ export function ProfileStatsPanel({ stats, points, rank, totalPlayers }: Profile
             </Card>
 
             <Card className="gap-3 p-4">
-                <Text className="font-body-bold text-[12px] uppercase tracking-[0.96px] text-text">
-                    {t('profile:stats.trend.title')}
-                </Text>
-                <View className="items-center gap-3 px-2 pb-1.5 pt-3.5">
-                    <View className="h-0 w-full border-b-2 border-dashed border-border-strong" />
-                    <Text className="text-center font-body text-[12.5px] leading-[18px] text-text-muted">
-                        {t('profile:stats.trend.empty')}
+                <View className="flex-row items-center justify-between gap-2">
+                    <Text className="font-body-bold text-[12px] uppercase tracking-[0.96px] text-text">
+                        {t('profile:stats.trend.title')}
                     </Text>
+                    {trend.length > 0 ? (
+                        <Badge tone="brand">
+                            {t('profile:stats.trend.lastRound', {
+                                count: trend[trend.length - 1].points,
+                            })}
+                        </Badge>
+                    ) : null}
                 </View>
+                {trend.length > 0 ? (
+                    <PointsTrendChart trend={trend} />
+                ) : (
+                    <View className="items-center gap-3 px-2 pb-1.5 pt-3.5">
+                        <View className="h-0 w-full border-b-2 border-dashed border-border-strong" />
+                        <Text className="text-center font-body text-[12.5px] leading-[18px] text-text-muted">
+                            {t('profile:stats.trend.empty')}
+                        </Text>
+                    </View>
+                )}
             </Card>
         </View>
     );

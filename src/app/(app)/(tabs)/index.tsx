@@ -15,6 +15,7 @@ import { useActiveCompetition } from '@/features/matches/use-active-competition'
 import { useMatches } from '@/features/matches/use-matches';
 import { PredictionCard } from '@/features/predictions/components/prediction-card';
 import { splitMatches } from '@/features/predictions/split-matches';
+import { useCommunityDistributions } from '@/features/predictions/use-community-distributions';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
 import { i18n } from '@/lib/i18n';
 import { ScrollView, Text, View } from '@/tw';
@@ -71,6 +72,7 @@ export default function MatchesScreen() {
     const competition = useActiveCompetition();
     const matches = useMatches(competition.data?.id);
     const predictions = useMyPredictions(competition.data?.id);
+    const distributions = useCommunityDistributions(competition.data?.id);
     const myLeagues = useMyLeagues();
     const standing = useMyStanding(competition.data?.id, userId);
     const leaderboard = useGlobalLeaderboard(competition.data?.id);
@@ -250,6 +252,7 @@ export default function MatchesScreen() {
             for (const match of group.matches) {
                 listChildren.push(
                     <PredictionCard
+                        distribution={distributions.data?.get(match.id)}
                         key={match.id}
                         match={match}
                         prediction={predictions.data?.get(match.id)}

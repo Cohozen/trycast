@@ -29,6 +29,13 @@
         "missed": "Raté",
         "pending": "Points à venir"
     },
+    "distribution": {
+        "title": "La communauté a joué",
+        "count_one": "{{count}} prono",
+        "count_other": "{{count}} pronos",
+        "basedOn_one": "D’après {{count}} prono",
+        "basedOn_other": "D’après {{count}} pronos"
+    },
     "reconciliation": {
         "yourProno": "Ton prono",
         "pointsWon": "Points gagnés",

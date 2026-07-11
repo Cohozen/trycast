@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { TeamFlag } from '@/features/matches/components/team-flag';
 import { formatKickoffTime, statusLabel } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
+import { CommunityDistribution } from '@/features/predictions/components/community-distribution';
 import { PointsDetailSheet } from '@/features/predictions/components/points-detail-sheet';
 import { VerdictPill } from '@/features/predictions/components/verdict-pill';
-import type { PredictionRow } from '@/features/predictions/types';
+import type { PredictionDistribution, PredictionRow } from '@/features/predictions/types';
 import { verdictOf } from '@/features/predictions/verdict';
 import { i18n } from '@/lib/i18n';
 import { Pressable, Text, View } from '@/tw';
@@ -15,6 +16,8 @@ import { cn } from '@/tw/variants';
 type ResultCardProps = {
     match: MatchWithTeams;
     prediction: PredictionRow | undefined;
+    /** Distribution communautaire du match (bloc « La communauté a joué »). */
+    distribution?: PredictionDistribution;
 };
 
 /**
@@ -22,13 +25,20 @@ type ResultCardProps = {
  * avant, réconciliation du prono (verdict, bonus cochés, points gagnés) et
  * accès au détail du barème en bottom sheet.
  */
-export function ResultCard({ match, prediction }: ResultCardProps) {
+export function ResultCard({ match, prediction, distribution }: ResultCardProps) {
     const { t } = useTranslation(['predictions', 'matches']);
     const [detailOpen, setDetailOpen] = useState(false);
 
     const verdict = prediction ? verdictOf(prediction) : null;
     const scored = prediction != null && prediction.points_awarded !== null;
     const statusKey = statusLabel(match.status);
+    const predictedOutcome = prediction
+        ? prediction.predicted_home_score > prediction.predicted_away_score
+            ? ('home' as const)
+            : prediction.predicted_home_score < prediction.predicted_away_score
+              ? ('away' as const)
+              : ('draw' as const)
+        : null;
 
     const homeWins =
         match.home_score !== null && match.away_score !== null
@@ -179,6 +189,16 @@ export function ResultCard({ match, prediction }: ResultCardProps) {
                             </View>
                         )}
                     </View>
+
+                    {distribution && distribution.total > 0 ? (
+                        <View className="mt-3 border-t border-dashed border-border pt-3">
+                            <CommunityDistribution
+                                distribution={distribution}
+                                predictedOutcome={predictedOutcome}
+                                withLabels
+                            />
+                        </View>
+                    ) : null}
                 </View>
             </Pressable>
 

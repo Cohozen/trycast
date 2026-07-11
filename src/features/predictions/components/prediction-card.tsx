@@ -6,9 +6,10 @@ import { TeamFlag } from '@/features/matches/components/team-flag';
 import { formatKickoff } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
 import { BonusToggle } from '@/features/predictions/components/bonus-toggle';
+import { CommunityDistribution } from '@/features/predictions/components/community-distribution';
 import { ScoreInput } from '@/features/predictions/components/score-input';
 import { toPredictionMessageKey } from '@/features/predictions/errors';
-import type { PredictionRow } from '@/features/predictions/types';
+import type { PredictionDistribution, PredictionRow } from '@/features/predictions/types';
 import { useUpsertPrediction } from '@/features/predictions/use-upsert-prediction';
 import { parsePredictedScore, validatePredictedScore } from '@/features/predictions/validation';
 import { BAREME_V1 } from '@/features/scoring/bareme';
@@ -26,6 +27,8 @@ type PredictionCardProps = {
     match: MatchWithTeams;
     prediction: PredictionRow | undefined;
     userId: string;
+    /** Distribution communautaire du match (remplace les barres de cotes dès qu'un prono existe). */
+    distribution?: PredictionDistribution;
 };
 
 type SaveStatus = 'toPredict' | 'saving' | 'saved';
@@ -48,7 +51,7 @@ const TONE_CLASSES = {
  * carte, aucun bouton). La deadline reste portée par la RLS : après kickoff
  * le serveur refuse (42501) et l'erreur s'affiche.
  */
-export function PredictionCard({ match, prediction, userId }: PredictionCardProps) {
+export function PredictionCard({ match, prediction, userId, distribution }: PredictionCardProps) {
     const { t } = useTranslation(['predictions', 'matches']);
     const [homeRaw, setHomeRaw] = useState(
         prediction ? String(prediction.predicted_home_score) : '',
@@ -239,7 +242,13 @@ export function PredictionCard({ match, prediction, userId }: PredictionCardProp
                         );
                     })}
                 </View>
-                {probabilities ? (
+                {/* La communauté a joué (décision 2026-07-11 : visible aussi avant
+                    kickoff) ; tant que personne n'a pronostiqué, repli sur les
+                    probabilités implicites des cotes — autre sémantique, d'où la
+                    légende portée par CommunityDistribution. */}
+                {distribution && distribution.total > 0 ? (
+                    <CommunityDistribution distribution={distribution} />
+                ) : probabilities ? (
                     <View className="flex-row gap-2">
                         {cells.map(({ key, outcome }) => (
                             <View className="flex-1 px-1" key={key}>

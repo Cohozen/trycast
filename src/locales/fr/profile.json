@@ -43,7 +43,11 @@
         },
         "trend": {
             "title": "Points par journée",
-            "empty": "Ta progression s'affichera après ta première journée de pronos."
+            "empty": "Ta progression s'affichera après ta première journée de pronos.",
+            "roundLabel": "J{{round}}",
+            "roundUnknown": "J ?",
+            "lastRound_one": "{{count}} pt",
+            "lastRound_other": "{{count}} pts"
         }
     },
     "predictions": {

@@ -10,6 +10,7 @@ import { useActiveCompetition } from '@/features/matches/use-active-competition'
 import { useMatches } from '@/features/matches/use-matches';
 import { ResultCard } from '@/features/predictions/components/result-card';
 import { splitMatches } from '@/features/predictions/split-matches';
+import { useCommunityDistributions } from '@/features/predictions/use-community-distributions';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
 import { i18n } from '@/lib/i18n';
 import { ScrollView, Text, View } from '@/tw';
@@ -20,6 +21,7 @@ export default function ResultsScreen() {
     const competition = useActiveCompetition();
     const matches = useMatches(competition.data?.id);
     const predictions = useMyPredictions(competition.data?.id);
+    const distributions = useCommunityDistributions(competition.data?.id);
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
     const screenInsets = useScreenInsets();
 
@@ -129,6 +131,7 @@ export default function ResultsScreen() {
                         </View>
                         {dayResults.map((match) => (
                             <ResultCard
+                                distribution={distributions.data?.get(match.id)}
                                 key={match.id}
                                 match={match}
                                 prediction={predictions.data?.get(match.id)}

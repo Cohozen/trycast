@@ -18,7 +18,9 @@ import { useMyStanding } from '@/features/leagues/use-my-standing';
 import { useCompetitions } from '@/features/matches/use-competitions';
 import { useMatches } from '@/features/matches/use-matches';
 import { ResultCard } from '@/features/predictions/components/result-card';
+import { useCommunityDistributions } from '@/features/predictions/use-community-distributions';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
+import { computePointsByRound } from '@/features/profile/compute-points-by-round';
 import { computeProfileStats } from '@/features/profile/compute-profile-stats';
 import { ProfileStatsPanel } from '@/features/profile/components/profile-stats';
 import { useProfile } from '@/features/profile/use-profile';
@@ -31,8 +33,6 @@ type ProfileTab = 'stats' | 'predictions' | 'leagues';
 /**
  * Écran Profil (maquette Profil) : identité + chiffres clés, sélecteur de
  * compétition (contexte de tout l'écran), tabs Stats / Pronos / Ligues.
- * Structure iso maquette sur les données disponibles ; la courbe par journée
- * attend son backend (état vide assumé).
  */
 export default function ProfileScreen() {
     const { t } = useTranslation(['profile', 'leagues', 'common']);
@@ -55,6 +55,7 @@ export default function ProfileScreen() {
     const myRank = useMyRank(competitionId, standing.isPending ? undefined : standing.data);
     const matches = useMatches(competitionId);
     const predictions = useMyPredictions(competitionId);
+    const distributions = useCommunityDistributions(competitionId);
     const myLeagues = useMyLeagues();
 
     const textColor = useThemeColor('text');
@@ -64,6 +65,7 @@ export default function ProfileScreen() {
     const screenInsets = useScreenInsets();
 
     const stats = computeProfileStats(predictions.data ?? new Map(), matches.data ?? []);
+    const trend = computePointsByRound(predictions.data ?? new Map(), matches.data ?? []);
     const memberSince = profile
         ? new Intl.DateTimeFormat(i18n.language, { month: 'long', year: 'numeric' }).format(
               new Date(profile.created_at),
@@ -198,6 +200,7 @@ export default function ProfileScreen() {
                         rank={myRank.data?.rank ?? null}
                         stats={stats}
                         totalPlayers={myRank.data?.total ?? null}
+                        trend={trend}
                     />
                 ) : tab === 'predictions' ? (
                     finishedMatches.length === 0 ? (
@@ -220,6 +223,7 @@ export default function ProfileScreen() {
                                             </Text>
                                         ) : null}
                                         <ResultCard
+                                            distribution={distributions.data?.get(match.id)}
                                             match={match}
                                             prediction={predictions.data?.get(match.id)}
                                         />
