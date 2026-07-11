@@ -33,8 +33,12 @@ export type ExpoPushReceipt =
 export type TicketPair = { id: string; token: string };
 
 export type TicketOutcome = {
-    /** Tickets ok, à vérifier en receipts au tick suivant */
-    pairs: TicketPair[];
+    /**
+     * Tickets ok, à vérifier en receipts au tick suivant. `index` = position
+     * du message dans le lot envoyé (un même token peut apparaître pour deux
+     * matchs différents : seul l'index rattache un ticket à son envoi).
+     */
+    pairs: (TicketPair & { index: number })[];
     /** Tokens morts à supprimer de push_tokens */
     unregisteredTokens: string[];
     /** Autres erreurs de ticket (message d'erreur Expo) */
@@ -65,7 +69,7 @@ export function analyzeTickets(
             return;
         }
         if (ticket.status === 'ok') {
-            outcome.pairs.push({ id: ticket.id, token });
+            outcome.pairs.push({ id: ticket.id, token, index });
             return;
         }
         if (ticket.details?.error === 'DeviceNotRegistered') {

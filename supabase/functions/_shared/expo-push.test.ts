@@ -36,9 +36,9 @@ describe('analyzeTickets', () => {
         ];
         const outcome = analyzeTickets(messages, tickets);
         expect(outcome.pairs).toEqual([
-            { id: 'id-1', token: 'tok-a' },
-            { id: 'id-2', token: 'tok-b' },
-            { id: 'id-3', token: 'tok-c' },
+            { id: 'id-1', token: 'tok-a', index: 0 },
+            { id: 'id-2', token: 'tok-b', index: 1 },
+            { id: 'id-3', token: 'tok-c', index: 2 },
         ]);
         expect(outcome.unregisteredTokens).toEqual([]);
         expect(outcome.errors).toEqual([]);
@@ -51,7 +51,7 @@ describe('analyzeTickets', () => {
             { status: 'error', message: 'quota', details: { error: 'MessageRateExceeded' } },
         ];
         const outcome = analyzeTickets(messages, tickets);
-        expect(outcome.pairs).toEqual([{ id: 'id-1', token: 'tok-a' }]);
+        expect(outcome.pairs).toEqual([{ id: 'id-1', token: 'tok-a', index: 0 }]);
         expect(outcome.unregisteredTokens).toEqual(['tok-b']);
         expect(outcome.errors).toEqual(['ticket tok-c: MessageRateExceeded']);
     });
