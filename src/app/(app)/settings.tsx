@@ -11,6 +11,7 @@ import { SegmentedControl } from '@/components/ui/segmented-control';
 import { DeleteAccountModal } from '@/features/profile/components/delete-account-modal';
 import { UsernameEditor } from '@/features/profile/components/username-editor';
 import { useSession } from '@/features/auth/session-context';
+import { unregisterPushToken } from '@/features/notifications/register-push-token';
 import {
     loadThemePreference,
     setThemePreference,
@@ -59,6 +60,14 @@ export default function SettingsScreen() {
     const onThemeChange = (next: ThemePreference) => {
         setTheme(next);
         setThemePreference(next);
+    };
+
+    // Le token push part AVANT la session (après signOut, plus de droits pour
+    // la RPC — et le compte suivant sur ce téléphone ne doit pas recevoir les
+    // push de celui-ci)
+    const onLogout = async () => {
+        await unregisterPushToken();
+        await supabase.auth.signOut();
     };
 
     const onConfirmDelete = async () => {
@@ -141,7 +150,7 @@ export default function SettingsScreen() {
                 <View className="mt-1">
                     <Button
                         fullWidth
-                        onPress={() => supabase.auth.signOut()}
+                        onPress={onLogout}
                         title={t('profile:settings.logout')}
                         variant="secondary"
                     />

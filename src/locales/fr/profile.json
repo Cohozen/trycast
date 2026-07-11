@@ -64,6 +64,7 @@
         "sections": {
             "account": "Compte",
             "preferences": "Préférences",
+            "notifications": "Notifications",
             "about": "À propos",
             "danger": "Zone de danger"
         },
@@ -77,6 +78,25 @@
         "language": {
             "label": "Langue",
             "current": "Français"
+        },
+        "notifications": {
+            "channelName": "Général",
+            "master": {
+                "label": "Notifications",
+                "subtitleOn": "Choisis ce que tu veux recevoir",
+                "subtitleOff": "Toutes les notifications sont coupées",
+                "subtitleBlocked": "Bloquées au niveau du système"
+            },
+            "reminder": {
+                "label": "Rappel de prono",
+                "description": "Avant chaque coup d'envoi si tu n'as pas pronostiqué."
+            },
+            "results": {
+                "label": "Résultats & points",
+                "description": "Quand un match est terminé et tes points calculés."
+            },
+            "blockedBanner": "Les notifications sont bloquées dans les réglages {{os}}. Active-les pour recevoir tes rappels.",
+            "openSettings": "Ouvrir les réglages"
         },
         "version": "Version",
         "logout": "Se déconnecter",
