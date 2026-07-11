@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { useWindowDimensions } from 'react-native';
+
 import type { StripDay } from '@/features/matches/day-range';
 import { i18n } from '@/lib/i18n';
 import { Pressable, ScrollView, Text, View } from '@/tw';
@@ -9,18 +12,40 @@ type DayStripProps = {
     onSelect: (key: string) => void;
 };
 
+// Géométrie des pilules (miroir des classes ci-dessous : w-12, gap-2.5, px-4),
+// nécessaire pour positionner la strip sur le jour sélectionné au montage.
+const ITEM_WIDTH = 48;
+const ITEM_GAP = 10;
+const EDGE_PADDING = 16;
+
 /**
  * Bande horizontale de sélection de jour (maquette Résultats) : pilules
  * jour/numéro sur la plage continue de la compétition — sélection grenat
  * avec glow, aujourd'hui cerclé, jours sans match estompés et inertes.
+ * Au montage, la strip est positionnée pour centrer le jour sélectionné.
  */
 export function DayStrip({ days, selected, onSelect }: DayStripProps) {
     const weekdayFormatter = new Intl.DateTimeFormat(i18n.language, { weekday: 'short' });
+    const { width: windowWidth } = useWindowDimensions();
+
+    // Offset figé au montage : centre le jour présélectionné sans re-scroller
+    // à chaque sélection manuelle (le doigt garde la main ensuite).
+    const [initialOffset] = useState(() => {
+        const index = days.findIndex((day) => day.key === selected);
+        if (index < 0) return 0;
+        const contentWidth =
+            2 * EDGE_PADDING + days.length * ITEM_WIDTH + (days.length - 1) * ITEM_GAP;
+        const maxOffset = Math.max(0, contentWidth - windowWidth);
+        const itemStart = EDGE_PADDING + index * (ITEM_WIDTH + ITEM_GAP);
+        const centered = itemStart - (windowWidth - ITEM_WIDTH) / 2;
+        return Math.min(maxOffset, Math.max(0, centered));
+    });
 
     return (
         <ScrollView
             className="flex-none border-b border-border"
             contentContainerClassName="gap-2.5 px-4 pb-2.5 pt-1"
+            contentOffset={{ x: initialOffset, y: 0 }}
             horizontal
             showsHorizontalScrollIndicator={false}>
             {days.map((day) => {

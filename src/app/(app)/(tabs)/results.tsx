@@ -71,7 +71,9 @@ export default function ResultsScreen() {
               matchDayKeys: new Set(results.map((match) => dayKeyOf(match.kickoff_at))),
           })
         : [];
-    const currentDay = selectedDay ?? days.find((day) => day.hasMatches)?.key ?? null;
+    // La plage s'arrête à aujourd'hui : le dernier jour avec matchs est donc
+    // le plus proche de la date courante — c'est lui qu'on présélectionne.
+    const currentDay = selectedDay ?? days.findLast((day) => day.hasMatches)?.key ?? null;
     const dayResults = results.filter((m) => dayKeyOf(m.kickoff_at) === currentDay);
     const dayTitle =
         dayResults.length > 0
