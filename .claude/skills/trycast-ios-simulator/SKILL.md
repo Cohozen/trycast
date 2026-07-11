@@ -70,6 +70,7 @@ Après chaque interaction : `sleep 1-2` puis vérifier (screenshot ou describe-u
 - **describe-ui** pèse plusieurs centaines de Ko sur un écran chargé : toujours piper dans un filtre, jamais l'afficher brut.
 - **Session** : l'app garde la session Supabase (compte perso `cohozen` connecté). Pour tester le flux auth, se déconnecter via Profil, puis utiliser les comptes seedés `e2e.user1@trycast.local` / `e2e.user2@trycast.local`, mot de passe `motdepasse123` (`scripts/seed-test-users.sql`, projet DEV uniquement). Ne pas se déconnecter sans raison : ça casse l'état de test de Corentin.
 - **Prudence données** : les champs de score des matchs **auto-savent** dans la base dev — ne pas y taper de valeurs de test sans les remettre en l'état. Le champ « Code d'invitation » (`league/join`) est inoffensif tant qu'on ne soumet pas : c'est le bon endroit pour tester la saisie.
+- **Tester light/dark** (vécu 11/07/2026) : la préférence de thème de l'app (Réglages > Thème, celle de Corentin = **Sombre**) **prime sur le système** — `xcrun simctl ui booted appearance light` ne change alors rien à l'app. Recette : Profil > engrenage (365,92) → segmenté Thème (Système (90,322) / Clair (201,322) / Sombre (311,322), coordonnées à reconfirmer via describe-ui) → vérifier les écrans → **remettre « Sombre » et l'appearance système `dark` avant de finir** (état de test de Corentin). Après un tap thème, un `axe button home` + `openurl` peut rester sur le springboard : rejouer l'`openurl`.
 
 ## Nettoyage fin de session
 
