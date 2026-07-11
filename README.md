@@ -31,7 +31,14 @@ npx expo start
 
 Depuis le terminal Metro : `i` ouvre le simulateur iOS, `a` l'émulateur Android, `w` le navigateur, `j` les React Native DevTools. Raccourcis : `npm run ios`, `npm run android`, `npm run web`.
 
-Le projet tourne dans **Expo Go** (aucun module natif custom pour l'instant) : pas besoin de development build.
+L'app tourne dans **Expo Go** pour le quotidien (simulateur, émulateur, web), mais les **notifications push** n'y fonctionnent pas (retirées d'Expo Go depuis le SDK 53) : l'app le détecte et saute simplement l'enregistrement du token. Pour tester les push en réel, il faut un **development build** installé sur un téléphone physique :
+
+```bash
+npx eas-cli build --profile development --platform android   # APK à installer (QR code)
+npx expo start                                               # puis ouvrir l'app TryCast (dev build), pas Expo Go
+```
+
+Le build embarque l'identité Firebase (FCM) de l'app : le fichier `google-services.json` n'est pas versionné, il vit à la racine en local et dans l'env EAS `GOOGLE_SERVICES_JSON` pour les builds cloud. Un push de test peut s'envoyer à la main depuis [expo.dev/notifications](https://expo.dev/notifications) avec le token affiché dans les logs Metro.
 
 ## Scripts
 
