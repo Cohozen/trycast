@@ -110,6 +110,7 @@ export function ProfileStatsPanel({ stats, points, rank, totalPlayers }: Profile
                         exact={stats.exact}
                         good={stats.good - stats.exact}
                         missed={stats.missed}
+                        notPredicted={stats.notPredicted}
                         precisionPct={stats.precisionPct}
                     />
                 ) : (

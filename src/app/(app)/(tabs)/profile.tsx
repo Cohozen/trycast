@@ -63,7 +63,7 @@ export default function ProfileScreen() {
     const faintColor = useThemeColor('text-faint');
     const screenInsets = useScreenInsets();
 
-    const stats = computeProfileStats([...(predictions.data?.values() ?? [])]);
+    const stats = computeProfileStats(predictions.data ?? new Map(), matches.data ?? []);
     const memberSince = profile
         ? new Intl.DateTimeFormat(i18n.language, { month: 'long', year: 'numeric' }).format(
               new Date(profile.created_at),
@@ -88,11 +88,10 @@ export default function ProfileScreen() {
         },
     ];
 
-    const scoredMatches = (matches.data ?? [])
-        .filter((match) => {
-            const prediction = predictions.data?.get(match.id);
-            return prediction !== undefined && prediction.points_awarded !== null;
-        })
+    // Tous les matchs terminés, pronostiqués ou non (ResultCard gère le cas
+    // sans prono), du plus récent au plus ancien.
+    const finishedMatches = (matches.data ?? [])
+        .filter((match) => match.status === 'finished')
         .sort((a, b) => b.kickoff_at.localeCompare(a.kickoff_at));
 
     const dayTitleOf = (iso: string) =>
@@ -202,18 +201,18 @@ export default function ProfileScreen() {
                         totalPlayers={myRank.data?.total ?? null}
                     />
                 ) : tab === 'predictions' ? (
-                    scoredMatches.length === 0 ? (
+                    finishedMatches.length === 0 ? (
                         <EmptyState
                             message={t('profile:predictions.emptyMessage')}
                             title={t('profile:predictions.emptyTitle')}
                         />
                     ) : (
                         <View className="gap-3">
-                            {scoredMatches.map((match, index) => {
+                            {finishedMatches.map((match, index) => {
                                 const dayTitle = dayTitleOf(match.kickoff_at);
                                 const newDay =
                                     index === 0 ||
-                                    dayTitle !== dayTitleOf(scoredMatches[index - 1].kickoff_at);
+                                    dayTitle !== dayTitleOf(finishedMatches[index - 1].kickoff_at);
                                 return (
                                     <View className="gap-3" key={match.id}>
                                         {newDay ? (

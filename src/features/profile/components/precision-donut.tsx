@@ -10,6 +10,8 @@ type PrecisionDonutProps = {
     good: number;
     exact: number;
     missed: number;
+    /** Matchs terminés sans prono (segment neutre, pèse dans la précision). */
+    notPredicted: number;
 };
 
 const SIZE = 108;
@@ -27,11 +29,20 @@ function LegendRow({ dotClass, label }: { dotClass: string; label: string }) {
 }
 
 /** Donut de précision de l'onglet Stats du Profil (maquette Profil). */
-export function PrecisionDonut({ precisionPct, good, exact, missed }: PrecisionDonutProps) {
+export function PrecisionDonut({
+    precisionPct,
+    good,
+    exact,
+    missed,
+    notPredicted,
+}: PrecisionDonutProps) {
     const { t } = useTranslation(['profile']);
     const trackColor = useThemeColor('surface-sunken');
     const brandColor = useThemeColor('brand');
+    const faintColor = useThemeColor('text-faint');
     const arc = (CIRCUMFERENCE * precisionPct) / 100;
+    const total = good + exact + missed + notPredicted;
+    const notPredictedArc = total > 0 ? (CIRCUMFERENCE * notPredicted) / total : 0;
 
     return (
         <View className="flex-row items-center gap-[18px]">
@@ -45,6 +56,20 @@ export function PrecisionDonut({ precisionPct, good, exact, missed }: PrecisionD
                         stroke={trackColor}
                         strokeWidth={STROKE}
                     />
+                    {notPredicted > 0 ? (
+                        <Circle
+                            cx={SIZE / 2}
+                            cy={SIZE / 2}
+                            fill="none"
+                            r={RADIUS}
+                            stroke={faintColor}
+                            strokeDasharray={`${notPredictedArc} ${CIRCUMFERENCE}`}
+                            strokeDashoffset={-arc}
+                            strokeLinecap="round"
+                            strokeWidth={STROKE}
+                            transform={`rotate(-90 ${SIZE / 2} ${SIZE / 2})`}
+                        />
+                    ) : null}
                     <Circle
                         cx={SIZE / 2}
                         cy={SIZE / 2}
@@ -78,6 +103,10 @@ export function PrecisionDonut({ precisionPct, good, exact, missed }: PrecisionD
                 <LegendRow
                     dotClass="bg-border-strong"
                     label={t('profile:stats.precision.missed', { count: missed })}
+                />
+                <LegendRow
+                    dotClass="bg-text-faint"
+                    label={t('profile:stats.precision.notPredicted', { count: notPredicted })}
                 />
             </View>
         </View>

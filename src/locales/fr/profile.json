@@ -37,6 +37,8 @@
             "exact_other": "{{count}} scores exacts",
             "missed_one": "{{count}} raté",
             "missed_other": "{{count}} ratés",
+            "notPredicted_one": "{{count}} non pronostiqué",
+            "notPredicted_other": "{{count}} non pronostiqués",
             "empty": "Aucun prono scoré sur cette compétition pour l'instant."
         },
         "trend": {
