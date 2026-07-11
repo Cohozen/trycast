@@ -52,3 +52,22 @@ Bascule validée en conditions réelles le soir même : 18 matchs / 12 équipes 
 NC 2026 importés (leagueId 124179), idempotence vérifiée. Particularités relevées :
 les Fidji y jouent sous « Fijian Drua » (alias ajouté au mapping équipes), et `/odds`
 exige un plan payant (401 en Basic, capture best-effort en attendant l'upgrade Pro).
+
+## Rebondissement (2026-07-11) : le score live in-play est disponible en plan Pro
+
+Constat corrigé par Corentin lui-même en testant pendant un match : le
+**`state.score` est bien renseigné et évolue pendant le match** avec la clé
+**Pro** — le « null avant/pendant » relevé plus haut venait de la **clé FREE**.
+Décalage observé ~3-5 min, jugé suffisant dans un premier temps.
+
+Conséquence : la **carte LIVE** (reportée v2 au Lot 5.5 faute de données) est
+débloquée. GO acté pour une EF `sync-live` (polling pendant les fenêtres de
+match, colonnes `live_*` sur `matches` — **jamais réutiliser `home_score`**,
+déclencheur du pipeline de scoring) ; le filtre de fenêtre de `sync-results`
+(qui ne lit `state.score` que sur `finished`) est à revoir pour l'in-play. Plan
+d'implémentation : `~/.claude/plans/j-ai-push-la-function-iridescent-pond.md`
+(annexe A2). Fournisseurs live alternatifs écartés : **SportDevs inaccessible**,
+API-Sports inutile pour le live. ⚠️ le live in-play dépend du renouvellement du
+plan Pro (même échéance que les odds, ~2026-08-06).
+
+Les **essais** restent sans source exploitable (saisie admin) — inchangé.
