@@ -240,6 +240,86 @@ export type Database = {
                     },
                 ];
             };
+            notification_prefs: {
+                Row: {
+                    master: boolean;
+                    reminder_enabled: boolean;
+                    results_enabled: boolean;
+                    updated_at: string;
+                    user_id: string;
+                };
+                Insert: {
+                    master?: boolean;
+                    reminder_enabled?: boolean;
+                    results_enabled?: boolean;
+                    updated_at?: string;
+                    user_id: string;
+                };
+                Update: {
+                    master?: boolean;
+                    reminder_enabled?: boolean;
+                    results_enabled?: boolean;
+                    updated_at?: string;
+                    user_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'notification_prefs_user_id_fkey';
+                        columns: ['user_id'];
+                        isOneToOne: true;
+                        referencedRelation: 'profiles';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
+            notification_sends: {
+                Row: {
+                    created_at: string;
+                    id: string;
+                    match_id: string;
+                    receipt_checked_at: string | null;
+                    status: string;
+                    ticket_ids: Json | null;
+                    type: string;
+                    user_id: string;
+                };
+                Insert: {
+                    created_at?: string;
+                    id?: string;
+                    match_id: string;
+                    receipt_checked_at?: string | null;
+                    status?: string;
+                    ticket_ids?: Json | null;
+                    type: string;
+                    user_id: string;
+                };
+                Update: {
+                    created_at?: string;
+                    id?: string;
+                    match_id?: string;
+                    receipt_checked_at?: string | null;
+                    status?: string;
+                    ticket_ids?: Json | null;
+                    type?: string;
+                    user_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'notification_sends_match_id_fkey';
+                        columns: ['match_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'matches';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'notification_sends_user_id_fkey';
+                        columns: ['user_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'profiles';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             predictions: {
                 Row: {
                     created_at: string;
@@ -323,6 +403,41 @@ export type Database = {
                     username?: string;
                 };
                 Relationships: [];
+            };
+            push_tokens: {
+                Row: {
+                    created_at: string;
+                    id: string;
+                    platform: string;
+                    token: string;
+                    updated_at: string;
+                    user_id: string;
+                };
+                Insert: {
+                    created_at?: string;
+                    id?: string;
+                    platform: string;
+                    token: string;
+                    updated_at?: string;
+                    user_id: string;
+                };
+                Update: {
+                    created_at?: string;
+                    id?: string;
+                    platform?: string;
+                    token?: string;
+                    updated_at?: string;
+                    user_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'push_tokens_user_id_fkey';
+                        columns: ['user_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'profiles';
+                        referencedColumns: ['id'];
+                    },
+                ];
             };
             scoring_rules: {
                 Row: {
@@ -485,6 +600,37 @@ export type Database = {
                     isSetofReturn: false;
                 };
             };
+            notify_reminder_targets: {
+                Args: never;
+                Returns: {
+                    away_team: string;
+                    home_team: string;
+                    kickoff_at: string;
+                    locale: string;
+                    match_id: string;
+                    token: string;
+                    user_id: string;
+                }[];
+            };
+            notify_result_targets: {
+                Args: never;
+                Returns: {
+                    away_score: number;
+                    away_team: string;
+                    home_score: number;
+                    home_team: string;
+                    locale: string;
+                    match_id: string;
+                    points_awarded: number;
+                    token: string;
+                    user_id: string;
+                }[];
+            };
+            register_push_token: {
+                Args: { p_platform: string; p_token: string };
+                Returns: undefined;
+            };
+            unregister_push_token: { Args: { p_token: string }; Returns: undefined };
             username_available: { Args: { candidate: string }; Returns: boolean };
         };
         Enums: {
