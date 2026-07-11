@@ -33,9 +33,14 @@ Chaque script re-seede son état avant exécution. Ordre de seed cumulatif : use
 - Predictions : `bash scripts/e2e-predictions.sh` (seed `seed-test-predictions.sql`, **après** les users)
 - Scoring : `bash scripts/e2e-scoring.sh` + `scripts/e2e-scoring.sql` côté serveur (rejouer `seed-test-scoring.sql` avant **chaque** run du `.sql`)
 - Leagues : `bash scripts/e2e-leagues.sh` (rejouer `seed-test-leagues.sql` avant chaque run)
+- Notifications : `bash scripts/e2e-notifications.sh` (seuls les users de test sont requis ; filtres PostgREST sur un token Expo → crochets à URL-encoder, cf. `TOKEN_ENC` dans le script)
 
 Les scripts lisent `.env` (`EXPO_PUBLIC_SUPABASE_URL` / `_KEY`, clé publishable uniquement) et acceptent `EMAIL1/EMAIL2/PASSWORD` en override.
 
 ## Edge Functions
 
 Dans `supabase/functions/`, déploiement `supabase functions deploy <name>`.
+
+⚠️ **Toute EF appelée par pg_cron doit être déclarée `verify_jwt = false` dans `supabase/config.toml`** (bloc `[functions.<name>]`) **avant son premier deploy**. Par défaut la passerelle exige un JWT dans `Authorization` — or le cron n'envoie que le header `x-sync-secret` → chaque tick prend un 401 `UNAUTHORIZED_NO_AUTH_HEADER` **avant** d'atteindre le code de la fonction (vécu au Lot 6 sur `notify`, 2026-07-11 ; la protection réelle est le secret partagé vérifié dans la fonction). Diagnostic : `select status_code, content from net._http_response order by created desc` — c'est là que pg_net loge les réponses des ticks. Un deploy parti sans le bloc se corrige par un simple redeploy après ajout du bloc.
+
+Ordre de mise en route d'une EF cron (en-têtes des migrations `20260707000300`/`20260711000300`) : `supabase secrets set <NAME>_SECRET` → bloc config.toml → `supabase functions deploy <name>` → `vault.create_secret` (même valeur) → `supabase db push` de la migration cron (jamais avant le deploy : 404 au premier tick). Les commandes `secrets set`/`functions deploy` sont bloquées par le classifieur en mode auto → les préparer et les faire exécuter par Corentin.
