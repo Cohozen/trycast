@@ -83,6 +83,14 @@
             "label": "Langue",
             "current": "Français"
         },
+        "password": {
+            "row": "Mot de passe",
+            "rowValue": "Modifier",
+            "modalTitle": "Nouveau mot de passe",
+            "modalIntro": "Choisis un nouveau mot de passe pour sécuriser ton compte.",
+            "confirm": "Enregistrer",
+            "updated": "Mot de passe mis à jour !"
+        },
         "notifications": {
             "channelName": "Général",
             "master": {

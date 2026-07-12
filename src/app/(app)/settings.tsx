@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
-import { ChevronLeft, Globe } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Globe, KeyRound } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,7 +8,9 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { IconButton } from '@/components/ui/icon-button';
 import { SegmentedControl } from '@/components/ui/segmented-control';
+import { Toast } from '@/components/ui/toast';
 import { DeleteAccountModal } from '@/features/profile/components/delete-account-modal';
+import { PasswordEditorModal } from '@/features/profile/components/password-editor-modal';
 import { UsernameEditor } from '@/features/profile/components/username-editor';
 import { useSession } from '@/features/auth/session-context';
 import { NotificationSettings } from '@/features/notifications/components/notification-settings';
@@ -20,7 +22,7 @@ import {
 } from '@/features/profile/theme-preference';
 import { useDeleteAccount, useProfile } from '@/features/profile/use-profile';
 import { supabase } from '@/lib/supabase';
-import { ScrollView, Text, useThemeColor, View } from '@/tw';
+import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
 import { useScreenInsets } from '@/tw/use-screen-insets';
 
 function SectionLabel({ children, danger = false }: { children: string; danger?: boolean }) {
@@ -37,9 +39,9 @@ function SectionLabel({ children, danger = false }: { children: string; danger?:
 }
 
 /**
- * Écran Réglages (V0 minimal de la maquette) : thème, langue affichée,
- * version, déconnexion et zone de danger avec la modale de suppression.
- * Photo, e-mail/mot de passe, notifications et RGPD arrivent avec leurs lots.
+ * Écran Réglages : compte (pseudo + mot de passe), thème, langue affichée,
+ * notifications, version, déconnexion et zone de danger. Photo, e-mail et
+ * RGPD arrivent avec leurs lots.
  */
 export default function SettingsScreen() {
     const { t } = useTranslation(['profile', 'common']);
@@ -50,8 +52,11 @@ export default function SettingsScreen() {
 
     const [theme, setTheme] = useState<ThemePreference>('system');
     const [confirmingDelete, setConfirmingDelete] = useState(false);
+    const [editingPassword, setEditingPassword] = useState(false);
+    const [passwordSaved, setPasswordSaved] = useState(false);
     const textColor = useThemeColor('text');
     const brandColor = useThemeColor('brand');
+    const textFaintColor = useThemeColor('text-faint');
     const screenInsets = useScreenInsets();
 
     useEffect(() => {
@@ -96,10 +101,32 @@ export default function SettingsScreen() {
                 </Text>
             </View>
 
-            {/* Compte — photo, e-mail et mot de passe arrivent avec leurs lots */}
+            {/* Compte — pseudo + mot de passe (e-mail arrive avec le Lot 7) */}
             <View className="gap-2.5">
                 <SectionLabel>{t('profile:settings.sections.account')}</SectionLabel>
+                {passwordSaved ? (
+                    <Toast message={t('profile:settings.password.updated')} tone="success" />
+                ) : null}
                 <UsernameEditor userId={session?.user.id ?? ''} />
+                <Pressable
+                    accessibilityRole="button"
+                    onPress={() => {
+                        setPasswordSaved(false);
+                        setEditingPassword(true);
+                    }}>
+                    <Card className="flex-row items-center gap-3 px-4 py-3.5">
+                        <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">
+                            <KeyRound color={brandColor} size={17} strokeWidth={1.9} />
+                        </View>
+                        <Text className="flex-1 font-body-semibold text-[15px] text-text">
+                            {t('profile:settings.password.row')}
+                        </Text>
+                        <Text className="font-body-medium text-[14px] text-text-muted">
+                            {t('profile:settings.password.rowValue')}
+                        </Text>
+                        <ChevronRight color={textFaintColor} size={18} strokeWidth={1.9} />
+                    </Card>
+                </Pressable>
             </View>
 
             {/* Préférences */}
@@ -184,6 +211,12 @@ export default function SettingsScreen() {
                     />
                 </View>
             </View>
+
+            <PasswordEditorModal
+                onClose={() => setEditingPassword(false)}
+                onSuccess={() => setPasswordSaved(true)}
+                visible={editingPassword}
+            />
 
             <DeleteAccountModal
                 deleting={deleteAccount.isPending}
