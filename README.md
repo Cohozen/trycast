@@ -16,29 +16,28 @@ Pronostic unique par match (score exact + bonus offensifs), points pondérés pa
 ## Prérequis
 
 - Node.js ≥ 20 et npm
-- **iOS** : Xcode + un simulateur iOS (macOS uniquement)
+- **iOS** : Xcode + CocoaPods (`brew install cocoapods`) + un simulateur iOS (macOS uniquement)
 - **Android** : Android Studio + un émulateur (image ARM64 sur Apple Silicon)
-- Ou l'app [Expo Go](https://expo.dev/go) sur un téléphone physique (même compte réseau non requis, scan du QR code)
-- CLI optionnelles : `supabase` (migrations, typegen) et `eas-cli` (builds) — `npm install -g supabase eas-cli`
+- CLI optionnelles : `supabase` (migrations, typegen) et `eas-cli` (builds cloud) — `npm install -g supabase eas-cli`
 
 ## Démarrage
 
 ```bash
 npm install
 cp .env.example .env   # puis renseigner l'URL et la clé publishable Supabase
-npx expo start
+npm run ios            # ou npm run android
 ```
 
-Depuis le terminal Metro : `i` ouvre le simulateur iOS, `a` l'émulateur Android, `w` le navigateur, `j` les React Native DevTools. Raccourcis : `npm run ios`, `npm run android`, `npm run web`.
+Le projet embarque `expo-dev-client` : l'app tourne dans un **development build local** (pas dans Expo Go). `npm run ios` (`expo run:ios`) et `npm run android` (`expo run:android`) compilent le client de dev natif, l'installent sur le simulateur/émulateur et démarrent Metro. La **première** compilation prend quelques minutes (prebuild + CocoaPods/Gradle) ; ensuite `npm start` (`expo start`) suffit pour relancer Metro et rouvrir l'app déjà installée (`w` ouvre le web, `j` les React Native DevTools). Les dossiers natifs `/ios` et `/android` sont régénérés à la volée par le prebuild et **non versionnés**.
 
-L'app tourne dans **Expo Go** pour le quotidien (simulateur, émulateur, web), mais les **notifications push** n'y fonctionnent pas (retirées d'Expo Go depuis le SDK 53) : l'app le détecte et saute simplement l'enregistrement du token. Pour tester les push en réel, il faut un **development build** installé sur un téléphone physique :
+Les **notifications push** nécessitent ce dev build (elles sont retirées d'Expo Go depuis le SDK 53) et un **appareil physique** : sur simulateur/émulateur, l'app détecte l'absence de contexte push et saute simplement l'enregistrement du token. Pour un dev build installable sur téléphone (distribution interne), passer par EAS :
 
 ```bash
 npx eas-cli build --profile development --platform android   # APK à installer (QR code)
-npx expo start                                               # puis ouvrir l'app TryCast (dev build), pas Expo Go
+npx eas-cli build --profile development --platform ios       # build simulateur (iOS device = compte Apple Developer requis, Lot 7)
 ```
 
-Le build embarque l'identité Firebase (FCM) de l'app : le fichier `google-services.json` n'est pas versionné, il vit à la racine en local et dans l'env EAS `GOOGLE_SERVICES_JSON` pour les builds cloud. Un push de test peut s'envoyer à la main depuis [expo.dev/notifications](https://expo.dev/notifications) avec le token affiché dans les logs Metro.
+Le build Android embarque l'identité Firebase (FCM) de l'app : le fichier `google-services.json` n'est pas versionné, il vit à la racine en local et dans l'env EAS `GOOGLE_SERVICES_JSON` pour les builds cloud. Un push de test peut s'envoyer à la main depuis [expo.dev/notifications](https://expo.dev/notifications) avec le token affiché dans les logs Metro.
 
 ## Scripts
 
