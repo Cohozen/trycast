@@ -3,20 +3,20 @@ name: trycast-design-system
 description: Styler un écran ou composant TryCast avec le design system (tokens Tailwind v4 light/dark, primitives src/components/ui/, polices Anton/Inter, iconographie Lucide). À utiliser dès qu'on touche au style d'un écran, qu'on crée un composant UI, ou qu'on se demande quelle classe/couleur/police employer.
 ---
 
-# TryCast — design system (Lot 5.5)
+# TryCast — design system (Lot 5.5, tokens v2)
 
 Source de vérité : `src/global.css` (tokens `@theme`) + le livrable Claude Design versionné dans `docs/design/` (maquettes HTML par écran, composants de référence dans `docs/design/project/_ds/…`). En cas de doute sur un rendu, **lire la maquette de l'écran** avant d'inventer.
 
 ## Identité (à ne jamais enfreindre)
 
 - **Le grenat (`accent`, #E63E63) est une étincelle, jamais un fond** : CTA primaire, statut live, sélection active. Ne jamais en inonder un écran.
-- Light = base **crème** (`bg` papier), dark = base **verte** (green-900/800). En dark, rester dans les tons verts — pas de blanc/crème pour les surfaces (le crème y est couleur de texte).
+- **Surfaces = neutres chauds** (DS v2) : light = base **sable/blanc** (`bg` #FAF8F4, `surface` blanc), dark = base **charbon chaud** (`bg`/`surface` charbon, PAS vert). Le **vert est la MARQUE** (`brand` — vert foncé en light, `green-400` #43A56E lisible en dark : logo, avatars, icônes discrètes), pas un fond plein cadre. Ne jamais teinter une surface en vert « à la main ».
 - Le rouge **danger** (#C4362B brique) est distinct du grenat : réservé à la destruction (suppression compte/ligue). Le grenat marque aussi l'erreur de saisie (bordure input).
 - Fonds plats, pas de dégradés, pas d'emoji décoratifs. Ombres discrètes.
 
 ## Tokens → classes
 
-- Couleurs sémantiques (basculent light/dark toutes seules via `light-dark()`) : `bg-bg`, `bg-surface`, `bg-surface-sunken`, `border-border`, `border-border-strong`, `text-text`, `text-text-muted`, `text-text-faint`, `bg-brand`/`text-on-brand`, `bg-accent`/`text-on-accent`, `bg-accent-press`, `bg-danger`/`text-on-danger`, `text-success`, `text-warning`, `text-info`, `bg-live`. Primitives dispo pour cas ciblés : `bg-green-700`, `bg-cream-100`, etc.
+- Couleurs sémantiques (basculent light/dark toutes seules via `light-dark()`) : `bg-bg`, `bg-surface`, `bg-surface-sunken`, `border-border`, `border-border-strong`, `text-text`, `text-text-muted`, `text-text-faint`, `bg-brand`/`text-on-brand`, `bg-accent`/`text-on-accent`, `bg-accent-press`, `bg-danger`/`text-on-danger`, `text-success`, `text-warning`, `text-info`, `bg-live`. Primitives (legacy `green-*`/`cream-*`/`ink-*`/`grenat-*`) exposées pour cas ciblés — mais préférer les tokens sémantiques ; les surfaces neutres v2 (sable/charbon) sont couvertes par `bg`/`surface`/`surface-sunken`/`border`. La TabBar flottante teinte sa pastille active dark en `bg-accent/15 border-accent/30` (grenat), plus de vert.
 - Teintes translucides : modificateur d'opacité (`bg-accent/15`, `bg-text/10`) — compile en `color-mix`, OK natif + web.
 - Radius : `rounded-xs|sm|md|lg|xl|pill` (6/10/14/20/28/999 px). Carte par défaut = `rounded-md`, boutons/chips = `rounded-pill`, sheets = `rounded-lg`.
 - Ombres : classes dédiées `tc-shadow-sm|md|lg` et `tc-glow-accent` (PAS les `shadow-*` Tailwind : leurs variables composées passent mal en natif).
