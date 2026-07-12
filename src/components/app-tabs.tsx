@@ -16,9 +16,10 @@ import { cn } from '@/tw/variants';
 
 /**
  * Barre d'onglets flottante du design system (4 onglets). L'onglet actif
- * porte l'étincelle grenat sur une pastille claire — retintée en tons verts
- * en dark (le blanc du DS ne va pas sur la surface verte, cf. note du
- * livrable). Pas de flou : surface quasi opaque, plus robuste en RN.
+ * porte l'étincelle grenat sur une pastille claire — teintée accent (grenat)
+ * en dark sur la barre charbon (verre blanc en light, hairline claire +
+ * pastille grenat en dark, cf. tokens --glass-* du DS v2). Pas de flou :
+ * surface quasi opaque, plus robuste en RN.
  */
 export default function AppTabs() {
     const { t } = useTranslation('common');
@@ -54,7 +55,7 @@ function FloatingTabList(props: TabListProps) {
         <View
             className="absolute inset-x-0 bottom-0 items-center px-4"
             style={{ paddingBottom: Math.max(insets.bottom, 16) }}>
-            <View className="w-full max-w-[500px] flex-row gap-1 rounded-[34px] border border-white/70 bg-surface/95 p-2 tc-shadow-lg dark:border-green-600/60">
+            <View className="w-full max-w-[500px] flex-row gap-1 rounded-[34px] border border-white/70 bg-surface/95 p-2 tc-shadow-lg dark:border-white/12">
                 {props.children}
             </View>
         </View>
@@ -73,7 +74,7 @@ export function TabButton({ icon: Icon, label, isFocused, ...props }: TabButtonP
                 className={cn(
                     'flex-1 items-center justify-center gap-1.5 rounded-[28px] border border-transparent px-2 py-3',
                     isFocused &&
-                        'border-white/50 bg-white/55 tc-shadow-sm dark:border-green-600/70 dark:bg-green-700/70',
+                        'border-white/50 bg-white/55 tc-shadow-sm dark:border-accent/30 dark:bg-accent/15',
                 )}>
                 <Icon
                     color={isFocused ? accent : faint}

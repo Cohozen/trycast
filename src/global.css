@@ -3,10 +3,12 @@
 @import "tailwindcss/utilities.css";
 
 /* ============================================================
- * TryCast — design system V0
+ * TryCast — design system v2 (surfaces neutres)
  * Source de vérité : docs/design/project/_ds/…/tokens/*.css
- * Grenat = étincelle, jamais un fond (CTA, live, sélection).
- * Light = base crème, dark = base verte ; bascule via light-dark()
+ * Surfaces = neutres chauds (sable en light, charbon en dark).
+ * Vert = MARQUE (--brand : logo, avatars, accents discrets).
+ * Grenat = étincelle (--accent), jamais un fond (CTA, live, sélection).
+ * Light = base sable/blanc, dark = base charbon ; bascule via light-dark()
  * (pilotée par le color scheme système / Appearance).
  *
  * IMPORTANT (natif) : react-native-css n'enregistre pas les variables
@@ -34,25 +36,27 @@
 @layer theme {
     @theme {
         /* ---- Couleurs sémantiques → utilitaires (bg-surface, text-text-muted…).
+         * DS v2 : surfaces neutres chaudes (sable en light, charbon en dark),
+         * vert = marque, grenat = étincelle.
          * Palette primitive de référence :
          * green-900 #0e3320 · green-800 #14432a · green-700 #1c5638 · green-600 #26694a
          * grenat-600 #c82e52 · grenat-500 #e63e63 · grenat-400 #f06485
          * cream #f1ebdd · cream-100 #fbf7ef · cream-200 #e7dfcc
-         * ink-900 #16130e · ink-600 #5a5245 · ink-400 #8a8071 · mist-300 #a9c0b2 */
-        --color-bg: light-dark(#f1ebdd, #0e3320);
-        --color-surface: light-dark(#fbf7ef, #14432a);
-        --color-surface-sunken: light-dark(#e7dfcc, #0b2a19);
-        --color-border: light-dark(#e7dfcc, #1c5638);
-        --color-border-strong: light-dark(#d8ceb8, #26694a);
-        --color-text: light-dark(#16130e, #f1ebdd);
-        --color-text-muted: light-dark(#5a5245, #a9c0b2);
-        --color-text-faint: light-dark(#8a8071, #7e9587);
-        --color-brand: light-dark(#14432a, #f1ebdd);
-        --color-on-brand: light-dark(#f1ebdd, #0e3320);
+         * ink-900 #16130e · ink-600 #5f584b · ink-400 #928a7b · mist-300 #a9c0b2 */
+        --color-bg: light-dark(#faf8f4, #17140f);
+        --color-surface: light-dark(#ffffff, #201c16);
+        --color-surface-sunken: light-dark(#f3f0ea, #100e0b);
+        --color-border: light-dark(#e8e3d9, #2f2921);
+        --color-border-strong: light-dark(#d6cfc1, #383127);
+        --color-text: light-dark(#16130e, #f4f0e9);
+        --color-text-muted: light-dark(#5f584b, #b2a999);
+        --color-text-faint: light-dark(#928a7b, #7d7666);
+        --color-brand: light-dark(#14432a, #43a56e);
+        --color-on-brand: light-dark(#faf8f4, #100e0b);
         --color-accent: #e63e63;
         --color-accent-hover: #f06485;
         --color-accent-press: #c82e52;
-        --color-on-accent: #f1ebdd;
+        --color-on-accent: #ffffff;
         --color-focus-ring: light-dark(#e63e63, #f06485);
 
         /* Danger (brique) : distinct du grenat, seule couleur de destruction */
@@ -78,8 +82,8 @@
         --color-cream-100: #fbf7ef;
         --color-cream-200: #e7dfcc;
         --color-ink-900: #16130e;
-        --color-ink-600: #5a5245;
-        --color-ink-400: #8a8071;
+        --color-ink-600: #5f584b;
+        --color-ink-400: #928a7b;
         --color-mist-300: #a9c0b2;
 
         /* ---- Typo : Anton (display) + Inter (corps) chargées via expo-font.
