@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":4,"namespace":"TryCastDesignSystem_a0f4ea","components":[{"name":"Avatar","sourcePath":"components/core/Avatar.jsx"},{"name":"Badge","sourcePath":"components/core/Badge.jsx"},{"name":"Button","sourcePath":"components/core/Button.jsx"},{"name":"Chip","sourcePath":"components/core/Chip.jsx"},{"name":"IconButton","sourcePath":"components/core/IconButton.jsx"},{"name":"Input","sourcePath":"components/core/Input.jsx"},{"name":"SegmentedControl","sourcePath":"components/core/SegmentedControl.jsx"},{"name":"Skeleton","sourcePath":"components/core/Skeleton.jsx"},{"name":"EmptyState","sourcePath":"components/feedback/EmptyState.jsx"},{"name":"Toast","sourcePath":"components/feedback/Toast.jsx"},{"name":"Header","sourcePath":"components/navigation/Header.jsx"},{"name":"TabBar","sourcePath":"components/navigation/TabBar.jsx"},{"name":"CompetitionBadge","sourcePath":"components/rugby/CompetitionBadge.jsx"},{"name":"MatchCard","sourcePath":"components/rugby/MatchCard.jsx"},{"name":"RankingRow","sourcePath":"components/rugby/RankingRow.jsx"},{"name":"BonusToggle","sourcePath":"components/rugby/ScorePrediction.jsx"},{"name":"ScorePrediction","sourcePath":"components/rugby/ScorePrediction.jsx"},{"name":"ScoreStepper","sourcePath":"components/rugby/ScoreStepper.jsx"},{"name":"FLAGS","sourcePath":"components/rugby/TeamFlag.jsx"},{"name":"TeamFlag","sourcePath":"components/rugby/TeamFlag.jsx"}],"sourceHashes":{"components/core/Avatar.jsx":"5acfce476f7e","components/core/Badge.jsx":"fe9a7e9e00c1","components/core/Button.jsx":"3e294986d815","components/core/Chip.jsx":"8fdd67d9db42","components/core/IconButton.jsx":"f09fc2936a80","components/core/Input.jsx":"a9db68d9c3b3","components/core/SegmentedControl.jsx":"b75fe4d3a08d","components/core/Skeleton.jsx":"f7c1ba87c5d7","components/feedback/EmptyState.jsx":"93a674e76cf6","components/feedback/Toast.jsx":"abb28720abf3","components/navigation/Header.jsx":"b2d8cf0fb524","components/navigation/TabBar.jsx":"6772839c5867","components/rugby/CompetitionBadge.jsx":"a6f387c48a36","components/rugby/MatchCard.jsx":"6d98f9e117eb","components/rugby/RankingRow.jsx":"967a31baad77","components/rugby/ScorePrediction.jsx":"1652f66abeed","components/rugby/ScoreStepper.jsx":"e49c329a2bb1","components/rugby/TeamFlag.jsx":"68c2fafdf4a3","uploads/trycast-colors.ts":"4c9d112f06fe"},"inlinedExternals":[],"unexposedExports":[{"name":"palette","sourcePath":"uploads/trycast-colors.ts"},{"name":"theme","sourcePath":"uploads/trycast-colors.ts"}]} */
+/* @ds-bundle: {"format":4,"namespace":"TryCastDesignSystem_a0f4ea","components":[{"name":"Avatar","sourcePath":"components/core/Avatar.jsx"},{"name":"Badge","sourcePath":"components/core/Badge.jsx"},{"name":"Button","sourcePath":"components/core/Button.jsx"},{"name":"Chip","sourcePath":"components/core/Chip.jsx"},{"name":"IconButton","sourcePath":"components/core/IconButton.jsx"},{"name":"Input","sourcePath":"components/core/Input.jsx"},{"name":"LeagueSelector","sourcePath":"components/core/LeagueSelector.jsx"},{"name":"SegmentedControl","sourcePath":"components/core/SegmentedControl.jsx"},{"name":"Skeleton","sourcePath":"components/core/Skeleton.jsx"},{"name":"EmptyState","sourcePath":"components/feedback/EmptyState.jsx"},{"name":"Toast","sourcePath":"components/feedback/Toast.jsx"},{"name":"DateSelector","sourcePath":"components/navigation/DateSelector.jsx"},{"name":"Header","sourcePath":"components/navigation/Header.jsx"},{"name":"TabBar","sourcePath":"components/navigation/TabBar.jsx"},{"name":"CompetitionBadge","sourcePath":"components/rugby/CompetitionBadge.jsx"},{"name":"MatchCard","sourcePath":"components/rugby/MatchCard.jsx"},{"name":"RankingRow","sourcePath":"components/rugby/RankingRow.jsx"},{"name":"BonusToggle","sourcePath":"components/rugby/ScorePrediction.jsx"},{"name":"ScorePrediction","sourcePath":"components/rugby/ScorePrediction.jsx"},{"name":"ScoreStepper","sourcePath":"components/rugby/ScoreStepper.jsx"},{"name":"FLAGS","sourcePath":"components/rugby/TeamFlag.jsx"},{"name":"TeamFlag","sourcePath":"components/rugby/TeamFlag.jsx"}],"sourceHashes":{"components/core/Avatar.jsx":"5acfce476f7e","components/core/Badge.jsx":"fe9a7e9e00c1","components/core/Button.jsx":"3e294986d815","components/core/Chip.jsx":"8fdd67d9db42","components/core/IconButton.jsx":"f09fc2936a80","components/core/Input.jsx":"a9db68d9c3b3","components/core/LeagueSelector.jsx":"ad5027ed26e0","components/core/SegmentedControl.jsx":"b75fe4d3a08d","components/core/Skeleton.jsx":"f7c1ba87c5d7","components/feedback/EmptyState.jsx":"93a674e76cf6","components/feedback/Toast.jsx":"abb28720abf3","components/navigation/DateSelector.jsx":"4a256e145a5b","components/navigation/Header.jsx":"b2d8cf0fb524","components/navigation/TabBar.jsx":"68fb1cf309fe","components/rugby/CompetitionBadge.jsx":"a6f387c48a36","components/rugby/MatchCard.jsx":"6d98f9e117eb","components/rugby/RankingRow.jsx":"967a31baad77","components/rugby/ScorePrediction.jsx":"1652f66abeed","components/rugby/ScoreStepper.jsx":"e49c329a2bb1","components/rugby/TeamFlag.jsx":"68c2fafdf4a3"},"inlinedExternals":[],"unexposedExports":[]} */
 
 (() => {
 
@@ -459,6 +459,300 @@ function Input({
 Object.assign(__ds_scope, { Input });
 })(); } catch (e) { __ds_ns.__errors.push({ path: "components/core/Input.jsx", error: String((e && e.message) || e) }); }
 
+// components/core/LeagueSelector.jsx
+try { (() => {
+function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
+/**
+ * LeagueSelector — dropdown to pick one league from a user-created list.
+ * Unlike SegmentedControl (2–4 fixed views), league names are user-defined,
+ * variable in length and count, so the list lives in a scrollable menu.
+ *
+ * leagues: [{ id, name, memberCount?, avatarSrc? }]
+ * Selected row carries the grenat spark (check + tint). onCreate adds a
+ * footer action ("Créer ou rejoindre une ligue").
+ */
+function LeagueSelector({
+  leagues = [],
+  value,
+  onChange,
+  onCreate,
+  placeholder = 'Choisir une ligue',
+  size = 'md',
+  disabled = false,
+  style,
+  ...rest
+}) {
+  const [open, setOpen] = React.useState(false);
+  const rootRef = React.useRef(null);
+  const selected = leagues.find(l => l.id === value) || null;
+  const h = size === 'sm' ? 44 : 52;
+  React.useEffect(() => {
+    if (!open) return undefined;
+    const onDoc = e => {
+      if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false);
+    };
+    const onKey = e => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('mousedown', onDoc);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDoc);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+  const pick = id => {
+    onChange && onChange(id);
+    setOpen(false);
+  };
+  return /*#__PURE__*/React.createElement("div", _extends({
+    ref: rootRef,
+    style: {
+      position: 'relative',
+      width: '100%',
+      fontFamily: 'var(--font-body)',
+      ...style
+    }
+  }, rest), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    disabled: disabled,
+    onClick: () => !disabled && setOpen(o => !o),
+    "aria-haspopup": "listbox",
+    "aria-expanded": open,
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      width: '100%',
+      height: h,
+      padding: '0 12px 0 10px',
+      background: 'var(--surface)',
+      border: `1.5px solid ${open ? 'var(--brand)' : 'var(--border-strong)'}`,
+      borderRadius: 'var(--radius-md)',
+      boxShadow: open ? '0 0 0 3px color-mix(in srgb, var(--brand) 14%, transparent)' : 'var(--shadow-sm)',
+      cursor: disabled ? 'not-allowed' : 'pointer',
+      opacity: disabled ? 0.6 : 1,
+      transition: 'border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out)',
+      WebkitTapHighlightColor: 'transparent',
+      textAlign: 'left'
+    }
+  }, selected ? /*#__PURE__*/React.createElement(__ds_scope.Avatar, {
+    name: selected.name,
+    src: selected.avatarSrc,
+    size: "sm"
+  }) : /*#__PURE__*/React.createElement("span", {
+    "aria-hidden": true,
+    style: {
+      width: 32,
+      height: 32,
+      flexShrink: 0,
+      borderRadius: 'var(--radius-pill)',
+      border: '1.5px dashed var(--border-strong)'
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      flex: 1,
+      minWidth: 0,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 1
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontWeight: 'var(--fw-semibold)',
+      fontSize: 15,
+      color: selected ? 'var(--text)' : 'var(--text-faint)',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis'
+    }
+  }, selected ? selected.name : placeholder), selected && selected.memberCount != null && /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12,
+      color: 'var(--text-faint)',
+      fontVariantNumeric: 'tabular-nums'
+    }
+  }, selected.memberCount, " membre", selected.memberCount > 1 ? 's' : '')), /*#__PURE__*/React.createElement(Chevron, {
+    open: open
+  })), open && /*#__PURE__*/React.createElement("div", {
+    role: "listbox",
+    style: {
+      position: 'absolute',
+      top: 'calc(100% + 6px)',
+      left: 0,
+      right: 0,
+      zIndex: 40,
+      padding: 6,
+      background: 'var(--surface)',
+      border: '1px solid var(--border)',
+      borderRadius: 'var(--radius-lg)',
+      boxShadow: 'var(--shadow-lg)',
+      maxHeight: 296,
+      overflowY: 'auto',
+      animation: 'tc-ls-in var(--dur) var(--ease-out)'
+    }
+  }, /*#__PURE__*/React.createElement("style", null, '@keyframes tc-ls-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}'), leagues.length === 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: '14px 12px',
+      fontSize: 13,
+      color: 'var(--text-faint)'
+    }
+  }, "Aucune ligue pour l'instant."), leagues.map(l => {
+    const active = l.id === value;
+    return /*#__PURE__*/React.createElement(Option, {
+      key: l.id,
+      league: l,
+      active: active,
+      onPick: () => pick(l.id)
+    });
+  }), onCreate && /*#__PURE__*/React.createElement(React.Fragment, null, leagues.length > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      height: 1,
+      background: 'var(--border)',
+      margin: '6px 4px'
+    }
+  }), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    onClick: () => {
+      setOpen(false);
+      onCreate();
+    },
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      width: '100%',
+      padding: '10px 8px',
+      border: 'none',
+      background: 'transparent',
+      borderRadius: 'var(--radius-md)',
+      cursor: 'pointer',
+      fontFamily: 'var(--font-body)',
+      fontWeight: 'var(--fw-semibold)',
+      fontSize: 14,
+      color: 'var(--accent)',
+      WebkitTapHighlightColor: 'transparent'
+    },
+    onMouseEnter: e => e.currentTarget.style.background = 'color-mix(in srgb, var(--accent) 8%, transparent)',
+    onMouseLeave: e => e.currentTarget.style.background = 'transparent'
+  }, /*#__PURE__*/React.createElement("span", {
+    "aria-hidden": true,
+    style: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: 32,
+      height: 32,
+      flexShrink: 0,
+      borderRadius: 'var(--radius-pill)',
+      background: 'color-mix(in srgb, var(--accent) 12%, transparent)'
+    }
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "18",
+    height: "18",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2.2",
+    strokeLinecap: "round"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M12 5v14M5 12h14"
+  }))), "Cr\xE9er ou rejoindre une ligue"))));
+}
+function Option({
+  league,
+  active,
+  onPick
+}) {
+  const [hover, setHover] = React.useState(false);
+  return /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    role: "option",
+    "aria-selected": active,
+    onClick: onPick,
+    onMouseEnter: () => setHover(true),
+    onMouseLeave: () => setHover(false),
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      width: '100%',
+      padding: '8px',
+      border: 'none',
+      background: active ? 'color-mix(in srgb, var(--accent) 8%, transparent)' : hover ? 'var(--surface-sunken)' : 'transparent',
+      borderRadius: 'var(--radius-md)',
+      cursor: 'pointer',
+      textAlign: 'left',
+      transition: 'background var(--dur-fast) var(--ease-out)',
+      WebkitTapHighlightColor: 'transparent'
+    }
+  }, /*#__PURE__*/React.createElement(__ds_scope.Avatar, {
+    name: league.name,
+    src: league.avatarSrc,
+    size: "sm",
+    ring: active
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      flex: 1,
+      minWidth: 0,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 1
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: 'var(--font-body)',
+      fontWeight: active ? 'var(--fw-bold)' : 'var(--fw-semibold)',
+      fontSize: 15,
+      color: 'var(--text)',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis'
+    }
+  }, league.name), league.memberCount != null && /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: 'var(--font-body)',
+      fontSize: 12,
+      color: 'var(--text-faint)',
+      fontVariantNumeric: 'tabular-nums'
+    }
+  }, league.memberCount, " membre", league.memberCount > 1 ? 's' : '')), active && /*#__PURE__*/React.createElement("svg", {
+    width: "20",
+    height: "20",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "var(--accent)",
+    strokeWidth: "2.6",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": true
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M20 6L9 17l-5-5"
+  })));
+}
+function Chevron({
+  open
+}) {
+  return /*#__PURE__*/React.createElement("svg", {
+    width: "20",
+    height: "20",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "var(--text-faint)",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": true,
+    style: {
+      flexShrink: 0,
+      transition: 'transform var(--dur) var(--ease-out)',
+      transform: open ? 'rotate(180deg)' : 'none'
+    }
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M6 9l6 6 6-6"
+  }));
+}
+Object.assign(__ds_scope, { LeagueSelector });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/core/LeagueSelector.jsx", error: String((e && e.message) || e) }); }
+
 // components/core/SegmentedControl.jsx
 try { (() => {
 function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
@@ -710,6 +1004,143 @@ function Toast({
 Object.assign(__ds_scope, { Toast });
 })(); } catch (e) { __ds_ns.__errors.push({ path: "components/feedback/Toast.jsx", error: String((e && e.message) || e) }); }
 
+// components/navigation/DateSelector.jsx
+try { (() => {
+function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
+const WEEKDAYS_FR = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'];
+
+// Build a run of N days from `start` (Date/ISO). Internal — used when `days` is omitted.
+function buildDays(start, count = 7) {
+  const base = start ? new Date(start) : new Date();
+  base.setHours(0, 0, 0, 0);
+  return Array.from({
+    length: count
+  }, (_, i) => {
+    const d = new Date(base);
+    d.setDate(base.getDate() + i);
+    const iso = d.toISOString().slice(0, 10);
+    return {
+      date: iso,
+      weekday: WEEKDAYS_FR[d.getDay()],
+      day: d.getDate()
+    };
+  });
+}
+const toISO = v => {
+  if (!v) return null;
+  if (typeof v === 'string') return v.slice(0, 10);
+  return new Date(v).toISOString().slice(0, 10);
+};
+
+/**
+ * DateSelector — horizontal, scrollable strip of day cells for browsing a
+ * schedule (match days). One selected day rides the grenat spark; today gets a
+ * hairline ring; days carrying a match show a small accent dot. Past / empty
+ * days fade back. Mobile-first: cells are ≥44px hit targets, strip scrolls x.
+ *
+ * days: [{ date:'2027-02-24', weekday:'jeu', day:24, hasMatch?, disabled? }]
+ *   — or omit `days` and pass `start` (+ `count`) to auto-generate a week.
+ * value: selected `date` string · today: `date` string that is "today".
+ */
+function DateSelector({
+  days,
+  start,
+  count = 7,
+  value,
+  today,
+  onChange,
+  style,
+  ...rest
+}) {
+  const items = days && days.length ? days : buildDays(start, count);
+  const selectedISO = toISO(value);
+  const todayISO = toISO(today);
+  return /*#__PURE__*/React.createElement("div", _extends({
+    style: {
+      display: 'flex',
+      gap: 10,
+      overflowX: 'auto',
+      padding: '4px 16px 8px',
+      scrollbarWidth: 'none',
+      WebkitOverflowScrolling: 'touch',
+      ...style
+    }
+  }, rest), items.map(d => {
+    const iso = toISO(d.date);
+    const selected = iso === selectedISO;
+    const isToday = iso === todayISO;
+    const disabled = !!d.disabled;
+    let bg = 'transparent';
+    let color = 'var(--text)';
+    let border = '1.5px solid transparent';
+    let boxShadow = 'none';
+    if (selected) {
+      bg = 'var(--accent)';
+      color = 'var(--on-accent)';
+      boxShadow = 'var(--glow-accent)';
+    } else if (isToday) {
+      bg = 'var(--surface)';
+      border = '1.5px solid var(--border-strong)';
+    }
+    const dotColor = selected ? 'var(--on-accent)' : 'var(--accent)';
+    return /*#__PURE__*/React.createElement("button", {
+      key: iso,
+      type: "button",
+      disabled: disabled,
+      "aria-pressed": selected,
+      onClick: () => !disabled && onChange && onChange(d.date),
+      style: {
+        flex: '0 0 auto',
+        width: 48,
+        minHeight: 76,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        padding: '10px 0',
+        borderRadius: 'var(--radius-pill)',
+        background: bg,
+        color,
+        border,
+        boxShadow,
+        cursor: disabled ? 'default' : 'pointer',
+        opacity: disabled ? 0.4 : 1,
+        transition: 'background var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), transform var(--dur-fast) var(--ease-out)',
+        WebkitTapHighlightColor: 'transparent'
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontFamily: 'var(--font-body)',
+        fontWeight: 'var(--fw-bold)',
+        fontSize: 'var(--overline-size)',
+        letterSpacing: 'var(--overline-track)',
+        textTransform: 'uppercase',
+        color: selected ? 'var(--on-accent)' : 'var(--text-faint)',
+        opacity: selected ? 0.75 : 1
+      }
+    }, d.weekday), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontFamily: 'var(--font-body)',
+        fontWeight: selected || isToday ? 'var(--fw-bold)' : 'var(--fw-semibold)',
+        fontSize: 15,
+        fontVariantNumeric: 'tabular-nums',
+        lineHeight: 1
+      }
+    }, d.day), /*#__PURE__*/React.createElement("span", {
+      "aria-hidden": true,
+      style: {
+        width: 5,
+        height: 5,
+        borderRadius: 'var(--radius-pill)',
+        background: d.hasMatch ? dotColor : 'transparent'
+      }
+    }));
+  }));
+}
+Object.assign(__ds_scope, { DateSelector });
+})(); } catch (e) { __ds_ns.__errors.push({ path: "components/navigation/DateSelector.jsx", error: String((e && e.message) || e) }); }
+
 // components/navigation/Header.jsx
 try { (() => {
 function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
@@ -815,10 +1246,10 @@ function TabBar({
     margin: '0 16px 16px',
     marginBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
     borderRadius: 34,
-    border: '1px solid color-mix(in srgb, #ffffff 70%, transparent)',
+    border: '1px solid var(--glass-hairline)',
     boxShadow: '0 16px 40px rgba(22, 19, 14, 0.14)',
     padding: 8,
-    background: 'color-mix(in srgb, var(--surface) 60%, transparent)',
+    background: 'var(--glass-bar)',
     backdropFilter: 'blur(28px)',
     WebkitBackdropFilter: 'blur(28px)'
   } : {
@@ -840,7 +1271,7 @@ function TabBar({
   }, rest), items.map(it => {
     const isActive = it.key === active;
     const color = isActive ? 'var(--accent)' : 'var(--text-faint)';
-    const activeBg = floating ? 'color-mix(in srgb, #ffffff 55%, transparent)' : 'var(--surface)';
+    const activeBg = floating ? 'var(--glass-pill)' : 'var(--surface)';
     return /*#__PURE__*/React.createElement("button", {
       key: it.key,
       type: "button",
@@ -865,7 +1296,7 @@ function TabBar({
         borderRadius: 28,
         color,
         background: isActive ? activeBg : 'transparent',
-        border: `1px solid ${isActive && floating ? 'color-mix(in srgb, #ffffff 50%, transparent)' : 'transparent'}`,
+        border: `1px solid ${isActive && floating ? 'var(--glass-pill-border)' : 'transparent'}`,
         boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
         transition: 'background var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), color var(--dur-fast) var(--ease-out)'
       }
@@ -2004,85 +2435,6 @@ function ScorePrediction({
 Object.assign(__ds_scope, { BonusToggle, ScorePrediction });
 })(); } catch (e) { __ds_ns.__errors.push({ path: "components/rugby/ScorePrediction.jsx", error: String((e && e.message) || e) }); }
 
-// uploads/trycast-colors.ts
-try { (() => {
-/**
- * TryCast — tokens de couleur (Direction B · Grenat)
- * À importer dans tailwind.config.{js,ts} sous theme.extend.colors,
- * ou à consommer directement en TS.
- */
-
-const palette = {
-  green: {
-    900: '#0E3320',
-    // fond le plus profond / pressé
-    800: '#14432A',
-    // vert marque (surfaces sombres, brand)
-    700: '#1C5638',
-    // surface élevée (dark)
-    600: '#26694A' // vert clair (bordures dark, accents discrets)
-  },
-  grenat: {
-    600: '#C82E52',
-    // accent pressé
-    500: '#E63E63',
-    // ACCENT — l'étincelle (CTA, live, prono sélectionné)
-    400: '#F06485' // accent survol / clair (traîne du logo)
-  },
-  cream: {
-    DEFAULT: '#F1EBDD',
-    // papier / fond clair
-    200: '#E7DFCC' // surface crème plus profonde, séparateurs
-  },
-  ink: {
-    900: '#16130E',
-    // texte principal sur clair (noir chaud)
-    600: '#5A5245',
-    // texte secondaire
-    400: '#8A8071' // texte discret / placeholders
-  }
-};
-
-/** Rôles sémantiques par thème — mappe ces valeurs à tes classes. */
-const theme = {
-  light: {
-    bg: palette.cream.DEFAULT,
-    surface: '#FBF7EF',
-    border: palette.cream[200],
-    text: palette.ink[900],
-    textMuted: palette.ink[600],
-    brand: palette.green[800],
-    accent: palette.grenat[500]
-  },
-  dark: {
-    bg: palette.green[900],
-    surface: palette.green[800],
-    border: palette.green[700],
-    text: palette.cream.DEFAULT,
-    textMuted: '#A9C0B2',
-    brand: palette.cream.DEFAULT,
-    accent: palette.grenat[500]
-  }
-};
-
-/**
- * Extrait pour tailwind.config.ts :
- *
- * import { palette } from './src/theme/colors';
- * export default {
- *   theme: { extend: { colors: {
- *     brand:  palette.green,
- *     accent: palette.grenat,
- *     cream:  palette.cream,
- *     ink:    palette.ink,
- *   } } },
- * };
- *
- * → bg-brand-800, text-accent-500, border-cream-200, text-ink-900, etc.
- */
-Object.assign(__ds_scope, { palette, theme });
-})(); } catch (e) { __ds_ns.__errors.push({ path: "uploads/trycast-colors.ts", error: String((e && e.message) || e) }); }
-
 __ds_ns.Avatar = __ds_scope.Avatar;
 
 __ds_ns.Badge = __ds_scope.Badge;
@@ -2095,6 +2447,8 @@ __ds_ns.IconButton = __ds_scope.IconButton;
 
 __ds_ns.Input = __ds_scope.Input;
 
+__ds_ns.LeagueSelector = __ds_scope.LeagueSelector;
+
 __ds_ns.SegmentedControl = __ds_scope.SegmentedControl;
 
 __ds_ns.Skeleton = __ds_scope.Skeleton;
@@ -2102,6 +2456,8 @@ __ds_ns.Skeleton = __ds_scope.Skeleton;
 __ds_ns.EmptyState = __ds_scope.EmptyState;
 
 __ds_ns.Toast = __ds_scope.Toast;
+
+__ds_ns.DateSelector = __ds_scope.DateSelector;
 
 __ds_ns.Header = __ds_scope.Header;
 

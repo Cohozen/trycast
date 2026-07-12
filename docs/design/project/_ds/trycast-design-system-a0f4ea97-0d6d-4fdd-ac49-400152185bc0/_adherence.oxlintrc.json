@@ -19,8 +19,7 @@
               "components/core/**",
               "components/feedback/**",
               "components/navigation/**",
-              "components/rugby/**",
-              "uploads/**"
+              "components/rugby/**"
             ],
             "message": "Import design-system components from 'index.js', not component internals."
           }
@@ -90,6 +89,10 @@
         "message": "<CompetitionBadge> size must be one of 'sm' | 'md'."
       },
       {
+        "selector": "JSXOpeningElement[name.name='DateSelectorDay'] > JSXAttribute > JSXIdentifier[name!=/^(?:date|weekday|day|hasMatch|disabled|key|ref|className|style|children)$/]",
+        "message": "<DateSelectorDay> doesn't accept that prop. Declared props: date, weekday, day, hasMatch, disabled."
+      },
+      {
         "selector": "JSXOpeningElement[name.name='EmptyState'] > JSXAttribute > JSXIdentifier[name!=/^(?:icon|title|message|action|style|key|ref|className|style|children)$/]",
         "message": "<EmptyState> doesn't accept that prop. Declared props: icon, title, message, action, style."
       },
@@ -116,6 +119,10 @@
       {
         "selector": "JSXOpeningElement[name.name='Input'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|value|placeholder|helper|error|disabled|type|leadingIcon|trailing|onChange|style|key|ref|className|style|children)$/]",
         "message": "<Input> doesn't accept that prop. Declared props: label, value, placeholder, helper, error, disabled, type, leadingIcon, trailing, onChange, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='League'] > JSXAttribute > JSXIdentifier[name!=/^(?:id|name|memberCount|avatarSrc|key|ref|className|style|children)$/]",
+        "message": "<League> doesn't accept that prop. Declared props: id, name, memberCount, avatarSrc."
       },
       {
         "selector": "JSXOpeningElement[name.name='MatchTeam'] > JSXAttribute > JSXIdentifier[name!=/^(?:abbr|name|color|score|key|ref|className|style|children)$/]",
@@ -194,6 +201,9 @@
       "CompetitionBadge": {
         "replaces": []
       },
+      "DateSelectorDay": {
+        "replaces": []
+      },
       "EmptyState": {
         "replaces": []
       },
@@ -204,6 +214,9 @@
         "replaces": []
       },
       "Input": {
+        "replaces": []
+      },
+      "League": {
         "replaces": []
       },
       "MatchTeam": {
@@ -249,6 +262,12 @@
       "--caption-lh",
       "--caption-size",
       "--caption-track",
+      "--char-600",
+      "--char-700",
+      "--char-800",
+      "--char-850",
+      "--char-900",
+      "--char-950",
       "--cream",
       "--cream-100",
       "--cream-200",
@@ -269,7 +288,13 @@
       "--fw-medium",
       "--fw-regular",
       "--fw-semibold",
+      "--glass-bar",
+      "--glass-hairline",
+      "--glass-pill",
+      "--glass-pill-border",
       "--glow-accent",
+      "--green-400",
+      "--green-500",
       "--green-600",
       "--green-700",
       "--green-800",
@@ -293,12 +318,20 @@
       "--overline-lh",
       "--overline-size",
       "--overline-track",
+      "--paper-100",
+      "--paper-300",
+      "--paper-500",
       "--radius-lg",
       "--radius-md",
       "--radius-pill",
       "--radius-sm",
       "--radius-xl",
       "--radius-xs",
+      "--sand-050",
+      "--sand-100",
+      "--sand-150",
+      "--sand-200",
+      "--sand-300",
       "--shadow-lg",
       "--shadow-md",
       "--shadow-sm",
@@ -330,15 +363,31 @@
       "--green-800": "color",
       "--green-700": "color",
       "--green-600": "color",
+      "--green-500": "color",
+      "--green-400": "color",
       "--grenat-600": "color",
       "--grenat-500": "color",
       "--grenat-400": "color",
-      "--cream": "color",
-      "--cream-100": "color",
-      "--cream-200": "color",
+      "--sand-050": "color",
+      "--sand-100": "color",
+      "--sand-150": "color",
+      "--sand-200": "color",
+      "--sand-300": "color",
+      "--char-950": "color",
+      "--char-900": "color",
+      "--char-850": "color",
+      "--char-800": "color",
+      "--char-700": "color",
+      "--char-600": "color",
       "--ink-900": "color",
       "--ink-600": "color",
       "--ink-400": "color",
+      "--paper-100": "color",
+      "--paper-300": "color",
+      "--paper-500": "color",
+      "--cream": "color",
+      "--cream-100": "color",
+      "--cream-200": "color",
       "--mist-300": "color",
       "--status-live": "color",
       "--success-500": "color",
@@ -359,6 +408,10 @@
       "--accent-press": "color",
       "--on-accent": "color",
       "--focus-ring": "color",
+      "--glass-bar": "color",
+      "--glass-hairline": "color",
+      "--glass-pill": "color",
+      "--glass-pill-border": "color",
       "--font-display": "font",
       "--font-body": "font",
       "--fw-regular": "font",

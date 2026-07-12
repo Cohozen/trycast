@@ -24,18 +24,21 @@
       --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: var(--cream);
       --focus-ring: var(--grenat-500);
       --shadow-sm: 0 1px 2px rgba(22,19,14,0.06); --shadow-md: 0 4px 14px rgba(22,19,14,0.08); --shadow-lg: 0 12px 32px rgba(22,19,14,0.12);
+      /* Floating TabBar glass: re-derive the bar hairline + pill border from the
+         warm --border ramp instead of the DS's raw #ffffff mixes, so the bar edge
+         stays coherent with every other surface border on the cream theme. */
+      --glass-hairline: color-mix(in srgb, var(--border-strong) 85%, transparent);
+      --glass-pill: color-mix(in srgb, var(--surface) 82%, transparent);
+      --glass-pill-border: color-mix(in srgb, var(--border-strong) 90%, transparent);
+    }
+    /* Dark theme is the DS v2 warm-charcoal surface set; re-derive the bar hairline
+       from --border-strong so the edge matches the charcoal border ramp (the DS's
+       accent-tinted --glass-pill / --glass-pill-border for the selected tab stay). */
+    [data-theme="dark"] {
+      --glass-hairline: color-mix(in srgb, var(--border-strong) 92%, transparent);
     }
     .tc-scroll::-webkit-scrollbar { width: 0; height: 0; }
     @keyframes tc-live { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-    /* Dark mode isn't defined for the DS floating TabBar: it hardcodes white (#ffffff)
-       glass, which reads as cream on the green dark surface. Retint it green here. */
-    [data-theme="dark"] .tc-tabbar-wrap nav {
-      border-color: color-mix(in srgb, var(--green-600) 60%, transparent) !important;
-    }
-    [data-theme="dark"] .tc-tabbar-wrap span[style*="rgb(255, 255, 255) 55%"] {
-      background: color-mix(in srgb, var(--green-700) 72%, transparent) !important;
-      border-color: color-mix(in srgb, var(--green-600) 70%, transparent) !important;
-    }
   </style>
 </helmet>
 <div data-theme="{{ theme }}" style="position: relative; width: 390px; height: 844px; font-family: var(--font-body); background: var(--bg); color: var(--text); border-radius: 46px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column;">

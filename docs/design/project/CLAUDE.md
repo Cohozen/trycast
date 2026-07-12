@@ -1,6 +1,6 @@
 # TryCast — notes projet
 
 ## Design system (TryCast, namespace `TryCastDesignSystem_a0f4ea`)
-- Le mode **dark** (thème vert, `--surface: var(--green-800)`, etc.) n'est PAS entièrement pris en charge par tous les composants du DS.
-- En particulier, le **`TabBar` variante flottante** code en dur du blanc (`#ffffff`) pour le verre du bar, la pastille active et ses bordures. En dark mode ça vire au crème/blanc au lieu de rester cohérent avec les tons verts. → Retinter en tons verts (`--green-600`/`--green-700`) côté écran quand on est en dark.
-- Règle générale : rester cohérent avec les tons **verts** en dark mode ; le crème est réservé au thème light (papier).
+- Le DS est en **v2** : surfaces neutres chaudes. Thème **light** = sable/crème (`--surface` clair), thème **dark** = **charbon chaud** (`--surface: var(--char-850)`), PAS vert. Le vert est la **marque** (`--brand`), le grenat est le **spark** (`--accent` : CTA, live, sélection).
+- Le **`TabBar` flottant** utilise des tokens de verre théma-aware : `--glass-bar`, `--glass-hairline`, `--glass-pill`, `--glass-pill-border`. En light ils sont basés sur `#ffffff` (verre blanc) ; en dark, `--glass-hairline` est une hairline claire et `--glass-pill`/`--glass-pill-border` sont teintés **accent** (grenat) pour l'onglet actif.
+- Pour garder les **bordures du TabBar cohérentes avec les tokens**, on redéfinit `--glass-hairline`/`--glass-pill-border` à partir de la rampe `--border-strong` par thème, côté écran (voir `MesMatchs.dc.html`) — ne pas hardcoder de couleur verte.

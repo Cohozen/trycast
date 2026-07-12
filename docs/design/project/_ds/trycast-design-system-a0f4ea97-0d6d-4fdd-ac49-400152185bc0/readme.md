@@ -51,7 +51,7 @@ The brief was to build the **design system foundations + components** — not ap
 
 React components, styled entirely with the CSS custom properties from `styles.css`. Import via `const { X } = window.<Namespace>` in card HTML (run `check_design_system` for the namespace).
 
-**Core** (`components/core/`): `Button`, `IconButton`, `Input`, `Chip`, `Badge`, `Avatar`, `SegmentedControl`, `Skeleton` **Navigation** (`components/navigation/`): `Header`, `TabBar` **Feedback** (`components/feedback/`): `Toast`, `EmptyState` **Rugby — the core** (`components/rugby/`): `MatchCard`, `ScorePrediction` (+ `BonusToggle`), `ScoreStepper`, `RankingRow`, `CompetitionBadge`, `TeamFlag`
+**Core** (`components/core/`): `Button`, `IconButton`, `Input`, `Chip`, `Badge`, `Avatar`, `SegmentedControl`, `LeagueSelector`, `Skeleton` **Navigation** (`components/navigation/`): `Header`, `TabBar`, `DateSelector` (match-day strip) **Feedback** (`components/feedback/`): `Toast`, `EmptyState` **Rugby — the core** (`components/rugby/`): `MatchCard`, `ScorePrediction` (+ `BonusToggle`), `ScoreStepper`, `RankingRow`, `CompetitionBadge`, `TeamFlag`
 
 Each component ships a `.jsx` implementation, a `.d.ts` props contract, and a `.prompt.md` usage note. `Button`, `MatchCard`, `ScorePrediction`, and `RankingRow` are also exposed as **Starting Points**.
 
