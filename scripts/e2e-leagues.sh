@@ -39,6 +39,15 @@ LID=$(curl -s "$URL/rest/v1/leagues?invite_code=eq.E2ETEST2&select=id" \
 COMP=$(curl -s "$URL/rest/v1/competitions?slug=eq.e2e-test&select=id" \
   -H "apikey: $KEY" -H "Authorization: Bearer $T1" |
   python3 -c 'import json,sys; print(json.load(sys.stdin)[0]["id"])')
+# Les deux matchs seedés (seed-test-predictions.sql) : passé = pronos visibles,
+# futur = masqués par la RPC get_match_league_predictions
+M_PASSE=$(curl -s "$URL/rest/v1/matches?api_game_id=eq.-102&select=id" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" |
+  python3 -c 'import json,sys; print(json.load(sys.stdin)[0]["id"])') ||
+  fail "match passé -102 introuvable (seed predictions manquant ?)"
+M_FUTUR=$(curl -s "$URL/rest/v1/matches?api_game_id=eq.-101&select=id" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" |
+  python3 -c 'import json,sys; print(json.load(sys.stdin)[0]["id"])')
 ok "ligue de test visible par son owner"
 
 # RLS : un non-membre ne voit aucune ligue…
@@ -50,6 +59,15 @@ RES=$(curl -s "$URL/rest/v1/leagues?invite_code=eq.E2ETEST2&select=id" \
   -H "apikey: $KEY" -H "Authorization: Bearer $T2")
 [ "$RES" = "[]" ] || fail "anti-énumération par code (attendu [], obtenu $RES)"
 ok "ligue invisible pour un non-membre, même par code"
+
+# Pronos de ligue : un non-membre n'obtient rien, même sur un match passé
+# (anti-énumération silencieuse, comme le leaderboard)
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/get_match_league_predictions" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T2" \
+  -H "Content-Type: application/json" \
+  -d "{\"p_match_id\":\"$M_PASSE\",\"p_league_id\":\"$LID\"}")
+[ "$RES" = "[]" ] || fail "pronos de ligue pour un non-membre (attendu [], obtenu $RES)"
+ok "pronos de ligue invisibles pour un non-membre"
 
 # Grants : insert direct refusé (création/adhésion = RPC uniquement)
 RES=$(curl -s -X POST "$URL/rest/v1/leagues" \
@@ -97,6 +115,37 @@ COUNT=$(curl -s -X POST "$URL/rest/v1/rpc/get_league_leaderboard" \
   python3 -c 'import json,sys; print(len(json.load(sys.stdin)))')
 [ "$COUNT" = "2" ] || fail "leaderboard ligue (attendu 2 rows, obtenu $COUNT)"
 ok "ligue et classement de ligue visibles pour le nouveau membre"
+
+# Pronos de ligue, match passé : user2 (membre) voit le prono 10-5 de user1
+# ET sa propre ligne sans prono (left join → champs null, décision 2026-07-13)
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/get_match_league_predictions" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T2" \
+  -H "Content-Type: application/json" \
+  -d "{\"p_match_id\":\"$M_PASSE\",\"p_league_id\":\"$LID\"}")
+echo "$RES" | python3 -c "
+import json, sys
+rows = json.load(sys.stdin)
+assert len(rows) == 2, f'attendu 2 lignes (membres), obtenu {len(rows)}'
+by_user = {r['user_id']: r for r in rows}
+u1, u2 = by_user['$U1'], by_user['$U2']
+assert (u1['predicted_home_score'], u1['predicted_away_score']) == (10, 5), u1
+assert u2['predicted_home_score'] is None, u2
+" || fail "pronos de ligue après kickoff ($RES)"
+ok "pronos de ligue visibles après kickoff (prono de user1 + ligne vide de user2)"
+
+# Match futur : user1 pose un prono (autorisé avant kickoff), la RPC ne doit
+# RIEN renvoyer avant le coup d'envoi — pas même des lignes masquées
+curl -s -X POST "$URL/rest/v1/predictions" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" \
+  -H "Prefer: resolution=merge-duplicates" \
+  -d "{\"user_id\":\"$U1\",\"match_id\":\"$M_FUTUR\",\"predicted_home_score\":21,\"predicted_away_score\":14}" > /dev/null
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/get_match_league_predictions" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T2" \
+  -H "Content-Type: application/json" \
+  -d "{\"p_match_id\":\"$M_FUTUR\",\"p_league_id\":\"$LID\"}")
+[ "$RES" = "[]" ] || fail "masquage avant kickoff (attendu [], obtenu $RES)"
+ok "pronos de ligue masqués avant le kickoff"
 
 # RPC create_league : code généré conforme ; nom invalide → 23514
 RES=$(curl -s -X POST "$URL/rest/v1/rpc/create_league" \
@@ -156,7 +205,11 @@ RES=$(curl -s -X POST "$URL/rest/v1/rpc/get_global_leaderboard" \
   -H "apikey: $KEY" -H "Content-Type: application/json" \
   -d "{\"p_competition_id\":\"$COMP\"}")
 echo "$RES" | grep -q '42501' || fail "leaderboard anonyme (attendu 42501, obtenu $RES)"
-ok "leaderboards refusés en anonyme"
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/get_match_league_predictions" \
+  -H "apikey: $KEY" -H "Content-Type: application/json" \
+  -d "{\"p_match_id\":\"$M_PASSE\",\"p_league_id\":\"$LID\"}")
+echo "$RES" | grep -q '42501' || fail "pronos de ligue anonyme (attendu 42501, obtenu $RES)"
+ok "leaderboards et pronos de ligue refusés en anonyme"
 
 echo
 echo "Tous les tests E2E ligues sont passés."
