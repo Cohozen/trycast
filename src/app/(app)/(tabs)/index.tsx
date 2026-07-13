@@ -10,8 +10,10 @@ import { useSession } from '@/features/auth/session-context';
 import { useGlobalLeaderboard } from '@/features/leagues/use-global-leaderboard';
 import { useMyLeagues } from '@/features/leagues/use-my-leagues';
 import { useMyStanding } from '@/features/leagues/use-my-standing';
+import { LiveMatchCard } from '@/features/matches/components/live-match-card';
 import type { MatchWithTeams } from '@/features/matches/types';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
+import { useLiveMatches } from '@/features/matches/use-live-matches';
 import { useMatches } from '@/features/matches/use-matches';
 import { PredictionCard } from '@/features/predictions/components/prediction-card';
 import { splitMatches } from '@/features/predictions/split-matches';
@@ -71,6 +73,7 @@ export default function MatchesScreen() {
 
     const competition = useActiveCompetition();
     const matches = useMatches(competition.data?.id);
+    const liveMatches = useLiveMatches(competition.data?.id);
     const predictions = useMyPredictions(competition.data?.id);
     const distributions = useCommunityDistributions(competition.data?.id);
     const myLeagues = useMyLeagues();
@@ -149,6 +152,17 @@ export default function MatchesScreen() {
     // date soient des enfants directs du ScrollView.
     const listChildren: ReactNode[] = [];
     const stickyIndices: number[] = [];
+
+    // Carte(s) LIVE en tête (vide tant que sync-live n'est pas activé).
+    for (const match of liveMatches.data ?? []) {
+        listChildren.push(
+            <LiveMatchCard
+                key={`live-${match.id}`}
+                match={match}
+                prediction={predictions.data?.get(match.id)}
+            />,
+        );
+    }
 
     if (hasLeagues) {
         listChildren.push(

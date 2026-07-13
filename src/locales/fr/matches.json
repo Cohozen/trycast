@@ -32,5 +32,18 @@
         "postponed": "Reporté",
         "cancelled": "Annulé"
     },
+    "live": {
+        "badge": "En direct",
+        "delayNote": "Score légèrement différé",
+        "yourPrediction": "Ton prono : {{home}}–{{away}}",
+        "periods": {
+            "firstHalf": "1re mi-temps",
+            "halfTime": "Mi-temps",
+            "secondHalf": "2e mi-temps",
+            "extraTime": "Prolongation",
+            "breakTime": "Pause",
+            "penalties": "Tirs au but"
+        }
+    },
     "teamTbd": "À déterminer"
 }
