@@ -31,7 +31,8 @@ Un composant **réutilisable** (multi-domaines) va dans `src/components/` (primi
 
 ## Écrans (Expo Router, `src/app/`)
 
-- Groupes `(auth)` et `(app)` ; onglets dans `src/app/(app)/(tabs)/`. Routes dynamiques : `src/app/(app)/<domaine>/[id].tsx`, actions dédiées `create.tsx` / `join.tsx`.
+- Groupes `(auth)` et `(app)` ; onglets dans `src/app/(app)/(tabs)/`. Routes dynamiques : `src/app/(app)/<domaine>/[id].tsx`, actions dédiées `create.tsx` / `join.tsx`. Écran hors-tabs avec header natif : le déclarer dans `src/app/(app)/_layout.tsx` (`headerShown: true` + `title` i18n) — le back label vient du `title` de l'écran précédent (d'où `title: ''` sur `(tabs)`).
+- ⚠️ **Routes typées** (vécu 2026-07-13) : après ajout d'une route, `router.push('/nouvelle-route')` casse `tsc` tant que `.expo/types/router.d.ts` (gitignoré, la CI n'est pas affectée) n'est pas régénéré — il n'y a pas de commande dédiée : lancer `npx expo start` quelques secondes (boucle `grep` sur le fichier) puis tuer Metro.
 - L'écran monte `const { t } = useTranslation(['<ns>', 'common'])` et affiche `t(to<Domaine>MessageKey(error))` sur échec. Le client n'est qu'une UX : jamais de règle de sécurité côté client, la RLS tranche.
 - Vérifier chaque écran en **light et dark** (les tokens basculent seuls, mais un oubli de token se voit tout de suite en dark).
 
