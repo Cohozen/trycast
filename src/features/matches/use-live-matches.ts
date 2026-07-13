@@ -1,12 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 
+import { MATCH_WITH_TEAMS } from '@/features/matches/match-select';
 import type { MatchWithTeams } from '@/features/matches/types';
 import { supabase } from '@/lib/supabase';
-
-// Mêmes embeds équipes que useMatches (hints FK obligatoires).
-const MATCH_WITH_TEAMS = `*,
-    home_team:teams!matches_home_team_id_fkey(*),
-    away_team:teams!matches_away_team_id_fkey(*)`;
 
 /**
  * Matchs en cours d'une compétition avec un score live écrit par l'EF
