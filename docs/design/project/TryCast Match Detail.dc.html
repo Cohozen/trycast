@@ -140,41 +140,6 @@
                   </div>
                 </div>
 
-                <!-- ===== TIMELINE (live / terminé) ===== -->
-                <sc-if value="{{ f.showTimeline }}" hint-placeholder-val="{{ false }}">
-                  <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                      <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text);">Déroulé du match</span>
-                      <sc-if value="{{ f.timelineLiveTag }}" hint-placeholder-val="{{ false }}"><span style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: var(--accent);"><span style="width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: tc-live 1.4s ease-in-out infinite;"></span>{{ f.liveMinuteText }}</span></sc-if>
-                    </div>
-
-                    <!-- empty timeline -->
-                    <sc-if value="{{ f.emptyTimeline }}" hint-placeholder-val="{{ false }}">
-                      <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 24px 16px; border: 1px dashed var(--border-strong); border-radius: var(--radius-md);">
-                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
-                        <span style="font-size: 13px; color: var(--text-muted); text-wrap: pretty; max-width: 240px;">Le déroulé détaillé n'est pas disponible pour cette compétition. Le score reste à jour ci-dessus.</span>
-                      </div>
-                    </sc-if>
-
-                    <!-- events -->
-                    <sc-if value="{{ f.hasEvents }}" hint-placeholder-val="{{ true }}">
-                      <div style="display: flex; flex-direction: column; gap: 2px; position: relative;">
-                        <sc-for list="{{ f.events }}" as="ev" hint-placeholder-count="6">
-                          <div style="display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border);">
-                            <span style="flex: none; width: 30px; text-align: right; font-family: var(--font-body); font-weight: 700; font-size: 12px; color: var(--text-faint); font-variant-numeric: tabular-nums;">{{ ev.minute }}</span>
-                            <span style="flex: none; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: {{ ev.iconBg }}; color: {{ ev.iconColor }};">{{ ev.icon }}</span>
-                            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;">
-                              <span style="font-size: 13px; font-weight: 600; color: var(--text);">{{ ev.label }} · <span style="color: {{ ev.teamColor }}; font-weight: 700;">{{ ev.abbr }}</span></span>
-                              <span style="font-size: 12px; color: var(--text-muted);">{{ ev.scorer }}</span>
-                            </div>
-                            <span style="flex: none; font-family: var(--font-body); font-weight: 700; font-size: 13px; color: var(--text-muted); font-variant-numeric: tabular-nums;">{{ ev.runScore }}</span>
-                          </div>
-                        </sc-for>
-                      </div>
-                    </sc-if>
-                  </div>
-                </sc-if>
-
                 <!-- ===== MON PRONO ===== -->
                 <div style="display: flex; flex-direction: column; gap: 12px;">
                   <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
@@ -519,55 +484,6 @@ class Component extends DCLogic {
     const odds = { home: '1,75', draw: '21', away: '2,10' };
     const competitionLine = 'Tournoi des 6 Nations · Journée 2';
 
-    // timeline events with running score; liveTo marks the live cutoff index
-    const allEvents = [
-      { minute: "8'", type: 'try',    team: FRA, label: 'Essai',          scorer: 'A. Dupont',   hs: 5,  as: 0 },
-      { minute: "9'", type: 'conv',   team: FRA, label: 'Transformation', scorer: 'T. Ramos',    hs: 7,  as: 0 },
-      { minute: "22'", type: 'pen',   team: IRL, label: 'Pénalité',       scorer: 'J. Crowley',  hs: 7,  as: 3 },
-      { minute: "31'", type: 'try',   team: FRA, label: 'Essai',          scorer: 'D. Penaud',   hs: 12, as: 3 },
-      { minute: "33'", type: 'conv',  team: FRA, label: 'Transformation', scorer: 'T. Ramos',    hs: 14, as: 3 },
-      { minute: "39'", type: 'try',   team: IRL, label: 'Essai',          scorer: 'J. Lowe',     hs: 14, as: 8 },
-      { minute: "41'", type: 'conv',  team: IRL, label: 'Transformation', scorer: 'J. Crowley',  hs: 14, as: 10 },
-      { minute: "45'", type: 'pen',   team: FRA, label: 'Pénalité',       scorer: 'T. Ramos',    hs: 17, as: 10 },
-      { minute: "57'", type: 'pen',   team: IRL, label: 'Pénalité',       scorer: 'J. Crowley',  hs: 17, as: 13 },
-      { minute: "63'", type: 'try',   team: FRA, label: 'Essai',          scorer: 'L. Bielle-Biarrey', hs: 22, as: 13 },
-      { minute: "65'", type: 'conv',  team: FRA, label: 'Transformation', scorer: 'T. Ramos',    hs: 24, as: 13 },
-      { minute: "70'", type: 'yellow',team: IRL, label: 'Carton jaune',   scorer: 'C. Doris',    hs: 24, as: 13 },
-      { minute: "74'", type: 'try',   team: FRA, label: 'Essai',          scorer: 'D. Penaud',   hs: 29, as: 13 },
-      { minute: "79'", type: 'try',   team: IRL, label: 'Essai',          scorer: 'M. Hansen',   hs: 29, as: 18 },
-    ];
-    const liveCount = 9; // events up to 57'
-
-    const iconFor = (type) => {
-      // small linear glyph, 12px
-      const svg = (children) => E('svg', { width: 12, height: 12, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }, children);
-      if (type === 'try') return svg([E('ellipse', { key: 1, cx: 12, cy: 12, rx: 9, ry: 6, transform: 'rotate(-30 12 12)' }), E('path', { key: 2, d: 'M9 15l6-6' })]);
-      if (type === 'conv') return svg([E('path', { key: 1, d: 'M6 21V9' }), E('path', { key: 2, d: 'M18 21V9' }), E('path', { key: 3, d: 'M4 9h16' })]);
-      if (type === 'pen') return svg([E('path', { key: 1, d: 'M12 3v13' }), E('path', { key: 2, d: 'M12 3l7 3-7 3' })]);
-      if (type === 'yellow') return svg([E('rect', { key: 1, x: 7, y: 4, width: 10, height: 16, rx: 2 })]);
-      return svg([E('circle', { key: 1, cx: 12, cy: 12, r: 8 })]);
-    };
-    const iconColorFor = (type) => {
-      if (type === 'try') return { iconBg: 'color-mix(in srgb, var(--brand) 14%, transparent)', iconColor: 'var(--brand)' };
-      if (type === 'yellow') return { iconBg: 'color-mix(in srgb, var(--warning-500) 20%, transparent)', iconColor: 'var(--warning-500)' };
-      return { iconBg: 'var(--surface-sunken)', iconColor: 'var(--text-muted)' };
-    };
-
-    const buildEvents = (upTo) => allEvents.slice(0, upTo).slice().reverse().map((ev) => {
-      const ic = iconColorFor(ev.type);
-      return {
-        minute: ev.minute,
-        label: ev.label,
-        abbr: ev.team.abbr,
-        teamColor: ev.team.color,
-        scorer: ev.scorer,
-        runScore: ev.hs + '–' + ev.as,
-        icon: iconFor(ev.type),
-        iconBg: ic.iconBg,
-        iconColor: ic.iconColor,
-      };
-    });
-
     // my prono (fixed for locked/live/finished)
     const myFixed = { home: 24, away: 18, bonusHome: true, bonusAway: false };
 
@@ -639,7 +555,6 @@ class Component extends DCLogic {
       { id: 'fin_d',  theme: 'dark',  status: 'finished', label: 'Terminé · sombre',       dotColor: '#14432A' },
       { id: 'noleag', theme: 'light', status: 'finished', label: 'Terminé · 0 ligue (CTA)', dotColor: '#8A8071', variant: 'no-league' },
       { id: 'load',   theme: 'light', status: 'finished', label: 'Chargement (skeleton)',  dotColor: '#8A8071', variant: 'loading' },
-      { id: 'noevt',  theme: 'dark',  status: 'live',     label: 'Live · déroulé vide',    dotColor: '#8A8071', variant: 'empty-timeline' },
     ];
 
     const chipFor = (status) => {
@@ -650,7 +565,6 @@ class Component extends DCLogic {
 
     const frames = frameDefs.map((fd) => {
       const isLoading = fd.variant === 'loading';
-      const emptyTimeline = fd.variant === 'empty-timeline';
       const noLeague = fd.variant === 'no-league';
       const status = fd.status;
       this.ensure(fd.id);
@@ -662,9 +576,6 @@ class Component extends DCLogic {
       const scoreStr = (status === 'finished' ? finalHome + ' – ' + finalAway : liveHome + ' – ' + liveAway);
       const winner = hs > as ? 'home' : (hs < as ? 'away' : 'draw');
 
-      // timeline
-      const showTimeline = status === 'live' || status === 'finished';
-      const events = emptyTimeline ? [] : buildEvents(status === 'finished' ? allEvents.length : liveCount);
 
       // mon prono
       const pronoEditable = status === 'upcoming';
@@ -872,11 +783,6 @@ class Component extends DCLogic {
         competitionLine,
         odds,
 
-        showTimeline, emptyTimeline,
-        timelineLiveTag: status === 'live' && !emptyTimeline,
-        liveMinuteText: 'Live ' + liveMin,
-        hasEvents: showTimeline && !emptyTimeline,
-        events,
 
         pronoEditable, pronoReadonly, pronoReconciled,
         pronoValue: this.state.preds[fd.id],
