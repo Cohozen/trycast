@@ -28,6 +28,10 @@ function match(id: string, kickoffAt: string, status: MatchWithTeams['status']):
         tries_missing: false,
         needs_review: false,
         scored_at: null,
+        live_home_score: null,
+        live_away_score: null,
+        live_period: null,
+        live_updated_at: null,
     };
 }
 

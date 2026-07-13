@@ -161,6 +161,10 @@ export type Database = {
                     home_tries: number | null;
                     id: string;
                     kickoff_at: string;
+                    live_away_score: number | null;
+                    live_home_score: number | null;
+                    live_period: string | null;
+                    live_updated_at: string | null;
                     needs_review: boolean;
                     odds_away: number | null;
                     odds_captured_at: string | null;
@@ -183,6 +187,10 @@ export type Database = {
                     home_tries?: number | null;
                     id?: string;
                     kickoff_at: string;
+                    live_away_score?: number | null;
+                    live_home_score?: number | null;
+                    live_period?: string | null;
+                    live_updated_at?: string | null;
                     needs_review?: boolean;
                     odds_away?: number | null;
                     odds_captured_at?: string | null;
@@ -205,6 +213,10 @@ export type Database = {
                     home_tries?: number | null;
                     id?: string;
                     kickoff_at?: string;
+                    live_away_score?: number | null;
+                    live_home_score?: number | null;
+                    live_period?: string | null;
+                    live_updated_at?: string | null;
                     needs_review?: boolean;
                     odds_away?: number | null;
                     odds_captured_at?: string | null;
