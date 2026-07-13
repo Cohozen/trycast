@@ -15,7 +15,9 @@ export default function AppLayout() {
 
     return (
         <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(tabs)" />
+            {/* title vide : le back natif des écrans poussés affiche juste le
+                chevron, pas le nom technique « (tabs) » */}
+            <Stack.Screen name="(tabs)" options={{ title: '' }} />
             <Stack.Screen name="settings" />
             <Stack.Screen
                 name="league/create"
