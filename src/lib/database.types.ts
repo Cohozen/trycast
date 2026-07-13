@@ -385,18 +385,21 @@ export type Database = {
             };
             profiles: {
                 Row: {
+                    avatar_url: string | null;
                     created_at: string;
                     id: string;
                     locale: string | null;
                     username: string;
                 };
                 Insert: {
+                    avatar_url?: string | null;
                     created_at?: string;
                     id: string;
                     locale?: string | null;
                     username: string;
                 };
                 Update: {
+                    avatar_url?: string | null;
                     created_at?: string;
                     id?: string;
                     locale?: string | null;
@@ -562,6 +565,7 @@ export type Database = {
             get_global_leaderboard: {
                 Args: { p_competition_id: string; p_limit?: number; p_offset?: number };
                 Returns: {
+                    avatar_url: string;
                     exact_scores: number;
                     predictions_scored: number;
                     rank: number;
@@ -573,6 +577,7 @@ export type Database = {
             get_league_leaderboard: {
                 Args: { p_league_id: string; p_limit?: number; p_offset?: number };
                 Returns: {
+                    avatar_url: string;
                     exact_scores: number;
                     predictions_scored: number;
                     rank: number;
