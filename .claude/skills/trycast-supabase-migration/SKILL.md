@@ -25,6 +25,13 @@ Schéma **uniquement par migrations** dans `supabase/migrations/`. Jamais d'édi
 - **Piège récursion RLS** : une policy de `league_members` qui interroge `league_members`/`leagues` boucle (« infinite recursion detected in policy »). Utiliser des helpers `security definer` (`is_league_member` / `is_league_owner`) pour casser le cycle — toujours passer par eux dans les policies de ces tables.
 - Contraintes miroir côté client : quand tu ajoutes un `check` (ex. nom 3-40, format code), mets à jour `validation.ts` du domaine.
 
+## Storage (buckets & policies)
+
+- Bucket via `insert into storage.buckets (id, name, public) values (...) on conflict do nothing;` — passe bien en `db push` (contrairement à la crainte fréquente ; les policies sur `storage.objects` aussi, testé le 2026-07-13 sur `avatars`).
+- Policies cloisonnées par utilisateur : `(storage.foldername(name))[1] = (select auth.uid())::text` (chemin `<userId>/fichier`).
+- ⚠️ **Piège upsert/remove (débogué 2026-07-13)** : l'API Storage fait un **SELECT d'existence sous la RLS de l'utilisateur** avant un upload `upsert: true` **et** avant un `remove`. Sans policy **SELECT** « son propre dossier », l'API renvoie `403 "new row violates row-level security policy"` (HTTP 400) — **alors même que les policies INSERT/UPDATE sont correctes** et qu'un INSERT SQL direct sous le même JWT passe. Donc pour un avatar à chemin stable (upsert) : prévoir les 4 policies insert/update/delete/**select**. La lecture publique (bucket `public=true`) passe, elle, par l'URL CDN et court-circuite la RLS — la policy SELECT ne sert qu'aux écritures de l'utilisateur. E2E : `scripts/e2e-avatars.sh`.
+- Suppression directe interdite (`delete from storage.objects` → `storage.protect_delete()`), passer par l'API Storage.
+
 ## Scripts E2E (contre trycast-dev)
 
 Chaque script re-seede son état avant exécution. Ordre de seed cumulatif : users → predictions → (scoring | leagues).
