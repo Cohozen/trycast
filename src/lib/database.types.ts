@@ -598,6 +598,19 @@ export type Database = {
                     username: string;
                 }[];
             };
+            get_match_league_predictions: {
+                Args: { p_league_id: string; p_match_id: string };
+                Returns: {
+                    avatar_url: string;
+                    points_awarded: number;
+                    predicted_away_score: number;
+                    predicted_bonus_off_away: boolean;
+                    predicted_bonus_off_home: boolean;
+                    predicted_home_score: number;
+                    user_id: string;
+                    username: string;
+                }[];
+            };
             get_prediction_distributions: {
                 Args: { p_competition_id: string };
                 Returns: {
