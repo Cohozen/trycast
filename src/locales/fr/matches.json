@@ -45,5 +45,16 @@
             "penalties": "Tirs au but"
         }
     },
+    "detail": {
+        "screenTitle": "Match",
+        "upcoming": "À venir",
+        "kickoff": "Coup d'envoi",
+        "notFound": "Match introuvable.",
+        "singleLeague": "Une seule ligue",
+        "tabs": {
+            "predictions": "Pronos",
+            "leaderboard": "Classement"
+        }
+    },
     "teamTbd": "À déterminer"
 }
