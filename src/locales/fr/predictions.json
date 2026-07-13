@@ -23,6 +23,13 @@
         "bonusHome": "Bonus offensif domicile",
         "bonusAway": "Bonus offensif extérieur"
     },
+    "locked": {
+        "header": "Prono verrouillé"
+    },
+    "masked": {
+        "title": "Pronos masqués",
+        "message": "Les pronos des autres joueurs seront visibles au coup d'envoi. Pas de triche possible."
+    },
     "verdict": {
         "exact": "Score exact",
         "good": "Bon résultat",
