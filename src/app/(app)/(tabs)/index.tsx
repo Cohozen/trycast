@@ -20,7 +20,7 @@ import { splitMatches } from '@/features/predictions/split-matches';
 import { useCommunityDistributions } from '@/features/predictions/use-community-distributions';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
 import { i18n } from '@/lib/i18n';
-import { ScrollView, Text, View } from '@/tw';
+import { Pressable, ScrollView, Text, View } from '@/tw';
 import { useScreenInsets } from '@/tw/use-screen-insets';
 
 type DateGroup = { key: string; label: string; round: string | null; matches: MatchWithTeams[] };
@@ -153,14 +153,17 @@ export default function MatchesScreen() {
     const listChildren: ReactNode[] = [];
     const stickyIndices: number[] = [];
 
-    // Carte(s) LIVE en tête (vide tant que sync-live n'est pas activé).
+    // Carte(s) LIVE en tête (vide tant que sync-live n'est pas activé),
+    // pressables vers la page de détail — seule entrée du lot (décision
+    // 2026-07-13), surface read-only sans risque de mis-tap.
     for (const match of liveMatches.data ?? []) {
         listChildren.push(
-            <LiveMatchCard
+            <Pressable
+                accessibilityRole="button"
                 key={`live-${match.id}`}
-                match={match}
-                prediction={predictions.data?.get(match.id)}
-            />,
+                onPress={() => router.push({ pathname: '/match/[id]', params: { id: match.id } })}>
+                <LiveMatchCard match={match} prediction={predictions.data?.get(match.id)} />
+            </Pressable>,
         );
     }
 
