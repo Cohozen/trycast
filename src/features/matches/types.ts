@@ -10,3 +10,8 @@ export type MatchWithTeams = MatchRow & {
     home_team: TeamRow | null;
     away_team: TeamRow | null;
 };
+
+/** Match complet pour la page de détail : équipes + compétition embarquées. */
+export type MatchDetail = MatchWithTeams & {
+    competition: CompetitionRow | null;
+};

@@ -24,3 +24,10 @@ export type PredictionDistribution = {
 
 /** Distributions indexées par match (RPC batch par compétition). */
 export type DistributionsByMatch = Map<string, PredictionDistribution>;
+
+/**
+ * Prono d'un membre de ligue pour un match (RPC get_match_league_predictions,
+ * uniquement après kickoff). Scores null = membre sans prono (ligne « — »).
+ */
+export type MemberPrediction =
+    Database['public']['Functions']['get_match_league_predictions']['Returns'][number];
