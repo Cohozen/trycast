@@ -7,7 +7,7 @@ import { useActiveCompetition } from '@/features/matches/use-active-competition'
 // Les onglets vivent dans (tabs) ; les écrans ligue sont poussés au-dessus
 // (header natif visible, retour intégré).
 export default function AppLayout() {
-    const { t } = useTranslation(['leagues']);
+    const { t } = useTranslation(['leagues', 'matches']);
     const competition = useActiveCompetition();
     // Un seul channel Realtime pour toute l'app : les écrans classement
     // (général, ligues) n'ont qu'à lire le cache invalidé.
@@ -28,6 +28,10 @@ export default function AppLayout() {
             <Stack.Screen
                 name="league/[id]"
                 options={{ headerShown: true, title: t('leagues:detail.screenTitle') }}
+            />
+            <Stack.Screen
+                name="match/[id]"
+                options={{ headerShown: true, title: t('matches:detail.screenTitle') }}
             />
         </Stack>
     );
