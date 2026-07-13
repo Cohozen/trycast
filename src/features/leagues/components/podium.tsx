@@ -46,7 +46,12 @@ function PodiumColumn({
                 first ? 'max-w-[118px]' : 'max-w-[106px]',
             )}>
             {first ? <Star color={accentColor} fill={accentColor} size={20} /> : null}
-            <Avatar name={entry.username} ring={isMe} size={first ? 'lg' : 'md'} />
+            <Avatar
+                name={entry.username}
+                ring={isMe}
+                size={first ? 'lg' : 'md'}
+                uri={entry.avatar_url}
+            />
             <Text
                 className={cn(
                     'max-w-full text-center text-[12px] text-text',

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { IconButton } from '@/components/ui/icon-button';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Toast } from '@/components/ui/toast';
+import { AvatarEditor } from '@/features/profile/components/avatar-editor';
 import { DeleteAccountModal } from '@/features/profile/components/delete-account-modal';
 import { PasswordEditorModal } from '@/features/profile/components/password-editor-modal';
 import { UsernameEditor } from '@/features/profile/components/username-editor';
@@ -107,6 +108,7 @@ export default function SettingsScreen() {
                 {passwordSaved ? (
                     <Toast message={t('profile:settings.password.updated')} tone="success" />
                 ) : null}
+                <AvatarEditor userId={session?.user.id ?? ''} />
                 <UsernameEditor userId={session?.user.id ?? ''} />
                 <Pressable
                     accessibilityRole="button"

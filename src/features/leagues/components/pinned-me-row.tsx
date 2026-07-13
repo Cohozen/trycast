@@ -6,6 +6,7 @@ import { Text, View } from '@/tw';
 type PinnedMeRowProps = {
     rank: number;
     username: string;
+    avatarUrl?: string | null;
     points: number;
     /** Écart de points avec le joueur juste au-dessus (null si premier). */
     gapToAbove: number | null;
@@ -16,7 +17,7 @@ type PinnedMeRowProps = {
  * scope Général) quand ma ligne est hors du top affiché. Le rang du joueur
  * au-dessus est approximé à rang − 1 (exact hors ex æquo).
  */
-export function PinnedMeRow({ rank, username, points, gapToAbove }: PinnedMeRowProps) {
+export function PinnedMeRow({ rank, username, avatarUrl, points, gapToAbove }: PinnedMeRowProps) {
     const { t } = useTranslation(['leagues']);
 
     return (
@@ -30,7 +31,7 @@ export function PinnedMeRow({ rank, username, points, gapToAbove }: PinnedMeRowP
                         {t('leagues:leaderboard.pinned.rankSuffix')}
                     </Text>
                 </View>
-                <Avatar name={username} ring size="sm" />
+                <Avatar name={username} ring size="sm" uri={avatarUrl} />
                 <View className="min-w-0 flex-1 gap-0.5">
                     <Text className="font-body-bold text-[14px] text-text" numberOfLines={1}>
                         {username}

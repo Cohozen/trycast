@@ -270,6 +270,7 @@ export default function LeaderboardScreen() {
 
             {showPinnedMe && standing.data && myRank.data?.rank != null && profile ? (
                 <PinnedMeRow
+                    avatarUrl={profile.avatar_url}
                     gapToAbove={myRank.data.gapToAbove}
                     points={standing.data.total_points}
                     rank={myRank.data.rank}

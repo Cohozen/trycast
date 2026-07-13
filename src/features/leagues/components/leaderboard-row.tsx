@@ -49,7 +49,7 @@ export function LeaderboardRow({ entry, isMe, tie = false }: LeaderboardRowProps
                     </Text>
                 ) : null}
             </View>
-            <Avatar name={entry.username} ring={isMe} size="sm" />
+            <Avatar name={entry.username} ring={isMe} size="sm" uri={entry.avatar_url} />
             <View className="min-w-0 flex-1 gap-px">
                 <Text
                     className={cn(

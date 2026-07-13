@@ -83,6 +83,14 @@
             "label": "Langue",
             "current": "Français"
         },
+        "avatar": {
+            "label": "Photo de profil",
+            "change": "Changer",
+            "remove": "Supprimer",
+            "errors": {
+                "permission": "Autorise l'accès à tes photos pour choisir une image."
+            }
+        },
         "password": {
             "row": "Mot de passe",
             "rowValue": "Modifier",
