@@ -16,6 +16,10 @@ Workflow validé le 10/07/2026 (Xcode 26.6, simulateurs iOS 26.5, AXe 1.7.1). L'
 
 **Prérequis one-shot** : le dev client doit être compilé et installé sur le simulateur. Si l'app `com.cohozen.trycast` n'est pas encore sur le simulateur (ou après un changement natif/plugin) : `npm run ios` (= `expo run:ios`) — prebuild + pod install + build Xcode + install + Metro. Nécessite **CocoaPods** (`brew install cocoapods`) et Xcode.
 
+⚠️ **Deux pièges de rebuild vécus le 2026-07-13** (ajout de `expo-image-picker`/`-manipulator` + config plugin) :
+- **CocoaPods exige UTF-8** : `pod install` casse avec `Unicode Normalization not appropriate for ASCII-8BIT` si la locale du shell n'est pas UTF-8. Lancer le build avec `LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 npx expo run:ios …`.
+- **Un nouveau config plugin n'est PAS ré-appliqué sur un `ios/` préexistant** : `expo run:ios` fait un prebuild non destructif → les clés Info.plist du plugin (ex. `NSPhotoLibraryUsageDescription`) manquent → **crash TCC** (« attempted to access privacy-sensitive data without a usage description ») dès qu'on touche la ressource. Après tout ajout de dépendance native/plugin : `npx expo prebuild --clean -p ios` (ou supprimer `ios/`) **avant** `expo run:ios`. Vérifier : `grep NSPhotoLibraryUsageDescription ios/trycast/Info.plist`.
+
 Ensuite, une fois le dev client installé :
 
 ```bash
