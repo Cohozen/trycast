@@ -396,6 +396,9 @@ verify_jwt = false
 [functions.notify]
 verify_jwt = false
 
+[functions.sync-live]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327
