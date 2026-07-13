@@ -38,7 +38,13 @@
             ],
             "expo-secure-store",
             "expo-localization",
-            "expo-notifications"
+            "expo-notifications",
+            [
+                "expo-image-picker",
+                {
+                    "photosPermission": "TryCast accède à tes photos pour définir ta photo de profil."
+                }
+            ]
         ],
         "experiments": {
             "typedRoutes": true,
