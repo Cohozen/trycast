@@ -50,7 +50,78 @@
 
   <div style="display: flex; flex-direction: column; gap: 6px; color: #FBF7EF;">
     <span style="font-family: var(--font-display); font-size: 34px; letter-spacing: 0.01em;">TryCast — Écran Résultats</span>
-    <span style="font-size: 14px; color: rgba(255,255,255,0.72);">Réconciliation des pronos · thèmes clair &amp; sombre · tous les états</span>
+    <span style="font-size: 14px; color: rgba(255,255,255,0.72);">Réconciliation des pronos · carte à deux zones tactiles · thèmes clair &amp; sombre · tous les états</span>
+  </div>
+
+  <!-- ===== Panneau : deux zones tactiles ===== -->
+  <div data-theme="light" style="align-self: flex-start; display: flex; gap: 34px; align-items: center; padding: 26px 32px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); color: var(--text); font-family: var(--font-body); max-width: 800px;">
+
+    <!-- réplique de carte annotée -->
+    <div style="flex: none; width: 300px; display: flex; flex-direction: column; background: var(--surface); border: 1.5px solid color-mix(in srgb, var(--accent) 45%, var(--border)); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;">
+      <!-- zone A -->
+      <div style="position: relative; padding: 14px;">
+        <div style="position: absolute; inset: 3px; border: 2px dashed color-mix(in srgb, var(--text) 26%, transparent); border-radius: var(--radius-sm); pointer-events: none;"></div>
+        <div style="position: absolute; top: 7px; right: 7px; width: 20px; height: 20px; border-radius: 50%; background: var(--text); color: var(--surface); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px;">A</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; padding-right: 22px;">
+          <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">14h00</span>
+          <span style="display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: var(--radius-pill); background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 10px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 6.4L21 9l-5 4.2L17.6 20 12 16.3 6.4 20 8 13.2 3 9l6.6-.6z"></path></svg>Score exact</span>
+          <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);">Terminé</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="flex: none; width: 40px; height: 30px; border-radius: 7px; background: #2C5697; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px;">FRA</span>
+            <span style="flex: 1; font-weight: 600; font-size: 15px;">France</span>
+            <span style="font-family: var(--font-display); font-size: 24px; font-variant-numeric: tabular-nums;">27</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="flex: none; width: 40px; height: 30px; border-radius: 7px; background: #3FA0DF; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px;">URU</span>
+            <span style="flex: 1; font-weight: 600; font-size: 15px; color: var(--text-muted);">Uruguay</span>
+            <span style="font-family: var(--font-display); font-size: 24px; color: var(--text-faint); font-variant-numeric: tabular-nums;">15</span>
+          </div>
+        </div>
+      </div>
+      <!-- zone B -->
+      <div style="position: relative; padding: 12px 14px 14px; border-top: 1px dashed var(--border);">
+        <div style="position: absolute; inset: 3px; border: 2px dashed color-mix(in srgb, var(--accent) 55%, transparent); border-radius: var(--radius-sm); pointer-events: none;"></div>
+        <div style="position: absolute; top: 7px; right: 7px; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 11px;">B</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-right: 18px;">
+          <div style="display: flex; flex-direction: column; gap: 5px;">
+            <span style="font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint);">Ton prono</span>
+            <span style="align-self: flex-start; padding: 2px 9px; border-radius: var(--radius-pill); background: var(--surface-sunken); color: var(--text-muted); font-weight: 700; font-size: 12px; font-variant-numeric: tabular-nums;">27 – 15</span>
+          </div>
+          <div style="flex: none; display: flex; flex-direction: column; align-items: center; padding: 6px 14px; border-radius: var(--radius-md); background: color-mix(in srgb, var(--accent) 13%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);">
+            <span style="font-size: 8px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-faint);">Points gagnés</span>
+            <span style="display: inline-flex; align-items: baseline; gap: 2px;"><span style="font-family: var(--font-display); font-size: 30px; line-height: 1.02; color: var(--accent); font-variant-numeric: tabular-nums;">+19</span><span style="font-weight: 700; font-size: 11px; color: var(--accent);">pts</span></span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 8px; color: var(--text-faint); font-size: 11px; font-weight: 600;">
+          <span>Voir le détail des points</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- légende -->
+    <div style="display: flex; flex-direction: column; gap: 20px; max-width: 320px;">
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <span style="font-family: var(--font-display); font-size: 25px; letter-spacing: 0.01em;">Deux zones tactiles</span>
+        <span style="font-size: 13px; color: var(--text-muted); line-height: 1.5; text-wrap: pretty;">La ligne pointillée devient une vraie frontière d'interaction. Un seul tap, deux destinations claires.</span>
+      </div>
+      <div style="display: flex; align-items: flex-start; gap: 12px;">
+        <span style="flex: none; margin-top: 1px; width: 24px; height: 24px; border-radius: 50%; background: var(--text); color: var(--surface); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px;">A</span>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-weight: 700; font-size: 14px;">Le match → fiche complète</span>
+          <span style="font-size: 12.5px; color: var(--text-muted); line-height: 1.45;">Équipes et score : ouvre la page de détail du match.</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: flex-start; gap: 12px;">
+        <span style="flex: none; margin-top: 1px; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px;">B</span>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-weight: 700; font-size: 14px;">Les points → feuille de détail</span>
+          <span style="font-size: 12.5px; color: var(--text-muted); line-height: 1.45;">Ton prono et les points gagnés : ouvre le calcul détaillé.</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div style="display: flex; flex-wrap: nowrap; gap: 40px; align-items: flex-start;">
@@ -150,7 +221,10 @@
                 </div>
 
                 <sc-for list="{{ f.matches }}" as="m" hint-placeholder-count="4">
-                  <div onClick="{{ m.onOpen }}" style="display: flex; flex-direction: column; padding: 16px; background: var(--surface); border: {{ m.cardBorder }}; border-radius: var(--radius-md); box-shadow: {{ m.cardShadow }}; cursor: {{ m.cursor }}; -webkit-tap-highlight-color: transparent;">
+                  <div style="display: flex; flex-direction: column; background: var(--surface); border: {{ m.cardBorder }}; border-radius: var(--radius-md); box-shadow: {{ m.cardShadow }}; overflow: hidden; -webkit-tap-highlight-color: transparent;">
+
+                    <!-- ZONE A · identité du match → fiche du match -->
+                    <div role="button" tabindex="0" onClick="{{ m.onOpenMatch }}" style="display: flex; flex-direction: column; padding: 16px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);" style-hover="background: color-mix(in srgb, var(--text) 3%, transparent);" style-active="transform: scale(0.985); background: color-mix(in srgb, var(--text) 6%, transparent);">
 
                     <!-- top row: time + verdict + terminé -->
                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px;">
@@ -178,9 +252,11 @@
                       </div>
                     </div>
 
-                    <!-- reconciliation: predicted -->
+                    </div><!-- /ZONE A -->
+
+                    <!-- ZONE B · points → feuille détail des points -->
                     <sc-if value="{{ m.predicted }}" hint-placeholder-val="{{ true }}">
-                      <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); display: flex; flex-direction: column; gap: 10px;">
+                      <div role="button" tabindex="0" onClick="{{ m.onOpenSheet }}" style="padding: 12px 16px 16px; border-top: 1px dashed var(--border); display: flex; flex-direction: column; gap: 10px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);" style-hover="background: color-mix(in srgb, var(--accent) 5%, transparent);" style-active="transform: scale(0.985); background: color-mix(in srgb, var(--accent) 9%, transparent);">
                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
                           <!-- ton prono -->
                           <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0;">
@@ -210,9 +286,9 @@
                       </div>
                     </sc-if>
 
-                    <!-- reconciliation: not predicted -->
+                    <!-- ZONE A (suite) · pas de prono → fiche du match -->
                     <sc-if value="{{ m.notPredicted }}" hint-placeholder-val="{{ false }}">
-                      <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                      <div role="button" tabindex="0" onClick="{{ m.onOpenMatch }}" style="padding: 12px 16px 16px; border-top: 1px dashed var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);" style-hover="background: color-mix(in srgb, var(--text) 3%, transparent);" style-active="transform: scale(0.985); background: color-mix(in srgb, var(--text) 6%, transparent);">
                         <span style="font-size: 13px; color: var(--text-muted);">Tu n'avais pas pronostiqué ce match.</span>
                         <span style="flex: none; display: inline-flex; align-items: baseline; gap: 3px; color: var(--text-faint);"><span style="font-family: var(--font-display); font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums;">0</span><span style="font-family: var(--font-body); font-weight: 700; font-size: 11px;">pt</span></span>
                       </div>
@@ -252,6 +328,18 @@
                 </div>
               </div>
 
+              <!-- bonus pronostiqués -->
+              <sc-if value="{{ f.sheet.hasBonus }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; gap: 8px; margin: 0 0 18px;">
+                  <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">Bonus pronostiqués</span>
+                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <sc-for list="{{ f.sheet.bonusTags }}" as="b" hint-placeholder-count="1">
+                      <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: var(--radius-pill); border: 1px solid var(--border-strong); color: var(--text-muted); font-family: var(--font-body); font-weight: 600; font-size: 12px;"><span style="width: 5px; height: 5px; border-radius: 50%; background: {{ b.dot }};"></span>{{ b.label }}</span>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+
               <!-- breakdown rows -->
               <div style="display: flex; flex-direction: column; gap: 2px;">
                 <sc-for list="{{ f.sheet.rows }}" as="r" hint-placeholder-count="4">
@@ -275,6 +363,14 @@
             </div>
           </sc-if>
 
+          <!-- Toast · retour visuel de navigation (maquette) -->
+          <sc-if value="{{ f.showToast }}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; left: 20px; right: 20px; bottom: 104px; z-index: 7; display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--text); color: var(--bg); border-radius: var(--radius-pill); box-shadow: var(--shadow-lg); animation: tc-fade var(--dur) var(--ease-out); font-size: 13px; font-weight: 600;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+              <span style="flex: 1;">{{ f.toastText }}</span>
+            </div>
+          </sc-if>
+
           <!-- Floating tab bar -->
           <div class="tc-tabbar-wrap" style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;">
             <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TabBar" items="{{ f.tabItems }}" active="resultats" on-change="{{ noop }}" hint-size="100%,88px"></x-import>
@@ -289,13 +385,20 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:2100,&quot;height&quot;:1080},&quot;competitionName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Coupe du monde 2027&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;phaseLabel&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Poules&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showWeighting&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;highlightExact&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
 class Component extends DCLogic {
-  state = { sel: {}, sheet: { fSheet: 'm25_1' } };
+  state = { sel: {}, sheet: { fSheet: 'm25_1' }, toast: {} };
 
   selectDay(fid, iso) {
     this.setState((s) => ({ sel: { ...s.sel, [fid]: iso }, sheet: { ...s.sheet, [fid]: null } }));
   }
   openSheet(fid, mid) {
     this.setState((s) => ({ sheet: { ...s.sheet, [fid]: mid } }));
+  }
+  openMatch(fid) {
+    clearTimeout(this['_toast' + fid]);
+    this.setState((s) => ({ toast: { ...s.toast, [fid]: true } }));
+    this['_toast' + fid] = setTimeout(() => {
+      this.setState((s) => ({ toast: { ...s.toast, [fid]: false } }));
+    }, 1700);
   }
   closeSheet(fid) {
     this.setState((s) => ({ sheet: { ...s.sheet, [fid]: null } }));
@@ -428,8 +531,8 @@ class Component extends DCLogic {
         pointsColor: pc,
         pointsBg,
         pointsBorder,
-        cursor: predicted ? 'pointer' : 'default',
-        onOpen: predicted ? () => this.openSheet(fid, m.id) : undefined,
+        onOpenMatch: () => this.openMatch(fid),
+        onOpenSheet: predicted ? () => this.openSheet(fid, m.id) : undefined,
         ...v,
       };
     };
@@ -447,10 +550,17 @@ class Component extends DCLogic {
         const valColor = r.accent ? 'var(--accent)' : (r.pts > 0 ? 'var(--text)' : 'var(--text-faint)');
         return { label: r.label, mark, markBg, markColor, markBorder, valStr, valColor };
       });
+      const exactSpark = m.type === 'exact' && hlExact;
+      const bonusTags = (m.bonus || []).map((a) => ({
+        label: (T[a] ? T[a].name : a) + ' · bonus offensif',
+        dot: exactSpark ? 'var(--accent)' : 'var(--text-muted)',
+      }));
       return {
         title: m.home.name + ' – ' + m.away.name,
         finalStr: m.hs + ' – ' + m.as,
         pronoStr: m.prono ? (m.prono.h + ' – ' + m.prono.a) : '—',
+        bonusTags,
+        hasBonus: bonusTags.length > 0,
         rows,
         totalStr: total > 0 ? ('+' + total) : '+0',
         totalColor: pointsColorOf(m, total),
@@ -518,6 +628,8 @@ class Component extends DCLogic {
         matches,
         sheet,
         closeSheet: () => this.closeSheet(fd.id),
+        showToast: !!this.state.toast[fd.id],
+        toastText: 'Ouverture de la fiche du match\u2026',
         onEmptyGo: () => this.selectDay(fd.id, '2027-09-25'),
         skeletons: [0, 1, 2],
         emptyMessage: 'Le vendredi 24 n\u2019accueille aucune rencontre. Les résultats les plus récents sont ceux du samedi 25.',
