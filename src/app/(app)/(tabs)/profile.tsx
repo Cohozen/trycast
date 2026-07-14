@@ -230,6 +230,12 @@ export default function ProfileScreen() {
                                         <ResultCard
                                             distribution={distributions.data?.get(match.id)}
                                             match={match}
+                                            onOpenMatch={() =>
+                                                router.push({
+                                                    pathname: '/match/[id]',
+                                                    params: { id: match.id },
+                                                })
+                                            }
                                             prediction={predictions.data?.get(match.id)}
                                         />
                                     </View>

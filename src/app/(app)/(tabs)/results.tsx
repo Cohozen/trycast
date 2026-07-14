@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,6 +19,7 @@ import { useScreenInsets } from '@/tw/use-screen-insets';
 
 export default function ResultsScreen() {
     const { t } = useTranslation(['matches', 'predictions', 'common']);
+    const router = useRouter();
     const competition = useActiveCompetition();
     const matches = useMatches(competition.data?.id);
     const predictions = useMyPredictions(competition.data?.id);
@@ -134,6 +136,12 @@ export default function ResultsScreen() {
                                 distribution={distributions.data?.get(match.id)}
                                 key={match.id}
                                 match={match}
+                                onOpenMatch={() =>
+                                    router.push({
+                                        pathname: '/match/[id]',
+                                        params: { id: match.id },
+                                    })
+                                }
                                 prediction={predictions.data?.get(match.id)}
                             />
                         ))}
