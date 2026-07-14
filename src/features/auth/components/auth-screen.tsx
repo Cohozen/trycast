@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { BrandMark } from '@/components/brand-mark';
 import { Button } from '@/components/ui/button';
+import { Screen } from '@/components/ui/screen';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { TextField } from '@/components/ui/text-field';
 import { Toast } from '@/components/ui/toast';
@@ -14,8 +15,7 @@ import {
     validateUsername,
 } from '@/features/auth/validation';
 import { supabase } from '@/lib/supabase';
-import { Link, ScrollView, Text, View } from '@/tw';
-import { useScreenInsets } from '@/tw/use-screen-insets';
+import { Link, Text, View } from '@/tw';
 
 type AuthMode = 'login' | 'signup';
 
@@ -30,7 +30,6 @@ type FieldErrors = Partial<Record<'username' | 'email' | 'password' | 'confirm',
 export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
     const { t } = useTranslation(['auth', 'common']);
     const [mode, setMode] = useState<AuthMode>(initialMode);
-    const screenInsets = useScreenInsets();
 
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -116,13 +115,7 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
     const isLogin = mode === 'login';
 
     return (
-        <ScrollView
-            automaticallyAdjustKeyboardInsets
-            className="flex-1 bg-bg"
-            contentContainerClassName="w-full max-w-[440px] gap-5 self-center px-6 pb-8"
-            contentContainerStyle={{ paddingTop: screenInsets.top }}
-            keyboardDismissMode="interactive"
-            keyboardShouldPersistTaps="handled">
+        <Screen contentClassName="max-w-[440px] gap-5 px-6 pb-8">
             <View className="items-center gap-2.5 pt-3.5">
                 <BrandMark />
                 <Text className="font-display text-[38px] leading-8.5 tracking-[0.5px] text-text">
@@ -236,6 +229,6 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
                     </View>
                 </View>
             )}
-        </ScrollView>
+        </Screen>
     );
 }

@@ -2,13 +2,13 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
+import { Screen } from '@/components/ui/screen';
 import { TextField } from '@/components/ui/text-field';
 import { Toast } from '@/components/ui/toast';
 import { toAuthMessageKey } from '@/features/auth/errors';
 import { validateEmail } from '@/features/auth/validation';
 import { supabase } from '@/lib/supabase';
-import { Link, ScrollView, Text, View } from '@/tw';
-import { useScreenInsets } from '@/tw/use-screen-insets';
+import { Link, Text, View } from '@/tw';
 
 export default function ForgotPasswordScreen() {
     const { t } = useTranslation(['auth', 'common']);
@@ -16,7 +16,6 @@ export default function ForgotPasswordScreen() {
     const [error, setError] = useState<string | null>(null);
     const [sent, setSent] = useState(false);
     const [submitting, setSubmitting] = useState(false);
-    const screenInsets = useScreenInsets();
 
     const onSubmit = async () => {
         setError(null);
@@ -36,13 +35,7 @@ export default function ForgotPasswordScreen() {
     };
 
     return (
-        <ScrollView
-            automaticallyAdjustKeyboardInsets
-            className="flex-1 bg-bg"
-            contentContainerClassName="w-full max-w-[440px] gap-5 self-center px-6 pb-8"
-            contentContainerStyle={{ paddingTop: screenInsets.top }}
-            keyboardDismissMode="interactive"
-            keyboardShouldPersistTaps="handled">
+        <Screen contentClassName="max-w-[440px] gap-5 px-6 pb-8">
             <View className="gap-1.5">
                 <Text className="font-display text-h1 text-text">{t('auth:forgot.title')}</Text>
                 <Text className="font-body text-body text-text-muted">
@@ -78,6 +71,6 @@ export default function ForgotPasswordScreen() {
                 href="/login">
                 {t('auth:links.backToLogin')}
             </Link>
-        </ScrollView>
+        </Screen>
     );
 }
