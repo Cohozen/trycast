@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Modal } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
 import type { MatchWithTeams } from '@/features/matches/types';
@@ -29,6 +30,7 @@ type Row = { key: string; label: string; mark: 'ok' | 'ko' | 'info'; points: num
  */
 export function PointsDetailSheet({ match, prediction, visible, onClose }: PointsDetailSheetProps) {
     const { t } = useTranslation(['predictions', 'common']);
+    const insets = useSafeAreaInsets();
     const breakdown = parseBreakdown(prediction);
     if (!breakdown) {
         return null;
@@ -123,7 +125,10 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
         <Modal animationType="slide" onRequestClose={onClose} transparent visible={visible}>
             <View className="flex-1 justify-end">
                 <Pressable className="absolute inset-0 bg-[#16130E]/40" onPress={onClose} />
-                <View className="rounded-t-lg border-t border-border bg-surface px-5 pb-8 pt-2.5 tc-shadow-lg">
+                {/* Padding bas au-dessus de la barre gestuelle, plancher 32px (ex pb-8). */}
+                <View
+                    className="rounded-t-lg border-t border-border bg-surface px-5 pt-2.5 tc-shadow-lg"
+                    style={{ paddingBottom: Math.max(insets.bottom, 32) }}>
                     <View className="mb-4 mt-1 h-1 w-10 self-center rounded-pill bg-border-strong" />
 
                     <View className="mb-1 flex-row items-center justify-between gap-3">
