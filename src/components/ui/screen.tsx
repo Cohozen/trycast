@@ -10,9 +10,9 @@ type ScreenProps = ComponentProps<typeof ScrollView> & {
     contentClassName?: string;
     /**
      * Padding haut : 'safe' (défaut) cale le contenu sous la barre d'état ;
-     * 'header' ne met rien, le header natif occupe déjà la zone.
+     * 'none' ne met rien — un header natif ou un bloc épinglé occupe déjà la zone.
      */
-    top?: 'safe' | 'header';
+    top?: 'safe' | 'none';
     /**
      * Padding bas : 'content' (défaut) = fin de scroll classique ;
      * 'tabBar' = dégagement pour la tab bar flottante des onglets.

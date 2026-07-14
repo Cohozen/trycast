@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { BrandMark } from '@/components/brand-mark';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Screen } from '@/components/ui/screen';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSession } from '@/features/auth/session-context';
 import { useGlobalLeaderboard } from '@/features/leagues/use-global-leaderboard';
@@ -20,7 +21,7 @@ import { splitMatches } from '@/features/predictions/split-matches';
 import { useCommunityDistributions } from '@/features/predictions/use-community-distributions';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
 import { i18n } from '@/lib/i18n';
-import { Pressable, ScrollView, Text, View } from '@/tw';
+import { Pressable, Text, View } from '@/tw';
 import { useScreenInsets } from '@/tw/use-screen-insets';
 
 type DateGroup = { key: string; label: string; round: string | null; matches: MatchWithTeams[] };
@@ -88,13 +89,7 @@ export default function MatchesScreen() {
 
     if (loading) {
         return (
-            <ScrollView
-                className="flex-1 bg-bg"
-                contentContainerClassName="w-full max-w-[800px] gap-[18px] self-center px-5"
-                contentContainerStyle={{
-                    paddingTop: screenInsets.top,
-                    paddingBottom: screenInsets.bottomTabBar,
-                }}>
+            <Screen bottom="tabBar" contentClassName="gap-[18px]">
                 <Skeleton className="h-24" variant="block" />
                 <View className="flex-row gap-2.5">
                     <Skeleton className="h-12 flex-1" variant="block" />
@@ -103,7 +98,7 @@ export default function MatchesScreen() {
                 <Skeleton className="w-36" variant="line" />
                 <Skeleton className="h-56" variant="block" />
                 <Skeleton className="h-56" variant="block" />
-            </ScrollView>
+            </Screen>
         );
     }
 
@@ -344,13 +339,16 @@ export default function MatchesScreen() {
                 ) : null}
             </View>
 
-            <ScrollView
-                className="flex-1"
-                contentContainerClassName="w-full max-w-[800px] gap-3 self-center px-5 pt-3"
-                contentContainerStyle={{ paddingBottom: screenInsets.bottomTabBar }}
-                stickyHeaderIndices={stickyIndices}>
+            {/* Le scroll des pronos porte les inputs de score : Screen gère le
+                clavier (suivi iOS, taps actifs clavier ouvert) et le dégagement
+                de la tab bar ; le bloc épinglé au-dessus gère déjà le haut. */}
+            <Screen
+                bottom="tabBar"
+                contentClassName="gap-3 pt-3"
+                stickyHeaderIndices={stickyIndices}
+                top="none">
                 {listChildren}
-            </ScrollView>
+            </Screen>
         </View>
     );
 }
