@@ -19,7 +19,7 @@ import {
     useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, type LayoutRectangle } from 'react-native';
+import { Keyboard, Platform, StyleSheet, type LayoutRectangle } from 'react-native';
 import Animated, {
     useAnimatedStyle,
     useReducedMotion,
@@ -119,19 +119,59 @@ export default function AppTabs() {
     );
 }
 
+/** Clavier visible ? (surtout utile Android : la fenêtre se redimensionne et la barre remonterait au-dessus du clavier). */
+function useKeyboardShown(): boolean {
+    const [shown, setShown] = useState(false);
+    useEffect(() => {
+        // iOS émet les événements will* (animation suivie), Android seulement did*.
+        const show = Keyboard.addListener(
+            Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+            () => setShown(true),
+        );
+        const hide = Keyboard.addListener(
+            Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+            () => setShown(false),
+        );
+        return () => {
+            show.remove();
+            hide.remove();
+        };
+    }, []);
+    return shown;
+}
+
 function FloatingTabList(props: TabListProps) {
     // Marge basse dynamique : au-dessus de l'indicateur home / barre gestuelle,
     // plancher 16px sur les appareils sans inset (valeur runtime → prop style).
     const insets = useSafeAreaInsets();
+
+    // La barre s'escamote quand le clavier est ouvert (saisie d'un score) :
+    // fondu + léger glissé vers le bas, taps désactivés pendant ce temps.
+    const keyboardShown = useKeyboardShown();
+    const reduce = useReducedMotion();
+    const hidden = useSharedValue(0);
+    useEffect(() => {
+        const target = keyboardShown ? 1 : 0;
+        hidden.value = reduce ? target : withTiming(target, { duration: 160 });
+    }, [keyboardShown, reduce, hidden]);
+    const hideStyle = useAnimatedStyle(() => ({
+        opacity: 1 - hidden.value,
+        transform: [{ translateY: hidden.value * 24 }],
+    }));
+
     return (
-        <View
-            className="absolute inset-x-0 bottom-0 items-center px-4"
-            style={{ paddingBottom: Math.max(insets.bottom, 16) }}>
-            <View className="w-full max-w-[500px] flex-row gap-1 rounded-[34px] border border-white/70 bg-surface/95 p-2 tc-shadow-lg dark:border-white/12">
-                <SlidingPill />
-                {props.children}
+        <Animated.View
+            pointerEvents={keyboardShown ? 'none' : 'box-none'}
+            style={[styles.tabList, hideStyle]}>
+            <View
+                className="items-center px-4"
+                style={{ paddingBottom: Math.max(insets.bottom, 16) }}>
+                <View className="w-full max-w-[500px] flex-row gap-1 rounded-[34px] border border-white/70 bg-surface/95 p-2 tc-shadow-lg dark:border-white/12">
+                    <SlidingPill />
+                    {props.children}
+                </View>
             </View>
-        </View>
+        </Animated.View>
     );
 }
 
@@ -218,4 +258,5 @@ export function TabButton({ icon: Icon, label, isFocused, index, ...props }: Tab
 
 const styles = StyleSheet.create({
     pill: { position: 'absolute', left: 0, top: 0 },
+    tabList: { position: 'absolute', left: 0, right: 0, bottom: 0 },
 });
