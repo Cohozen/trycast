@@ -1,12 +1,11 @@
 import Constants from 'expo-constants';
-import { useRouter } from 'expo-router';
-import { ChevronLeft, ChevronRight, Globe, KeyRound } from 'lucide-react-native';
+import { ChevronRight, Globe, KeyRound } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { IconButton } from '@/components/ui/icon-button';
+import { Screen } from '@/components/ui/screen';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Toast } from '@/components/ui/toast';
 import { AvatarEditor } from '@/features/profile/components/avatar-editor';
@@ -23,8 +22,7 @@ import {
 } from '@/features/profile/theme-preference';
 import { useDeleteAccount, useProfile } from '@/features/profile/use-profile';
 import { supabase } from '@/lib/supabase';
-import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
-import { useScreenInsets } from '@/tw/use-screen-insets';
+import { Pressable, Text, useThemeColor, View } from '@/tw';
 
 function SectionLabel({ children, danger = false }: { children: string; danger?: boolean }) {
     return (
@@ -41,12 +39,12 @@ function SectionLabel({ children, danger = false }: { children: string; danger?:
 
 /**
  * Écran Réglages : compte (pseudo + mot de passe), thème, langue affichée,
- * notifications, version, déconnexion et zone de danger. Photo, e-mail et
- * RGPD arrivent avec leurs lots.
+ * notifications, version, déconnexion et zone de danger. Titre et retour
+ * portés par le header natif (déclaré dans le layout (app)). Photo, e-mail
+ * et RGPD arrivent avec leurs lots.
  */
 export default function SettingsScreen() {
     const { t } = useTranslation(['profile', 'common']);
-    const router = useRouter();
     const { session } = useSession();
     const { data: profile } = useProfile(session?.user.id ?? '');
     const deleteAccount = useDeleteAccount();
@@ -55,10 +53,8 @@ export default function SettingsScreen() {
     const [confirmingDelete, setConfirmingDelete] = useState(false);
     const [editingPassword, setEditingPassword] = useState(false);
     const [passwordSaved, setPasswordSaved] = useState(false);
-    const textColor = useThemeColor('text');
     const brandColor = useThemeColor('brand');
     const textFaintColor = useThemeColor('text-faint');
-    const screenInsets = useScreenInsets();
 
     useEffect(() => {
         loadThemePreference().then(setTheme);
@@ -87,21 +83,7 @@ export default function SettingsScreen() {
     };
 
     return (
-        <ScrollView
-            className="flex-1 bg-bg"
-            contentContainerClassName="w-full max-w-[800px] gap-[22px] self-center px-[18px] pb-10"
-            contentContainerStyle={{ paddingTop: screenInsets.top }}>
-            <View className="flex-row items-center gap-2.5">
-                <IconButton
-                    accessibilityLabel={t('common:actions.back')}
-                    onPress={() => router.back()}>
-                    <ChevronLeft color={textColor} size={22} strokeWidth={2.1} />
-                </IconButton>
-                <Text className="font-display text-[30px] leading-[30px] tracking-[0.3px] text-text">
-                    {t('profile:settings.title')}
-                </Text>
-            </View>
-
+        <Screen contentClassName="gap-[22px] px-[18px] pb-10 pt-4" top="none">
             {/* Compte — pseudo + mot de passe (e-mail arrive avec le Lot 7) */}
             <View className="gap-2.5">
                 <SectionLabel>{t('profile:settings.sections.account')}</SectionLabel>
@@ -227,6 +209,6 @@ export default function SettingsScreen() {
                 username={profile?.username ?? ''}
                 visible={confirmingDelete}
             />
-        </ScrollView>
+        </Screen>
     );
 }
