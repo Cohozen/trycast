@@ -52,6 +52,7 @@
     },
     "breakdown": {
         "basePoints": "Points de base",
+        "bonusPredicted": "Bonus pronostiqués",
         "winner": "Bon vainqueur · {{code}}",
         "winnerDraw": "Bon résultat · match nul",
         "exactScore": "Score exact",

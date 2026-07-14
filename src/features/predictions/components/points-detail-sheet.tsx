@@ -108,6 +108,14 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
         points: null,
     });
 
+    const bonusTags: string[] = [];
+    if (prediction.predicted_bonus_off_home) {
+        bonusTags.push(match.home_team?.code ?? match.home_team?.name ?? '?');
+    }
+    if (prediction.predicted_bonus_off_away) {
+        bonusTags.push(match.away_team?.code ?? match.away_team?.name ?? '?');
+    }
+
     const title = `${match.home_team?.name ?? '?'} – ${match.away_team?.name ?? '?'}`;
     const total = prediction.points_awarded ?? 0;
 
@@ -146,6 +154,26 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
                             </Text>
                         </View>
                     </View>
+
+                    {bonusTags.length > 0 ? (
+                        <View className="mb-3 gap-2">
+                            <Text className="font-body-bold text-[10px] uppercase tracking-[0.6px] text-text-faint">
+                                {t('predictions:breakdown.bonusPredicted')}
+                            </Text>
+                            <View className="flex-row flex-wrap items-center gap-2">
+                                {bonusTags.map((code) => (
+                                    <View
+                                        className="flex-row items-center gap-1.5 rounded-pill border border-border-strong px-2.5 py-1"
+                                        key={code}>
+                                        <View className="h-[5px] w-[5px] rounded-pill bg-text-muted" />
+                                        <Text className="font-body-semibold text-[12px] text-text-muted">
+                                            {t('predictions:reconciliation.bonusTag', { code })}
+                                        </Text>
+                                    </View>
+                                ))}
+                            </View>
+                        </View>
+                    ) : null}
 
                     {/* Points de base · 1 N 2, issue pronostiquée en avant */}
                     <View className="mb-3 gap-2">
