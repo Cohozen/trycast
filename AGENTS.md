@@ -31,6 +31,10 @@ Avant de considérer un lot terminé : `npm run typecheck && npm run lint && npm
 - Marges d'écran : jamais de padding haut/bas d'écran en dur (`pt-14`, `pb-32`) — `useScreenInsets()` de `@/tw/use-screen-insets` (safe areas avec planchers DS), valeurs passées en `style`/`contentContainerStyle` (détails et piège react-native-css dans le skill `trycast-design-system`)
 - Composant pressable qui toggle des classes à variables CSS au press (`scale-*`, `shadow-*`) : classe `will-change-variable` dans les classes de base du `Pressable`, sinon react-native-css remonte le composant au premier press (détails dans le skill `trycast-design-system`)
 
+## Dev builds
+
+L'app tourne dans un dev build (`expo-dev-client`), pas Expo Go. **Toute lib native ajoutée/retirée, tout changement `app.json`/`app.config.ts`, toute montée de SDK ⇒ prévenir explicitement Corentin qu'un rebuild du dev client est nécessaire** (commande, quotas EAS et pièges : skill `trycast-dev-builds`).
+
 ## Git
 
 - Commits petits et fréquents : un commit = un changement cohérent (config ≠ reformatage ≠ feature), messages `type: description`
