@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Screen } from '@/components/ui/screen';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Select } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,7 +25,7 @@ import { ResultCard } from '@/features/predictions/components/result-card';
 import { useCommunityDistributions } from '@/features/predictions/use-community-distributions';
 import { useMatchLeaguePredictions } from '@/features/predictions/use-match-league-predictions';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
-import { ScrollView, Text, useThemeColor, View } from '@/tw';
+import { Text, useThemeColor, View } from '@/tw';
 
 type LeagueView = 'predictions' | 'leaderboard';
 
@@ -108,9 +109,7 @@ export default function MatchScreen() {
     const boardEntries = markTies(leagueBoard.data ?? []);
 
     return (
-        <ScrollView
-            className="flex-1 bg-bg"
-            contentContainerClassName="w-full max-w-[800px] gap-5 self-center p-6">
+        <Screen contentClassName="gap-5 p-6" top="none">
             <MatchHero match={currentMatch} />
 
             {/* Mon prono, selon la phase */}
@@ -292,6 +291,6 @@ export default function MatchScreen() {
                     )}
                 </View>
             )}
-        </ScrollView>
+        </Screen>
     );
 }
