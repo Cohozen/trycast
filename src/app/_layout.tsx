@@ -11,7 +11,7 @@ import {
 } from '@expo-google-fonts/inter';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -24,6 +24,7 @@ import { useRegisterPushToken } from '@/features/notifications/use-register-push
 import { applyStoredThemePreference } from '@/features/profile/theme-preference';
 import { useSyncLocale } from '@/features/profile/use-sync-locale';
 import { queryClient } from '@/lib/query';
+import { navigationThemes } from '@/tw/navigation-theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -70,7 +71,8 @@ export default function RootLayout() {
     return (
         <QueryClientProvider client={queryClient}>
             <SessionProvider>
-                <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+                <ThemeProvider
+                    value={colorScheme === 'dark' ? navigationThemes.dark : navigationThemes.light}>
                     <AnimatedSplashOverlay />
                     <RootNavigator />
                     <StatusBar style="auto" animated />

@@ -3,22 +3,39 @@ import { useTranslation } from 'react-i18next';
 
 import { useStandingsRealtime } from '@/features/leagues/use-standings-realtime';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
+import { useThemeColor } from '@/tw';
 
 // Les onglets vivent dans (tabs) ; les écrans ligue sont poussés au-dessus
 // (header natif visible, retour intégré).
 export default function AppLayout() {
-    const { t } = useTranslation(['leagues', 'matches']);
+    const { t } = useTranslation(['leagues', 'matches', 'profile']);
     const competition = useActiveCompetition();
+    const bgColor = useThemeColor('bg');
+    const textColor = useThemeColor('text');
     // Un seul channel Realtime pour toute l'app : les écrans classement
     // (général, ligues) n'ont qu'à lire le cache invalidé.
     useStandingsRealtime(competition.data?.id);
 
     return (
-        <Stack screenOptions={{ headerShown: false }}>
+        <Stack
+            screenOptions={{
+                headerShown: false,
+                // Header natif aux couleurs du DS : fond identique à l'écran
+                // (sans hairline → continuité visuelle), titre Inter SemiBold.
+                // Le chevron reste couleur texte : le grenat est réservé aux
+                // CTA/live/sélection, pas à la navigation.
+                headerStyle: { backgroundColor: bgColor },
+                headerShadowVisible: false,
+                headerTintColor: textColor,
+                headerTitleStyle: { fontFamily: 'Inter_600SemiBold', color: textColor },
+            }}>
             {/* title vide : le back natif des écrans poussés affiche juste le
                 chevron, pas le nom technique « (tabs) » */}
             <Stack.Screen name="(tabs)" options={{ title: '' }} />
-            <Stack.Screen name="settings" />
+            <Stack.Screen
+                name="settings"
+                options={{ headerShown: true, title: t('profile:settings.title') }}
+            />
             <Stack.Screen
                 name="league/create"
                 options={{ headerShown: true, title: t('leagues:create.screenTitle') }}
