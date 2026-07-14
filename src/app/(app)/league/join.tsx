@@ -40,9 +40,7 @@ export default function JoinLeagueScreen() {
 
     return (
         <Screen contentClassName="gap-5 p-6" top="none">
-            <Text className="font-body text-body text-text-muted">
-                {t('leagues:join.intro')}
-            </Text>
+            <Text className="font-body text-body text-text-muted">{t('leagues:join.intro')}</Text>
 
             {error ? <Toast message={error} tone="accent" /> : null}
 

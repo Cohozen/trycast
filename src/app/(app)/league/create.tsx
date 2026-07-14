@@ -37,9 +37,7 @@ export default function CreateLeagueScreen() {
 
     return (
         <Screen contentClassName="gap-5 p-6" top="none">
-            <Text className="font-body text-body text-text-muted">
-                {t('leagues:create.intro')}
-            </Text>
+            <Text className="font-body text-body text-text-muted">{t('leagues:create.intro')}</Text>
 
             {error ? <Toast message={error} tone="accent" /> : null}
 
