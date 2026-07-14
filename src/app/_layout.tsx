@@ -1,6 +1,6 @@
+import '@/features/notifications/notification-handler';
 import '@/global.css';
 import '@/lib/i18n';
-import '@/features/notifications/notification-handler';
 
 import { Anton_400Regular } from '@expo-google-fonts/anton';
 import {
@@ -13,6 +13,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
@@ -72,6 +73,7 @@ export default function RootLayout() {
                 <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
                     <AnimatedSplashOverlay />
                     <RootNavigator />
+                    <StatusBar style="auto" animated />
                 </ThemeProvider>
             </SessionProvider>
         </QueryClientProvider>
