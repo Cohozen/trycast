@@ -15,6 +15,16 @@ Site **Astro statique** (pas d'adapter SSR) dans un sous-dossier autonome : son 
 - `web/src/styles/tokens.css` — **copie** des tokens DS (custom properties, dark via `[data-theme='dark']`) ; source de vérité design : `docs/design/project/_ds/…/tokens/`. Piège : pas de `*/` dans un commentaire CSS (chemins avec glob → lightningcss casse en minify)
 - Polices **self-hostées** via `@fontsource/anton` + `@fontsource/inter` (RGPD : pas de CDN Google Fonts). Thème posé par un script inline dans `<head>` selon `prefers-color-scheme`
 
+## Piège majeur : découverte tsconfig de rolldown (build cassé en CI/Vercel)
+
+La découverte automatique de tsconfig de vite/rolldown (Astro 7) **escalade au-dessus de `web/`** : un module `.astro` (ou un id à query `?astro…`) ne matche l'`include` d'aucun tsconfig (seuls .ts/.tsx, ou .js avec `allowJs`, matchent), donc la découverte continue vers le parent et **parse le tsconfig racine du repo** (`extends expo/tsconfig.base`). Sans `node_modules` racine (CI web, Vercel, clone frais avec install web seulement) : `Tsconfig not found expo/tsconfig.base`. En local ça passe car les deps racine sont installées.
+
+Correctifs en place (2026-07-15) :
+- `web/astro.config.mjs` : `resolve.tsconfigPaths: false` (aucun alias TS — coupe l'escalade côté resolver)
+- Scripts client en **`.js` dans `web/src/scripts/`** (jamais de `<script>` TS inline : un `.js` matche le tsconfig de `web/` via `allowJs` et l'escalade s'arrête)
+- Le **transform natif** (`builtin:vite-transform`) escalade quoi qu'il arrive (aucune option ne l'arrête — `oxc.tsconfig`/`rollupOptions.tsconfig` inopérants et absents des types) → on rend le tsconfig racine **parseable** avec un stub `node_modules/expo/tsconfig.base.json` = `{}` : step dédié dans `.github/workflows/web.yml` + `installCommand` de `web/vercel.json`
+- Reproduire en local : `mv node_modules/expo/tsconfig.base.json{,.bak}` puis `cd web && npm run build` (remettre le fichier après)
+
 ## Vérification
 
 ```bash
