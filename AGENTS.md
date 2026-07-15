@@ -31,6 +31,15 @@ Avant de considérer un lot terminé : `npm run typecheck && npm run lint && npm
 - Marges d'écran : jamais de padding haut/bas d'écran en dur (`pt-14`, `pb-32`) — `useScreenInsets()` de `@/tw/use-screen-insets` (safe areas avec planchers DS), valeurs passées en `style`/`contentContainerStyle` (détails et piège react-native-css dans le skill `trycast-design-system`)
 - Composant pressable qui toggle des classes à variables CSS au press (`scale-*`, `shadow-*`) : classe `will-change-variable` dans les classes de base du `Pressable`, sinon react-native-css remonte le composant au premier press (détails dans le skill `trycast-design-system`)
 
+## Site web (`web/`)
+
+- Site vitrine **Astro statique** (landing + waitlist + pages légales), sous-dossier autonome avec son propre `package.json` — **pas de workspaces npm**, ne pas mélanger avec les deps Expo
+- Styles : CSS scopé Astro avec les tokens DS copiés dans `web/src/styles/tokens.css` (custom properties `--bg`/`--surface`/`--accent`…, dark via `[data-theme='dark']`) ; polices Anton/Inter self-hostées via `@fontsource` (pas de CDN Google Fonts) ; mêmes règles DS que l'app (grenat = étincelle, jamais un fond)
+- Vérification : `cd web && npm run check && npm run build` — CI dédiée `.github/workflows/web.yml` (la CI app ignore `web/**`)
+- Preview navigateur : config `site-web` de `.claude/launch.json` (port 4321) ; piège : après un scroll, la capture d'écran du panneau navigateur rend une page vide — translater `document.body` en JS au lieu de scroller
+- Formulaire waitlist : RPC `join_waitlist` (migration `20260715000100_waitlist.sql`) appelée en fetch direct PostgREST, env `web/.env` (`PUBLIC_SUPABASE_URL`/`PUBLIC_SUPABASE_KEY`, modèle `web/.env.example`) ; anti-spam côté SQL (rate limit IP 3/h + plafond global 100/h + refus silencieux) + honeypot côté client — pas d'accès direct aux tables `waitlist_*`
+- Hébergement cible : Vercel (projet `trycast-web`, framework Astro)
+
 ## Dev builds
 
 L'app tourne dans un dev build (`expo-dev-client`), pas Expo Go. **Toute lib native ajoutée/retirée, tout changement `app.json`/`app.config.ts`, toute montée de SDK ⇒ prévenir explicitement Corentin qu'un rebuild du dev client est nécessaire** (commande, quotas EAS et pièges : skill `trycast-dev-builds`).
