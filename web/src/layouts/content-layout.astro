@@ -1,0 +1,103 @@
+---
+// Layout des pages de contenu (légal) : colonne étroite, typographie sobre.
+import BaseLayout from './base-layout.astro';
+
+interface Props {
+    title: string;
+    description: string;
+    heading: string;
+    updatedAt: string;
+}
+
+const { title, description, heading, updatedAt } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+    <main>
+        <div class="draft-notice">
+            Premier jet en attente de validation — ce document n'a pas encore été relu par
+            l'éditeur du site.
+        </div>
+        <h1>{heading}</h1>
+        <p class="updated">Dernière mise à jour : {updatedAt}</p>
+        <article>
+            <slot />
+        </article>
+    </main>
+</BaseLayout>
+
+<style>
+    main {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 56px 24px 88px;
+    }
+
+    .draft-notice {
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        border: 1px solid color-mix(in srgb, var(--warning-500) 45%, var(--border));
+        background: color-mix(in srgb, var(--warning-500) 10%, transparent);
+        color: var(--text);
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 36px;
+    }
+
+    h1 {
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-size: clamp(34px, 5.5vw, 52px);
+        line-height: 1.02;
+        margin: 0;
+    }
+
+    .updated {
+        margin: 12px 0 0;
+        font-size: 13px;
+        color: var(--text-faint);
+    }
+
+    article {
+        margin-top: 40px;
+    }
+
+    article :global(h2) {
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-size: 24px;
+        letter-spacing: 0.02em;
+        margin: 40px 0 12px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+    }
+
+    article :global(h2:first-child) {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+    }
+
+    article :global(p),
+    article :global(li) {
+        font-size: 15px;
+        line-height: 1.65;
+        color: var(--text-muted);
+    }
+
+    article :global(li) {
+        margin-bottom: 6px;
+    }
+
+    article :global(strong) {
+        color: var(--text);
+    }
+
+    article :global(.placeholder) {
+        background: color-mix(in srgb, var(--warning-500) 16%, transparent);
+        border-radius: 4px;
+        padding: 0 4px;
+        font-weight: 600;
+        color: var(--text);
+    }
+</style>
