@@ -1,5 +1,5 @@
 /* TryCast — Design system tokens (v2 · surfaces neutres chaudes)
- * Copie web du bundle de handoff docs/design/project/_ds/trycast-design-system-*/tokens/
+ * Copie web du bundle de handoff docs/design/project/_ds/trycast-design-system-…/tokens
  * (colors.css + typography.css + spacing.css). Les polices sont self-hostées via
  * @fontsource (voir base-layout.astro), pas de CDN Google Fonts. */
 
@@ -70,8 +70,8 @@
     --glass-pill-border: color-mix(in srgb, #ffffff 50%, transparent);
 
     /* ---- Typographie ---- */
-    --font-display: 'Anton', 'Arial Narrow', system-ui, sans-serif;
-    --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-display: "Anton", "Arial Narrow", system-ui, sans-serif;
+    --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 
     --fw-regular: 400;
     --fw-medium: 500;
@@ -111,7 +111,7 @@
 }
 
 /* ---- Semantic aliases: DARK theme (neutre charbon chaud) ---- */
-[data-theme='dark'] {
+[data-theme="dark"] {
     --bg: var(--char-900);
     --surface: var(--char-850);
     --surface-sunken: var(--char-950);

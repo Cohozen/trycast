@@ -1,0 +1,110 @@
+---
+import SectionHeading from './section-heading.astro';
+
+const faqs = [
+    {
+        q: 'C’est vraiment gratuit ?',
+        a: 'Oui, totalement. Aucun achat, aucune mise, aucune pub déguisée. Tu joues, tu chambres tes potes, point. C’est notre promesse de départ.',
+    },
+    {
+        q: 'C’est du pari d’argent ?',
+        a: 'Non, jamais. Zéro argent réel, zéro mise. TryCast est un jeu social entre amis : on parie sa fierté au classement, pas son portefeuille.',
+    },
+    {
+        q: 'Ça sort quand ?',
+        a: 'Lancement en février 2027 pour le coup d’envoi du Tournoi des 6 Nations, puis la Coupe du Monde à l’automne 2027. Inscris-toi pour être prévenu le jour J.',
+    },
+    {
+        q: 'Quelles compétitions ?',
+        a: '6 Nations, Champions Cup et Coupe du Monde 2027 dès le lancement. D’autres compétitions suivront au fil des saisons.',
+    },
+    {
+        q: 'Comment je joue avec mes potes ?',
+        a: 'Tu crées une ligue privée, tu partages le lien d’invitation, et vous vous affrontez au classement toute la saison. Simple comme une passe.',
+    },
+];
+---
+
+<section id="faq">
+    <SectionHeading kicker="Les questions" title="On te répond" />
+    <div>
+        {
+            faqs.map((faq) => (
+                <details>
+                    <summary>
+                        <span class="question">{faq.q}</span>
+                        <span class="plus">
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.4"
+                                stroke-linecap="round">
+                                <path d="M12 5v14M5 12h14" />
+                            </svg>
+                        </span>
+                    </summary>
+                    <p>{faq.a}</p>
+                </details>
+            ))
+        }
+    </div>
+</section>
+
+<style>
+    section {
+        scroll-margin-top: 76px;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 24px 88px;
+    }
+
+    details {
+        border-bottom: 1px solid var(--border);
+    }
+
+    summary {
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 24px 4px;
+        cursor: pointer;
+    }
+
+    summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .question {
+        flex: 1;
+        font-size: clamp(17px, 2.4vw, 21px);
+        font-weight: 700;
+    }
+
+    .plus {
+        flex: none;
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+        transition: transform var(--dur) var(--ease-out);
+    }
+
+    details[open] .plus {
+        transform: rotate(45deg);
+    }
+
+    details p {
+        margin: 0;
+        padding: 0 44px 26px 4px;
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--text-muted);
+        text-wrap: pretty;
+    }
+</style>

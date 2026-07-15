@@ -1,0 +1,33 @@
+---
+// Petit drapeau stylisé pour les mockups téléphone du hero (couleurs réelles de drapeaux,
+// cas documenté d'hex en dur).
+interface Props {
+    abbr: 'FRA' | 'IRL';
+}
+const { abbr } = Astro.props;
+const bands: Record<Props['abbr'], [string, string, string]> = {
+    FRA: ['#33518E', '#F6F4EF', '#D64545'],
+    IRL: ['#2E8B57', '#F6F4EF', '#DB8A2F'],
+};
+const [left, middle, right] = bands[abbr];
+---
+
+<svg width="46" height="32" viewBox="0 0 46 32" aria-hidden="true" style="flex: none;">
+    <clipPath id={`flag-${abbr}`}>
+        <rect x="0.5" y="0.5" width="45" height="31" rx="7"></rect>
+    </clipPath>
+    <g clip-path={`url(#flag-${abbr})`}>
+        <rect x="0" y="0" width="16" height="32" fill={left}></rect>
+        <rect x="16" y="0" width="15" height="32" fill={middle}></rect>
+        <rect x="31" y="0" width="15" height="32" fill={right}></rect>
+    </g>
+    <rect
+        x="0.5"
+        y="0.5"
+        width="45"
+        height="31"
+        rx="7"
+        fill="none"
+        stroke="var(--border-strong)"
+        stroke-width="1"></rect>
+</svg>

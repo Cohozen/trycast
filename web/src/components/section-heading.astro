@@ -1,0 +1,37 @@
+---
+// Titre de section éditorial : kicker Anton grenat + gros titre, soulignés d'un trait fort.
+interface Props {
+    kicker: string;
+    title: string;
+}
+const { kicker, title } = Astro.props;
+---
+
+<div class="heading">
+    <span class="kicker">{kicker}</span>
+    <h2>{title}</h2>
+</div>
+
+<style>
+    .heading {
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        border-bottom: 2px solid var(--text);
+        padding-bottom: 16px;
+    }
+
+    .kicker {
+        font-family: var(--font-display);
+        font-size: 15px;
+        color: var(--accent);
+    }
+
+    h2 {
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-size: clamp(30px, 5vw, 52px);
+        line-height: 0.95;
+        margin: 0;
+    }
+</style>

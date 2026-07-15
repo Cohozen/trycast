@@ -1,0 +1,180 @@
+---
+// Section « La différence » : bloc marque plein cadre assumé (data-theme="dark" figé comme
+// dans la maquette pour garder le même rendu vert + texte sombre dans les deux thèmes).
+const rows = [
+    {
+        bad: 'Une appli de foot avec du rugby collé dessus',
+        good: 'Pensée pour le rugby dès la première ligne de code',
+    },
+    { bad: 'Résultat sec : 1 · N · 2', good: 'Score exact, essais et bonus offensif' },
+    { bad: 'Tous les pronos valent pareil', good: 'Points pondérés par les cotes des bookmakers' },
+    { bad: 'Argent réel, mises et publicités', good: '100% gratuit, zéro mise, zéro argent réel' },
+    {
+        bad: 'Des joueurs anonymes que tu ne connais pas',
+        good: 'Des ligues privées, seulement entre potes',
+    },
+];
+---
+
+<section data-theme="dark">
+    <div class="inner">
+        <div class="intro">
+            <span class="overline">La différence</span>
+            <h2>Pensé pour le rugby, pas bricolé depuis le foot.</h2>
+            <p>
+                Le rugby a ses propres règles : score exact, essais, bonus offensif, cotes. On les a
+                mises au cœur du jeu — pas collées après coup.
+            </p>
+        </div>
+        <div class="table">
+            <div class="head">
+                <div class="head-them">Les apps génériques</div>
+                <div class="head-us">
+                    <svg width="16" height="16" viewBox="0 0 120 120" style="flex: none;">
+                        <g transform="rotate(-25 72 54)">
+                            <ellipse cx="72" cy="54" rx="30" ry="17" fill="#fff"></ellipse>
+                            <line x1="46" y1="54" x2="98" y2="54" stroke="#E63E63" stroke-width="3" stroke-linecap="round"></line>
+                        </g>
+                    </svg>
+                    TryCast
+                </div>
+            </div>
+            {
+                rows.map((row) => (
+                    <div class="row">
+                        <div class="bad">
+                            <span class="mark-bad">✕</span>
+                            {row.bad}
+                        </div>
+                        <div class="good">
+                            <span class="mark-good">✓</span>
+                            {row.good}
+                        </div>
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<style>
+    section {
+        background: var(--brand);
+        color: var(--on-brand);
+    }
+
+    .inner {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 88px 24px;
+    }
+
+    .intro {
+        max-width: 720px;
+    }
+
+    .overline {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: color-mix(in srgb, var(--on-brand) 62%, transparent);
+    }
+
+    h2 {
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-size: clamp(32px, 5.5vw, 60px);
+        line-height: 0.94;
+        margin: 16px 0 0;
+        text-wrap: balance;
+    }
+
+    .intro p {
+        margin: 20px 0 0;
+        font-size: 17px;
+        line-height: 1.55;
+        color: color-mix(in srgb, var(--on-brand) 82%, transparent);
+        max-width: 560px;
+        text-wrap: pretty;
+    }
+
+    .table {
+        margin-top: 44px;
+        border: 1px solid color-mix(in srgb, var(--on-brand) 22%, transparent);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+    }
+
+    .head,
+    .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .head-them {
+        padding: 20px 24px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: color-mix(in srgb, var(--on-brand) 78%, transparent);
+        border-bottom: 1px solid color-mix(in srgb, var(--on-brand) 18%, transparent);
+    }
+
+    .head-us {
+        padding: 20px 24px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #fff;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-bottom: 1px solid color-mix(in srgb, var(--on-brand) 18%, transparent);
+    }
+
+    .row {
+        border-bottom: 1px solid color-mix(in srgb, var(--on-brand) 14%, transparent);
+    }
+
+    .row:last-child {
+        border-bottom: none;
+    }
+
+    .bad {
+        padding: 18px 24px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        color: color-mix(in srgb, var(--on-brand) 88%, transparent);
+        font-size: 15px;
+        line-height: 1.4;
+    }
+
+    .good {
+        padding: 18px 24px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: color-mix(in srgb, var(--on-brand) 10%, transparent);
+        color: var(--on-brand);
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.4;
+    }
+
+    .mark-bad {
+        flex: none;
+        margin-top: 1px;
+        color: var(--accent-hover);
+    }
+
+    .mark-good {
+        flex: none;
+        margin-top: 1px;
+        color: var(--accent);
+    }
+</style>

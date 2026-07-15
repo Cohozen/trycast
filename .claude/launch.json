@@ -6,6 +6,12 @@
             "runtimeExecutable": "npx",
             "runtimeArgs": ["expo", "start", "--web", "--port", "8081"],
             "port": 8081
+        },
+        {
+            "name": "site-web",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": ["--prefix", "web", "run", "dev", "--", "--port", "4321"],
+            "port": 4321
         }
     ]
 }

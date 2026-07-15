@@ -1,0 +1,72 @@
+---
+const items = [
+    'Gratuit, pour de vrai',
+    'Zéro argent réel',
+    '100% entre amis',
+    'Pensé pour le rugby',
+];
+---
+
+<section aria-label="TryCast en quatre promesses">
+    <div class="track">
+        {
+            [false, true].map((clone) => (
+                <div class="group" aria-hidden={clone || undefined}>
+                    {items.map((item) => (
+                        <>
+                            <span>{item}</span>
+                            <span class="dot">●</span>
+                        </>
+                    ))}
+                </div>
+            ))
+        }
+    </div>
+</section>
+
+<style>
+    section {
+        background: var(--text);
+        color: var(--bg);
+        overflow: hidden;
+        border-top: 1px solid var(--text);
+        border-bottom: 1px solid var(--text);
+    }
+
+    .track {
+        display: flex;
+        width: max-content;
+        animation: marq 32s linear infinite;
+        padding: 18px 0;
+    }
+
+    .group {
+        display: flex;
+        align-items: center;
+        gap: 34px;
+        padding-right: 34px;
+        font-family: var(--font-display);
+        font-size: 30px;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+    }
+
+    .dot {
+        color: var(--accent);
+    }
+
+    @keyframes marq {
+        from {
+            transform: translateX(0);
+        }
+        to {
+            transform: translateX(-50%);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .track {
+            animation: none;
+        }
+    }
+</style>

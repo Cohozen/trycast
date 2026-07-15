@@ -1,0 +1,81 @@
+---
+import SectionHeading from './section-heading.astro';
+
+const steps = [
+    {
+        n: '01',
+        title: 'Fais ton prono',
+        body: "Score exact, essais et bonus offensif. Un prono par match, ça s'enregistre tout seul. Aucun bouton à chercher.",
+    },
+    {
+        n: '02',
+        title: 'Marque des points malins',
+        body: 'Tes points sont pondérés par les cotes : oser le bon outsider rapporte gros. Le prono facile, moins.',
+    },
+    {
+        n: '03',
+        title: 'Domine ta ligue',
+        body: 'Grimpe au classement de ta ligue privée et au général. Le chambrage entre potes fait le reste.',
+    },
+];
+---
+
+<section id="concept">
+    <SectionHeading kicker="01 — 03" title="Comment ça marche" />
+    <div class="grid">
+        {
+            steps.map((step) => (
+                <div class="step">
+                    <div class="number">{step.n}</div>
+                    <h3>{step.title}</h3>
+                    <p>{step.body}</p>
+                </div>
+            ))
+        }
+    </div>
+</section>
+
+<style>
+    section {
+        scroll-margin-top: 76px;
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 88px 24px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 0;
+        margin-top: 8px;
+    }
+
+    .step {
+        padding: 40px 28px 32px;
+        border-bottom: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+    }
+
+    .number {
+        font-family: var(--font-display);
+        font-size: clamp(56px, 7vw, 84px);
+        line-height: 0.85;
+        color: var(--accent);
+    }
+
+    h3 {
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-size: 26px;
+        margin: 18px 0 10px;
+        letter-spacing: 0.01em;
+    }
+
+    p {
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.55;
+        color: var(--text-muted);
+        text-wrap: pretty;
+    }
+</style>

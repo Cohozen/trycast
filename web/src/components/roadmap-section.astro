@@ -1,0 +1,116 @@
+---
+import SectionHeading from './section-heading.astro';
+---
+
+<section id="competitions">
+    <SectionHeading kicker="La saison" title="Sur la route de 2027" />
+    <div class="grid">
+        <div class="card">
+            <div class="badge"><span class="badge-dot"></span>Étape 1</div>
+            <div class="date">Février 2027</div>
+            <p>
+                Lancement pour le coup d'envoi du Tournoi des 6 Nations. Crée ta ligue, pronostique
+                la première journée.
+            </p>
+            <div class="chips">
+                <span class="chip">6 Nations</span>
+                <span class="chip">Champions Cup</span>
+            </div>
+        </div>
+        <div class="card card-highlight">
+            <div class="badge"><span class="badge-dot"></span>Le grand rendez-vous</div>
+            <div class="date">Automne 2027</div>
+            <p>
+                La Coupe du Monde 2027. Toute la compétition, tes potes, un seul classement. C'est
+                là que ça se joue.
+            </p>
+            <div class="chips">
+                <span class="chip chip-accent">Coupe du Monde 2027</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    section {
+        scroll-margin-top: 76px;
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 88px 24px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 36px;
+    }
+
+    .card {
+        padding: 32px 28px;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        background: var(--surface);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .card-highlight {
+        border: 1.5px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+        background: color-mix(in srgb, var(--accent) 5%, var(--surface));
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--accent);
+    }
+
+    .badge-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+    }
+
+    .date {
+        font-family: var(--font-display);
+        font-size: 30px;
+        margin: 12px 0 4px;
+    }
+
+    p {
+        margin: 0 0 18px;
+        font-size: 15px;
+        color: var(--text-muted);
+        line-height: 1.5;
+    }
+
+    .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .chip {
+        display: inline-flex;
+        height: 30px;
+        align-items: center;
+        padding: 0 12px;
+        border-radius: 999px;
+        border: 1.5px solid var(--border-strong);
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .chip-accent {
+        border: none;
+        background: var(--accent);
+        color: var(--on-accent);
+        font-weight: 700;
+    }
+</style>
