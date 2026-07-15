@@ -544,6 +544,42 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            waitlist_attempts: {
+                Row: {
+                    created_at: string;
+                    id: string;
+                    ip: string;
+                };
+                Insert: {
+                    created_at?: string;
+                    id?: string;
+                    ip: string;
+                };
+                Update: {
+                    created_at?: string;
+                    id?: string;
+                    ip?: string;
+                };
+                Relationships: [];
+            };
+            waitlist_signups: {
+                Row: {
+                    created_at: string;
+                    email: string;
+                    id: string;
+                };
+                Insert: {
+                    created_at?: string;
+                    email: string;
+                    id?: string;
+                };
+                Update: {
+                    created_at?: string;
+                    email?: string;
+                    id?: string;
+                };
+                Relationships: [];
+            };
         };
         Views: {
             [_ in never]: never;
@@ -639,6 +675,7 @@ export type Database = {
                     isSetofReturn: false;
                 };
             };
+            join_waitlist: { Args: { email: string }; Returns: undefined };
             notify_reminder_targets: {
                 Args: never;
                 Returns: {
