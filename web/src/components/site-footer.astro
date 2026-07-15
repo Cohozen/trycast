@@ -1,0 +1,147 @@
+---
+import BallLogo from './ball-logo.astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer>
+    <div class="top">
+        <div class="identity">
+            <div class="brand">
+                <BallLogo size={36} />
+                <span class="wordmark"><span class="try">Try</span><span class="cast">Cast</span></span>
+            </div>
+            <div class="tagline">Tente ton essai.</div>
+            <p class="pitch">
+                Le jeu de pronos rugby, gratuit et 100% entre amis. Non affilié aux compétitions,
+                clubs ou fédérations cités.
+            </p>
+        </div>
+        <div class="columns">
+            <div class="column">
+                <span class="heading">Produit</span>
+                <a href="/#concept">Le concept</a>
+                <a href="/#competitions">Compétitions</a>
+                <a href="/#faq">FAQ</a>
+                <a href="/#waitlist">Liste d'attente</a>
+            </div>
+            <div class="column">
+                <span class="heading">Légal</span>
+                <a href="/cgu">CGU</a>
+                <a href="/confidentialite">Confidentialité</a>
+                <a href="/mentions-legales">Mentions légales</a>
+            </div>
+            <div class="column">
+                <span class="heading">Contact</span>
+                <a href="mailto:salut@trycast.fr">salut@trycast.fr</a>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <span>© {year} TryCast. Fait entre potes, pour de vrai.</span>
+        <span>Aucun pari d'argent · aucune mise · jeu social gratuit.</span>
+    </div>
+</footer>
+
+<style>
+    footer {
+        background: var(--text);
+        color: var(--bg);
+    }
+
+    .top {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 64px 24px 40px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 48px;
+        justify-content: space-between;
+    }
+
+    .identity {
+        flex: 1 1 300px;
+        max-width: 380px;
+    }
+
+    .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+    .wordmark {
+        font-family: var(--font-display);
+        font-size: 30px;
+        letter-spacing: 0.02em;
+    }
+
+    .try {
+        color: var(--bg);
+    }
+
+    .cast {
+        color: var(--accent);
+    }
+
+    .tagline {
+        font-family: var(--font-display);
+        font-size: 22px;
+        margin-top: 18px;
+        color: var(--bg);
+    }
+
+    .pitch {
+        margin: 10px 0 0;
+        font-size: 13px;
+        line-height: 1.55;
+        color: color-mix(in srgb, var(--bg) 55%, transparent);
+        max-width: 320px;
+    }
+
+    .columns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 56px;
+    }
+
+    .column {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .heading {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: color-mix(in srgb, var(--bg) 45%, transparent);
+    }
+
+    .column a {
+        font-size: 14px;
+        color: color-mix(in srgb, var(--bg) 78%, transparent);
+    }
+
+    .column a:hover {
+        color: var(--bg);
+    }
+
+    .bottom {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 22px 24px;
+        border-top: 1px solid color-mix(in srgb, var(--bg) 16%, transparent);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .bottom span {
+        font-size: 12px;
+        color: color-mix(in srgb, var(--bg) 50%, transparent);
+    }
+</style>

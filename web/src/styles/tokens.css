@@ -1,0 +1,139 @@
+/* TryCast — Design system tokens (v2 · surfaces neutres chaudes)
+ * Copie web du bundle de handoff docs/design/project/_ds/trycast-design-system-*/tokens/
+ * (colors.css + typography.css + spacing.css). Les polices sont self-hostées via
+ * @fontsource (voir base-layout.astro), pas de CDN Google Fonts. */
+
+:root {
+    /* ---- Primitive palette · marque ---- */
+    --green-900: #0e3320; /* vert profond */
+    --green-800: #14432a; /* MARQUE (light) */
+    --green-700: #1c5638; /* raised (rare) */
+    --green-600: #26694a; /* bordures discrètes */
+    --green-500: #328b5c; /* marque médiane */
+    --green-400: #43a56e; /* MARQUE (dark) — vert lisible sur charbon */
+
+    --grenat-600: #c82e52; /* accent pressed */
+    --grenat-500: #e63e63; /* ACCENT — the spark (CTA, live, selected) */
+    --grenat-400: #f06485; /* accent hover / light (logo trail) */
+
+    /* ---- Primitive palette · neutres chauds ---- */
+    --sand-050: #faf8f4; /* fond le plus clair */
+    --sand-100: #ffffff; /* surface claire */
+    --sand-150: #f3f0ea; /* surface enfoncée (light) */
+    --sand-200: #e8e3d9; /* séparateurs (light) */
+    --sand-300: #d6cfc1; /* bordure forte (light) */
+
+    --char-950: #100e0b; /* enfoncé (dark) */
+    --char-900: #17140f; /* fond charbon chaud (dark) */
+    --char-850: #201c16; /* surface (dark) */
+    --char-800: #2a251e; /* raised (dark) */
+    --char-700: #383127; /* bordure forte (dark) */
+    --char-600: #2f2921; /* bordure (dark) */
+
+    /* ---- Primitive palette · texte ---- */
+    --ink-900: #16130e; /* texte primaire sur clair (noir chaud) */
+    --ink-600: #5f584b; /* texte secondaire */
+    --ink-400: #928a7b; /* texte discret / placeholders */
+
+    /* Texte sur fond sombre */
+    --paper-100: #f4f0e9; /* texte primaire sur charbon */
+    --paper-300: #b2a999; /* texte secondaire sur charbon */
+    --paper-500: #7d7666; /* texte discret sur charbon */
+
+    /* ---- Status (mutés pour respecter la règle du spark) ---- */
+    --status-live: var(--grenat-500);
+    --success-500: #2e8b57;
+    --warning-500: #d8a23a;
+    --info-500: #3c7da6;
+
+    /* ---- Semantic aliases: LIGHT theme (default, neutre sable) ---- */
+    --bg: var(--sand-050);
+    --surface: var(--sand-100);
+    --surface-sunken: var(--sand-150);
+    --border: var(--sand-200);
+    --border-strong: var(--sand-300);
+    --text: var(--ink-900);
+    --text-muted: var(--ink-600);
+    --text-faint: var(--ink-400);
+    --brand: var(--green-800);
+    --on-brand: var(--sand-050);
+    --accent: var(--grenat-500);
+    --accent-hover: var(--grenat-400);
+    --accent-press: var(--grenat-600);
+    --on-accent: #ffffff;
+    --focus-ring: var(--grenat-500);
+
+    /* ---- Glass (barres flottantes, overlays) — light ---- */
+    --glass-bar: color-mix(in srgb, var(--surface) 60%, transparent);
+    --glass-hairline: color-mix(in srgb, #ffffff 70%, transparent);
+    --glass-pill: color-mix(in srgb, #ffffff 55%, transparent);
+    --glass-pill-border: color-mix(in srgb, #ffffff 50%, transparent);
+
+    /* ---- Typographie ---- */
+    --font-display: 'Anton', 'Arial Narrow', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+    --fw-regular: 400;
+    --fw-medium: 500;
+    --fw-semibold: 600;
+    --fw-bold: 700;
+
+    /* ---- Espacement (base 4px), rayons, ombres, motion ---- */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+
+    --radius-xs: 6px;
+    --radius-sm: 10px;
+    --radius-md: 14px; /* carte par défaut */
+    --radius-lg: 20px; /* sheets, grosses cartes */
+    --radius-xl: 28px;
+    --radius-pill: 999px;
+
+    --shadow-sm: 0 1px 2px rgba(22, 19, 14, 0.06);
+    --shadow-md: 0 4px 14px rgba(22, 19, 14, 0.08);
+    --shadow-lg: 0 12px 32px rgba(22, 19, 14, 0.12);
+    /* Glow grenat — réservé au spark (CTA, live, sélection) */
+    --glow-accent: 0 4px 18px rgba(230, 62, 99, 0.35);
+
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --dur-fast: 120ms;
+    --dur: 200ms;
+    --dur-slow: 320ms;
+}
+
+/* ---- Semantic aliases: DARK theme (neutre charbon chaud) ---- */
+[data-theme='dark'] {
+    --bg: var(--char-900);
+    --surface: var(--char-850);
+    --surface-sunken: var(--char-950);
+    --border: var(--char-600);
+    --border-strong: var(--char-700);
+    --text: var(--paper-100);
+    --text-muted: var(--paper-300);
+    --text-faint: var(--paper-500);
+    --brand: var(--green-400);
+    --on-brand: var(--char-950);
+    --accent: var(--grenat-500);
+    --accent-hover: var(--grenat-400);
+    --accent-press: var(--grenat-600);
+    --on-accent: #ffffff;
+    --focus-ring: var(--grenat-400);
+
+    --glass-bar: color-mix(in srgb, var(--surface) 80%, transparent);
+    --glass-hairline: color-mix(in srgb, var(--paper-100) 12%, transparent);
+    --glass-pill: color-mix(in srgb, var(--accent) 13%, transparent);
+    --glass-pill-border: color-mix(in srgb, var(--accent) 30%, transparent);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45);
+}

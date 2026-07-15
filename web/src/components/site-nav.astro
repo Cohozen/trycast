@@ -1,0 +1,99 @@
+---
+import BallLogo from './ball-logo.astro';
+---
+
+<header>
+    <nav>
+        <a href="/#top" class="brand">
+            <BallLogo size={34} />
+            <span class="wordmark">TryCast</span>
+        </a>
+        <div class="spacer"></div>
+        <div class="links">
+            <a href="/#concept">Le concept</a>
+            <a href="/#competitions">Compétitions</a>
+            <a href="/#faq">FAQ</a>
+        </div>
+        <a href="/#waitlist" class="cta">Liste d'attente</a>
+    </nav>
+</header>
+
+<style>
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: color-mix(in srgb, var(--bg) 86%, transparent);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-bottom: 1px solid var(--border);
+    }
+
+    nav {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 14px 24px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 11px;
+        color: var(--text);
+    }
+
+    .wordmark {
+        font-family: var(--font-display);
+        font-size: 25px;
+        letter-spacing: 0.02em;
+        line-height: 1;
+    }
+
+    .spacer {
+        flex: 1;
+    }
+
+    .links {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+    }
+
+    .links a {
+        color: var(--text-muted);
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .links a:hover {
+        color: var(--text);
+    }
+
+    .cta {
+        display: inline-flex;
+        align-items: center;
+        height: 42px;
+        padding: 0 20px;
+        border-radius: var(--radius-pill);
+        background: var(--accent);
+        color: var(--on-accent);
+        font-size: 14px;
+        font-weight: 700;
+        box-shadow: var(--glow-accent);
+        white-space: nowrap;
+    }
+
+    .cta:hover {
+        background: var(--accent-press);
+        color: var(--on-accent);
+    }
+
+    @media (max-width: 680px) {
+        .links {
+            display: none;
+        }
+    }
+</style>
