@@ -1,0 +1,27 @@
+name: Web
+
+on:
+  push:
+    branches: [main]
+    paths: ['web/**']
+  pull_request:
+    paths: ['web/**']
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      # Le formatage web est vérifié ici (la CI app ignore web/**) ; biome.json à la racine
+      - run: npx --yes @biomejs/biome@2.5.2 format web
+      - run: npm ci
+        working-directory: web
+      - run: npm run check
+        working-directory: web
+      - run: npm run build
+        working-directory: web
