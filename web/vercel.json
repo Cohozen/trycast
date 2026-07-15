@@ -1,0 +1,4 @@
+{
+    "$schema": "https://openapi.vercel.sh/vercel.json",
+    "installCommand": "npm ci && (mkdir -p ../node_modules/expo && echo '{}' > ../node_modules/expo/tsconfig.base.json || true)"
+}

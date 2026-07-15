@@ -19,6 +19,11 @@ jobs:
           cache-dependency-path: web/package-lock.json
       # Le formatage web est vérifié ici (la CI app ignore web/**) ; biome.json à la racine
       - run: npx --yes @biomejs/biome@2.5.2 format web
+      # La découverte tsconfig de rolldown parse le tsconfig racine (app Expo) même pour un
+      # build web ; sans node_modules racine, son `extends expo/tsconfig.base` casse le build
+      # (« Tsconfig not found »). Stub minimal pour le rendre parseable — détails dans
+      # web/astro.config.mjs et le skill trycast-site-web.
+      - run: mkdir -p node_modules/expo && echo '{}' > node_modules/expo/tsconfig.base.json
       - run: npm ci
         working-directory: web
       - run: npm run check
