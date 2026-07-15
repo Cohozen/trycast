@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/styles.css">
+  <script src="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/_ds_bundle.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    /* LIGHT overrides matched to sibling screens (cream paper) + dedicated DANGER token.
+       Danger (brick) is intentionally distinct from grenat: grenat = spark (CTA / focus / selection),
+       brick-red = the ONLY error color (validation, code invalide). */
+    [data-theme="light"] {
+      --bg: var(--cream); --surface: var(--cream-100); --surface-sunken: var(--cream-200);
+      --border: var(--cream-200); --border-strong: #D8CEB8;
+      --text: var(--ink-900); --text-muted: var(--ink-600); --text-faint: var(--ink-400);
+      --brand: var(--green-800); --on-brand: var(--cream);
+      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: var(--cream);
+      --focus-ring: var(--grenat-500);
+      --danger: #C4362B; --danger-press: #A82C22; --on-danger: #FBF7EF;
+      --warn-ink: #8A5A12; --warn-bg: #F3E4C4;
+      --shadow-sm: 0 1px 2px rgba(22,19,14,0.06); --shadow-md: 0 4px 14px rgba(22,19,14,0.08); --shadow-lg: 0 12px 32px rgba(22,19,14,0.12);
+    }
+    [data-theme="dark"] { --danger: #F0685A; --danger-press: #D8564A; --on-danger: #2A0F0C; --warn-ink: #E6C069; --warn-bg: #3A3117; }
+    .tc-scroll::-webkit-scrollbar { width: 0; height: 0; }
+    @keyframes tc-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    @keyframes tc-pop { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+    @keyframes tc-slideup { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    @keyframes tc-caret { 0%, 45% { opacity: 1; } 55%, 100% { opacity: 0; } }
+    .tc-caret { display: inline-block; width: 2px; height: 22px; background: var(--accent); border-radius: 1px; animation: tc-caret 1.05s steps(1) infinite; vertical-align: middle; }
+  </style>
+</helmet>
+<div style="width: max-content; min-height: 100vh; padding: 48px; background: #7C776E; font-family: var(--font-body); display: flex; flex-direction: column; gap: 32px;">
+
+  <div style="display: flex; flex-direction: column; gap: 6px; color: #FBF7EF;">
+    <span style="font-family: var(--font-display); font-size: 34px; letter-spacing: 0.01em;">TryCast — Créer ou rejoindre une ligue</span>
+    <span style="font-size: 14px; color: rgba(255,255,255,0.72);">Segmented Créer / Rejoindre · nom + picker de couleur · rappel privé · code OTP 8 caractères · sheet d'aperçu · états vide / erreur / chargement / succès · thèmes clair &amp; sombre</span>
+  </div>
+
+  <div style="display: flex; flex-wrap: nowrap; gap: 40px; align-items: flex-start;">
+    <sc-for list="{{ frames }}" as="f" hint-placeholder-count="17">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+
+        <div style="display: inline-flex; align-items: center; gap: 8px; color: #FBF7EF; font-size: 13px; font-weight: 600; padding: 0 4px; max-width: 390px;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ f.dot }}; flex: none;"></span>{{ f.label }}
+        </div>
+
+        <!-- PHONE -->
+        <div data-theme="{{ f.theme }}" data-screen-label="{{ f.label }}" style="position: relative; width: 390px; height: 844px; font-family: var(--font-body); background: var(--bg); color: var(--text); border-radius: 46px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column;">
+
+          <!-- Status bar -->
+          <div style="flex: none; display: flex; justify-content: space-between; align-items: center; padding: 14px 30px 8px; font-size: 13px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums;">
+            <span>9:41</span>
+            <span style="display: flex; gap: 7px; align-items: center;">
+              <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"></rect><rect x="9" y="2" width="3" height="9" rx="1"></rect><rect x="13.5" y="0" width="3" height="11" rx="1"></rect></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M1 4.2C3 2.4 5.4 1.4 8 1.4s5 1 7 2.8"></path><path d="M3.4 7C4.7 5.9 6.3 5.3 8 5.3s3.3.6 4.6 1.7"></path><path d="M6 9.6c.6-.5 1.3-.8 2-.8s1.4.3 2 .8"></path></svg>
+              <svg width="26" height="12" viewBox="0 0 26 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity="0.4"></rect><rect x="2" y="2" width="17" height="8" rx="1.5" fill="currentColor"></rect><rect x="23" y="4" width="2" height="4" rx="1" fill="currentColor" opacity="0.4"></rect></svg>
+            </span>
+          </div>
+
+          <!-- NAV: back + title -->
+          <div style="flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 12px 8px;">
+            <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.IconButton" variant="ghost" ariaLabel="Retour" onClick="{{ f.noop }}" hint-size="44px,44px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></x-import>
+            <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint);">Ligues</span>
+            <span style="width: 44px; height: 44px; flex: none;"></span>
+          </div>
+
+          <!-- HERO TITLE -->
+          <div style="flex: none; padding: 0 20px 14px;">
+            <span style="font-family: var(--font-display); font-size: 30px; line-height: 1; letter-spacing: 0.01em; color: var(--text);">{{ f.heroTitle }}</span>
+          </div>
+
+          <!-- SEGMENTED -->
+          <div style="flex: none; padding: 0 20px 16px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 3px; height: 44px; background: var(--surface-sunken); border-radius: var(--radius-pill);">
+              <button type="button" onClick="{{ f.selCreer }}" style="border: none; border-radius: var(--radius-pill); cursor: pointer; font-family: var(--font-body); font-weight: 700; font-size: 14px; -webkit-tap-highlight-color: transparent; transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out); background: {{ f.segCreerBg }}; color: {{ f.segCreerColor }}; box-shadow: {{ f.segCreerShadow }};">Créer</button>
+              <button type="button" onClick="{{ f.selRejoindre }}" style="border: none; border-radius: var(--radius-pill); cursor: pointer; font-family: var(--font-body); font-weight: 700; font-size: 14px; -webkit-tap-highlight-color: transparent; transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out); background: {{ f.segRejoindreBg }}; color: {{ f.segRejoindreColor }}; box-shadow: {{ f.segRejoindreShadow }};">Rejoindre</button>
+            </div>
+          </div>
+
+          <!-- SCROLL REGION -->
+          <div class="tc-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 4px 20px 32px;">
+
+            <!-- ============================= TAB CRÉER ============================= -->
+            <sc-if value="{{ f.showCreer }}" hint-placeholder-val="{{ true }}">
+
+              <!-- CRÉER · SUCCÈS → bloc invitation -->
+              <sc-if value="{{ f.creerSuccess }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; gap: 22px; padding-top: 8px; animation: tc-fade var(--dur) var(--ease-out);">
+                  <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 13px;">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; border-radius: 50%; background: color-mix(in srgb, var(--success-500) 16%, transparent); color: var(--success-500);"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span>
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                      <span style="font-family: var(--font-display); font-size: 27px; line-height: 1.02; letter-spacing: 0.01em; color: var(--text);">Ligue créée !</span>
+                      <span style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5; max-width: 270px; text-wrap: pretty;"><strong style="color: var(--text); font-weight: 700;">{{ f.leagueName }}</strong> est prête. Invite tes potes avec ce code avant d'y entrer.</span>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 20px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+                    <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);">Code d'invitation</span>
+                    <span style="font-family: var(--font-display); font-size: 40px; line-height: 1; letter-spacing: 0.16em; color: var(--text); font-variant-numeric: tabular-nums; padding-left: 0.16em;">{{ f.leagueCode }}</span>
+                    <div style="display: flex; gap: 10px; width: 100%;">
+                      <button type="button" onClick="{{ f.noop }}" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 46px; border-radius: var(--radius-pill); border: none; background: var(--brand); color: var(--on-brand); font-family: var(--font-body); font-weight: 700; font-size: 14px; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-active="transform: scale(0.97);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>Copier</button>
+                      <button type="button" onClick="{{ f.noop }}" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 46px; border-radius: var(--radius-pill); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font-family: var(--font-body); font-weight: 700; font-size: 14px; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-active="transform: scale(0.97);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"></path></svg>Partager</button>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="primary" full-width="{{ true }}" onClick="{{ f.noop }}" hint-size="100%,48px">Ouvrir la ligue</x-import>
+                    <span style="text-align: center; font-size: 12px; color: var(--text-faint);">Tu pourras réinviter à tout moment depuis les réglages.</span>
+                  </div>
+                </div>
+              </sc-if>
+
+              <!-- CRÉER · FORMULAIRE -->
+              <sc-if value="{{ f.creerForm }}" hint-placeholder-val="{{ true }}">
+                <div style="display: flex; flex-direction: column; gap: 24px; padding-top: 4px;">
+
+                  <!-- Aperçu icône + nom -->
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 2px;">
+                    <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 76px; height: 76px; border-radius: var(--radius-md); background: {{ f.iconColor }}; color: #FBF7EF; font-family: var(--font-display); font-size: 32px; letter-spacing: 0.02em; box-shadow: var(--shadow-md);">{{ f.initials }}</span>
+                    <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">{{ f.namePreview }}</span>
+                  </div>
+
+                  <!-- Nom -->
+                  <div style="display: flex; flex-direction: column; gap: 7px;">
+                    <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); padding: 0 2px;">Nom de la ligue</span>
+                    <div style="display: flex; align-items: center; gap: 8px; height: 50px; padding: 0 16px; background: var(--surface); border: 1.5px solid {{ f.nameBorder }}; border-radius: var(--radius-sm); box-shadow: {{ f.nameRing }}; transition: border-color var(--dur-fast) var(--ease-out);">
+                      <span style="flex: 1; min-width: 0; font-size: 16px; color: {{ f.nameColor }}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ f.nameText }}</span>
+                      <sc-if value="{{ f.nameFocused }}" hint-placeholder-val="{{ false }}"><span class="tc-caret"></span></sc-if>
+                      <sc-if value="{{ f.nameHasError }}" hint-placeholder-val="{{ false }}"><span style="flex: none; color: var(--danger);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path></svg></span></sc-if>
+                    </div>
+                    <sc-if value="{{ f.nameHasError }}" hint-placeholder-val="{{ false }}">
+                      <span style="display: flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; color: var(--danger); padding: 0 2px;">{{ f.nameErrorMsg }}</span>
+                    </sc-if>
+                    <sc-if value="{{ f.nameShowHelper }}" hint-placeholder-val="{{ true }}">
+                      <span style="font-size: 12.5px; color: var(--text-faint); padding: 0 2px;">Entre 3 et 30 caractères. Visible par tes membres.</span>
+                    </sc-if>
+                  </div>
+
+                  <!-- Couleur / icône -->
+                  <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); padding: 0 2px;">Couleur de la ligue</span>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; padding: 2px;">
+                      <sc-for list="{{ f.swatches }}" as="sw" hint-placeholder-count="6">
+                        <button type="button" onClick="{{ f.noop }}" aria-label="Choisir cette couleur" style="flex: none; width: 46px; height: 46px; border-radius: 50%; background: {{ sw.color }}; border: none; box-shadow: {{ sw.ring }}; cursor: pointer; -webkit-tap-highlight-color: transparent; display: flex; align-items: center; justify-content: center; transition: box-shadow var(--dur-fast) var(--ease-out);" style-active="transform: scale(0.92);">
+                          <sc-if value="{{ sw.selected }}" hint-placeholder-val="{{ false }}"><span style="color: #FBF7EF;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span></sc-if>
+                        </button>
+                      </sc-for>
+                    </div>
+                    <span style="font-size: 12px; color: var(--text-faint); padding: 0 2px;">L'icône reprend les initiales de ta ligue. Pas d'upload nécessaire.</span>
+                  </div>
+
+                  <!-- Rappel discret -->
+                  <div style="display: flex; align-items: flex-start; gap: 9px; padding: 12px 14px; background: var(--surface-sunken); border-radius: var(--radius-sm);">
+                    <span style="flex: none; color: var(--text-muted); margin-top: 1px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg></span>
+                    <span style="flex: 1; font-size: 12.5px; color: var(--text-muted); line-height: 1.45; text-wrap: pretty;">Ligue privée, accessible uniquement par code d'invitation. Tu la partages toi-même.</span>
+                  </div>
+
+                  <!-- CTA -->
+                  <div style="padding-top: 2px;">
+                    <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="primary" full-width="{{ true }}" loading="{{ f.creerLoading }}" disabled="{{ f.creerDisabled }}" onClick="{{ f.noop }}" hint-size="100%,48px">Créer la ligue</x-import>
+                  </div>
+                </div>
+              </sc-if>
+            </sc-if>
+
+            <!-- ============================= TAB REJOINDRE ============================= -->
+            <sc-if value="{{ f.showRejoindre }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 22px; padding-top: 6px;">
+
+                <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;">
+                  <span style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; border-radius: 50%; background: var(--surface-sunken); color: var(--text-muted);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3"></path><path d="M9 7V5a3 3 0 0 1 6 0v2"></path><path d="M9 13h6"></path></svg></span>
+                  <span style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5; max-width: 280px; text-wrap: pretty;">Saisis le code à 8 caractères reçu de ton pote — ou colle directement le lien d'invitation.</span>
+                </div>
+
+                <!-- OTP -->
+                <div style="display: flex; flex-direction: column; gap: 9px;">
+                  <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); padding: 0 2px; text-align: center;">Code d'invitation</span>
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <div style="display: flex; gap: 7px;">
+                      <sc-for list="{{ f.otp1 }}" as="b" hint-placeholder-count="4">
+                        <span style="width: 33px; height: 52px; display: flex; align-items: center; justify-content: center; border: 1.5px solid {{ b.borderColor }}; border-radius: var(--radius-sm); background: {{ b.bg }}; box-shadow: {{ b.ring }}; font-family: var(--font-display); font-size: 26px; line-height: 1; color: {{ b.color }};">{{ b.char }}</span>
+                      </sc-for>
+                    </div>
+                    <span style="width: 12px; height: 2px; border-radius: 1px; background: var(--border-strong); flex: none;"></span>
+                    <div style="display: flex; gap: 7px;">
+                      <sc-for list="{{ f.otp2 }}" as="b" hint-placeholder-count="4">
+                        <span style="width: 33px; height: 52px; display: flex; align-items: center; justify-content: center; border: 1.5px solid {{ b.borderColor }}; border-radius: var(--radius-sm); background: {{ b.bg }}; box-shadow: {{ b.ring }}; font-family: var(--font-display); font-size: 26px; line-height: 1; color: {{ b.color }};">{{ b.char }}</span>
+                      </sc-for>
+                    </div>
+                  </div>
+
+                  <!-- inline error -->
+                  <sc-if value="{{ f.otpError }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 4px 2px 0; color: var(--danger); animation: tc-fade var(--dur) var(--ease-out);">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path></svg>
+                      <span style="font-size: 12.5px; font-weight: 600;">{{ f.otpErrorMsg }}</span>
+                    </div>
+                  </sc-if>
+
+                  <!-- link detected -->
+                  <sc-if value="{{ f.linkDetected }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 2px 0; color: var(--brand); animation: tc-fade var(--dur) var(--ease-out);">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"></path><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"></path></svg>
+                      <span style="font-size: 12.5px; font-weight: 600;">Code détecté depuis le lien collé</span>
+                    </div>
+                  </sc-if>
+                </div>
+
+                <!-- paste link affordance -->
+                <button type="button" onClick="{{ f.noop }}" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 46px; border-radius: var(--radius-pill); border: 1px dashed var(--border-strong); background: transparent; color: var(--text-muted); font-family: var(--font-body); font-weight: 600; font-size: 13.5px; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-active="transform: scale(0.98);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path></svg>
+                  Coller un lien d'invitation
+                </button>
+
+                <div style="display: flex; align-items: flex-start; gap: 7px; padding: 2px 4px; color: var(--text-faint);">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 12h1v4h1"></path></svg>
+                  <span style="font-size: 12px; line-height: 1.4; text-wrap: pretty;">On te montre l'aperçu de la ligue avant que tu la rejoignes — rien n'est validé à la frappe.</span>
+                </div>
+              </div>
+            </sc-if>
+
+          </div>
+
+          <!-- ============ SHEET · aperçu de la ligue ============ -->
+          <sc-if value="{{ f.sheetOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; inset: 0; z-index: 50; background: rgba(11,26,17,0.5); animation: tc-fade var(--dur) var(--ease-out); display: flex; align-items: flex-end;">
+              <div style="width: 100%; background: var(--surface); border-radius: var(--radius-lg) var(--radius-lg) 0 0; box-shadow: var(--shadow-lg); animation: tc-slideup var(--dur) var(--ease-out); padding: 12px 20px calc(24px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 18px;">
+                <span style="align-self: center; width: 40px; height: 4px; border-radius: 2px; background: var(--border-strong);"></span>
+
+                <div style="display: flex; align-items: center; gap: 15px;">
+                  <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; border-radius: var(--radius-md); background: {{ f.sheetColor }}; color: #FBF7EF; font-family: var(--font-display); font-size: 26px; letter-spacing: 0.02em; box-shadow: var(--shadow-sm);">{{ f.sheetInitials }}</span>
+                  <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px;">
+                    <span style="font-family: var(--font-display); font-size: 26px; line-height: 1; letter-spacing: 0.01em; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ f.sheetName }}</span>
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                      <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; color: var(--text-muted);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path></svg>{{ f.sheetMembers }}</span>
+                      <span style="width: 3px; height: 3px; border-radius: 50%; background: var(--text-faint);"></span>
+                      <span style="font-size: 12.5px; font-weight: 600; color: var(--text-faint);">{{ f.sheetMeta }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- déjà membre -->
+                <sc-if value="{{ f.sheetMember }}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; align-items: flex-start; gap: 10px; padding: 13px 14px; background: color-mix(in srgb, var(--brand) 10%, transparent); border: 1px solid color-mix(in srgb, var(--brand) 30%, transparent); border-radius: var(--radius-sm);">
+                    <span style="flex: none; color: var(--brand); margin-top: 1px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span>
+                    <span style="flex: 1; font-size: 13px; color: var(--text); line-height: 1.45; text-wrap: pretty;">Tu fais déjà partie de cette ligue. Ouvre-la directement pour voir le classement.</span>
+                  </div>
+                </sc-if>
+
+                <!-- ligue pleine -->
+                <sc-if value="{{ f.sheetFull }}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; align-items: flex-start; gap: 10px; padding: 13px 14px; background: color-mix(in srgb, var(--warn-ink) 12%, transparent); border: 1px solid color-mix(in srgb, var(--warn-ink) 34%, transparent); border-radius: var(--radius-sm);">
+                    <span style="flex: none; color: var(--warn-ink); margin-top: 1px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path><path d="M12 9v4M12 17h.01"></path></svg></span>
+                    <span style="flex: 1; font-size: 13px; color: var(--text); line-height: 1.45; text-wrap: pretty;">Cette ligue est complète (50 / 50 membres). Demande à l'admin de faire de la place, puis réessaie.</span>
+                  </div>
+                </sc-if>
+
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="{{ f.sheetCtaVariant }}" full-width="{{ true }}" loading="{{ f.sheetCtaLoading }}" disabled="{{ f.sheetCtaDisabled }}" onClick="{{ f.noop }}" hint-size="100%,48px">{{ f.sheetCtaLabel }}</x-import>
+                  <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="ghost" full-width="{{ true }}" onClick="{{ f.noop }}" hint-size="100%,44px">Annuler</x-import>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ============ TOAST · succès ============ -->
+          <sc-if value="{{ f.showToast }}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; left: 20px; right: 20px; bottom: 28px; z-index: 30; display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--text); color: var(--bg); border-radius: var(--radius-pill); box-shadow: var(--shadow-lg); animation: tc-fade var(--dur) var(--ease-out); font-size: 13.5px; font-weight: 600;">
+              <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--success-500); color: #fff;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span>
+              <span style="flex: 1;">{{ f.toastMsg }}</span>
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:7400,&quot;height&quot;:1000}}">
+class Component extends DCLogic {
+  state = { seg: {} };
+
+  setSeg(fid, v) { this.setState((s) => ({ seg: { ...s.seg, [fid]: v } })); }
+
+  renderVals() {
+    const noop = () => {};
+    const segOptions = [
+      { value: 'creer', label: 'Créer' },
+      { value: 'rejoindre', label: 'Rejoindre' },
+    ];
+
+    // brand-friendly league colors (grenat reserved as spark → not offered as a fill)
+    const palette = ['#14432A', '#2A6FDB', '#1F8A6B', '#E0952A', '#7A4F9E', '#3C4657'];
+
+    const initialsOf = (name) => {
+      const parts = (name || '').trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return '?';
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    };
+
+    // OTP builder: 8 boxes, split visually into 2 groups of 4
+    const buildOtp = (str, activeIdx, error) => {
+      const chars = (str || '').split('');
+      const arr = [];
+      for (let i = 0; i < 8; i++) {
+        const ch = chars[i] || '';
+        let borderColor = 'var(--border)', bg = 'var(--surface)', ring = 'none', color = 'var(--text)';
+        if (error) {
+          borderColor = 'var(--danger)';
+          bg = 'color-mix(in srgb, var(--danger) 5%, var(--surface))';
+        } else if (ch) {
+          borderColor = 'var(--border-strong)';
+        } else if (i === activeIdx) {
+          borderColor = 'var(--accent)';
+          ring = '0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent)';
+        }
+        arr.push({ char: ch, borderColor, bg, ring, color });
+      }
+      return { otp1: arr.slice(0, 4), otp2: arr.slice(4, 8) };
+    };
+
+    const mkSwatches = (selIdx) => palette.map((c, i) => ({
+      color: c,
+      selected: i === selIdx,
+      ring: i === selIdx ? '0 0 0 3px var(--bg), 0 0 0 5.5px var(--accent)' : '0 0 0 1px color-mix(in srgb, var(--text) 12%, transparent)',
+    }));
+
+    // ---------------- Frame definitions ----------------
+    const defs = [
+      // ---- CRÉER ----
+      { id: 'creer_empty_l', theme: 'light', tab: 'creer', label: 'Créer · champ vide (état initial)', dot: '#8A8071',
+        name: '', colorIdx: 0 },
+      { id: 'creer_empty_d', theme: 'dark', tab: 'creer', label: 'Créer · champ vide · sombre', dot: '#2C2A26',
+        name: '', colorIdx: 0 },
+      { id: 'creer_error_l', theme: 'light', tab: 'creer', label: 'Créer · erreur de validation', dot: '#C4362B',
+        name: 'Le', colorIdx: 1, nameError: 'Le nom doit faire au moins 3 caractères.', focused: true },
+      { id: 'creer_picker_l', theme: 'light', tab: 'creer', label: 'Créer · nom saisi + choix couleur', dot: '#8A8071',
+        name: 'Les Potes du Sud', colorIdx: 3, focused: true },
+      { id: 'creer_loading_l', theme: 'light', tab: 'creer', label: 'Créer · création en cours', dot: '#8A8071',
+        name: 'Les Potes du Sud', colorIdx: 3, loading: true },
+      { id: 'creer_success_l', theme: 'light', tab: 'creer', label: 'Créer · succès → invitation', dot: '#2E8B57',
+        success: true, sname: 'Les Potes du Sud', scode: 'PECH-4X9' },
+      { id: 'creer_success_d', theme: 'dark', tab: 'creer', label: 'Créer · succès → invitation · sombre', dot: '#2E8B57',
+        success: true, sname: 'Les Potes du Sud', scode: 'PECH-4X9' },
+
+      // ---- REJOINDRE ----
+      { id: 'join_typing_l', theme: 'light', tab: 'rejoindre', label: 'Rejoindre · saisie en cours', dot: '#8A8071',
+        otp: 'PECH', active: 4 },
+      { id: 'join_typing_d', theme: 'dark', tab: 'rejoindre', label: 'Rejoindre · saisie en cours · sombre', dot: '#2C2A26',
+        otp: 'PECH', active: 4 },
+      { id: 'join_paste_l', theme: 'light', tab: 'rejoindre', label: 'Rejoindre · lien collé (code détecté)', dot: '#14432A',
+        otp: 'PECH4X9K', active: -1, linkDetected: true },
+      { id: 'join_invalid_l', theme: 'light', tab: 'rejoindre', label: 'Rejoindre · code invalide (inline error)', dot: '#C4362B',
+        otp: 'ZZ99QK21', active: -1, otpError: 'Aucune ligue trouvée avec ce code.' },
+      { id: 'join_found_l', theme: 'light', tab: 'rejoindre', label: 'Rejoindre · ligue trouvée (sheet)', dot: '#E63E63',
+        otp: 'PECH4X9K', active: -1, sheet: 'found' },
+      { id: 'join_found_d', theme: 'dark', tab: 'rejoindre', label: 'Rejoindre · ligue trouvée · sombre', dot: '#E63E63',
+        otp: 'PECH4X9K', active: -1, sheet: 'found' },
+      { id: 'join_member_l', theme: 'light', tab: 'rejoindre', label: 'Rejoindre · déjà membre (sheet)', dot: '#14432A',
+        otp: 'PECH4X9K', active: -1, sheet: 'member' },
+      { id: 'join_full_l', theme: 'light', tab: 'rejoindre', label: 'Rejoindre · ligue pleine (sheet)', dot: '#8A5A12',
+        otp: 'PECH4X9K', active: -1, sheet: 'full' },
+      { id: 'join_loading_l', theme: 'light', tab: 'rejoindre', label: 'Rejoindre · adhésion en cours', dot: '#E63E63',
+        otp: 'PECH4X9K', active: -1, sheet: 'loading' },
+      { id: 'join_success_l', theme: 'light', tab: 'rejoindre', label: 'Rejoindre · succès', dot: '#2E8B57',
+        otp: 'PECH4X9K', active: -1, toast: 'Bienvenue dans Les Bleus 2027 !' },
+    ];
+
+    // sheet content
+    const sheetLeague = { name: 'Les Bleus 2027', initials: 'LB', color: '#2A6FDB', meta: 'Ligue privée · 6 Nations 2027' };
+
+    const frames = defs.map((d) => {
+      const seg = this.state.seg[d.id] || d.tab;
+      const showCreer = seg === 'creer';
+      const showRejoindre = seg === 'rejoindre';
+
+      // créer form
+      const nameHasError = !!d.nameError;
+      const hasName = !!(d.name && d.name.length);
+      const otpData = buildOtp(d.otp, d.active == null ? -1 : d.active, !!d.otpError);
+
+      // sheet cta
+      let sheetCtaLabel = 'Rejoindre', sheetCtaVariant = 'primary', sheetCtaLoading = false, sheetCtaDisabled = false;
+      if (d.sheet === 'member') { sheetCtaLabel = 'Ouvrir la ligue'; sheetCtaVariant = 'secondary'; }
+      else if (d.sheet === 'full') { sheetCtaLabel = 'Ligue complète'; sheetCtaDisabled = true; }
+      else if (d.sheet === 'loading') { sheetCtaLoading = true; }
+      const sheetMembers = d.sheet === 'full' ? '50 / 50 membres' : (d.sheet === 'member' ? '7 membres' : '6 membres');
+
+      return {
+        id: d.id, label: d.label, theme: d.theme, dot: d.dot, noop,
+        heroTitle: showCreer ? 'Nouvelle ligue' : 'Rejoindre une ligue',
+        selCreer: () => this.setSeg(d.id, 'creer'),
+        selRejoindre: () => this.setSeg(d.id, 'rejoindre'),
+        segCreerBg: showCreer ? 'var(--accent)' : 'transparent',
+        segCreerColor: showCreer ? 'var(--on-accent)' : 'var(--text-faint)',
+        segCreerShadow: showCreer ? 'var(--glow-accent)' : 'none',
+        segRejoindreBg: showRejoindre ? 'var(--accent)' : 'transparent',
+        segRejoindreColor: showRejoindre ? 'var(--on-accent)' : 'var(--text-faint)',
+        segRejoindreShadow: showRejoindre ? 'var(--glow-accent)' : 'none',
+
+        showCreer, showRejoindre,
+
+        // ---- créer ----
+        creerSuccess: showCreer && !!d.success,
+        creerForm: showCreer && !d.success,
+        leagueName: d.sname || 'Les Potes du Sud',
+        leagueCode: d.scode || 'PECH-4X9',
+
+        initials: initialsOf(d.name),
+        namePreview: hasName ? '' : 'Choisis un nom mémorable',
+        iconColor: palette[d.colorIdx || 0],
+        swatches: mkSwatches(d.colorIdx || 0),
+
+        nameText: hasName ? d.name : 'ex. Les Potes du Sud',
+        nameColor: hasName ? 'var(--text)' : 'var(--text-faint)',
+        nameBorder: nameHasError ? 'var(--danger)' : (d.focused ? 'var(--accent)' : 'var(--border-strong)'),
+        nameRing: nameHasError
+          ? '0 0 0 3px color-mix(in srgb, var(--danger) 14%, transparent)'
+          : (d.focused ? '0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent)' : 'none'),
+        nameFocused: !!d.focused && !nameHasError,
+        nameHasError,
+        nameErrorMsg: d.nameError || '',
+        nameShowHelper: !nameHasError,
+
+        creerLoading: !!d.loading,
+        creerDisabled: !hasName && !d.loading,
+
+        // ---- rejoindre ----
+        otp1: otpData.otp1,
+        otp2: otpData.otp2,
+        otpError: !!d.otpError,
+        otpErrorMsg: d.otpError || '',
+        linkDetected: !!d.linkDetected,
+
+        // ---- sheet ----
+        sheetOpen: !!d.sheet,
+        sheetName: sheetLeague.name,
+        sheetInitials: sheetLeague.initials,
+        sheetColor: sheetLeague.color,
+        sheetMeta: sheetLeague.meta,
+        sheetMembers,
+        sheetMember: d.sheet === 'member',
+        sheetFull: d.sheet === 'full',
+        sheetCtaLabel, sheetCtaVariant, sheetCtaLoading, sheetCtaDisabled,
+
+        // ---- toast ----
+        showToast: !!d.toast,
+        toastMsg: d.toast || '',
+      };
+    });
+
+    return { frames };
+  }
+}
+</script>
+</body>
+</html>

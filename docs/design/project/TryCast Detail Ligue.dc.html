@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/styles.css">
+  <script src="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/_ds_bundle.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    /* LIGHT overrides matched to sibling screens (cream paper) + dedicated DANGER token.
+       Danger (brick) is intentionally distinct from grenat: grenat = spark (active/1st/moi),
+       brick-red = the ONLY destruction color (quitter / supprimer / retirer). */
+    [data-theme="light"] {
+      --bg: var(--cream); --surface: var(--cream-100); --surface-sunken: var(--cream-200);
+      --border: var(--cream-200); --border-strong: #D8CEB8;
+      --text: var(--ink-900); --text-muted: var(--ink-600); --text-faint: var(--ink-400);
+      --brand: var(--green-800); --on-brand: var(--cream);
+      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: var(--cream);
+      --focus-ring: var(--grenat-500);
+      --danger: #C4362B; --danger-press: #A82C22; --on-danger: #FBF7EF;
+      --shadow-sm: 0 1px 2px rgba(22,19,14,0.06); --shadow-md: 0 4px 14px rgba(22,19,14,0.08); --shadow-lg: 0 12px 32px rgba(22,19,14,0.12);
+    }
+    [data-theme="dark"] { --danger: #F0685A; --danger-press: #D8564A; --on-danger: #2A0F0C; }
+    .tc-scroll::-webkit-scrollbar { width: 0; height: 0; }
+    .tc-strip::-webkit-scrollbar { width: 0; height: 0; }
+    @keyframes tc-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    @keyframes tc-pop { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+    @keyframes tc-slideup { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    @keyframes tc-shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+    .tc-shim { background: linear-gradient(90deg, color-mix(in srgb, var(--text) 7%, transparent) 25%, color-mix(in srgb, var(--text) 15%, transparent) 37%, color-mix(in srgb, var(--text) 7%, transparent) 63%); background-size: 400% 100%; animation: tc-shimmer 1.4s ease infinite; border-radius: var(--radius-xs); }
+  </style>
+</helmet>
+<div style="width: max-content; min-height: 100vh; padding: 48px; background: #7C776E; font-family: var(--font-body); display: flex; flex-direction: column; gap: 32px;">
+
+  <div style="display: flex; flex-direction: column; gap: 6px; color: #FBF7EF;">
+    <span style="font-family: var(--font-display); font-size: 34px; letter-spacing: 0.01em;">TryCast — Détail d'une ligue</span>
+    <span style="font-size: 14px; color: rgba(255,255,255,0.72);">En-tête ligue · onglets Classement / Résultats / Réglages · vue admin &amp; membre · invitation, gestion des membres, zone danger · modales de confirmation · thèmes clair &amp; sombre · états limites</span>
+  </div>
+
+  <div style="display: flex; flex-wrap: nowrap; gap: 40px; align-items: flex-start;">
+    <sc-for list="{{ frames }}" as="f" hint-placeholder-count="16">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+
+        <div style="display: inline-flex; align-items: center; gap: 8px; color: #FBF7EF; font-size: 13px; font-weight: 600; padding: 0 4px; max-width: 390px;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ f.dot }}; flex: none;"></span>{{ f.label }}
+        </div>
+
+        <!-- PHONE -->
+        <div class="tc-phone" data-theme="{{ f.theme }}" data-screen-label="{{ f.label }}" style="position: relative; width: 390px; height: 844px; font-family: var(--font-body); background: var(--bg); color: var(--text); border-radius: 46px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column;">
+
+          <!-- Status bar -->
+          <div style="flex: none; display: flex; justify-content: space-between; align-items: center; padding: 14px 30px 8px; font-size: 13px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums;">
+            <span>9:41</span>
+            <span style="display: flex; gap: 7px; align-items: center;">
+              <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"></rect><rect x="9" y="2" width="3" height="9" rx="1"></rect><rect x="13.5" y="0" width="3" height="11" rx="1"></rect></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M1 4.2C3 2.4 5.4 1.4 8 1.4s5 1 7 2.8"></path><path d="M3.4 7C4.7 5.9 6.3 5.3 8 5.3s3.3.6 4.6 1.7"></path><path d="M6 9.6c.6-.5 1.3-.8 2-.8s1.4.3 2 .8"></path></svg>
+              <svg width="26" height="12" viewBox="0 0 26 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity="0.4"></rect><rect x="2" y="2" width="17" height="8" rx="1.5" fill="currentColor"></rect><rect x="23" y="4" width="2" height="4" rx="1" fill="currentColor" opacity="0.4"></rect></svg>
+            </span>
+          </div>
+
+          <!-- NAV: back + overflow -->
+          <div style="flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 12px 6px;">
+            <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.IconButton" variant="ghost" ariaLabel="Retour" onClick="{{ f.noop }}" hint-size="44px,44px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></x-import>
+            <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint);">Ma ligue</span>
+            <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.IconButton" variant="ghost" ariaLabel="Options" onClick="{{ f.noop }}" hint-size="44px,44px"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></x-import>
+          </div>
+
+          <!-- LEAGUE IDENTITY -->
+          <div style="flex: none; display: flex; align-items: center; gap: 14px; padding: 6px 20px 14px;">
+            <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 58px; height: 58px; border-radius: var(--radius-md); background: var(--brand); color: var(--on-brand); font-family: var(--font-display); font-size: 26px; letter-spacing: 0.02em; box-shadow: var(--shadow-sm);">{{ f.leagueInitials }}</span>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px;">
+              <span style="font-family: var(--font-display); font-size: 28px; line-height: 0.98; letter-spacing: 0.01em; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ f.leagueName }}</span>
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; color: var(--text-muted);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path></svg>{{ f.membersLine }}</span>
+                <sc-if value="{{ f.isAdmin }}" hint-placeholder-val="{{ false }}">
+                  <span style="display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 9px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--brand) 13%, transparent); color: var(--brand); font-size: 10px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 5.4 5.6.5-4.2 3.7 1.2 5.4L12 19.8 6.9 22.5l1.2-5.4L4 13.4l5.6-.5z"></path></svg>Admin</span>
+                </sc-if>
+                <sc-if value="{{ f.isMemberBadge }}" hint-placeholder-val="{{ true }}">
+                  <span style="display: inline-flex; align-items: center; height: 20px; padding: 0 9px; border-radius: var(--radius-pill); background: var(--surface-sunken); color: var(--text-muted); font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">Membre</span>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+
+          <!-- TABS -->
+          <div style="flex: none; padding: 0 20px 14px;">
+            <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.SegmentedControl" options="{{ f.tabOptions }}" value="{{ f.tabValue }}" onChange="{{ f.setTab }}" hint-size="100%,40px"></x-import>
+          </div>
+
+          <!-- SCROLL REGION -->
+          <div class="tc-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 2px 20px 32px;">
+
+            <!-- ===================== LOADING (per-tab skeleton) ===================== -->
+            <sc-if value="{{ f.isLoading }}" hint-placeholder-val="{{ false }}">
+              <!-- classement skeleton -->
+              <sc-if value="{{ f.skClassement }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; gap: 20px; padding-top: 6px;">
+                  <div style="display: flex; align-items: flex-end; justify-content: center; gap: 10px; padding: 4px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;"><div class="tc-shim" style="width: 44px; height: 44px; border-radius: 50%;"></div><div class="tc-shim" style="width: 48px; height: 11px;"></div><div class="tc-shim" style="width: 84px; height: 62px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;"></div></div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;"><div class="tc-shim" style="width: 58px; height: 58px; border-radius: 50%;"></div><div class="tc-shim" style="width: 54px; height: 12px;"></div><div class="tc-shim" style="width: 92px; height: 92px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;"></div></div>
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;"><div class="tc-shim" style="width: 44px; height: 44px; border-radius: 50%;"></div><div class="tc-shim" style="width: 48px; height: 11px;"></div><div class="tc-shim" style="width: 84px; height: 48px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;"></div></div>
+                  </div>
+                  <div class="tc-shim" style="width: 150px; height: 12px;"></div>
+                  <sc-for list="{{ f.skeletons }}" as="sk" hint-placeholder-count="5">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 4px 2px;"><div class="tc-shim" style="width: 20px; height: 16px;"></div><div class="tc-shim" style="width: 32px; height: 32px; border-radius: 50%;"></div><div class="tc-shim" style="flex: 1; height: 14px; max-width: 150px;"></div><div class="tc-shim" style="width: 40px; height: 20px;"></div></div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <!-- résultats skeleton -->
+              <sc-if value="{{ f.skResultats }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; gap: 16px; padding-top: 4px;">
+                  <div style="display: flex; gap: 10px;"><div class="tc-shim" style="width: 52px; height: 60px; border-radius: var(--radius-pill);"></div><div class="tc-shim" style="width: 52px; height: 60px; border-radius: var(--radius-pill);"></div><div class="tc-shim" style="width: 52px; height: 60px; border-radius: var(--radius-pill);"></div><div class="tc-shim" style="width: 52px; height: 60px; border-radius: var(--radius-pill);"></div><div class="tc-shim" style="width: 52px; height: 60px; border-radius: var(--radius-pill);"></div></div>
+                  <div class="tc-shim" style="width: 160px; height: 12px;"></div>
+                  <sc-for list="{{ f.skeletons }}" as="sk" hint-placeholder-count="5">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 4px 2px;"><div class="tc-shim" style="width: 20px; height: 16px;"></div><div class="tc-shim" style="width: 32px; height: 32px; border-radius: 50%;"></div><div class="tc-shim" style="flex: 1; height: 14px; max-width: 140px;"></div><div class="tc-shim" style="width: 42px; height: 22px;"></div></div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <!-- réglages skeleton -->
+              <sc-if value="{{ f.skReglages }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; gap: 18px; padding-top: 4px;">
+                  <div class="tc-shim" style="width: 110px; height: 12px;"></div>
+                  <div class="tc-shim" style="width: 100%; height: 128px; border-radius: var(--radius-md);"></div>
+                  <div class="tc-shim" style="width: 140px; height: 12px;"></div>
+                  <sc-for list="{{ f.skeletons }}" as="sk" hint-placeholder-count="4">
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 4px 2px;"><div class="tc-shim" style="width: 34px; height: 34px; border-radius: 50%;"></div><div class="tc-shim" style="flex: 1; height: 14px; max-width: 150px;"></div><div class="tc-shim" style="width: 24px; height: 24px; border-radius: 50%;"></div></div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </sc-if>
+
+            <!-- ===================== TAB: CLASSEMENT ===================== -->
+            <sc-if value="{{ f.showClassement }}" hint-placeholder-val="{{ true }}">
+
+              <!-- 1-MEMBER: reduced ranking + invitation highlighted -->
+              <sc-if value="{{ f.isOneMember }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; flex-direction: column; gap: 18px; padding-top: 6px;">
+                  <div style="display: flex; align-items: center; gap: 11px; padding: 12px 14px; background: color-mix(in srgb, var(--accent) 8%, var(--surface)); border: 1.5px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: var(--radius-md);">
+                    <span style="flex: none; min-width: 24px; text-align: center; font-family: var(--font-display); font-size: 19px; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums;">1</span>
+                    <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="Antoine Mercier" size="sm" ring="{{ true }}" hint-size="32px,32px"></x-import>
+                    <span style="flex: 1; min-width: 0; font-size: 14px; font-weight: 700; color: var(--text);">Antoine M. · toi</span>
+                    <span style="flex: none; display: inline-flex; align-items: baseline; gap: 2px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums;">244</span><span style="font-size: 10px; font-weight: 700; color: var(--text-faint);">pts</span></span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding: 18px 16px 8px; background: var(--surface); border: 1px dashed var(--border-strong); border-radius: var(--radius-md);">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; border-radius: 50%; background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.4"></circle><path d="M3.5 20c0-3.4 2.7-5.5 5.5-5.5s5.5 2.1 5.5 5.5"></path><path d="M19 8v6M22 11h-6"></path></svg></span>
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                      <span style="font-family: var(--font-display); font-size: 22px; letter-spacing: 0.01em; color: var(--text);">Tu es seul pour l'instant</span>
+                      <span style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5; max-width: 250px; text-wrap: pretty;">Le classement prend vie dès qu'un pote te rejoint. Partage ton code d'invitation.</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--surface-sunken); border-radius: var(--radius-md); margin-top: 2px;">
+                      <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);">Code</span>
+                      <span style="font-family: var(--font-display); font-size: 24px; letter-spacing: 0.14em; color: var(--text); font-variant-numeric: tabular-nums;">{{ f.leagueCode }}</span>
+                    </div>
+                    <div style="width: 100%; max-width: 260px; margin-top: 4px;">
+                      <button type="button" onClick="{{ f.onGoReglages }}" style="width: 100%; height: 48px; border-radius: var(--radius-pill); border: none; background: var(--brand); color: var(--on-brand); font-family: var(--font-body); font-weight: 700; font-size: 15px; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-active="transform: scale(0.97);">Inviter des amis</button>
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <!-- FULL: podium + table -->
+              <sc-if value="{{ f.showFullRanking }}" hint-placeholder-val="{{ true }}">
+                <div style="display: flex; flex-direction: column; gap: 20px; padding-top: 6px;">
+
+                  <!-- PODIUM -->
+                  <div style="display: flex; align-items: flex-end; justify-content: center; gap: 8px; padding: 6px 2px 0;">
+                    <!-- 2e -->
+                    <div style="flex: 1; max-width: 106px; display: flex; flex-direction: column; align-items: center; gap: 7px;">
+                      <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ f.p2.name }}" size="md" ring="{{ f.p2.isMe }}" hint-size="40px,40px"></x-import>
+                      <span style="max-width: 100%; font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;">{{ f.p2.name }}</span>
+                      <span style="display: inline-flex; align-items: baseline; gap: 2px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ f.p2.pts }}</span><span style="font-size: 9px; font-weight: 700; color: var(--text-faint);">pts</span></span>
+                      <div style="width: 100%; height: 68px; border-radius: var(--radius-sm) var(--radius-sm) 0 0; background: var(--surface); border: 1px solid var(--border); border-bottom: none; display: flex; align-items: center; justify-content: center;"><span style="font-family: var(--font-display); font-size: 30px; line-height: 1; color: var(--text-muted); font-variant-numeric: tabular-nums;">2</span></div>
+                    </div>
+                    <!-- 1er -->
+                    <div style="flex: 1; max-width: 118px; display: flex; flex-direction: column; align-items: center; gap: 7px;">
+                      <span style="color: var(--accent); margin-bottom: -2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.7 6.3L21 9l-4.8 4.1L17.7 20 12 16.4 6.3 20l1.5-6.9L3 9l6.3-.7z"></path></svg></span>
+                      <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ f.p1.name }}" size="lg" ring="{{ f.p1.isMe }}" hint-size="56px,56px"></x-import>
+                      <span style="max-width: 100%; font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;">{{ f.p1.name }}</span>
+                      <span style="display: inline-flex; align-items: baseline; gap: 2px;"><span style="font-family: var(--font-display); font-size: 26px; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums;">{{ f.p1.pts }}</span><span style="font-size: 10px; font-weight: 700; color: var(--accent);">pts</span></span>
+                      <div style="width: 100%; height: 96px; border-radius: var(--radius-sm) var(--radius-sm) 0 0; background: color-mix(in srgb, var(--accent) 10%, var(--surface)); border: 1.5px solid color-mix(in srgb, var(--accent) 40%, transparent); border-bottom: none; box-shadow: var(--glow-accent); display: flex; align-items: center; justify-content: center;"><span style="font-family: var(--font-display); font-size: 40px; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums;">1</span></div>
+                    </div>
+                    <!-- 3e -->
+                    <div style="flex: 1; max-width: 106px; display: flex; flex-direction: column; align-items: center; gap: 7px;">
+                      <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ f.p3.name }}" size="md" ring="{{ f.p3.isMe }}" hint-size="40px,40px"></x-import>
+                      <span style="max-width: 100%; font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;">{{ f.p3.name }}</span>
+                      <span style="display: inline-flex; align-items: baseline; gap: 2px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ f.p3.pts }}</span><span style="font-size: 9px; font-weight: 700; color: var(--text-faint);">pts</span></span>
+                      <div style="width: 100%; height: 52px; border-radius: var(--radius-sm) var(--radius-sm) 0 0; background: var(--surface); border: 1px solid var(--border); border-bottom: none; display: flex; align-items: center; justify-content: center;"><span style="font-family: var(--font-display); font-size: 30px; line-height: 1; color: var(--text-muted); font-variant-numeric: tabular-nums;">3</span></div>
+                    </div>
+                  </div>
+
+                  <!-- TABLE -->
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 0 2px;">
+                      <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text);">Classement complet</span>
+                      <span style="flex: none; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint); white-space: nowrap;">{{ f.membersLine }}</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                      <sc-for list="{{ f.rows }}" as="s" hint-placeholder-count="6">
+                        <div style="display: flex; align-items: center; gap: 11px; padding: 10px 12px; background: {{ s.rowBg }}; border-left: {{ s.rowEdge }}; border-radius: var(--radius-sm);">
+                          <span style="flex: none; min-width: 24px; text-align: center; font-family: var(--font-display); font-size: 17px; line-height: 1; color: {{ s.rankColor }}; font-variant-numeric: tabular-nums;">{{ s.rank }}</span>
+                          <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ s.name }}" size="sm" ring="{{ s.isMe }}" hint-size="32px,32px"></x-import>
+                          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                            <span style="font-size: 14px; font-weight: {{ s.nameWeight }}; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ s.displayName }}</span>
+                            <span style="display: flex; align-items: center; gap: 7px; flex-wrap: wrap;">
+                              <span style="font-size: 11px; font-weight: 600; color: var(--text-faint);">{{ s.goodStr }}</span>
+                              <sc-if value="{{ s.hasExact }}" hint-placeholder-val="{{ false }}"><span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px 1px 5px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); font-size: 10px; font-weight: 700;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4"></circle></svg>{{ s.exactStr }}</span></sc-if>
+                            </span>
+                          </span>
+                          <span style="flex: none; display: inline-flex; align-items: baseline; gap: 2px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: {{ s.ptsColor }}; font-variant-numeric: tabular-nums;">{{ s.pts }}</span><span style="font-size: 10px; font-weight: 700; color: var(--text-faint);">pts</span></span>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+              </sc-if>
+            </sc-if>
+
+            <!-- ===================== TAB: RÉSULTATS ===================== -->
+            <sc-if value="{{ f.showResultats }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 16px; padding-top: 2px;">
+
+                <!-- journée strip -->
+                <div style="display: flex; flex-direction: column; gap: 9px;">
+                  <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); padding: 0 2px;">Journée</span>
+                  <div class="tc-strip" style="display: flex; gap: 9px; overflow-x: auto; padding: 2px 0 4px;">
+                    <sc-for list="{{ f.journees }}" as="j" hint-placeholder-count="5">
+                      <button type="button" onClick="{{ j.onSelect }}" style="flex: 0 0 auto; width: 54px; min-height: 66px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 8px 0; border-radius: var(--radius-pill); background: {{ j.bg }}; color: {{ j.color }}; border: {{ j.border }}; box-shadow: {{ j.boxShadow }}; opacity: {{ j.opacity }}; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);">
+                        <span style="font-weight: 700; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: {{ j.overlineColor }};">J</span>
+                        <span style="font-family: var(--font-display); font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums;">{{ j.num }}</span>
+                        <span style="width: 5px; height: 5px; border-radius: 50%; background: {{ j.dotColor }};"></span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </div>
+
+                <!-- RÉSULTATS · empty (journée pas jouée) -->
+                <sc-if value="{{ f.resEmpty }}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 13px; padding: 40px 16px 20px;">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 62px; height: 62px; border-radius: 50%; background: var(--surface-sunken); color: var(--text-faint);"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span>
+                    <span style="font-family: var(--font-display); font-size: 22px; letter-spacing: 0.01em; color: var(--text);">Journée pas encore jouée</span>
+                    <span style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5; max-width: 260px; text-wrap: pretty;">Les points de la <b style="color: var(--text); font-weight: 700;">journée {{ f.selectedNum }}</b> s'afficheront ici une fois les matchs terminés et les pronos réconciliés.</span>
+                    <button type="button" onClick="{{ f.onBackToLastJournee }}" style="margin-top: 4px; display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: var(--radius-pill); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font-family: var(--font-body); font-weight: 600; font-size: 13px; cursor: pointer; -webkit-tap-highlight-color: transparent;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>Voir la journée {{ f.lastPlayedNum }}</button>
+                  </div>
+                </sc-if>
+
+                <!-- RÉSULTATS · per-journée member ranking -->
+                <sc-if value="{{ f.resList }}" hint-placeholder-val="{{ true }}">
+                  <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 0 2px;">
+                      <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text);">Journée {{ f.selectedNum }}</span>
+                      <span style="flex: none; font-size: 11px; font-weight: 600; color: var(--text-faint); white-space: nowrap;">{{ f.journeeMeta }}</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                      <sc-for list="{{ f.journeeRows }}" as="r" hint-placeholder-count="6">
+                        <div style="display: flex; align-items: center; gap: 11px; padding: 10px 12px; background: {{ r.rowBg }}; border-left: {{ r.rowEdge }}; border-radius: var(--radius-sm);">
+                          <span style="flex: none; min-width: 22px; text-align: center; font-family: var(--font-display); font-size: 17px; line-height: 1; color: {{ r.rankColor }}; font-variant-numeric: tabular-nums;">{{ r.rank }}</span>
+                          <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ r.name }}" size="sm" ring="{{ r.isMe }}" hint-size="32px,32px"></x-import>
+                          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                            <span style="font-size: 14px; font-weight: {{ r.nameWeight }}; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ r.displayName }}</span>
+                            <span style="font-size: 11px; font-weight: 600; color: {{ r.exactColor }};">{{ r.exactStr }}</span>
+                          </span>
+                          <span style="flex: none; display: inline-flex; align-items: baseline; gap: 2px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: {{ r.ptsColor }}; font-variant-numeric: tabular-nums;">{{ r.ptsStr }}</span><span style="font-size: 10px; font-weight: 700; color: var(--text-faint);">pts</span></span>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <div style="display: flex; align-items: flex-start; gap: 7px; padding: 6px 4px 0; color: var(--text-muted);">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 12h1v4h1"></path></svg>
+                      <span style="font-size: 12px; line-height: 1.4; text-wrap: pretty;">Points de cette journée uniquement — pas le cumul de la saison.</span>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+
+            <!-- ===================== TAB: RÉGLAGES ===================== -->
+            <sc-if value="{{ f.showReglages }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 22px; padding-top: 2px;">
+
+                <!-- INVITATION (tous) -->
+                <div style="display: flex; flex-direction: column; gap: 9px;">
+                  <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); padding: 0 4px;">Inviter des amis</span>
+                  <div style="display: flex; flex-direction: column; gap: 14px; padding: 18px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                      <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);">Code de la ligue</span>
+                      <span style="font-family: var(--font-display); font-size: 40px; line-height: 1; letter-spacing: 0.16em; color: var(--text); font-variant-numeric: tabular-nums; padding-left: 0.16em;">{{ f.leagueCode }}</span>
+                      <span style="font-size: 12px; color: var(--text-muted); text-align: center; line-height: 1.4;">Partage ce code : tes potes le saisissent pour rejoindre la ligue.</span>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                      <button type="button" onClick="{{ f.onCopy }}" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 46px; border-radius: var(--radius-pill); border: none; background: var(--brand); color: var(--on-brand); font-family: var(--font-body); font-weight: 700; font-size: 14px; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-active="transform: scale(0.97);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>Copier</button>
+                      <button type="button" onClick="{{ f.noop }}" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 46px; border-radius: var(--radius-pill); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font-family: var(--font-body); font-weight: 700; font-size: 14px; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-active="transform: scale(0.97);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"></path></svg>Partager</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- GESTION DES MEMBRES (admin only) -->
+                <sc-if value="{{ f.isAdmin }}" hint-placeholder-val="{{ false }}">
+                  <div style="display: flex; flex-direction: column; gap: 9px;">
+                    <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 0 4px;">
+                      <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint);">Membres</span>
+                      <span style="font-size: 11px; font-weight: 600; color: var(--text-faint);">{{ f.membersLine }}</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;">
+                      <sc-for list="{{ f.memberRows }}" as="m" hint-placeholder-count="6">
+                        <div style="display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-top: {{ m.edge }};">
+                          <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ m.name }}" size="sm" ring="{{ m.isMe }}" hint-size="32px,32px"></x-import>
+                          <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                            <span style="font-size: 14.5px; font-weight: {{ m.weight }}; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ m.displayName }}</span>
+                            <span style="font-size: 11px; font-weight: 600; color: var(--text-faint);">{{ m.sub }}</span>
+                          </span>
+                          <sc-if value="{{ m.creatorTag }}" hint-placeholder-val="{{ false }}">
+                            <span style="flex: none; display: inline-flex; align-items: center; height: 20px; padding: 0 9px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--brand) 12%, transparent); color: var(--brand); font-size: 10px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">Créateur</span>
+                          </sc-if>
+                          <sc-if value="{{ m.canRemove }}" hint-placeholder-val="{{ true }}">
+                            <button type="button" aria-label="Retirer ce membre" onClick="{{ m.onRemove }}" style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; border: none; background: transparent; color: var(--text-faint); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);" style-hover="background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.4"></circle><path d="M3.5 20c0-3.4 2.7-5.5 5.5-5.5 1.3 0 2.5.4 3.4 1.1"></path><path d="M16 12h6"></path></svg></button>
+                          </sc-if>
+                        </div>
+                      </sc-for>
+                    </div>
+                    <span style="font-size: 11.5px; color: var(--text-faint); line-height: 1.4; padding: 0 4px;">Retirer un membre demande une confirmation. Il pourra rejoindre à nouveau avec le code.</span>
+                  </div>
+                </sc-if>
+
+                <!-- ACTIONS · bas -->
+                <div style="display: flex; flex-direction: column; gap: 9px; margin-top: 4px; padding-top: 20px; border-top: 1px dashed var(--border-strong);">
+                  <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--danger); padding: 0 4px;">Zone de danger</span>
+
+                  <!-- MEMBER: quitter -->
+                  <sc-if value="{{ f.isMember }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; flex-direction: column; gap: 12px; padding: 15px; background: color-mix(in srgb, var(--danger) 6%, var(--surface)); border: 1px solid color-mix(in srgb, var(--danger) 30%, var(--border)); border-radius: var(--radius-md);">
+                      <div style="display: flex; flex-direction: column; gap: 3px;">
+                        <span style="font-size: 15px; font-weight: 700; color: var(--text);">Quitter la ligue</span>
+                        <span style="font-size: 12.5px; color: var(--text-muted); line-height: 1.45; text-wrap: pretty;">Tu perdras l'accès au classement et à l'historique de cette ligue.</span>
+                      </div>
+                      <button type="button" onClick="{{ f.noop }}" style="width: 100%; height: 48px; border-radius: var(--radius-pill); background: transparent; color: var(--danger); border: 1.5px solid var(--danger); font-family: var(--font-body); font-weight: 700; font-size: 15px; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-hover="background: color-mix(in srgb, var(--danger) 10%, transparent);">Quitter la ligue</button>
+                    </div>
+                  </sc-if>
+
+                  <!-- ADMIN: transférer + supprimer -->
+                  <sc-if value="{{ f.isAdmin }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; flex-direction: column; gap: 12px; padding: 15px; background: color-mix(in srgb, var(--danger) 6%, var(--surface)); border: 1px solid color-mix(in srgb, var(--danger) 30%, var(--border)); border-radius: var(--radius-md);">
+                      <div style="display: flex; align-items: flex-start; gap: 9px; padding: 11px 12px; background: color-mix(in srgb, var(--warning-500) 12%, transparent); border: 1px solid color-mix(in srgb, var(--warning-500) 30%, transparent); border-radius: var(--radius-sm);">
+                        <span style="flex: none; color: var(--warning-500); margin-top: 1px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path><path d="M12 9v4M12 17h.01"></path></svg></span>
+                        <span style="flex: 1; font-size: 12.5px; color: var(--text); line-height: 1.4; text-wrap: pretty;">Tu es le créateur. Transfère la propriété avant de quitter, ou supprime la ligue pour tout le monde.</span>
+                      </div>
+                      <button type="button" onClick="{{ f.noop }}" style="display: flex; align-items: center; gap: 11px; width: 100%; padding: 13px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; font-family: var(--font-body);" style-hover="background: color-mix(in srgb, var(--text) 3%, transparent);">
+                        <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--brand) 12%, transparent); color: var(--brand);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg></span>
+                        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                          <span style="font-size: 14.5px; font-weight: 700; color: var(--text);">Transférer la propriété</span>
+                          <span style="font-size: 11.5px; color: var(--text-muted); line-height: 1.35;">Désigne un membre comme nouvel admin.</span>
+                        </span>
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-faint);"><path d="M9 6l6 6-6 6"></path></svg>
+                      </button>
+                      <button type="button" onClick="{{ f.noop }}" style="width: 100%; height: 48px; border-radius: var(--radius-pill); background: transparent; color: var(--danger); border: 1.5px solid var(--danger); font-family: var(--font-body); font-weight: 700; font-size: 15px; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-hover="background: color-mix(in srgb, var(--danger) 10%, transparent);">Supprimer la ligue</button>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-if>
+
+          </div>
+
+          <!-- ============ TOAST · code copié ============ -->
+          <sc-if value="{{ f.showToast }}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; left: 20px; right: 20px; bottom: 28px; z-index: 30; display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: var(--text); color: var(--bg); border-radius: var(--radius-pill); box-shadow: var(--shadow-lg); animation: tc-fade var(--dur) var(--ease-out); font-size: 13.5px; font-weight: 600;">
+              <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--success-500); color: #fff;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span>
+              <span style="flex: 1;">Code copié · {{ f.leagueCode }}</span>
+            </div>
+          </sc-if>
+
+          <!-- ============ MODAL: QUITTER (simple) ============ -->
+          <sc-if value="{{ f.modalQuitter }}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; inset: 0; z-index: 50; background: rgba(11,26,17,0.5); animation: tc-fade var(--dur) var(--ease-out); display: flex; align-items: center; justify-content: center; padding: 16px;">
+              <div style="width: 100%; background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; animation: tc-pop var(--dur) var(--ease-out);">
+                <div style="padding: 24px 20px 8px; display: flex; flex-direction: column; align-items: center; gap: 13px; text-align: center;">
+                  <span style="display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger);"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5M21 12H9"></path></svg></span>
+                  <span style="font-family: var(--font-display); font-size: 25px; line-height: 1.05; letter-spacing: 0.01em; color: var(--text);">Quitter cette ligue ?</span>
+                  <span style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5; text-wrap: pretty;">Tu quittes <strong style="color: var(--text); font-weight: 700;">{{ f.leagueName }}</strong>. Tu perdras l'accès à son classement et à ton historique ici. Tu pourras la rejoindre à nouveau avec le code.</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px 20px 18px;">
+                  <button type="button" onClick="{{ f.noop }}" style="width: 100%; height: 50px; border-radius: var(--radius-pill); border: none; background: var(--danger); color: var(--on-danger); font-family: var(--font-body); font-weight: 700; font-size: 15px; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-active="transform: scale(0.98);">Quitter la ligue</button>
+                  <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="ghost" full-width="{{ true }}" onClick="{{ f.noop }}" hint-size="100%,44px">Annuler</x-import>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ============ MODAL: SUPPRIMER (forte) ============ -->
+          <sc-if value="{{ f.modalSupprimer }}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; inset: 0; z-index: 50; background: rgba(11,26,17,0.5); animation: tc-fade var(--dur) var(--ease-out); display: flex; align-items: center; justify-content: center; padding: 16px;">
+              <div style="width: 100%; max-height: calc(100% - 24px); background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; animation: tc-pop var(--dur) var(--ease-out); display: flex; flex-direction: column;">
+                <div class="tc-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 22px 20px 16px; display: flex; flex-direction: column; gap: 14px;">
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger);"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6M14 11v6"></path></svg></span>
+                    <span style="font-family: var(--font-display); font-size: 24px; line-height: 1.05; letter-spacing: 0.01em; color: var(--text);">Supprimer {{ f.leagueName }} ?</span>
+                    <span style="font-size: 13px; color: var(--text-muted); line-height: 1.45; text-wrap: pretty;">Cette action est <strong style="color: var(--danger);">irréversible</strong>. Pour tous les membres :</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 8px; padding: 13px 15px; background: color-mix(in srgb, var(--danger) 6%, var(--surface-sunken)); border-radius: var(--radius-sm);">
+                    <sc-for list="{{ f.deleteLosses }}" as="l" hint-placeholder-count="3">
+                      <div style="display: flex; align-items: center; gap: 9px;">
+                        <span style="flex: none; color: var(--danger);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></span>
+                        <span style="font-size: 13px; color: var(--text);">{{ l.t }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <button type="button" onClick="{{ f.noop }}" style="display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: 0; border: none; background: transparent; cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; font-family: var(--font-body);">
+                    <span style="flex: none; margin-top: 1px; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 6px; border: 1.8px solid var(--danger); background: var(--danger); color: var(--on-danger);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span>
+                    <span style="flex: 1; font-size: 13px; color: var(--text); line-height: 1.4;">Je comprends que la ligue et son classement seront définitivement supprimés.</span>
+                  </button>
+                </div>
+                <div style="flex: none; display: flex; flex-direction: column; gap: 10px; padding: 14px 20px 18px; border-top: 1px solid var(--border); background: var(--surface);">
+                  <button type="button" onClick="{{ f.noop }}" style="width: 100%; height: 50px; border-radius: var(--radius-pill); border: none; background: var(--danger); color: var(--on-danger); font-family: var(--font-body); font-weight: 700; font-size: 15px; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-active="transform: scale(0.98);">Supprimer définitivement</button>
+                  <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="ghost" full-width="{{ true }}" onClick="{{ f.noop }}" hint-size="100%,44px">Annuler</x-import>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ============ MODAL: RETIRER UN MEMBRE (simple) ============ -->
+          <sc-if value="{{ f.modalRetirer }}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; inset: 0; z-index: 50; background: rgba(11,26,17,0.5); animation: tc-fade var(--dur) var(--ease-out); display: flex; align-items: center; justify-content: center; padding: 16px;">
+              <div style="width: 100%; background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; animation: tc-pop var(--dur) var(--ease-out);">
+                <div style="padding: 24px 20px 8px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
+                  <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ f.removeName }}" size="lg" hint-size="56px,56px"></x-import>
+                  <span style="font-family: var(--font-display); font-size: 24px; line-height: 1.05; letter-spacing: 0.01em; color: var(--text);">Retirer {{ f.removeFirst }} ?</span>
+                  <span style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5; text-wrap: pretty;">{{ f.removeFirst }} perdra l'accès à <strong style="color: var(--text); font-weight: 700;">{{ f.leagueName }}</strong> et à son classement. Tu pourras le réinviter avec le code.</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px 20px 18px;">
+                  <button type="button" onClick="{{ f.onCloseModal }}" style="width: 100%; height: 50px; border-radius: var(--radius-pill); border: none; background: var(--danger); color: var(--on-danger); font-family: var(--font-body); font-weight: 700; font-size: 15px; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-active="transform: scale(0.98);">Retirer de la ligue</button>
+                  <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="ghost" full-width="{{ true }}" onClick="{{ f.onCloseModal }}" hint-size="100%,44px">Annuler</x-import>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:6640,&quot;height&quot;:1000}}">
+class Component extends DCLogic {
+  state = { tab: {}, journee: {}, rm: {} };
+
+  setTab(fid, v) { this.setState((s) => ({ tab: { ...s.tab, [fid]: v } })); }
+  selectJournee(fid, key) { this.setState((s) => ({ journee: { ...s.journee, [fid]: key } })); }
+  openRemove(fid, name) { this.setState((s) => ({ rm: { ...s.rm, [fid]: name } })); }
+  closeRemove(fid) { this.setState((s) => ({ rm: { ...s.rm, [fid]: null } })); }
+
+  renderVals() {
+    const leagueName = 'Les Potes';
+    const leagueInitials = 'LP';
+    const leagueCode = 'PECH-4X9';
+    const memberFmt = (n) => n + (n > 1 ? ' membres' : ' membre');
+    const goodFmt = (n) => n + (n > 1 ? ' bons pronos' : ' bon prono');
+    const exactSeasonFmt = (n) => n + (n > 1 ? ' scores exacts' : ' score exact');
+    const firstNameOf = (full) => full.split(' ')[0];
+    const shortName = (full) => { const p = full.split(' '); return p.length > 1 ? p[0] + ' ' + p[1][0] + '.' : full; };
+
+    // ---- Members (Les Potes, 6) ----
+    // Admin view: I (Antoine) am creator. Member view: Léa is creator.
+    const memberNames = ['Léa Berthier', 'Karim Mensah', 'Hugo Delaunay', 'Sophie Lémaire', 'Antoine Mercier', 'Thomas Payet'];
+    const memberCount = 6;
+
+    // ---- Season standings (Classement tab) ----
+    const standings = [
+      { rank: 1, name: 'Léa Berthier', pts: 342, good: 24, exact: 5 },
+      { rank: 2, name: 'Karim Mensah', pts: 318, good: 22, exact: 3 },
+      { rank: 3, name: 'Hugo Delaunay', pts: 291, good: 20, exact: 2 },
+      { rank: 4, name: 'Sophie Lémaire', pts: 268, good: 18, exact: 0 },
+      { rank: 5, name: 'Antoine Mercier', pts: 244, good: 16, exact: 1, me: true },
+      { rank: 6, name: 'Thomas Payet', pts: 221, good: 14, exact: 0 },
+    ];
+    const mkRow = (r) => ({
+      rank: r.rank, name: r.name,
+      displayName: r.me ? shortName(r.name) + ' · toi' : r.name,
+      isMe: !!r.me,
+      nameWeight: r.me ? 700 : 600,
+      pts: r.pts,
+      ptsColor: r.me ? 'var(--accent)' : 'var(--text)',
+      goodStr: goodFmt(r.good),
+      hasExact: (r.exact || 0) > 0,
+      exactStr: exactSeasonFmt(r.exact || 0),
+      rankColor: r.me ? 'var(--accent)' : (r.rank <= 3 ? 'var(--brand)' : 'var(--text-muted)'),
+      rowBg: r.me ? 'color-mix(in srgb, var(--accent) 8%, var(--surface))' : 'var(--surface)',
+      rowEdge: r.me ? '3px solid var(--accent)' : '3px solid transparent',
+    });
+    const mkPodium = (r) => ({ name: shortName(r.name), pts: r.pts, isMe: !!r.me });
+    const rows = standings.map(mkRow);
+    const p1 = mkPodium(standings[0]), p2 = mkPodium(standings[1]), p3 = mkPodium(standings[2]);
+
+    // ---- Journée data (Résultats tab) ----
+    const journeeDefs = [
+      { key: 'j1', num: 1, played: true },
+      { key: 'j2', num: 2, played: true },
+      { key: 'j3', num: 3, played: true },
+      { key: 'j4', num: 4, played: false },
+      { key: 'j5', num: 5, played: false },
+    ];
+    const lastPlayed = 'j3';
+    const lastPlayedNum = 3;
+    const journeeMeta = {
+      j1: 'sam. 1 févr.', j2: 'sam. 8 févr.', j3: 'sam. 22 févr.', j4: 'sam. 8 mars', j5: 'sam. 15 mars',
+    };
+    const journeeStandings = {
+      j1: [
+        { name: 'Léa Berthier', pts: 52, exact: 2 },
+        { name: 'Sophie Lémaire', pts: 44, exact: 1 },
+        { name: 'Karim Mensah', pts: 39, exact: 1 },
+        { name: 'Antoine Mercier', pts: 31, exact: 0, me: true },
+        { name: 'Hugo Delaunay', pts: 28, exact: 0 },
+        { name: 'Thomas Payet', pts: 20, exact: 0 },
+      ],
+      j2: [
+        { name: 'Karim Mensah', pts: 61, exact: 2 },
+        { name: 'Hugo Delaunay', pts: 55, exact: 2 },
+        { name: 'Antoine Mercier', pts: 48, exact: 1, me: true },
+        { name: 'Léa Berthier', pts: 40, exact: 1 },
+        { name: 'Thomas Payet', pts: 33, exact: 0 },
+        { name: 'Sophie Lémaire', pts: 24, exact: 0 },
+      ],
+      j3: [
+        { name: 'Hugo Delaunay', pts: 58, exact: 2 },
+        { name: 'Léa Berthier', pts: 47, exact: 1 },
+        { name: 'Antoine Mercier', pts: 41, exact: 1, me: true },
+        { name: 'Karim Mensah', pts: 35, exact: 0 },
+        { name: 'Sophie Lémaire', pts: 22, exact: 0 },
+        { name: 'Thomas Payet', pts: 18, exact: 0 },
+      ],
+    };
+    const exactDayFmt = (n) => n === 0 ? 'aucun score exact' : (n + (n > 1 ? ' scores exacts' : ' score exact'));
+
+    // ---- Tabs ----
+    const tabOptions = [
+      { value: 'classement', label: 'Classement' },
+      { value: 'resultats', label: 'Résultats' },
+      { value: 'reglages', label: 'Réglages' },
+    ];
+
+    const frameDefs = [
+      { id: 'cl_admin_l', view: 'admin', tab: 'classement', theme: 'light', label: 'Classement · vue admin · clair', dot: 'var(--grenat-500)' },
+      { id: 'cl_member_d', view: 'member', tab: 'classement', theme: 'dark', label: 'Classement · vue membre · sombre', dot: '#14432A' },
+      { id: 'res_admin_l', view: 'admin', tab: 'resultats', theme: 'light', label: 'Résultats · classement de la journée · clair', dot: '#8A8071' },
+      { id: 'res_empty_l', view: 'admin', tab: 'resultats', journee: 'j4', theme: 'light', label: 'Résultats · journée pas encore jouée', dot: '#8A8071' },
+      { id: 'res_member_d', view: 'member', tab: 'resultats', theme: 'dark', label: 'Résultats · vue membre · sombre', dot: '#14432A' },
+      { id: 'set_member_l', view: 'member', tab: 'reglages', theme: 'light', label: 'Réglages · vue membre · clair', dot: '#FBF7EF' },
+      { id: 'set_admin_l', view: 'admin', tab: 'reglages', theme: 'light', label: 'Réglages · vue admin · clair', dot: '#FBF7EF' },
+      { id: 'set_admin_d', view: 'admin', tab: 'reglages', theme: 'dark', label: 'Réglages · vue admin · sombre', dot: '#14432A' },
+      { id: 'set_toast_l', view: 'member', tab: 'reglages', theme: 'light', toast: true, label: 'Réglages · code copié (micro-feedback)', dot: '#2E8B57' },
+      { id: 'one_member_l', view: 'admin', tab: 'classement', variant: 'onemember', theme: 'light', label: 'Ligue à 1 membre · invitation mise en avant', dot: '#8A8071' },
+      { id: 'modal_quit', view: 'member', tab: 'reglages', modal: 'quitter', theme: 'light', label: 'Modale · quitter la ligue', dot: '#C4362B' },
+      { id: 'modal_del', view: 'admin', tab: 'reglages', modal: 'supprimer', theme: 'light', label: 'Modale · supprimer la ligue (admin)', dot: '#C4362B' },
+      { id: 'modal_rm', view: 'admin', tab: 'reglages', modal: 'retirer', theme: 'light', label: 'Modale · retirer un membre', dot: '#C4362B' },
+      { id: 'load_cl', view: 'admin', tab: 'classement', variant: 'loading', theme: 'light', label: 'Chargement · onglet Classement', dot: '#8A8071' },
+      { id: 'load_res', view: 'admin', tab: 'resultats', variant: 'loading', theme: 'light', label: 'Chargement · onglet Résultats', dot: '#8A8071' },
+      { id: 'load_set', view: 'admin', tab: 'reglages', variant: 'loading', theme: 'light', label: 'Chargement · onglet Réglages', dot: '#8A8071' },
+    ];
+
+    const frames = frameDefs.map((fd) => {
+      const isAdmin = fd.view === 'admin';
+      const isMember = !isAdmin;
+      const isOneMember = fd.variant === 'onemember';
+      const isLoading = fd.variant === 'loading';
+      const tab = this.state.tab[fd.id] || fd.tab;
+
+      // journée selection
+      const selKey = this.state.journee[fd.id] || fd.journee || lastPlayed;
+      const selDef = journeeDefs.find((j) => j.key === selKey) || journeeDefs[2];
+      const selPlayed = selDef.played;
+      const journees = journeeDefs.map((j) => {
+        const isSel = j.key === selKey;
+        let bg = 'transparent', color = 'var(--text)', border = '1.5px solid transparent', boxShadow = 'none';
+        if (isSel) { bg = 'var(--accent)'; color = 'var(--on-accent)'; boxShadow = 'var(--glow-accent)'; }
+        else if (j.key === lastPlayed) { bg = 'var(--surface)'; border = '1.5px solid var(--border-strong)'; }
+        return {
+          num: j.num,
+          bg, color, border, boxShadow,
+          overlineColor: isSel ? 'var(--on-accent)' : 'var(--text-faint)',
+          dotColor: j.played ? (isSel ? 'var(--on-accent)' : 'var(--accent)') : 'transparent',
+          opacity: (!j.played && !isSel) ? 0.5 : 1,
+          onSelect: () => this.selectJournee(fd.id, j.key),
+        };
+      });
+
+      // per-journée rows
+      const jData = journeeStandings[selKey] || [];
+      const journeeRows = jData.map((r, i) => ({
+        rank: i + 1,
+        name: r.name,
+        displayName: r.me ? shortName(r.name) + ' · toi' : r.name,
+        isMe: !!r.me,
+        nameWeight: r.me ? 700 : 600,
+        rankColor: r.me ? 'var(--accent)' : (i < 3 ? 'var(--brand)' : 'var(--text-muted)'),
+        rowBg: r.me ? 'color-mix(in srgb, var(--accent) 8%, var(--surface))' : 'var(--surface)',
+        rowEdge: r.me ? '3px solid var(--accent)' : '3px solid transparent',
+        ptsStr: '+' + r.pts,
+        ptsColor: r.me ? 'var(--accent)' : 'var(--text)',
+        exactStr: exactDayFmt(r.exact),
+        exactColor: r.exact > 0 ? 'var(--accent)' : 'var(--text-faint)',
+      }));
+
+      // member rows (admin management)
+      const memberRows = memberNames.map((name, i) => {
+        const me = name === 'Antoine Mercier';
+        const creator = isAdmin ? me : (name === 'Léa Berthier');
+        return {
+          name,
+          displayName: me ? shortName(name) + ' · toi' : name,
+          isMe: me,
+          weight: me ? 700 : 600,
+          sub: creator ? 'Créateur de la ligue' : 'Membre',
+          edge: i === 0 ? 'none' : '1px solid var(--border)',
+          creatorTag: creator,
+          canRemove: !creator && !me,
+          onRemove: () => this.openRemove(fd.id, name),
+        };
+      });
+
+      // remove modal target
+      const removeName = this.state.rm[fd.id] || (fd.modal === 'retirer' ? 'Karim Mensah' : '');
+
+      return {
+        id: fd.id, label: fd.label, theme: fd.theme, dot: fd.dot,
+        noop: () => {},
+
+        leagueName, leagueInitials, leagueCode,
+        membersLine: isOneMember ? '1 membre' : memberFmt(memberCount),
+        isAdmin, isMember,
+        isMemberBadge: isMember,
+
+        tabOptions, tabValue: tab, setTab: (v) => this.setTab(fd.id, v),
+
+        // loading
+        isLoading,
+        skClassement: isLoading && tab === 'classement',
+        skResultats: isLoading && tab === 'resultats',
+        skReglages: isLoading && tab === 'reglages',
+        skeletons: [0, 1, 2, 3, 4],
+
+        // classement
+        showClassement: !isLoading && tab === 'classement',
+        isOneMember,
+        showFullRanking: !isOneMember,
+        p1, p2, p3, rows,
+        onGoReglages: () => this.setTab(fd.id, 'reglages'),
+
+        // résultats
+        showResultats: !isLoading && tab === 'resultats',
+        journees,
+        selectedNum: selDef.num,
+        lastPlayedNum,
+        resEmpty: !selPlayed,
+        resList: selPlayed,
+        journeeRows,
+        journeeMeta: journeeMeta[selKey] || '',
+        onBackToLastJournee: () => this.selectJournee(fd.id, lastPlayed),
+
+        // réglages
+        showReglages: !isLoading && tab === 'reglages',
+        memberRows,
+        onCopy: () => {},
+
+        // toast
+        showToast: !!fd.toast,
+
+        // modals
+        modalQuitter: fd.modal === 'quitter',
+        modalSupprimer: fd.modal === 'supprimer',
+        modalRetirer: fd.modal === 'retirer' || !!this.state.rm[fd.id],
+        removeName,
+        removeFirst: firstNameOf(removeName || 'Karim'),
+        onCloseModal: () => this.closeRemove(fd.id),
+        deleteLosses: [
+          { t: 'Le classement et l\u2019historique de la ligue' },
+          { t: 'L\u2019accès coupé pour tous les membres' },
+          { t: 'Le code d\u2019invitation, désactivé' },
+        ],
+      };
+    });
+
+    return { frames };
+  }
+}
+</script>
+</body>
+</html>
