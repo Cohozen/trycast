@@ -66,7 +66,22 @@ supabase/
   functions/      # Edge Functions (delete-account, sync-fixtures) — logique pure testée sous Vitest
 scripts/          # Seeds (compétitions, users/matchs de test), saisie admin des essais, scripts E2E
 docs/             # Notes de décision (choix du fournisseur de données…)
+web/              # Site vitrine Astro (landing + waitlist beta + pages légales) — projet autonome, voir ci-dessous
 ```
+
+## Site vitrine (`web/`)
+
+Site statique [Astro](https://astro.build) totalement indépendant de l'app (son propre `package.json`, pas de workspaces) : landing marketing, formulaire d'inscription à la beta (RPC Supabase `join_waitlist`, anti-spam côté SQL) et pages légales (CGU, confidentialité, mentions). Mêmes tokens de design que l'app, copiés en CSS vanilla.
+
+```bash
+cd web
+cp .env.example .env        # PUBLIC_SUPABASE_URL + clé publishable
+npm install
+npm run dev                 # http://localhost:4321
+npm run check && npm run build
+```
+
+CI dédiée (`.github/workflows/web.yml`, déclenchée sur `web/**` uniquement). Hébergement cible : Vercel (projet `trycast-web`).
 
 ## Backend Supabase
 
