@@ -57,4 +57,4 @@ Vérifier l'insert côté serveur (MCP `execute_sql` sur `waitlist_signups`), pu
 
 ## Déploiement
 
-Cible : Vercel, projet `trycast-web`, framework Astro (build baké avec les `PUBLIC_*`). Le connecteur Vercel de la session peut déployer (`deploy_to_vercel`, fichiers sources + `.env` dans l'arbre) **si** le droit de créer/écrire le projet est accordé — sinon 403 « You don't have permission to create a project » (action Corentin : ré-autoriser le connecteur ou créer le projet dans le dashboard).
+Vercel, projet créé par Corentin (2026-07-15), **branché sur le repo GitHub avec Root Directory `web`** : chaque push sur `main` rebuilde le site — c'est **la** voie de déploiement. Le `installCommand` de `web/vercel.json` (stub tsconfig, voir piège ci-dessus) est indispensable. Les `PUBLIC_*` sont bakées au build (env vars Vercel côté dashboard, ou `.env` non versionné en local). Le connecteur Vercel de Claude **ne voit pas ce projet** (`list_projects` vide — autre scope) : ne pas tenter `deploy_to_vercel` (risque de créer un projet parallèle), passer par un commit + push (accord de Corentin requis pour le push).

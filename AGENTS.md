@@ -38,7 +38,7 @@ Avant de considérer un lot terminé : `npm run typecheck && npm run lint && npm
 - Vérification : `cd web && npm run check && npm run build` — CI dédiée `.github/workflows/web.yml` (la CI app ignore `web/**`)
 - Preview navigateur : config `site-web` de `.claude/launch.json` (port 4321) ; piège : après un scroll, la capture d'écran du panneau navigateur rend une page vide — translater `document.body` en JS au lieu de scroller
 - Formulaire waitlist : RPC `join_waitlist` (migration `20260715000100_waitlist.sql`) appelée en fetch direct PostgREST, env `web/.env` (`PUBLIC_SUPABASE_URL`/`PUBLIC_SUPABASE_KEY`, modèle `web/.env.example`) ; anti-spam côté SQL (rate limit IP 3/h + plafond global 100/h + refus silencieux) + honeypot côté client — pas d'accès direct aux tables `waitlist_*`
-- Hébergement cible : Vercel (projet `trycast-web`, framework Astro)
+- Hébergement : **Vercel** (Root Directory `web`, build sur push GitHub) — le `installCommand` de `web/vercel.json` pose un stub `expo/tsconfig.base.json` requis par la découverte tsconfig de rolldown (piège détaillé dans le skill `trycast-site-web`) ; le connecteur Vercel de Claude ne voit pas le projet (scope), passer par git push
 
 ## Dev builds
 
