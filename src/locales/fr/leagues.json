@@ -50,8 +50,6 @@
         }
     },
     "create": {
-        "screenTitle": "Créer une ligue",
-        "intro": "Donne un nom à ta ligue — tu recevras un code d'invitation à partager avec tes amis.",
         "nameLabel": "Nom de la ligue",
         "namePlaceholder": "Les copains du rugby",
         "namePreview": "Choisis un nom mémorable",
@@ -70,11 +68,8 @@
         }
     },
     "join": {
-        "screenTitle": "Rejoindre une ligue",
         "intro": "Saisis le code à 8 caractères reçu de ton pote — ou colle directement le lien d'invitation.",
         "codeLabel": "Code d'invitation",
-        "codePlaceholder": "ABCD2345",
-        "submit": "Rejoindre la ligue",
         "paste": "Coller un lien d'invitation",
         "pasteEmpty": "Aucun code d'invitation dans le presse-papier.",
         "linkDetected": "Code détecté depuis le lien collé",
@@ -92,15 +87,53 @@
         "screenTitle": "Ligue",
         "members_one": "{{count}} membre",
         "members_other": "{{count}} membres",
-        "code": "code {{code}}",
-        "kickHint": "Appui long sur un membre pour l'exclure.",
         "invite": "Inviter des amis",
         "shareMessage": "Rejoins ma ligue « {{name}} » sur TryCast avec le code {{code}} !",
         "codeCopied": "Code copié · {{code}}",
         "notFound": "Ligue introuvable.",
+        "badges": {
+            "admin": "Admin",
+            "member": "Membre"
+        },
+        "tabs": {
+            "standings": "Classement",
+            "results": "Résultats",
+            "settings": "Réglages"
+        },
+        "solo": {
+            "title": "Tu es seul pour l'instant",
+            "message": "Le classement prend vie dès qu'un pote te rejoint. Partage ton code d'invitation.",
+            "codeOverline": "Code"
+        },
         "results": {
+            "roundOverline": "Journée",
             "roundShort": "J",
-            "exactsNone": "aucun score exact"
+            "roundTitle": "Journée {{round}}",
+            "exactsNone": "aucun score exact",
+            "notPlayedTitle": "Journée pas encore jouée",
+            "notPlayedMessage": "Les points de la journée {{round}} s'afficheront ici une fois les matchs terminés et les pronos réconciliés.",
+            "backToPlayed": "Voir la journée {{round}}",
+            "dayNote": "Points de cette journée uniquement — pas le cumul de la saison.",
+            "empty": "Les résultats par journée arrivent après les premiers matchs terminés."
+        },
+        "settings": {
+            "inviteOverline": "Inviter des amis",
+            "codeOverline": "Code de la ligue",
+            "codeHint": "Partage ce code : tes potes le saisissent pour rejoindre la ligue.",
+            "membersOverline": "Membres",
+            "creatorTag": "Créateur",
+            "creatorSub": "Créateur de la ligue",
+            "memberSub": "Membre",
+            "memberYou": "{{username}} · toi",
+            "removeLabel": "Retirer ce membre",
+            "removeHint": "Retirer un membre demande une confirmation. Il pourra rejoindre à nouveau avec le code.",
+            "dangerOverline": "Zone de danger",
+            "leaveTitle": "Quitter la ligue",
+            "leaveText": "Tu perdras l'accès au classement et à l'historique de cette ligue.",
+            "ownerWarning": "Tu es le créateur. Transfère la propriété avant de quitter, ou supprime la ligue pour tout le monde.",
+            "transferTitle": "Transférer la propriété",
+            "transferSub": "Désigne un membre comme nouvel admin.",
+            "deleteAction": "Supprimer la ligue"
         },
         "leave": {
             "title": "Quitter cette ligue ?",
@@ -110,7 +143,6 @@
         "delete": {
             "title": "Supprimer {{name}} ?",
             "intro": "Cette action est irréversible. Pour tous les membres :",
-            "message": "« {{name}} » et ses membres seront supprimés. Cette action est définitive.",
             "losses": {
                 "history": "Le classement et l'historique de la ligue",
                 "access": "L'accès coupé pour tous les membres",
