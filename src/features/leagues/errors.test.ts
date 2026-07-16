@@ -10,6 +10,7 @@ function pgError(code: string): PostgrestError {
 describe('toLeagueMessageKey', () => {
     it.each([
         ['P0002', 'leagues:errors.invalidCode'],
+        ['P0003', 'leagues:errors.full'],
         ['23514', 'leagues:errors.invalidName'],
         ['42501', 'leagues:errors.notAllowed'],
         ['XX000', 'leagues:errors.server'],

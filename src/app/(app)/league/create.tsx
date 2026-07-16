@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
 import { TextField } from '@/components/ui/text-field';
 import { Toast } from '@/components/ui/toast';
+import { DEFAULT_LEAGUE_COLOR } from '@/features/leagues/colors';
 import { toLeagueMessageKey } from '@/features/leagues/errors';
 import { useCreateLeague } from '@/features/leagues/use-create-league';
 import { validateLeagueName } from '@/features/leagues/validation';
@@ -25,14 +26,17 @@ export default function CreateLeagueScreen() {
         setFieldError(nameError && t(nameError));
         if (nameError) return;
 
-        createLeague.mutate(name.trim(), {
-            onSuccess: (league) => {
-                router.replace({ pathname: '/league/[id]', params: { id: league.id } });
+        createLeague.mutate(
+            { name: name.trim(), color: DEFAULT_LEAGUE_COLOR },
+            {
+                onSuccess: (league) => {
+                    router.replace({ pathname: '/league/[id]', params: { id: league.id } });
+                },
+                onError: (mutationError) => {
+                    setError(t(toLeagueMessageKey(mutationError)));
+                },
             },
-            onError: (mutationError) => {
-                setError(t(toLeagueMessageKey(mutationError)));
-            },
-        });
+        );
     };
 
     return (

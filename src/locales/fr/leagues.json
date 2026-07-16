@@ -89,6 +89,7 @@
         "load": "Impossible de charger le classement.",
         "invalidCode": "Code d'invitation invalide.",
         "invalidName": "Nom de ligue invalide (3 à 40 caractères).",
+        "full": "Cette ligue est complète (50 membres).",
         "notAllowed": "Action non autorisée.",
         "server": "Impossible de contacter le serveur. Réessaie dans un instant."
     }
