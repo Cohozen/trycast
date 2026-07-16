@@ -37,12 +37,8 @@ export default function AppLayout() {
                 options={{ headerShown: true, title: t('profile:settings.title') }}
             />
             <Stack.Screen
-                name="league/create"
-                options={{ headerShown: true, title: t('leagues:create.screenTitle') }}
-            />
-            <Stack.Screen
-                name="league/join"
-                options={{ headerShown: true, title: t('leagues:join.screenTitle') }}
+                name="league/new"
+                options={{ headerShown: true, title: t('leagues:new.screenTitle') }}
             />
             <Stack.Screen
                 name="league/[id]"

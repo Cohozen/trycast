@@ -4,7 +4,7 @@ import { ActivityIndicator, Pressable, Text, useThemeColor } from '@/tw';
 import type { ThemeColorToken } from '@/tw';
 import { cn } from '@/tw/variants';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'danger-outline';
+type ButtonVariant = 'primary' | 'brand' | 'secondary' | 'ghost' | 'danger' | 'danger-outline';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 type ButtonProps = {
@@ -34,6 +34,14 @@ const variantClasses: Record<
         boxPressed: 'bg-accent-press',
         text: 'text-on-accent',
         spinner: 'on-accent',
+    },
+    // Vert marque en fond : réservé aux actions « d'invitation » des maquettes
+    // ligues (Copier le code) — pas un second CTA accent.
+    brand: {
+        box: 'bg-brand',
+        boxPressed: 'bg-brand/85',
+        text: 'text-on-brand',
+        spinner: 'on-brand',
     },
     secondary: {
         box: 'border-[1.5px] border-border-strong bg-transparent',

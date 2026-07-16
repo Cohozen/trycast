@@ -169,7 +169,7 @@ export default function MatchesScreen() {
                 <View className="flex-1">
                     <Button
                         fullWidth
-                        onPress={() => router.push('/league/create')}
+                        onPress={() => router.push('/league/new')}
                         title={t('leagues:actions.create')}
                         variant="secondary"
                     />
@@ -177,7 +177,9 @@ export default function MatchesScreen() {
                 <View className="flex-1">
                     <Button
                         fullWidth
-                        onPress={() => router.push('/league/join')}
+                        onPress={() =>
+                            router.push({ pathname: '/league/new', params: { tab: 'join' } })
+                        }
                         title={t('leagues:actions.join')}
                         variant="ghost"
                     />
@@ -198,13 +200,15 @@ export default function MatchesScreen() {
                 <View className="mt-2 w-full max-w-75 gap-2.5">
                     <Button
                         fullWidth
-                        onPress={() => router.push('/league/create')}
+                        onPress={() => router.push('/league/new')}
                         size="lg"
                         title={t('leagues:actions.create')}
                     />
                     <Button
                         fullWidth
-                        onPress={() => router.push('/league/join')}
+                        onPress={() =>
+                            router.push({ pathname: '/league/new', params: { tab: 'join' } })
+                        }
                         size="lg"
                         title={t('leagues:actions.join')}
                         variant="secondary"

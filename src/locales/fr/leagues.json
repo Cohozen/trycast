@@ -40,22 +40,45 @@
             "exacts_other": "{{count}} scores exacts"
         }
     },
+    "new": {
+        "screenTitle": "Ligues",
+        "createTitle": "Nouvelle ligue",
+        "joinTitle": "Rejoindre une ligue",
+        "tabs": {
+            "create": "Créer",
+            "join": "Rejoindre"
+        }
+    },
     "create": {
         "screenTitle": "Créer une ligue",
         "intro": "Donne un nom à ta ligue — tu recevras un code d'invitation à partager avec tes amis.",
         "nameLabel": "Nom de la ligue",
         "namePlaceholder": "Les copains du rugby",
+        "namePreview": "Choisis un nom mémorable",
+        "nameHelper": "Entre 3 et 40 caractères. Visible par tes membres.",
+        "privacyNote": "Ligue privée, accessible uniquement par code d'invitation. Tu la partages toi-même.",
         "submit": "Créer la ligue",
         "colorLabel": "Couleur de la ligue",
         "colorHint": "L'icône reprend les initiales de ta ligue. Pas d'upload nécessaire.",
-        "colorSwatch": "Choisir cette couleur"
+        "colorSwatch": "Choisir cette couleur",
+        "success": {
+            "title": "Ligue créée !",
+            "message": "{{name}} est prête. Invite tes potes avec ce code avant d'y entrer.",
+            "codeLabel": "Code d'invitation",
+            "open": "Ouvrir la ligue",
+            "reinvite": "Tu pourras réinviter à tout moment depuis les réglages."
+        }
     },
     "join": {
         "screenTitle": "Rejoindre une ligue",
-        "intro": "Entre le code d'invitation reçu de l'organisateur de la ligue.",
+        "intro": "Saisis le code à 8 caractères reçu de ton pote — ou colle directement le lien d'invitation.",
         "codeLabel": "Code d'invitation",
         "codePlaceholder": "ABCD2345",
         "submit": "Rejoindre la ligue",
+        "paste": "Coller un lien d'invitation",
+        "pasteEmpty": "Aucun code d'invitation dans le presse-papier.",
+        "linkDetected": "Code détecté depuis le lien collé",
+        "hint": "On te montre l'aperçu de la ligue avant que tu la rejoignes — rien n'est validé à la frappe.",
         "preview": {
             "meta": "Ligue privée · {{competition}}",
             "alreadyMember": "Tu fais déjà partie de cette ligue. Ouvre-la directement pour voir le classement.",
@@ -73,6 +96,7 @@
         "kickHint": "Appui long sur un membre pour l'exclure.",
         "invite": "Inviter des amis",
         "shareMessage": "Rejoins ma ligue « {{name}} » sur TryCast avec le code {{code}} !",
+        "codeCopied": "Code copié · {{code}}",
         "notFound": "Ligue introuvable.",
         "results": {
             "roundShort": "J",

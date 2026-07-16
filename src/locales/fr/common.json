@@ -10,7 +10,9 @@
         "save": "Enregistrer",
         "retry": "Réessayer",
         "back": "Retour",
-        "close": "Fermer"
+        "close": "Fermer",
+        "copy": "Copier",
+        "share": "Partager"
     },
     "errors": {
         "generic": "Une erreur est survenue. Réessaie.",

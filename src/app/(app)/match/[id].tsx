@@ -152,12 +152,14 @@ export default function MatchScreen() {
                     <View className="mt-1 w-full max-w-[280px] gap-2.5">
                         <Button
                             fullWidth
-                            onPress={() => router.push('/league/create')}
+                            onPress={() => router.push('/league/new')}
                             title={t('leagues:actions.create')}
                         />
                         <Button
                             fullWidth
-                            onPress={() => router.push('/league/join')}
+                            onPress={() =>
+                                router.push({ pathname: '/league/new', params: { tab: 'join' } })
+                            }
                             title={t('leagues:actions.join')}
                             variant="secondary"
                         />
