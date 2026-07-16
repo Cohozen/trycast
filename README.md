@@ -140,10 +140,15 @@ tri et les égalités (points, puis scores exacts, puis moins de pronos) :
 
 Les ligues sont privées : visibles de leurs seuls membres (RLS), on les rejoint
 uniquement par code d'invitation à 8 caractères via la RPC `join_league` — le code n'est
-jamais résoluble par une requête directe, donc pas d'énumération possible. La création
-passe par `create_league` (code généré côté serveur, créateur membre d'office). Le
-créateur peut renommer, exclure un membre ou supprimer sa ligue ; un membre peut la
-quitter. Le partage du code passe par la feuille de partage du téléphone.
+jamais résoluble par une requête directe, donc pas d'énumération possible (plafond :
+50 membres). Avant d'adhérer, `preview_league` montre l'identité de la ligue (nom,
+couleur, effectif) sans rien engager. La création passe par `create_league` (code généré
+côté serveur, couleur d'identité choisie dans une palette fermée, créateur membre
+d'office). Le créateur peut renommer, exclure un membre, transférer la propriété
+(`transfer_league_ownership`) ou supprimer sa ligue ; un membre peut la quitter.
+L'onglet Résultats du détail de ligue classe les membres journée par journée
+(`get_league_round_points`). Le partage du code passe par la copie (expo-clipboard) ou
+la feuille de partage du téléphone.
 
 L'app s'abonne aux changements de `standings` (Realtime) : les classements se
 rafraîchissent seuls quand le scoring passe.
