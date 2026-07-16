@@ -161,7 +161,11 @@ export default function LeagueScreen() {
                     isOwner={isOwner}
                     league={league}
                     members={members}
-                    onLeft={() => router.back()}
+                    // Ouvert par deep link, l'écran n'a pas de pile derrière lui :
+                    // repli sur l'onglet Classement plutôt qu'un GO_BACK dans le vide
+                    onLeft={() =>
+                        router.canGoBack() ? router.back() : router.replace('/leaderboard')
+                    }
                     userId={userId}
                 />
             ) : null}
@@ -590,8 +594,13 @@ function SettingsTab({
                 </View>
             ) : null}
 
-            {/* Zone de danger */}
-            <View className="gap-2 border-t border-dashed border-border-strong pt-5">
+            {/* Zone de danger — le séparateur pointillé vit dans sa propre View :
+                posé sur le conteneur, react-native-css propage le borderStyle
+                aux bordures des descendants (cartes/boutons rendus dashed) */}
+            {/* h-0 + bordure uniforme : iOS ne rend le dashed que si la largeur
+                de bordure est identique sur les 4 côtés */}
+            <View className="h-0 overflow-hidden border border-dashed border-border-strong" />
+            <View className="gap-2">
                 <SectionOverline
                     label={t('leagues:detail.settings.dangerOverline')}
                     tone="danger"
