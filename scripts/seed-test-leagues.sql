@@ -23,3 +23,16 @@ insert into public.league_members (league_id, user_id, role)
 select l.id, l.owner_id, 'owner'
 from public.leagues l
 where l.invite_code = 'E2ETEST2';
+
+-- Pages ligues (2026-07-16) : get_league_round_points ne compte que les
+-- journées entamées (matchs finished) et les pronos réconciliés. On termine le
+-- match passé -102 sur le score 10-5 (le prono seedé de user1 : score exact)
+-- et on le score à la main — points arbitraires, standings non recalculé
+-- (hors sujet ici, e2e-scoring a son propre seed). Rejouable : valeurs fixes.
+update public.matches
+set status = 'finished', home_score = 10, away_score = 5
+where api_game_id = -102;
+
+update public.predictions
+set points_awarded = 8, scored_at = now()
+where match_id = (select id from public.matches where api_game_id = -102);

@@ -109,6 +109,7 @@ export type Database = {
             };
             leagues: {
                 Row: {
+                    color: string;
                     competition_id: string;
                     created_at: string;
                     id: string;
@@ -117,6 +118,7 @@ export type Database = {
                     owner_id: string;
                 };
                 Insert: {
+                    color?: string;
                     competition_id: string;
                     created_at?: string;
                     id?: string;
@@ -125,6 +127,7 @@ export type Database = {
                     owner_id: string;
                 };
                 Update: {
+                    color?: string;
                     competition_id?: string;
                     created_at?: string;
                     id?: string;
@@ -594,8 +597,9 @@ export type Database = {
                 Returns: Json;
             };
             create_league: {
-                Args: { p_name: string };
+                Args: { p_color?: string; p_name: string };
                 Returns: {
+                    color: string;
                     competition_id: string;
                     created_at: string;
                     id: string;
@@ -634,6 +638,18 @@ export type Database = {
                     username: string;
                 }[];
             };
+            get_league_round_points: {
+                Args: { p_league_id: string };
+                Returns: {
+                    avatar_url: string;
+                    exact_scores: number;
+                    first_kickoff: string;
+                    points: number;
+                    round: string;
+                    user_id: string;
+                    username: string;
+                }[];
+            };
             get_match_league_predictions: {
                 Args: { p_league_id: string; p_match_id: string };
                 Returns: {
@@ -661,6 +677,7 @@ export type Database = {
             join_league: {
                 Args: { p_code: string };
                 Returns: {
+                    color: string;
                     competition_id: string;
                     created_at: string;
                     id: string;
@@ -702,9 +719,39 @@ export type Database = {
                     user_id: string;
                 }[];
             };
+            preview_league: {
+                Args: { p_code: string };
+                Returns: {
+                    color: string;
+                    competition_name: string;
+                    is_full: boolean;
+                    is_member: boolean;
+                    league_id: string;
+                    member_count: number;
+                    name: string;
+                }[];
+            };
             register_push_token: {
                 Args: { p_platform: string; p_token: string };
                 Returns: undefined;
+            };
+            transfer_league_ownership: {
+                Args: { p_league_id: string; p_new_owner_id: string };
+                Returns: {
+                    color: string;
+                    competition_id: string;
+                    created_at: string;
+                    id: string;
+                    invite_code: string;
+                    name: string;
+                    owner_id: string;
+                };
+                SetofOptions: {
+                    from: '*';
+                    to: 'leagues';
+                    isOneToOne: true;
+                    isSetofReturn: false;
+                };
             };
             unregister_push_token: { Args: { p_token: string }; Returns: undefined };
             username_available: { Args: { candidate: string }; Returns: boolean };

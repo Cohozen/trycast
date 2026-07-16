@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# Vérification E2E RLS des ligues contre le projet Supabase (Lot 5) :
-# invisibilité pour les non-membres, anti-énumération par code, RPC
-# create_league/join_league, quitter/exclure, owner verrouillé, leaderboards.
+# Vérification E2E RLS des ligues contre le projet Supabase (Lot 5 + pages
+# ligues 2026-07-16) : invisibilité pour les non-membres, anti-énumération par
+# code, RPC create_league/join_league, quitter/exclure, owner verrouillé,
+# leaderboards, couleur de ligue, preview_league, transfert de propriété.
+# Le plafond de 50 membres (P0003) n'est pas couvert ici — il faudrait 50
+# comptes auth ; garanti par le verrou de join_league, testable en SQL.
 # Prérequis : scripts/seed-test-users.sql PUIS scripts/seed-test-predictions.sql
 # PUIS scripts/seed-test-leagues.sql.
 # Usage : EMAIL1=... EMAIL2=... PASSWORD=... ./scripts/e2e-leagues.sh
@@ -200,6 +203,128 @@ RES=$(curl -s -X DELETE "$URL/rest/v1/leagues?id=eq.$LID2" \
 echo "$RES" | grep -q "$LID2" || fail "delete ligue par l'owner ($RES)"
 ok "suppression de sa ligue par l'owner"
 
+# Pages ligues : couleur à la création (défaut + explicite + hors palette)
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/create_league" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" \
+  -d '{"p_name":"Ligue Pages E2E","p_color":"#E0952A"}')
+LID3=$(echo "$RES" | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])') ||
+  fail "create_league avec couleur ($RES)"
+CODE3=$(echo "$RES" | python3 -c 'import json,sys; print(json.load(sys.stdin)["invite_code"])')
+echo "$RES" | grep -q '#E0952A' || fail "couleur non persistée ($RES)"
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/create_league" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" \
+  -d '{"p_name":"Ligue Pirate","p_color":"#FF0000"}')
+echo "$RES" | grep -q '23514' || fail "couleur hors palette (attendu 23514, obtenu $RES)"
+ok "create_league : couleur persistée, palette fermée"
+
+# Transfert vers un non-membre : refusé avant que user2 ne rejoigne
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/transfer_league_ownership" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" \
+  -d "{\"p_league_id\":\"$LID3\",\"p_new_owner_id\":\"$U2\"}")
+echo "$RES" | grep -q 'P0002' || fail "transfert vers non-membre (attendu P0002, obtenu $RES)"
+ok "transfert vers un non-membre refusé"
+
+# preview_league : identité sans adhésion (code normalisé), code bidon → P0002
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/preview_league" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T2" \
+  -H "Content-Type: application/json" \
+  -d "{\"p_code\":\" $(echo "$CODE3" | tr '[:upper:]' '[:lower:]') \"}")
+echo "$RES" | python3 -c "
+import json, sys
+row = json.load(sys.stdin)[0]
+assert row['name'] == 'Ligue Pages E2E', row
+assert row['color'] == '#E0952A', row
+assert row['member_count'] == 1, row
+assert row['is_member'] is False, row
+assert row['is_full'] is False, row
+" || fail "preview_league non-membre ($RES)"
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/preview_league" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T2" \
+  -H "Content-Type: application/json" -d '{"p_code":"XXXXXXXX"}')
+echo "$RES" | grep -q 'P0002' || fail "preview code bidon (attendu P0002, obtenu $RES)"
+ok "preview_league : aperçu sans adhésion, code bidon refusé"
+
+# user2 rejoint → preview le voit membre
+curl -s -X POST "$URL/rest/v1/rpc/join_league" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T2" \
+  -H "Content-Type: application/json" -d "{\"p_code\":\"$CODE3\"}" > /dev/null
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/preview_league" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T2" \
+  -H "Content-Type: application/json" -d "{\"p_code\":\"$CODE3\"}")
+echo "$RES" | python3 -c "
+import json, sys
+row = json.load(sys.stdin)[0]
+assert row['is_member'] is True, row
+assert row['member_count'] == 2, row
+" || fail "preview_league membre ($RES)"
+ok "preview_league reflète l'adhésion"
+
+# Transfert : refusé pour un simple membre, refusé vers soi-même, puis effectif
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/transfer_league_ownership" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T2" \
+  -H "Content-Type: application/json" \
+  -d "{\"p_league_id\":\"$LID3\",\"p_new_owner_id\":\"$U2\"}")
+echo "$RES" | grep -q '42501' || fail "transfert par un membre (attendu 42501, obtenu $RES)"
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/transfer_league_ownership" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" \
+  -d "{\"p_league_id\":\"$LID3\",\"p_new_owner_id\":\"$U1\"}")
+echo "$RES" | grep -q '23514' || fail "transfert vers soi-même (attendu 23514, obtenu $RES)"
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/transfer_league_ownership" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" \
+  -d "{\"p_league_id\":\"$LID3\",\"p_new_owner_id\":\"$U2\"}")
+echo "$RES" | python3 -c "
+import json, sys
+row = json.load(sys.stdin)
+row = row[0] if isinstance(row, list) else row
+assert row['owner_id'] == '$U2', row
+" || fail "transfert effectif ($RES)"
+RES=$(curl -s "$URL/rest/v1/league_members?league_id=eq.$LID3&select=user_id,role" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T2")
+echo "$RES" | python3 -c "
+import json, sys
+roles = {r['user_id']: r['role'] for r in json.load(sys.stdin)}
+assert roles['$U1'] == 'member', roles
+assert roles['$U2'] == 'owner', roles
+" || fail "rôles après transfert ($RES)"
+ok "transfert de propriété (membre refusé, soi-même refusé, swap owner/rôles)"
+
+# L'ex-owner est un membre comme un autre : il peut quitter, puis le nouvel
+# owner supprime la ligue (nettoyage)
+RES=$(curl -s -X DELETE "$URL/rest/v1/league_members?league_id=eq.$LID3&user_id=eq.$U1" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" -H "Prefer: return=representation")
+echo "$RES" | grep -q "$U1" || fail "self-leave de l'ex-owner ($RES)"
+RES=$(curl -s -X DELETE "$URL/rest/v1/leagues?id=eq.$LID3" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T2" -H "Prefer: return=representation")
+echo "$RES" | grep -q "$LID3" || fail "delete par le nouvel owner ($RES)"
+ok "ex-owner libéré, suppression par le nouvel owner"
+
+# get_league_round_points : non-membre → 0 ligne ; membre → agrégat par journée
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/get_league_round_points" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T2" \
+  -H "Content-Type: application/json" -d "{\"p_league_id\":\"$LID\"}")
+[ "$RES" = "[]" ] || fail "round points pour un non-membre (attendu [], obtenu $RES)"
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/get_league_round_points" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" -d "{\"p_league_id\":\"$LID\"}")
+# À ce stade user2 a été exclu : 1 membre × 1 journée entamée (E2E, match -102
+# terminé 10-5 par le seed = score exact du prono de user1, 8 pts seedés)
+echo "$RES" | python3 -c "
+import json, sys
+rows = json.load(sys.stdin)
+assert len(rows) == 1, f'attendu 1 ligne (1 membre, 1 journée), obtenu {len(rows)}'
+row = rows[0]
+assert row['round'] == 'E2E', row
+assert row['user_id'] == '$U1', row
+assert row['points'] == 8, row
+assert row['exact_scores'] == 1, row
+" || fail "round points pour l'owner ($RES)"
+ok "round points : 0 ligne hors ligue, agrégat exact par journée pour un membre"
+
 # Leaderboards : accès anonyme refusé
 RES=$(curl -s -X POST "$URL/rest/v1/rpc/get_global_leaderboard" \
   -H "apikey: $KEY" -H "Content-Type: application/json" \
@@ -209,7 +334,11 @@ RES=$(curl -s -X POST "$URL/rest/v1/rpc/get_match_league_predictions" \
   -H "apikey: $KEY" -H "Content-Type: application/json" \
   -d "{\"p_match_id\":\"$M_PASSE\",\"p_league_id\":\"$LID\"}")
 echo "$RES" | grep -q '42501' || fail "pronos de ligue anonyme (attendu 42501, obtenu $RES)"
-ok "leaderboards et pronos de ligue refusés en anonyme"
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/preview_league" \
+  -H "apikey: $KEY" -H "Content-Type: application/json" \
+  -d '{"p_code":"E2ETEST2"}')
+echo "$RES" | grep -q '42501' || fail "preview anonyme (attendu 42501, obtenu $RES)"
+ok "leaderboards, pronos de ligue et preview refusés en anonyme"
 
 echo
 echo "Tous les tests E2E ligues sont passés."
