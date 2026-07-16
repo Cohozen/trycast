@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { normalizeInviteCode, validateLeagueName } from './validation';
+import { extractInviteCode, normalizeInviteCode, validateLeagueName } from './validation';
 
 describe('validateLeagueName', () => {
     it.each([
@@ -42,5 +42,27 @@ describe('normalizeInviteCode', () => {
         ['ABCDEFGL'], // L exclu
     ])('refuse %j', (input) => {
         expect(normalizeInviteCode(input)).toBeNull();
+    });
+});
+
+describe('extractInviteCode', () => {
+    it.each([
+        ['E2ETEST2', 'E2ETEST2'],
+        ['  e2et-est2 ', 'E2ETEST2'],
+        ['Rejoins ma ligue avec le code E2ETEST2 !', 'E2ETEST2'],
+        ['https://trycast.app/join/E2ETEST2', 'E2ETEST2'],
+        ['https://trycast.app/join?code=e2etest2', 'E2ETEST2'],
+    ])('extrait %j', (input, expected) => {
+        expect(extractInviteCode(input)).toBe(expected);
+    });
+
+    it.each([
+        [''],
+        ['aucun code ici'],
+        ['ABCDEFG0'], // hors alphabet
+        ['ABCDEFGHJKMN'], // séquence trop longue, pas un code isolé
+        ['E2ETEST2 ou XW3KP7QM'], // deux candidats : ambigu, on ne devine pas
+    ])('ne devine rien pour %j', (input) => {
+        expect(extractInviteCode(input)).toBeNull();
     });
 });

@@ -45,14 +45,25 @@
         "intro": "Donne un nom à ta ligue — tu recevras un code d'invitation à partager avec tes amis.",
         "nameLabel": "Nom de la ligue",
         "namePlaceholder": "Les copains du rugby",
-        "submit": "Créer la ligue"
+        "submit": "Créer la ligue",
+        "colorLabel": "Couleur de la ligue",
+        "colorHint": "L'icône reprend les initiales de ta ligue. Pas d'upload nécessaire.",
+        "colorSwatch": "Choisir cette couleur"
     },
     "join": {
         "screenTitle": "Rejoindre une ligue",
         "intro": "Entre le code d'invitation reçu de l'organisateur de la ligue.",
         "codeLabel": "Code d'invitation",
         "codePlaceholder": "ABCD2345",
-        "submit": "Rejoindre la ligue"
+        "submit": "Rejoindre la ligue",
+        "preview": {
+            "meta": "Ligue privée · {{competition}}",
+            "alreadyMember": "Tu fais déjà partie de cette ligue. Ouvre-la directement pour voir le classement.",
+            "fullNote": "Cette ligue est complète ({{count}} membres). Demande à l'admin de faire de la place, puis réessaie.",
+            "join": "Rejoindre",
+            "open": "Ouvrir la ligue",
+            "full": "Ligue complète"
+        }
     },
     "detail": {
         "screenTitle": "Ligue",
@@ -63,20 +74,37 @@
         "invite": "Inviter des amis",
         "shareMessage": "Rejoins ma ligue « {{name}} » sur TryCast avec le code {{code}} !",
         "notFound": "Ligue introuvable.",
+        "results": {
+            "roundShort": "J",
+            "exactsNone": "aucun score exact"
+        },
         "leave": {
-            "title": "Quitter la ligue",
-            "message": "Tu ne verras plus le classement de « {{name}} ».",
-            "confirm": "Quitter"
+            "title": "Quitter cette ligue ?",
+            "message": "Tu quittes {{name}}. Tu perdras l'accès à son classement et à ton historique ici. Tu pourras la rejoindre à nouveau avec le code.",
+            "confirm": "Quitter la ligue"
         },
         "delete": {
-            "title": "Supprimer la ligue",
+            "title": "Supprimer {{name}} ?",
+            "intro": "Cette action est irréversible. Pour tous les membres :",
             "message": "« {{name}} » et ses membres seront supprimés. Cette action est définitive.",
-            "confirm": "Supprimer"
+            "losses": {
+                "history": "Le classement et l'historique de la ligue",
+                "access": "L'accès coupé pour tous les membres",
+                "code": "Le code d'invitation, désactivé"
+            },
+            "acknowledge": "Je comprends que la ligue et son classement seront définitivement supprimés.",
+            "confirm": "Supprimer définitivement"
         },
         "kick": {
-            "title": "Exclure ce membre",
-            "message": "Retirer {{username}} de la ligue ?",
-            "confirm": "Exclure"
+            "title": "Retirer {{username}} ?",
+            "message": "{{username}} perdra l'accès à {{name}} et à son classement. Tu pourras le réinviter avec le code.",
+            "confirm": "Retirer de la ligue"
+        },
+        "transfer": {
+            "title": "Transférer la propriété",
+            "subtitle": "Désigne un membre comme nouvel admin de la ligue.",
+            "note": "Tu deviendras simple membre — le nouvel admin pourra te retirer.",
+            "confirm": "Transférer la propriété"
         }
     },
     "owner": "Ta ligue",

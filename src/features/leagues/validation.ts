@@ -25,3 +25,16 @@ export function normalizeInviteCode(raw: string): string | null {
     const code = raw.toUpperCase().replaceAll(/[\s-]/g, '');
     return /^[A-HJ-KM-NP-Z2-9]{8}$/.test(code) ? code : null;
 }
+
+/**
+ * Extrait un code d'invitation d'un texte collé (bouton « Coller un lien ») :
+ * code nu (espaces/tirets tolérés) ou noyé dans un lien/message — on cherche
+ * alors une séquence isolée de 8 caractères de l'alphabet du serveur. null si
+ * rien ne ressemble à un code.
+ */
+export function extractInviteCode(raw: string): string | null {
+    const direct = normalizeInviteCode(raw);
+    if (direct) return direct;
+    const matches = raw.toUpperCase().match(/(?<![A-Z0-9])[A-HJ-KM-NP-Z2-9]{8}(?![A-Z0-9])/g);
+    return matches?.length === 1 ? matches[0] : null;
+}
