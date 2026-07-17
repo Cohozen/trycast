@@ -108,6 +108,9 @@ lointain) ; l'onglet **Résultats** montre le score réel, le prono et les point
   volets écart, bonus défensif et offensif. L'aperçu « peut rapporter N pts » affiché à la
   saisie utilise ce même module ; l'attribution officielle passe par le job serveur
   (voir §Scoring) avec le barème versionné en base (`scoring_rules`).
+- **Auto-enregistrement** : pas de bouton « Valider » — toute saisie complète part après un
+  court debounce, avec une pastille de statut et un retour haptique de succès (expo-haptics,
+  helper `src/lib/haptics.ts` — réservé aux confirmations, jamais de vibration décorative).
 
 ## Scoring
 
@@ -147,8 +150,8 @@ côté serveur, couleur d'identité choisie dans une palette fermée, créateur 
 d'office). Le créateur peut renommer, exclure un membre, transférer la propriété
 (`transfer_league_ownership`) ou supprimer sa ligue ; un membre peut la quitter.
 L'onglet Résultats du détail de ligue classe les membres journée par journée
-(`get_league_round_points`). Le partage du code passe par la copie (expo-clipboard) ou
-la feuille de partage du téléphone.
+(`get_league_round_points`). Le partage du code passe par la copie (expo-clipboard,
+avec un léger retour haptique) ou la feuille de partage du téléphone.
 
 L'app s'abonne aux changements de `standings` (Realtime) : les classements se
 rafraîchissent seuls quand le scoring passe.
