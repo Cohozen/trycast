@@ -21,6 +21,7 @@ import { useCreateLeague } from '@/features/leagues/use-create-league';
 import { useJoinLeague } from '@/features/leagues/use-join-league';
 import { useLeaguePreview } from '@/features/leagues/use-league-preview';
 import { extractInviteCode, validateLeagueName } from '@/features/leagues/validation';
+import { hapticLight } from '@/lib/haptics';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 
 type NewLeagueTab = 'create' | 'join';
@@ -147,6 +148,7 @@ function CreateSuccess({ league }: { league: LeagueRow }) {
 
     const copyCode = async () => {
         await Clipboard.setStringAsync(league.invite_code);
+        hapticLight();
         setCopied(true);
     };
     const shareCode = () => {

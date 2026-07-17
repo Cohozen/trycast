@@ -46,6 +46,7 @@ import { useMyLeagues } from '@/features/leagues/use-my-leagues';
 import { useTransferOwnership } from '@/features/leagues/use-transfer-ownership';
 import type { MatchWithTeams } from '@/features/matches/types';
 import { useMatches } from '@/features/matches/use-matches';
+import { hapticLight } from '@/lib/haptics';
 import { i18n } from '@/lib/i18n';
 import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
@@ -470,6 +471,7 @@ function SettingsTab({
 
     const copyCode = async () => {
         await Clipboard.setStringAsync(league.invite_code);
+        hapticLight();
         setCopied(true);
     };
     const shareCode = () => {

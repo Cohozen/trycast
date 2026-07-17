@@ -19,6 +19,7 @@ import {
     probabilityTone,
     winnerPointsByOutcome,
 } from '@/features/scoring/potential-by-outcome';
+import { hapticSuccess } from '@/lib/haptics';
 import { i18n } from '@/lib/i18n';
 import { Text, View } from '@/tw';
 import { cn } from '@/tw/variants';
@@ -95,7 +96,7 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
     const { mutate } = upsert;
     useEffect(() => {
         if (draft === null || saved) return;
-        const timer = setTimeout(() => mutate(draft), 700);
+        const timer = setTimeout(() => mutate(draft, { onSuccess: hapticSuccess }), 700);
         return () => clearTimeout(timer);
         // draft est dérivé de ces quatre états — les lister évite un objet neuf par rendu
     }, [homeRaw, awayRaw, bonusHome, bonusAway, saved, mutate]); // eslint-disable-line react-hooks/exhaustive-deps
