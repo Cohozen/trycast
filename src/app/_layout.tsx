@@ -17,7 +17,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import { AnimatedSplashOverlay } from '@/components/animated-splash-overlay';
 import { SessionProvider, useSession } from '@/features/auth/session-context';
 import { useNotificationObserver } from '@/features/notifications/use-notification-observer';
 import { useRegisterPushToken } from '@/features/notifications/use-register-push-token';
