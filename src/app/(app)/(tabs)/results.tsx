@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
+import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { DayStrip } from '@/features/matches/components/day-strip';
 import { buildDayRange, dayKeyOf, MATCH_DAYS_ONLY } from '@/features/matches/day-range';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
@@ -26,6 +27,15 @@ export default function ResultsScreen() {
     const distributions = useCommunityDistributions(competition.data?.id);
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
     const screenInsets = useScreenInsets();
+
+    const refreshControl = usePullToRefresh(() =>
+        Promise.all([
+            competition.refetch(),
+            matches.refetch(),
+            predictions.refetch(),
+            distributions.refetch(),
+        ]),
+    );
 
     if (
         competition.isPending ||
@@ -124,7 +134,8 @@ export default function ResultsScreen() {
                     <ScrollView
                         className="flex-1"
                         contentContainerClassName="w-full max-w-[800px] gap-3 self-center px-5 pt-4"
-                        contentContainerStyle={{ paddingBottom: screenInsets.bottomTabBar }}>
+                        contentContainerStyle={{ paddingBottom: screenInsets.bottomTabBar }}
+                        refreshControl={refreshControl}>
                         <View className="flex-row items-baseline justify-between gap-3 px-0.5">
                             <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
                                 {dayTitle}

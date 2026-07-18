@@ -9,6 +9,7 @@ import { Screen } from '@/components/ui/screen';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Select } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { useSession } from '@/features/auth/session-context';
 import { LeaderboardRow } from '@/features/leagues/components/leaderboard-row';
 import { markTies } from '@/features/leagues/ranking';
@@ -67,6 +68,17 @@ export default function MatchScreen() {
     );
     const leagueBoard = useLeagueLeaderboard(view === 'leaderboard' ? currentLeagueId : undefined);
 
+    const refreshControl = usePullToRefresh(() =>
+        Promise.all([
+            match.refetch(),
+            myPredictions.refetch(),
+            distributions.refetch(),
+            myLeagues.refetch(),
+            leaguePredictions.refetch(),
+            leagueBoard.refetch(),
+        ]),
+    );
+
     if (match.isPending) {
         return (
             <View className="flex-1 gap-3 bg-bg p-6">
@@ -112,7 +124,11 @@ export default function MatchScreen() {
     // stickyHeaderIndices={[0]} → MatchHero, enfant direct d'index 0 du
     // ScrollView de Screen, avec un fond opaque (cf. MatchHero).
     return (
-        <Screen contentClassName="gap-5 p-6" stickyHeaderIndices={[0]} top="none">
+        <Screen
+            contentClassName="gap-5 p-6"
+            refreshControl={refreshControl}
+            stickyHeaderIndices={[0]}
+            top="none">
             <MatchHero match={currentMatch} />
 
             {/* Mon prono, selon la phase */}

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Screen } from '@/components/ui/screen';
 import { Skeleton } from '@/components/ui/skeleton';
+import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { useSession } from '@/features/auth/session-context';
 import { useGlobalLeaderboard } from '@/features/leagues/use-global-leaderboard';
 import { useMyLeagues } from '@/features/leagues/use-my-leagues';
@@ -81,6 +82,18 @@ export default function MatchesScreen() {
     const standing = useMyStanding(competition.data?.id, userId);
     const leaderboard = useGlobalLeaderboard(competition.data?.id);
     const screenInsets = useScreenInsets();
+
+    const refreshControl = usePullToRefresh(() =>
+        Promise.all([
+            matches.refetch(),
+            liveMatches.refetch(),
+            predictions.refetch(),
+            distributions.refetch(),
+            standing.refetch(),
+            leaderboard.refetch(),
+            myLeagues.refetch(),
+        ]),
+    );
 
     const loading =
         !userId ||
@@ -349,6 +362,7 @@ export default function MatchesScreen() {
             <Screen
                 bottom="tabBar"
                 contentClassName="gap-3 pt-3"
+                refreshControl={refreshControl}
                 stickyHeaderIndices={stickyIndices}
                 top="none">
                 {listChildren}
