@@ -153,8 +153,8 @@ export default function LeaderboardScreen() {
                             trailing={
                                 currentLeague
                                     ? t('leagues:detail.members', {
-                                          count: currentLeague.member_count,
-                                      })
+                                        count: currentLeague.member_count,
+                                    })
                                     : undefined
                             }
                             value={currentLeagueId}
@@ -179,7 +179,7 @@ export default function LeaderboardScreen() {
                 ) : null}
 
                 {effectiveScope === 'global' ? (
-                    <Card className="flex-row items-center gap-2.5 px-3.5 py-2.5">
+                    <Card className="flex-row items-center gap-2.5 px-3.5 py-2.75">
                         <View className="h-[34px] w-[34px] items-center justify-center rounded-sm bg-brand/10">
                             <Globe color={brandColor} size={18} strokeWidth={1.9} />
                         </View>

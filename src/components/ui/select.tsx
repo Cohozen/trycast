@@ -78,7 +78,7 @@ export function Select<V extends string>({
                     accessibilityRole="button"
                     accessibilityState={{ expanded: open }}
                     className={cn(
-                        'flex-row items-center gap-3 rounded-md border bg-surface px-3.5 py-[11px] tc-shadow-sm',
+                        'flex-row items-center gap-3 rounded-md border bg-surface px-3.5 py-2.75 tc-shadow-sm',
                         open ? 'border-accent' : 'border-border',
                     )}
                     onPress={openPanel}>

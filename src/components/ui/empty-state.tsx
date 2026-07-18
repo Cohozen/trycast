@@ -12,13 +12,13 @@ type EmptyStateProps = {
 /** État vide du design system : titre Anton, message court, action éventuelle. */
 export function EmptyState({ title, message, icon, action }: EmptyStateProps) {
     return (
-        <View className="items-center gap-3 px-7 py-10">
+        <View className="items-center gap-3 px-7 py-8">
             {icon ? (
-                <View className="mb-1 h-[72px] w-[72px] items-center justify-center rounded-pill bg-brand/10">
+                <View className="mb-1 h-18 w-18 items-center justify-center rounded-pill bg-brand/10">
                     {icon}
                 </View>
             ) : null}
-            <Text className="text-center font-display text-h2 text-text">{title}</Text>
+            <Text className="text-center font-display text-h2 leading-1 text-text">{title}</Text>
             {message ? (
                 <Text className="max-w-[280px] text-center font-body text-[14px] leading-[21px] text-text-muted">
                     {message}
