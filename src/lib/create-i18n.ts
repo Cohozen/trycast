@@ -2,6 +2,7 @@ import { createInstance, type i18n as I18nInstance } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import auth from '@/locales/fr/auth.json';
+import celebration from '@/locales/fr/celebration.json';
 import common from '@/locales/fr/common.json';
 import leagues from '@/locales/fr/leagues.json';
 import matches from '@/locales/fr/matches.json';
@@ -15,7 +16,7 @@ import profile from '@/locales/fr/profile.json';
  * l'ajout d'une langue ne demande que ses JSON, rien d'autre ne change.
  */
 export const resources = {
-    fr: { common, auth, matches, predictions, leagues, profile },
+    fr: { common, auth, matches, predictions, leagues, profile, celebration },
 } as const;
 
 export const defaultNS = 'common';

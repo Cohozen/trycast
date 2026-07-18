@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { ToastProvider } from '@/components/ui/toast-provider';
+import { CelebrationHost } from '@/features/celebration/components/celebration-host';
 import { useStandingsRealtime } from '@/features/leagues/use-standings-realtime';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
 import { useThemeColor } from '@/tw';
@@ -51,6 +52,7 @@ export default function AppLayout() {
                     options={{ headerShown: true, title: t('matches:detail.screenTitle') }}
                 />
             </Stack>
+            <CelebrationHost />
         </ToastProvider>
     );
 }
