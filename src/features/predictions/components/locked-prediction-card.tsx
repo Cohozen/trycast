@@ -2,6 +2,7 @@ import { Lock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 
 import { TeamFlag } from '@/features/matches/components/team-flag';
+import { teamName } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
 import type { PredictionRow } from '@/features/predictions/types';
 import { BAREME_V1 } from '@/features/scoring/bareme';
@@ -57,7 +58,7 @@ export function LockedPredictionCard({ match, prediction }: LockedPredictionCard
             <View className="flex-row items-center gap-3">
                 <TeamFlag team={team} />
                 <Text className="flex-1 font-body-semibold text-[16px] text-text">
-                    {team?.name ?? t('matches:teamTbd')}
+                    {team ? teamName(team, t) : t('matches:teamTbd')}
                 </Text>
                 <Text className="font-display text-[26px] leading-[27px] text-text">{score}</Text>
             </View>

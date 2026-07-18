@@ -1,3 +1,11 @@
+/**
+ * Ne garder dans la bande que les jours ayant au moins un match : au rugby
+ * l'écart entre deux journées peut être énorme, la plage continue affichait
+ * trop de jours grisés. Repasser à `false` restaure la plage continue (jours
+ * vides désactivés) sans autre changement.
+ */
+export const MATCH_DAYS_ONLY = true;
+
 /** Jour de la bande de sélection (maquette Résultats). */
 export type StripDay = {
     key: string;

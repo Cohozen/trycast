@@ -3,6 +3,7 @@ import { Modal } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui/button';
+import { teamName } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
 import type { PredictionRow } from '@/features/predictions/types';
 import { parseBreakdown, verdictOf } from '@/features/predictions/verdict';
@@ -29,7 +30,7 @@ type Row = { key: string; label: string; mark: 'ok' | 'ko' | 'info'; points: num
  * barème (✓/✗) depuis le breakdown persisté, total gagné.
  */
 export function PointsDetailSheet({ match, prediction, visible, onClose }: PointsDetailSheetProps) {
-    const { t } = useTranslation(['predictions', 'common']);
+    const { t } = useTranslation(['predictions', 'common', 'matches']);
     const insets = useSafeAreaInsets();
     const breakdown = parseBreakdown(prediction);
     if (!breakdown) {
@@ -118,7 +119,9 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
         bonusTags.push(match.away_team?.code ?? match.away_team?.name ?? '?');
     }
 
-    const title = `${match.home_team?.name ?? '?'} – ${match.away_team?.name ?? '?'}`;
+    const homeName = match.home_team ? teamName(match.home_team, t) : '?';
+    const awayName = match.away_team ? teamName(match.away_team, t) : '?';
+    const title = `${homeName} – ${awayName}`;
     const total = prediction.points_awarded ?? 0;
 
     return (

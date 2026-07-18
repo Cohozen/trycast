@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TeamFlag } from '@/features/matches/components/team-flag';
-import { formatKickoff } from '@/features/matches/format-match';
+import { formatKickoff, teamName } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
 import { BonusToggle } from '@/features/predictions/components/bonus-toggle';
 import { CommunityDistribution } from '@/features/predictions/components/community-distribution';
@@ -75,12 +75,12 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
 
     const draft = complete
         ? {
-            match_id: match.id,
-            predicted_home_score: parsePredictedScore(homeRaw),
-            predicted_away_score: parsePredictedScore(awayRaw),
-            predicted_bonus_off_home: bonusHome,
-            predicted_bonus_off_away: bonusAway,
-        }
+              match_id: match.id,
+              predicted_home_score: parsePredictedScore(homeRaw),
+              predicted_away_score: parsePredictedScore(awayRaw),
+              predicted_bonus_off_home: bonusHome,
+              predicted_bonus_off_away: bonusAway,
+          }
         : null;
 
     const saved =
@@ -104,15 +104,15 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
     const odds = { home: match.odds_home, draw: match.odds_draw, away: match.odds_away };
     const potential = draft
         ? computePotentialPoints(
-            {
-                homeScore: draft.predicted_home_score,
-                awayScore: draft.predicted_away_score,
-                bonusOffHome: draft.predicted_bonus_off_home,
-                bonusOffAway: draft.predicted_bonus_off_away,
-            },
-            odds,
-            BAREME_V1,
-        )
+              {
+                  homeScore: draft.predicted_home_score,
+                  awayScore: draft.predicted_away_score,
+                  bonusOffHome: draft.predicted_bonus_off_home,
+                  bonusOffAway: draft.predicted_bonus_off_away,
+              },
+              odds,
+              BAREME_V1,
+          )
         : null;
     const winnerPoints = winnerPointsByOutcome(odds, BAREME_V1);
     const probabilities = impliedProbabilities(odds);
@@ -162,11 +162,11 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
             {/* Noms + drapeaux + saisie du score */}
             <View className="flex-row items-center justify-between">
                 <Text className="flex-1 text-center font-body-bold text-[18px] text-text">
-                    {match.home_team?.name ?? t('matches:teamTbd')}
+                    {match.home_team ? teamName(match.home_team, t) : t('matches:teamTbd')}
                 </Text>
                 <View className="w-6" />
                 <Text className="flex-1 text-center font-body-bold text-[18px] text-text">
-                    {match.away_team?.name ?? t('matches:teamTbd')}
+                    {match.away_team ? teamName(match.away_team, t) : t('matches:teamTbd')}
                 </Text>
             </View>
             <View className="flex-row items-center justify-between gap-2.5">

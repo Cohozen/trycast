@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { MatchStatusChip } from '@/features/matches/components/match-status-chip';
 import { TeamFlag } from '@/features/matches/components/team-flag';
-import { formatKickoffTime } from '@/features/matches/format-match';
+import { formatKickoffTime, teamName } from '@/features/matches/format-match';
 import type { MatchDetail, TeamRow } from '@/features/matches/types';
 import { i18n } from '@/lib/i18n';
 import { Text, View } from '@/tw';
@@ -32,7 +32,7 @@ function TeamColumn({ team, muted }: { team: TeamRow | null; muted: boolean }) {
                     muted ? 'text-text-muted' : 'text-text',
                 )}
                 numberOfLines={2}>
-                {team?.name ?? t('matches:teamTbd')}
+                {team ? teamName(team, t) : t('matches:teamTbd')}
             </Text>
         </View>
     );
@@ -74,8 +74,10 @@ export function MatchHero({ match }: MatchHeroProps) {
         .filter(Boolean)
         .join(' · ');
 
+    // bg-bg : le hero est épinglé (sticky) sur la page de détail, fond opaque
+    // obligatoire pour masquer le contenu défilant dessous.
     return (
-        <View className="gap-3 border-b border-border pb-4">
+        <View className="gap-3 border-b border-border bg-bg pb-4">
             <MatchStatusChip match={match} />
 
             <View className="flex-row items-start gap-1.5">

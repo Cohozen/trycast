@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DayStrip } from '@/features/matches/components/day-strip';
-import { buildDayRange, dayKeyOf } from '@/features/matches/day-range';
+import { buildDayRange, dayKeyOf, MATCH_DAYS_ONLY } from '@/features/matches/day-range';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
 import { useMatches } from '@/features/matches/use-matches';
 import { ResultCard } from '@/features/predictions/components/result-card';
@@ -68,13 +68,15 @@ export default function ResultsScreen() {
     }
 
     const results = matches.data ? splitMatches(matches.data, new Date()).results : [];
-    const days = competition.data
+    const fullRange = competition.data
         ? buildDayRange({
               startsOn: competition.data.starts_on,
               endsOn: competition.data.ends_on,
               matchDayKeys: new Set(results.map((match) => dayKeyOf(match.kickoff_at))),
           })
         : [];
+    // Par défaut on n'expose que les jours avec des matchs (cf. MATCH_DAYS_ONLY).
+    const days = MATCH_DAYS_ONLY ? fullRange.filter((day) => day.hasMatches) : fullRange;
     // La plage s'arrête à aujourd'hui : le dernier jour avec matchs est donc
     // le plus proche de la date courante — c'est lui qu'on présélectionne.
     const currentDay = selectedDay ?? days.findLast((day) => day.hasMatches)?.key ?? null;

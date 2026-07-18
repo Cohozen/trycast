@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TeamFlag } from '@/features/matches/components/team-flag';
-import { formatKickoffTime, statusLabel } from '@/features/matches/format-match';
+import { formatKickoffTime, statusLabel, teamName } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
 import { CommunityDistribution } from '@/features/predictions/components/community-distribution';
 import { PointsDetailSheet } from '@/features/predictions/components/points-detail-sheet';
@@ -45,10 +45,11 @@ export function ResultCard({ match, prediction, distribution, onOpenMatch }: Res
         ? prediction.predicted_home_score > prediction.predicted_away_score
             ? ('home' as const)
             : prediction.predicted_home_score < prediction.predicted_away_score
-                ? ('away' as const)
-                : ('draw' as const)
+              ? ('away' as const)
+              : ('draw' as const)
         : null;
 
+    const isLive = match.status === 'in_play';
     const homeWins =
         match.home_score !== null && match.away_score !== null
             ? match.home_score > match.away_score
@@ -64,7 +65,15 @@ export function ResultCard({ match, prediction, distribution, onOpenMatch }: Res
 
     const teamRow = (side: 'home' | 'away') => {
         const team = side === 'home' ? match.home_team : match.away_team;
-        const score = side === 'home' ? match.home_score : match.away_score;
+        // Match en cours : le score final (home_score/away_score) est encore
+        // null, on lit les colonnes live_* écrites par l'EF sync-live.
+        const score = isLive
+            ? side === 'home'
+                ? match.live_home_score
+                : match.live_away_score
+            : side === 'home'
+              ? match.home_score
+              : match.away_score;
         const winner = homeWins === null ? null : side === 'home' ? homeWins : !homeWins;
         return (
             <View className="flex-row items-center gap-3">
@@ -74,7 +83,7 @@ export function ResultCard({ match, prediction, distribution, onOpenMatch }: Res
                         'flex-1 font-body-semibold text-[16px]',
                         winner === false ? 'text-text-muted' : 'text-text',
                     )}>
-                    {team?.name ?? t('matches:teamTbd')}
+                    {team ? teamName(team, t) : t('matches:teamTbd')}
                 </Text>
                 <Text
                     className={cn(

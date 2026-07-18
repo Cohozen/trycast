@@ -108,8 +108,11 @@ export default function MatchScreen() {
     const distribution = distributions.data?.get(currentMatch.id);
     const boardEntries = markTies(leagueBoard.data ?? []);
 
+    // Le hero (score/live + cotes) reste épinglé pendant le scroll :
+    // stickyHeaderIndices={[0]} → MatchHero, enfant direct d'index 0 du
+    // ScrollView de Screen, avec un fond opaque (cf. MatchHero).
     return (
-        <Screen contentClassName="gap-5 p-6" top="none">
+        <Screen contentClassName="gap-5 p-6" stickyHeaderIndices={[0]} top="none">
             <MatchHero match={currentMatch} />
 
             {/* Mon prono, selon la phase */}

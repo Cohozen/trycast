@@ -56,5 +56,19 @@
             "leaderboard": "Classement"
         }
     },
-    "teamTbd": "À déterminer"
+    "teamTbd": "À déterminer",
+    "teams": {
+        "FRA": "France",
+        "IRL": "Irlande",
+        "ITA": "Italie",
+        "ARG": "Argentine",
+        "JPN": "Japon",
+        "ENG": "Angleterre",
+        "SCO": "Écosse",
+        "WAL": "Pays de Galles",
+        "NZL": "Nouvelle-Zélande",
+        "AUS": "Australie",
+        "RSA": "Afrique du Sud",
+        "FIJ": "Fidji"
+    }
 }
