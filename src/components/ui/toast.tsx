@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
-type ToastTone = 'neutral' | 'success' | 'accent' | 'live';
+export type ToastTone = 'neutral' | 'success' | 'accent' | 'live';
 
 type ToastProps = {
     message: string;

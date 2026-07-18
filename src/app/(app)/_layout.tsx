@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
+import { ToastProvider } from '@/components/ui/toast-provider';
 import { useStandingsRealtime } from '@/features/leagues/use-standings-realtime';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
 import { useThemeColor } from '@/tw';
@@ -17,37 +18,39 @@ export default function AppLayout() {
     useStandingsRealtime(competition.data?.id);
 
     return (
-        <Stack
-            screenOptions={{
-                headerShown: false,
-                // Header natif aux couleurs du DS : fond identique à l'écran
-                // (sans hairline → continuité visuelle), titre Inter SemiBold.
-                // Le chevron reste couleur texte : le grenat est réservé aux
-                // CTA/live/sélection, pas à la navigation.
-                headerStyle: { backgroundColor: bgColor },
-                headerShadowVisible: false,
-                headerTintColor: textColor,
-                headerTitleStyle: { fontFamily: 'Inter_600SemiBold', color: textColor },
-            }}>
-            {/* title vide : le back natif des écrans poussés affiche juste le
-                chevron, pas le nom technique « (tabs) » */}
-            <Stack.Screen name="(tabs)" options={{ title: '' }} />
-            <Stack.Screen
-                name="settings"
-                options={{ headerShown: true, title: t('profile:settings.title') }}
-            />
-            <Stack.Screen
-                name="league/new"
-                options={{ headerShown: true, title: t('leagues:new.screenTitle') }}
-            />
-            <Stack.Screen
-                name="league/[id]"
-                options={{ headerShown: true, title: t('leagues:detail.screenTitle') }}
-            />
-            <Stack.Screen
-                name="match/[id]"
-                options={{ headerShown: true, title: t('matches:detail.screenTitle') }}
-            />
-        </Stack>
+        <ToastProvider>
+            <Stack
+                screenOptions={{
+                    headerShown: false,
+                    // Header natif aux couleurs du DS : fond identique à l'écran
+                    // (sans hairline → continuité visuelle), titre Inter SemiBold.
+                    // Le chevron reste couleur texte : le grenat est réservé aux
+                    // CTA/live/sélection, pas à la navigation.
+                    headerStyle: { backgroundColor: bgColor },
+                    headerShadowVisible: false,
+                    headerTintColor: textColor,
+                    headerTitleStyle: { fontFamily: 'Inter_600SemiBold', color: textColor },
+                }}>
+                {/* title vide : le back natif des écrans poussés affiche juste le
+                    chevron, pas le nom technique « (tabs) » */}
+                <Stack.Screen name="(tabs)" options={{ title: '' }} />
+                <Stack.Screen
+                    name="settings"
+                    options={{ headerShown: true, title: t('profile:settings.title') }}
+                />
+                <Stack.Screen
+                    name="league/new"
+                    options={{ headerShown: true, title: t('leagues:new.screenTitle') }}
+                />
+                <Stack.Screen
+                    name="league/[id]"
+                    options={{ headerShown: true, title: t('leagues:detail.screenTitle') }}
+                />
+                <Stack.Screen
+                    name="match/[id]"
+                    options={{ headerShown: true, title: t('matches:detail.screenTitle') }}
+                />
+            </Stack>
+        </ToastProvider>
     );
 }

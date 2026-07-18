@@ -1,5 +1,5 @@
 import * as Clipboard from 'expo-clipboard';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Check, ClipboardPaste, Copy, Info, Link2, Lock, Share2 } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import { Screen } from '@/components/ui/screen';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { TextField } from '@/components/ui/text-field';
 import { Toast } from '@/components/ui/toast';
+import { useToast } from '@/components/ui/toast-provider';
 import { DEFAULT_LEAGUE_COLOR, type LeagueColor } from '@/features/leagues/colors';
 import { InviteCodeInput } from '@/features/leagues/components/invite-code-input';
 import { LeagueColorPicker } from '@/features/leagues/components/league-color-picker';
@@ -37,11 +38,13 @@ export default function NewLeagueScreen() {
     const params = useLocalSearchParams<{ tab?: string }>();
     const [tab, setTab] = useState<NewLeagueTab>(params.tab === 'join' ? 'join' : 'create');
 
+    // Le titre du header natif suit l'onglet (surcharge l'option statique du
+    // layout) ; il remplace l'ancien grand titre in-screen, devenu redondant.
+    const title = tab === 'create' ? t('leagues:new.createTitle') : t('leagues:new.joinTitle');
+
     return (
         <Screen contentClassName="gap-5 p-6" top="none">
-            <Text className="font-display text-[30px] leading-[32px] text-text">
-                {tab === 'create' ? t('leagues:new.createTitle') : t('leagues:new.joinTitle')}
-            </Text>
+            <Stack.Screen options={{ title }} />
             <SegmentedControl
                 onChange={setTab}
                 options={[
@@ -140,7 +143,7 @@ function CreateSection() {
 function CreateSuccess({ league }: { league: LeagueRow }) {
     const { t } = useTranslation(['leagues', 'common']);
     const router = useRouter();
-    const [copied, setCopied] = useState(false);
+    const toast = useToast();
     const successColor = useThemeColor('success');
     const onBrandColor = useThemeColor('on-brand');
     const textColor = useThemeColor('text');
@@ -148,7 +151,7 @@ function CreateSuccess({ league }: { league: LeagueRow }) {
     const copyCode = async () => {
         await Clipboard.setStringAsync(league.invite_code);
         hapticLight();
-        setCopied(true);
+        toast.show(t('leagues:detail.codeCopied', { code: league.invite_code }), 'success');
     };
     const shareCode = () => {
         Share.share({
@@ -201,13 +204,6 @@ function CreateSuccess({ league }: { league: LeagueRow }) {
                     </View>
                 </View>
             </View>
-
-            {copied ? (
-                <Toast
-                    message={t('leagues:detail.codeCopied', { code: league.invite_code })}
-                    tone="success"
-                />
-            ) : null}
 
             <View className="gap-2.5">
                 <Button

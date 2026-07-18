@@ -23,7 +23,7 @@ import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Toast } from '@/components/ui/toast';
+import { useToast } from '@/components/ui/toast-provider';
 import { useSession } from '@/features/auth/session-context';
 import { DeleteLeagueModal } from '@/features/leagues/components/delete-league-modal';
 import { LeaderboardRow } from '@/features/leagues/components/leaderboard-row';
@@ -334,10 +334,10 @@ function ResultsTab({
     const selectedRound = rounds.find((round) => roundKeyOf(round.round) === selected);
     const meta = selectedRound
         ? new Intl.DateTimeFormat(i18n.language, {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short',
-        }).format(new Date(selectedRound.firstKickoff))
+              weekday: 'short',
+              day: 'numeric',
+              month: 'short',
+          }).format(new Date(selectedRound.firstKickoff))
         : '';
 
     return (
@@ -456,7 +456,7 @@ function SettingsTab({
     const kickMember = useKickMember(league.id);
     const transferOwnership = useTransferOwnership(league.id);
 
-    const [copied, setCopied] = useState(false);
+    const toast = useToast();
     const [leaveOpen, setLeaveOpen] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [transferOpen, setTransferOpen] = useState(false);
@@ -471,7 +471,7 @@ function SettingsTab({
     const copyCode = async () => {
         await Clipboard.setStringAsync(league.invite_code);
         hapticLight();
-        setCopied(true);
+        toast.show(t('leagues:detail.codeCopied', { code: league.invite_code }), 'success');
     };
     const shareCode = () => {
         Share.share({
@@ -520,12 +520,6 @@ function SettingsTab({
                         </View>
                     </View>
                 </Card>
-                {copied ? (
-                    <Toast
-                        message={t('leagues:detail.codeCopied', { code: league.invite_code })}
-                        tone="success"
-                    />
-                ) : null}
             </View>
 
             {/* Gestion des membres (admin) */}
@@ -559,8 +553,8 @@ function SettingsTab({
                                             numberOfLines={1}>
                                             {isMe
                                                 ? t('leagues:detail.settings.memberYou', {
-                                                    username: member.username,
-                                                })
+                                                      username: member.username,
+                                                  })
                                                 : member.username}
                                         </Text>
                                         <Text className="font-body-semibold text-[11px] text-text-faint">
