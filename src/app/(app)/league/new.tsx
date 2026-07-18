@@ -48,7 +48,6 @@ export default function NewLeagueScreen() {
                     { value: 'create', label: t('leagues:new.tabs.create') },
                     { value: 'join', label: t('leagues:new.tabs.join') },
                 ]}
-                size="sm"
                 value={tab}
             />
             {tab === 'create' ? <CreateSection /> : <JoinSection />}

@@ -74,7 +74,7 @@ export function LiveMatchCard({ match, prediction }: LiveMatchCardProps) {
                         {away}
                     </Text>
                 </View>
-                <TeamSide alignEnd team={match.away_team} />
+                <TeamSide team={match.away_team} />
             </View>
 
             {prediction ? (

@@ -153,26 +153,24 @@ export default function LeaderboardScreen() {
                             trailing={
                                 currentLeague
                                     ? t('leagues:detail.members', {
-                                          count: currentLeague.member_count,
-                                      })
+                                        count: currentLeague.member_count,
+                                    })
                                     : undefined
                             }
                             value={currentLeagueId}
                         />
-                        <Pressable
-                            accessibilityRole="button"
-                            className="flex-row items-center gap-1.5 self-end"
-                            onPress={() =>
-                                router.push({
+                        <View className="flex-row items-center gap-1.5 self-end">
+                            <Button
+                                size="sm"
+                                onPress={() => router.push({
                                     pathname: '/league/[id]',
                                     params: { id: currentLeagueId },
-                                })
-                            }>
-                            <Settings2 color={textMuted} size={14} strokeWidth={2} />
-                            <Text className="font-body-semibold text-[12.5px] text-text-muted">
-                                {t('leagues:leaderboard.manage')}
-                            </Text>
-                        </Pressable>
+                                })}
+                                title={t('leagues:leaderboard.manage')}
+                                variant="secondary"
+                                leadingIcon={<Settings2 color={textMuted} size={18} strokeWidth={1.9} />}
+                            />
+                        </View>
                     </View>
                 ) : null}
 

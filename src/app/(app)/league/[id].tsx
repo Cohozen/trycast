@@ -16,6 +16,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Share } from 'react-native';
 
+import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -33,7 +34,6 @@ import { RemoveMemberModal } from '@/features/leagues/components/remove-member-m
 import { RoundStandingRow } from '@/features/leagues/components/round-standing-row';
 import { RoundStrip, type RoundStripItem } from '@/features/leagues/components/round-strip';
 import { TransferOwnershipModal } from '@/features/leagues/components/transfer-ownership-modal';
-import { Avatar } from '@/components/ui/avatar';
 import { markTies } from '@/features/leagues/ranking';
 import { groupRoundPoints } from '@/features/leagues/round-points';
 import type { LeaderboardEntry } from '@/features/leagues/types';
@@ -138,7 +138,6 @@ export default function LeagueScreen() {
                     { value: 'results', label: t('leagues:detail.tabs.results') },
                     { value: 'settings', label: t('leagues:detail.tabs.settings') },
                 ]}
-                size="sm"
                 value={tab}
             />
 
@@ -335,10 +334,10 @@ function ResultsTab({
     const selectedRound = rounds.find((round) => roundKeyOf(round.round) === selected);
     const meta = selectedRound
         ? new Intl.DateTimeFormat(i18n.language, {
-              weekday: 'short',
-              day: 'numeric',
-              month: 'short',
-          }).format(new Date(selectedRound.firstKickoff))
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+        }).format(new Date(selectedRound.firstKickoff))
         : '';
 
     return (
@@ -560,8 +559,8 @@ function SettingsTab({
                                             numberOfLines={1}>
                                             {isMe
                                                 ? t('leagues:detail.settings.memberYou', {
-                                                      username: member.username,
-                                                  })
+                                                    username: member.username,
+                                                })
                                                 : member.username}
                                         </Text>
                                         <Text className="font-body-semibold text-[11px] text-text-faint">
