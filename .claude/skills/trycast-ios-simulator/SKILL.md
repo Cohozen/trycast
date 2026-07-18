@@ -53,6 +53,20 @@ for r in json.load(sys.stdin): walk(r)
 "
 ```
 
+## Manipuler l'état local AsyncStorage (forcer un état pour tester)
+
+Certaines features dépendent d'un flag device-local (`@react-native-async-storage/async-storage`) qu'on ne peut pas atteindre par l'UI — ex. l'overlay de célébration (`trycast.celebrated-matches`), qui n'apparaît qu'avec un « déjà vu » dans un état précis. On peut **éditer le stockage à la main** pour reproduire le cas (vécu 2026-07-18) :
+
+```bash
+DATA=$(xcrun simctl get_app_container booted com.cohozen.trycast data)
+MANIFEST="$DATA/Library/Application Support/com.cohozen.trycast/RCTAsyncLocalStorage_V1/manifest.json"
+```
+
+- Le backend iOS est un **`manifest.json`** (objet `{cléAsyncStorage: valeurString}`) ; les petites valeurs y sont inline (les >1024 car. partent dans des fichiers séparés du même dossier). La **session Supabase n'y est pas** (elle vit dans `expo-secure-store` via `LargeSecureStore`) — éditer ce fichier ne déconnecte pas.
+- **Terminer l'app d'abord** (`xcrun simctl terminate booted com.cohozen.trycast`), sinon un flush au prochain flush/exit écrase l'édition.
+- **Ne modifier que sa clé** (relire le JSON, changer une entrée, réécrire) pour préserver `trycast.theme-preference` & co. Sauver un `.bak` par prudence, le retirer à la fin.
+- Relancer (`openurl`, cf. piège launcher ci-dessous) et vérifier. Beaucoup de features **auto-cicatrisent** : le « Fermer/valider » réécrit la clé dans son état correct — vérifier le manifest après pour le confirmer, et laisser l'état de Corentin propre.
+
 ## Interagir (coordonnées en points logiques, PAS en pixels)
 
 ```bash
