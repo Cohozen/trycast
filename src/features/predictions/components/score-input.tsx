@@ -17,7 +17,7 @@ export function ScoreInput({ value, onChangeText, accessibilityLabel, invalid }:
         <TextInput
             accessibilityLabel={accessibilityLabel}
             className={cn(
-                'w-14 rounded-md border-2 border-transparent bg-surface-sunken px-0.5 py-1.5 text-center font-display text-[32px] leading-[34px] text-text',
+                'w-18 rounded-md border-2 border-transparent bg-surface-sunken px-0.5 py-1.5 text-center font-display text-[32px] leading-[34px] text-text',
                 invalid && 'border-accent',
             )}
             keyboardType="number-pad"

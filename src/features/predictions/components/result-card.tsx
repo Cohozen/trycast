@@ -45,8 +45,8 @@ export function ResultCard({ match, prediction, distribution, onOpenMatch }: Res
         ? prediction.predicted_home_score > prediction.predicted_away_score
             ? ('home' as const)
             : prediction.predicted_home_score < prediction.predicted_away_score
-              ? ('away' as const)
-              : ('draw' as const)
+                ? ('away' as const)
+                : ('draw' as const)
         : null;
 
     const homeWins =

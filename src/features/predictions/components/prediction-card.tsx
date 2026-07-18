@@ -75,12 +75,12 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
 
     const draft = complete
         ? {
-              match_id: match.id,
-              predicted_home_score: parsePredictedScore(homeRaw),
-              predicted_away_score: parsePredictedScore(awayRaw),
-              predicted_bonus_off_home: bonusHome,
-              predicted_bonus_off_away: bonusAway,
-          }
+            match_id: match.id,
+            predicted_home_score: parsePredictedScore(homeRaw),
+            predicted_away_score: parsePredictedScore(awayRaw),
+            predicted_bonus_off_home: bonusHome,
+            predicted_bonus_off_away: bonusAway,
+        }
         : null;
 
     const saved =
@@ -104,15 +104,15 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
     const odds = { home: match.odds_home, draw: match.odds_draw, away: match.odds_away };
     const potential = draft
         ? computePotentialPoints(
-              {
-                  homeScore: draft.predicted_home_score,
-                  awayScore: draft.predicted_away_score,
-                  bonusOffHome: draft.predicted_bonus_off_home,
-                  bonusOffAway: draft.predicted_bonus_off_away,
-              },
-              odds,
-              BAREME_V1,
-          )
+            {
+                homeScore: draft.predicted_home_score,
+                awayScore: draft.predicted_away_score,
+                bonusOffHome: draft.predicted_bonus_off_home,
+                bonusOffAway: draft.predicted_bonus_off_away,
+            },
+            odds,
+            BAREME_V1,
+        )
         : null;
     const winnerPoints = winnerPointsByOutcome(odds, BAREME_V1);
     const probabilities = impliedProbabilities(odds);
@@ -169,22 +169,30 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
                     {match.away_team?.name ?? t('matches:teamTbd')}
                 </Text>
             </View>
-            <View className="flex-row items-center justify-center gap-2.5">
-                <TeamFlag size="lg" team={match.home_team} />
-                <ScoreInput
-                    accessibilityLabel={t('predictions:form.homeScore')}
-                    invalid={homeInvalid}
-                    onChangeText={setHomeRaw}
-                    value={homeRaw}
-                />
+            <View className="flex-row items-center justify-between gap-2.5">
+                <View className="flex flex-row items-center gap-2.5">
+                    <View className="px-2">
+                        <TeamFlag size="lg" team={match.home_team} />
+                    </View>
+                    <ScoreInput
+                        accessibilityLabel={t('predictions:form.homeScore')}
+                        invalid={homeInvalid}
+                        onChangeText={setHomeRaw}
+                        value={homeRaw}
+                    />
+                </View>
                 <Text className="font-display text-[24px] text-text-faint">–</Text>
-                <ScoreInput
-                    accessibilityLabel={t('predictions:form.awayScore')}
-                    invalid={awayInvalid}
-                    onChangeText={setAwayRaw}
-                    value={awayRaw}
-                />
-                <TeamFlag size="lg" team={match.away_team} />
+                <View className="flex flex-row items-center gap-2.5">
+                    <ScoreInput
+                        accessibilityLabel={t('predictions:form.awayScore')}
+                        invalid={awayInvalid}
+                        onChangeText={setAwayRaw}
+                        value={awayRaw}
+                    />
+                    <View className="px-2">
+                        <TeamFlag size="lg" team={match.away_team} />
+                    </View>
+                </View>
             </View>
 
             {/* Bonus offensif */}
@@ -236,7 +244,7 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
                                     )}>
                                     {key}
                                 </Text>
-                                <Text className="font-display text-[20px] leading-[21px] text-text">
+                                <Text className="font-display text-[20px] leading-5.25 text-text">
                                     {active && potential ? potential.total : winnerPoints[outcome]}
                                 </Text>
                             </View>

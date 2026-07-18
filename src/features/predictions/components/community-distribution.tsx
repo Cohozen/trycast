@@ -64,9 +64,6 @@ export function CommunityDistribution({
                         </View>
                     ))}
                 </View>
-                <Text className="text-center font-body-semibold text-[10.5px] text-text-faint">
-                    {t('predictions:distribution.basedOn', { count: distribution.total })}
-                </Text>
             </View>
         );
     }
@@ -90,7 +87,7 @@ export function CommunityDistribution({
                                 <Text
                                     className={cn(
                                         'font-body-bold text-[10.5px]',
-                                        mine ? 'text-accent' : 'text-text-faint',
+                                        mine ? 'text-accent opacity-70' : 'text-text-faint',
                                     )}>
                                     {key}
                                 </Text>
