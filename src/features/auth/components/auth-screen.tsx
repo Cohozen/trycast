@@ -15,6 +15,7 @@ import {
     validateUsername,
 } from '@/features/auth/validation';
 import { supabase } from '@/lib/supabase';
+import { EMAIL_CONFIRM_URL } from '@/lib/urls';
 import { Link, Text, View } from '@/tw';
 
 type AuthMode = 'login' | 'signup';
@@ -97,7 +98,7 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
             const { data, error: signUpError } = await supabase.auth.signUp({
                 email: email.trim(),
                 password,
-                options: { data: { username } },
+                options: { data: { username }, emailRedirectTo: EMAIL_CONFIRM_URL },
             });
             if (signUpError) {
                 setError(t(toAuthMessageKey(signUpError)));

@@ -1,0 +1,107 @@
+---
+// Panneau d'atterrissage après une action de confirmation Auth (Supabase
+// redirige les liens d'e-mail vers ces pages). Statique, sans JS : l'app se
+// rouvre à la main (ou via le lien trycast:// quand elle est installée).
+interface Props {
+    heading: string;
+    body: string;
+}
+
+const { heading, body } = Astro.props;
+---
+
+<section>
+    <div class="card">
+        <span class="badge" aria-hidden="true">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--on-brand)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4.5 12.5l4.5 4.5 10.5-11"></path>
+            </svg>
+        </span>
+        <h1>{heading}</h1>
+        <p>{body}</p>
+        <a class="primary" href="trycast://">Ouvrir TryCast</a>
+        <a class="secondary" href="/">Retour à l'accueil</a>
+    </div>
+</section>
+
+<style>
+    section {
+        display: flex;
+        justify-content: center;
+        padding: 96px 24px 120px;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 440px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 6px;
+        padding: 40px 32px;
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 64px;
+        height: 64px;
+        border-radius: var(--radius-pill);
+        background: var(--brand);
+        margin-bottom: 14px;
+    }
+
+    h1 {
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-size: clamp(30px, 6vw, 40px);
+        line-height: 1;
+        letter-spacing: 0.01em;
+        text-wrap: balance;
+    }
+
+    p {
+        margin: 10px 0 6px;
+        font-size: 16px;
+        line-height: 1.55;
+        color: var(--text-muted);
+        text-wrap: pretty;
+    }
+
+    .primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 52px;
+        width: 100%;
+        margin-top: 18px;
+        border-radius: var(--radius-pill);
+        background: var(--accent);
+        color: var(--on-accent);
+        font-size: 16px;
+        font-weight: 700;
+        box-shadow: var(--glow-accent);
+    }
+
+    .primary:hover {
+        background: var(--accent-press);
+        color: var(--on-accent);
+    }
+
+    .secondary {
+        margin-top: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .secondary:hover {
+        color: var(--text);
+    }
+</style>
