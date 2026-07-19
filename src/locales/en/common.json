@@ -1,0 +1,21 @@
+{
+    "tabs": {
+        "matches": "Matches",
+        "results": "Results",
+        "leaderboard": "Leaderboard",
+        "profile": "Profile"
+    },
+    "actions": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "retry": "Retry",
+        "back": "Back",
+        "close": "Close",
+        "copy": "Copy",
+        "share": "Share"
+    },
+    "errors": {
+        "generic": "Something went wrong. Try again.",
+        "network": "Can't connect. Check your internet connection."
+    }
+}

@@ -1,0 +1,74 @@
+{
+    "header": {
+        "overline": "Ongoing competition"
+    },
+    "dates": {
+        "today": "Today",
+        "tomorrow": "Tomorrow"
+    },
+    "empty": {
+        "title": "No upcoming matches",
+        "message": "You're all caught up! Come back when the next round opens.",
+        "noCompetition": "No matches scheduled right now."
+    },
+    "results": {
+        "title": "Results",
+        "count_one": "{{count}} match",
+        "count_other": "{{count}} matches",
+        "number_day": "Round {{count}}",
+        "number_day_short": "R{{count}}",
+        "empty": {
+            "title": "No matches played",
+            "message": "Results and your points will appear here after the first kickoffs."
+        }
+    },
+    "errors": {
+        "load": "Couldn't load matches.",
+        "loadResults": "Couldn't load results."
+    },
+    "status": {
+        "inPlay": "Live",
+        "finished": "Finished",
+        "postponed": "Postponed",
+        "cancelled": "Cancelled"
+    },
+    "live": {
+        "badge": "Live",
+        "delayNote": "Score slightly delayed",
+        "yourPrediction": "Your pick: {{home}}–{{away}}",
+        "periods": {
+            "firstHalf": "1st half",
+            "halfTime": "Half-time",
+            "secondHalf": "2nd half",
+            "extraTime": "Extra time",
+            "breakTime": "Break",
+            "penalties": "Kicking competition"
+        }
+    },
+    "detail": {
+        "screenTitle": "Match",
+        "upcoming": "Upcoming",
+        "kickoff": "Kickoff",
+        "notFound": "Match not found.",
+        "singleLeague": "One league only",
+        "tabs": {
+            "predictions": "Predictions",
+            "leaderboard": "Leaderboard"
+        }
+    },
+    "teamTbd": "TBD",
+    "teams": {
+        "FRA": "France",
+        "IRL": "Ireland",
+        "ITA": "Italy",
+        "ARG": "Argentina",
+        "JPN": "Japan",
+        "ENG": "England",
+        "SCO": "Scotland",
+        "WAL": "Wales",
+        "NZL": "New Zealand",
+        "AUS": "Australia",
+        "RSA": "South Africa",
+        "FIJ": "Fiji"
+    }
+}

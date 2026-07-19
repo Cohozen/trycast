@@ -1,0 +1,76 @@
+{
+    "dashboard": {
+        "points": "Total points",
+        "played": "predictions made",
+        "globalRank": "overall"
+    },
+    "toPredict": {
+        "label_one": "match to predict",
+        "label_other": "matches to predict",
+        "autoSave": "Your entry saves automatically."
+    },
+    "status": {
+        "toPredict": "To predict",
+        "saving": "Saving…",
+        "saved": "Saved",
+        "locked": "Locked"
+    },
+    "form": {
+        "bonusLabel": "Attacking bonus",
+        "potentialLabel": "Potential points",
+        "homeScore": "Home team score",
+        "awayScore": "Away team score",
+        "bonusHome": "Home attacking bonus",
+        "bonusAway": "Away attacking bonus"
+    },
+    "locked": {
+        "header": "Prediction locked"
+    },
+    "masked": {
+        "title": "Predictions hidden",
+        "message": "Other players' predictions will be visible at kickoff. No cheating possible."
+    },
+    "verdict": {
+        "exact": "Exact score",
+        "good": "Right result",
+        "missed": "Missed",
+        "pending": "Points coming"
+    },
+    "distribution": {
+        "title": "The community played",
+        "count_one": "{{count}} prediction",
+        "count_other": "{{count}} predictions",
+        "basedOn_one": "Based on {{count}} prediction",
+        "basedOn_other": "Based on {{count}} predictions"
+    },
+    "reconciliation": {
+        "yourProno": "Your pick",
+        "pointsWon": "Points won",
+        "notPredicted": "You didn't predict this match.",
+        "seeDetails": "See points breakdown",
+        "bonusTag": "{{code}} bonus"
+    },
+    "breakdown": {
+        "basePoints": "Base points",
+        "bonusPredicted": "Predicted bonuses",
+        "winner": "Right winner · {{code}}",
+        "winnerDraw": "Right result · draw",
+        "exactScore": "Exact score",
+        "gap": "Margin bonus",
+        "defensive": "Defensive bonus",
+        "offensive": "Attacking bonus",
+        "offensivePending": "Attacking bonus · awaiting tries",
+        "odds": "Odds weighting (×{{odds}})",
+        "finalScore": "Final score",
+        "totalWon": "Total won"
+    },
+    "errors": {
+        "deadline": "Too late: kickoff has passed, the prediction is locked.",
+        "invalidScore": "Invalid score: enter a positive whole number.",
+        "saveFailed": "Couldn't save your prediction. Try again in a moment."
+    },
+    "validation": {
+        "missingScore": "Enter a score.",
+        "invalidScore": "The score must be a positive whole number."
+    }
+}

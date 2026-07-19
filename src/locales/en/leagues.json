@@ -1,0 +1,180 @@
+{
+    "actions": {
+        "create": "Create a league",
+        "join": "Join a league"
+    },
+    "hero": {
+        "title": "Join the game",
+        "message": "Create your league or join your friends' to start predicting together.",
+        "footnote": "You can also predict without a league — your points still count overall."
+    },
+    "leaderboard": {
+        "title": "Leaderboard",
+        "tabs": {
+            "leagues": "Leagues",
+            "global": "Overall"
+        },
+        "empty": "The leaderboard will appear after the first scored matches.",
+        "loadMore": "Load more",
+        "manage": "League settings",
+        "select": {
+            "overline": "League shown"
+        },
+        "general": {
+            "overline": "Global leaderboard",
+            "title": "All players"
+        },
+        "players_one": "{{count}} player",
+        "players_other": "{{count}} players",
+        "full": "Full leaderboard",
+        "tie": "tied",
+        "tieNote": "Ties are broken by number of exact scores, then correct predictions.",
+        "pinned": {
+            "rankSuffix": "",
+            "gap": "{{gap}} pts behind #{{rank}}"
+        },
+        "row": {
+            "predictions_one": "{{count}} prediction",
+            "predictions_other": "{{count}} predictions",
+            "exacts_one": "{{count}} exact score",
+            "exacts_other": "{{count}} exact scores"
+        }
+    },
+    "new": {
+        "screenTitle": "Leagues",
+        "createTitle": "New league",
+        "joinTitle": "Join a league",
+        "tabs": {
+            "create": "Create",
+            "join": "Join"
+        }
+    },
+    "create": {
+        "nameLabel": "League name",
+        "namePlaceholder": "The rugby crew",
+        "namePreview": "Pick a memorable name",
+        "nameHelper": "Between 3 and 40 characters. Visible to your members.",
+        "privacyNote": "Private league, accessible by invite code only. You share it yourself.",
+        "submit": "Create the league",
+        "colorLabel": "League colour",
+        "colorHint": "The icon uses your league's initials. No upload needed.",
+        "colorSwatch": "Choose this colour",
+        "success": {
+            "title": "League created!",
+            "message": "{{name}} is ready. Invite your friends with this code before you go in.",
+            "codeLabel": "Invite code",
+            "open": "Open the league",
+            "reinvite": "You can re-invite anytime from the settings."
+        }
+    },
+    "join": {
+        "intro": "Enter the 8-character code from your friend — or paste the invite link directly.",
+        "codeLabel": "Invite code",
+        "paste": "Paste an invite link",
+        "pasteEmpty": "No invite code in the clipboard.",
+        "linkDetected": "Code detected from the pasted link",
+        "hint": "We show you a preview of the league before you join — nothing is confirmed as you type.",
+        "preview": {
+            "meta": "Private league · {{competition}}",
+            "alreadyMember": "You're already in this league. Open it directly to see the leaderboard.",
+            "fullNote": "This league is full ({{count}} members). Ask the admin to make room, then try again.",
+            "join": "Join",
+            "open": "Open the league",
+            "full": "League full"
+        }
+    },
+    "detail": {
+        "screenTitle": "League",
+        "members_one": "{{count}} member",
+        "members_other": "{{count}} members",
+        "invite": "Invite friends",
+        "shareMessage": "Join my league \"{{name}}\" on TryCast with code {{code}}!",
+        "codeCopied": "Code copied · {{code}}",
+        "notFound": "League not found.",
+        "badges": {
+            "admin": "Admin",
+            "member": "Member"
+        },
+        "tabs": {
+            "standings": "Standings",
+            "results": "Results",
+            "settings": "Settings"
+        },
+        "solo": {
+            "title": "You're on your own for now",
+            "message": "The leaderboard comes alive as soon as a friend joins. Share your invite code.",
+            "codeOverline": "Code"
+        },
+        "results": {
+            "roundOverline": "Round",
+            "roundShort": "R",
+            "roundTitle": "Round {{round}}",
+            "exactsNone": "no exact scores",
+            "notPlayedTitle": "Round not played yet",
+            "notPlayedMessage": "Round {{round}} points will show here once the matches are done and predictions reconciled.",
+            "backToPlayed": "See round {{round}}",
+            "dayNote": "Points for this round only — not the season total.",
+            "empty": "Per-round results arrive after the first finished matches."
+        },
+        "settings": {
+            "inviteOverline": "Invite friends",
+            "codeOverline": "League code",
+            "codeHint": "Share this code: your friends enter it to join the league.",
+            "membersOverline": "Members",
+            "creatorTag": "Creator",
+            "creatorSub": "League creator",
+            "memberSub": "Member",
+            "memberYou": "{{username}} · you",
+            "removeLabel": "Remove this member",
+            "removeHint": "Removing a member requires confirmation. They can rejoin with the code.",
+            "dangerOverline": "Danger zone",
+            "leaveTitle": "Leave the league",
+            "leaveText": "You'll lose access to this league's leaderboard and history.",
+            "ownerWarning": "You're the creator. Transfer ownership before leaving, or delete the league for everyone.",
+            "transferTitle": "Transfer ownership",
+            "transferSub": "Make a member the new admin.",
+            "deleteAction": "Delete the league"
+        },
+        "leave": {
+            "title": "Leave this league?",
+            "message": "You're leaving {{name}}. You'll lose access to its leaderboard and your history here. You can rejoin with the code.",
+            "confirm": "Leave the league"
+        },
+        "delete": {
+            "title": "Delete {{name}}?",
+            "intro": "This action is irreversible. For all members:",
+            "losses": {
+                "history": "The league's leaderboard and history",
+                "access": "Access cut off for all members",
+                "code": "The invite code, deactivated"
+            },
+            "acknowledge": "I understand the league and its leaderboard will be permanently deleted.",
+            "confirm": "Delete permanently"
+        },
+        "kick": {
+            "title": "Remove {{username}}?",
+            "message": "{{username}} will lose access to {{name}} and its leaderboard. You can re-invite them with the code.",
+            "confirm": "Remove from league"
+        },
+        "transfer": {
+            "title": "Transfer ownership",
+            "subtitle": "Make a member the new league admin.",
+            "note": "You'll become a regular member — the new admin can remove you.",
+            "confirm": "Transfer ownership"
+        }
+    },
+    "owner": "Your league",
+    "validation": {
+        "nameRequired": "Give your league a name.",
+        "nameLength": "The name must be 3 to 40 characters.",
+        "codeFormat": "The code is 8 characters (letters and numbers)."
+    },
+    "errors": {
+        "load": "Couldn't load the leaderboard.",
+        "invalidCode": "Invalid invite code.",
+        "invalidName": "Invalid league name (3 to 40 characters).",
+        "full": "This league is full (50 members).",
+        "notAllowed": "Action not allowed.",
+        "server": "Couldn't reach the server. Try again in a moment."
+    }
+}

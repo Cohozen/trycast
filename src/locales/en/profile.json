@@ -1,0 +1,161 @@
+{
+    "title": "Profile",
+    "memberSince": "Member since {{date}}",
+    "figures": {
+        "points": "Points",
+        "rank": "Rank",
+        "precision": "Accuracy"
+    },
+    "competition": {
+        "overline": "Competition",
+        "current": "Ongoing"
+    },
+    "tabs": {
+        "stats": "Stats",
+        "predictions": "Predictions",
+        "leagues": "Leagues"
+    },
+    "stats": {
+        "cards": {
+            "points": "Points",
+            "played": "Predictions made",
+            "good": "Correct predictions",
+            "exact": "Exact scores"
+        },
+        "rank": {
+            "overline": "Overall leaderboard",
+            "of": "of {{count}} players",
+            "noneTitle": "Not ranked yet",
+            "noneHint": "Your rank appears after your first scored prediction."
+        },
+        "precision": {
+            "title": "Accuracy",
+            "center": "correct",
+            "good_one": "{{count}} correct prediction",
+            "good_other": "{{count}} correct predictions",
+            "exact_one": "{{count}} exact score",
+            "exact_other": "{{count}} exact scores",
+            "missed_one": "{{count}} missed",
+            "missed_other": "{{count}} missed",
+            "notPredicted_one": "{{count}} not predicted",
+            "notPredicted_other": "{{count}} not predicted",
+            "empty": "No scored predictions in this competition yet."
+        },
+        "trend": {
+            "title": "Points per round",
+            "empty": "Your progress will show after your first round of predictions.",
+            "roundLabel": "R{{round}}",
+            "roundUnknown": "R?",
+            "lastRound_one": "{{count}} pt",
+            "lastRound_other": "{{count}} pts"
+        }
+    },
+    "predictions": {
+        "emptyTitle": "No completed predictions",
+        "emptyMessage": "Your predictions will appear here once matches are played and scored."
+    },
+    "username": {
+        "label": "Username",
+        "hint": "3–20 characters · letters, numbers and \"_\" · must be unique.",
+        "updated": "Username updated!",
+        "taken": "That username is taken. Try another one."
+    },
+    "errors": {
+        "invalid": "Invalid username: 3–20 characters, letters, numbers and \"_\"."
+    },
+    "settings": {
+        "title": "Settings",
+        "sections": {
+            "account": "Account",
+            "preferences": "Preferences",
+            "notifications": "Notifications",
+            "privacy": "Privacy",
+            "about": "About",
+            "danger": "Danger zone"
+        },
+        "theme": {
+            "label": "Theme",
+            "autoSaved": "Auto-saved",
+            "system": "System",
+            "light": "Light",
+            "dark": "Dark"
+        },
+        "language": {
+            "label": "Language",
+            "current": "English"
+        },
+        "avatar": {
+            "label": "Profile photo",
+            "change": "Change",
+            "remove": "Remove",
+            "errors": {
+                "permission": "Allow access to your photos to pick an image."
+            }
+        },
+        "password": {
+            "row": "Password",
+            "rowValue": "Change",
+            "modalTitle": "New password",
+            "modalIntro": "Choose a new password to secure your account.",
+            "confirm": "Save",
+            "updated": "Password updated!"
+        },
+        "email": {
+            "row": "Email address",
+            "modalTitle": "Change email",
+            "modalIntro": "A confirmation link will be sent to your old and new address to validate the change.",
+            "newLabel": "New email address",
+            "confirm": "Send the link",
+            "sameEmail": "That's already your current address.",
+            "sent": "Link sent! Confirm the change from your old and new inbox."
+        },
+        "privacy": {
+            "communications": {
+                "label": "Communications",
+                "description": "Receive product news and updates by email.",
+                "since": "Accepted on {{date}}."
+            },
+            "export": {
+                "label": "Export my data",
+                "description": "Get a copy of your personal data."
+            }
+        },
+        "notifications": {
+            "channelName": "General",
+            "master": {
+                "label": "Notifications",
+                "subtitleOn": "Choose what you want to receive",
+                "subtitleOff": "All notifications are off",
+                "subtitleBlocked": "Blocked at the system level"
+            },
+            "reminder": {
+                "label": "Prediction reminder",
+                "description": "Before each kickoff if you haven't predicted."
+            },
+            "results": {
+                "label": "Results & points",
+                "description": "When a match ends and your points are calculated."
+            },
+            "blockedBanner": "Notifications are blocked in your {{os}} settings. Turn them on to get your reminders.",
+            "openSettings": "Open system settings"
+        },
+        "version": "Version",
+        "logout": "Log out",
+        "delete": {
+            "rowTitle": "Delete my account",
+            "rowSubtitle": "Irreversible: predictions, history, points and leagues will be permanently lost.",
+            "modalTitle": "Delete your account?",
+            "modalIntro": "This action is irreversible. You'll permanently lose:",
+            "losses": {
+                "predictions": "All your predictions and their history",
+                "points": "Your total points and rankings",
+                "leagues": "Your spot in all your leagues",
+                "profile": "Your profile and preferences"
+            },
+            "confirmPrompt": "To confirm, retype your username {{username}}",
+            "acknowledge": "I understand this action is final.",
+            "confirm": "Delete permanently",
+            "deleting": "Deleting…"
+        }
+    }
+}

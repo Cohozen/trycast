@@ -1,6 +1,13 @@
 import { createInstance, type i18n as I18nInstance } from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import authEn from '@/locales/en/auth.json';
+import celebrationEn from '@/locales/en/celebration.json';
+import commonEn from '@/locales/en/common.json';
+import leaguesEn from '@/locales/en/leagues.json';
+import matchesEn from '@/locales/en/matches.json';
+import predictionsEn from '@/locales/en/predictions.json';
+import profileEn from '@/locales/en/profile.json';
 import auth from '@/locales/fr/auth.json';
 import celebration from '@/locales/fr/celebration.json';
 import common from '@/locales/fr/common.json';
@@ -12,11 +19,21 @@ import profile from '@/locales/fr/profile.json';
 /**
  * Ressources i18n : FR = langue source, un namespace par domaine métier
  * (calqué sur src/features/) + `common` pour le partagé (onglets, actions,
- * erreurs génériques). L'EN rejoindra `resources` avant la RWC 2027 —
- * l'ajout d'une langue ne demande que ses JSON, rien d'autre ne change.
+ * erreurs génériques). EN est calqué sur FR à l'identique (parité des clés
+ * verrouillée par create-i18n.test.ts) ; ajouter une langue = ses JSON + une
+ * entrée ici, rien d'autre ne change.
  */
 export const resources = {
     fr: { common, auth, matches, predictions, leagues, profile, celebration },
+    en: {
+        common: commonEn,
+        auth: authEn,
+        matches: matchesEn,
+        predictions: predictionsEn,
+        leagues: leaguesEn,
+        profile: profileEn,
+        celebration: celebrationEn,
+    },
 } as const;
 
 export const defaultNS = 'common';
