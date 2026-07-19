@@ -18,6 +18,12 @@ import { NotificationSettings } from '@/features/notifications/components/notifi
 import { unregisterPushToken } from '@/features/notifications/register-push-token';
 import { PrivacySettings } from '@/features/privacy/components/privacy-settings';
 import {
+    type LanguagePreference,
+    loadLanguagePreference,
+    resolveLanguage,
+    setLanguagePreference,
+} from '@/features/profile/language-preference';
+import {
     loadThemePreference,
     setThemePreference,
     type ThemePreference,
@@ -51,6 +57,7 @@ export default function SettingsScreen() {
     const deleteAccount = useDeleteAccount();
 
     const [theme, setTheme] = useState<ThemePreference>('system');
+    const [language, setLanguage] = useState<LanguagePreference>('system');
     const [confirmingDelete, setConfirmingDelete] = useState(false);
     const [editingPassword, setEditingPassword] = useState(false);
     const [passwordSaved, setPasswordSaved] = useState(false);
@@ -61,11 +68,32 @@ export default function SettingsScreen() {
 
     useEffect(() => {
         loadThemePreference().then(setTheme);
+        loadLanguagePreference().then(setLanguage);
     }, []);
 
     const onThemeChange = (next: ThemePreference) => {
         setTheme(next);
         setThemePreference(next);
+    };
+
+    // Persiste + applique la langue, puis pousse la langue résolue dans
+    // profiles.locale (les notifications sont localisées côté serveur d'après
+    // cette colonne ; useSyncLocale ne se rejoue pas en cours de session).
+    const onLanguageChange = (next: LanguagePreference) => {
+        setLanguage(next);
+        setLanguagePreference(next);
+        const userId = session?.user.id;
+        if (userId) {
+            supabase
+                .from('profiles')
+                .update({ locale: resolveLanguage(next) })
+                .eq('id', userId)
+                .then(({ error }) => {
+                    if (error && __DEV__) {
+                        console.warn('Mise à jour de profiles.locale échouée :', error.message);
+                    }
+                });
+        }
     };
 
     // Le token push part AVANT la session (après signOut, plus de droits pour
@@ -162,16 +190,24 @@ export default function SettingsScreen() {
                         value={theme}
                     />
                 </Card>
-                <Card className="flex-row items-center gap-3 px-4 py-3.5">
-                    <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">
-                        <Globe color={brandColor} size={17} strokeWidth={1.9} />
+                <Card className="gap-3 px-4 py-3.5">
+                    <View className="flex-row items-center gap-3">
+                        <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">
+                            <Globe color={brandColor} size={17} strokeWidth={1.9} />
+                        </View>
+                        <Text className="flex-1 font-body-semibold text-[15px] text-text">
+                            {t('profile:settings.language.label')}
+                        </Text>
                     </View>
-                    <Text className="flex-1 font-body-semibold text-[15px] text-text">
-                        {t('profile:settings.language.label')}
-                    </Text>
-                    <Text className="font-body-medium text-[14px] text-text-muted">
-                        {t('profile:settings.language.current')}
-                    </Text>
+                    <SegmentedControl
+                        onChange={onLanguageChange}
+                        options={[
+                            { value: 'system', label: t('profile:settings.language.system') },
+                            { value: 'fr', label: t('profile:settings.language.fr') },
+                            { value: 'en', label: t('profile:settings.language.en') },
+                        ]}
+                        value={language}
+                    />
                 </Card>
             </View>
 

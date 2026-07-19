@@ -21,6 +21,7 @@ import { AnimatedSplashOverlay } from '@/components/animated-splash-overlay';
 import { SessionProvider, useSession } from '@/features/auth/session-context';
 import { useNotificationObserver } from '@/features/notifications/use-notification-observer';
 import { useRegisterPushToken } from '@/features/notifications/use-register-push-token';
+import { applyStoredLanguagePreference } from '@/features/profile/language-preference';
 import { applyStoredThemePreference } from '@/features/profile/theme-preference';
 import { useSyncLocale } from '@/features/profile/use-sync-locale';
 import { queryClient } from '@/lib/query';
@@ -62,10 +63,11 @@ function RootNavigator() {
 export default function RootLayout() {
     const colorScheme = useColorScheme();
 
-    // Ré-applique le thème choisi dans Réglages (effet : AsyncStorage n'existe
-    // pas pendant le rendu SSR web, et Appearance n'est utile qu'au client)
+    // Ré-applique thème et langue choisis dans Réglages (effet : AsyncStorage
+    // n'existe pas pendant le rendu SSR web, et Appearance n'est utile qu'au client)
     useEffect(() => {
         applyStoredThemePreference();
+        applyStoredLanguagePreference();
     }, []);
 
     return (

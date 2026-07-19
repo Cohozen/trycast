@@ -82,7 +82,9 @@
         },
         "language": {
             "label": "Langue",
-            "current": "Français"
+            "system": "Système",
+            "fr": "Français",
+            "en": "English"
         },
         "avatar": {
             "label": "Photo de profil",
