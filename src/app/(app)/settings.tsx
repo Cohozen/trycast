@@ -1,5 +1,5 @@
 import Constants from 'expo-constants';
-import { ChevronRight, Globe, KeyRound } from 'lucide-react-native';
+import { ChevronRight, Globe, KeyRound, Mail } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -10,6 +10,7 @@ import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Toast } from '@/components/ui/toast';
 import { AvatarEditor } from '@/features/profile/components/avatar-editor';
 import { DeleteAccountModal } from '@/features/profile/components/delete-account-modal';
+import { EmailEditorModal } from '@/features/profile/components/email-editor-modal';
 import { PasswordEditorModal } from '@/features/profile/components/password-editor-modal';
 import { UsernameEditor } from '@/features/profile/components/username-editor';
 import { useSession } from '@/features/auth/session-context';
@@ -38,10 +39,9 @@ function SectionLabel({ children, danger = false }: { children: string; danger?:
 }
 
 /**
- * Écran Réglages : compte (pseudo + mot de passe), thème, langue affichée,
+ * Écran Réglages : compte (pseudo, e-mail, mot de passe), thème, langue,
  * notifications, version, déconnexion et zone de danger. Titre et retour
- * portés par le header natif (déclaré dans le layout (app)). Photo, e-mail
- * et RGPD arrivent avec leurs lots.
+ * portés par le header natif (déclaré dans le layout (app)).
  */
 export default function SettingsScreen() {
     const { t } = useTranslation(['profile', 'common']);
@@ -53,6 +53,8 @@ export default function SettingsScreen() {
     const [confirmingDelete, setConfirmingDelete] = useState(false);
     const [editingPassword, setEditingPassword] = useState(false);
     const [passwordSaved, setPasswordSaved] = useState(false);
+    const [editingEmail, setEditingEmail] = useState(false);
+    const [emailSent, setEmailSent] = useState(false);
     const brandColor = useThemeColor('brand');
     const textFaintColor = useThemeColor('text-faint');
 
@@ -84,14 +86,38 @@ export default function SettingsScreen() {
 
     return (
         <Screen contentClassName="gap-[22px] px-[18px] pb-10 pt-4" top="none">
-            {/* Compte — pseudo + mot de passe (e-mail arrive avec le Lot 7) */}
+            {/* Compte — pseudo, e-mail, mot de passe */}
             <View className="gap-2.5">
                 <SectionLabel>{t('profile:settings.sections.account')}</SectionLabel>
                 {passwordSaved ? (
                     <Toast message={t('profile:settings.password.updated')} tone="success" />
                 ) : null}
+                {emailSent ? (
+                    <Toast message={t('profile:settings.email.sent')} tone="success" />
+                ) : null}
                 <AvatarEditor userId={session?.user.id ?? ''} />
                 <UsernameEditor userId={session?.user.id ?? ''} />
+                <Pressable
+                    accessibilityRole="button"
+                    onPress={() => {
+                        setEmailSent(false);
+                        setEditingEmail(true);
+                    }}>
+                    <Card className="flex-row items-center gap-3 px-4 py-3.5">
+                        <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">
+                            <Mail color={brandColor} size={17} strokeWidth={1.9} />
+                        </View>
+                        <Text className="font-body-semibold text-[15px] text-text">
+                            {t('profile:settings.email.row')}
+                        </Text>
+                        <Text
+                            className="flex-1 text-right font-body-medium text-[14px] text-text-muted"
+                            numberOfLines={1}>
+                            {session?.user.email ?? ''}
+                        </Text>
+                        <ChevronRight color={textFaintColor} size={18} strokeWidth={1.9} />
+                    </Card>
+                </Pressable>
                 <Pressable
                     accessibilityRole="button"
                     onPress={() => {
@@ -195,6 +221,13 @@ export default function SettingsScreen() {
                     />
                 </View>
             </View>
+
+            <EmailEditorModal
+                currentEmail={session?.user.email ?? ''}
+                onClose={() => setEditingEmail(false)}
+                onSuccess={() => setEmailSent(true)}
+                visible={editingEmail}
+            />
 
             <PasswordEditorModal
                 onClose={() => setEditingPassword(false)}

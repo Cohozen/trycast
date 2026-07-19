@@ -99,6 +99,15 @@
             "confirm": "Enregistrer",
             "updated": "Mot de passe mis à jour !"
         },
+        "email": {
+            "row": "Adresse e-mail",
+            "modalTitle": "Changer d'adresse",
+            "modalIntro": "Un lien de confirmation sera envoyé à ton ancienne et à ta nouvelle adresse pour valider le changement.",
+            "newLabel": "Nouvelle adresse e-mail",
+            "confirm": "Envoyer le lien",
+            "sameEmail": "C'est déjà ton adresse actuelle.",
+            "sent": "Lien envoyé ! Confirme le changement depuis ton ancienne et ta nouvelle boîte mail."
+        },
         "notifications": {
             "channelName": "Général",
             "master": {
