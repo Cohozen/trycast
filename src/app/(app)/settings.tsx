@@ -16,6 +16,7 @@ import { UsernameEditor } from '@/features/profile/components/username-editor';
 import { useSession } from '@/features/auth/session-context';
 import { NotificationSettings } from '@/features/notifications/components/notification-settings';
 import { unregisterPushToken } from '@/features/notifications/register-push-token';
+import { PrivacySettings } from '@/features/privacy/components/privacy-settings';
 import {
     loadThemePreference,
     setThemePreference,
@@ -178,6 +179,12 @@ export default function SettingsScreen() {
             <View className="gap-2.5">
                 <SectionLabel>{t('profile:settings.sections.notifications')}</SectionLabel>
                 <NotificationSettings userId={session?.user.id ?? ''} />
+            </View>
+
+            {/* Confidentialité (RGPD) */}
+            <View className="gap-2.5">
+                <SectionLabel>{t('profile:settings.sections.privacy')}</SectionLabel>
+                <PrivacySettings userId={session?.user.id ?? ''} />
             </View>
 
             {/* À propos */}

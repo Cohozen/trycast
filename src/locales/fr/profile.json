@@ -69,6 +69,7 @@
             "account": "Compte",
             "preferences": "Préférences",
             "notifications": "Notifications",
+            "privacy": "Confidentialité",
             "about": "À propos",
             "danger": "Zone de danger"
         },
@@ -107,6 +108,17 @@
             "confirm": "Envoyer le lien",
             "sameEmail": "C'est déjà ton adresse actuelle.",
             "sent": "Lien envoyé ! Confirme le changement depuis ton ancienne et ta nouvelle boîte mail."
+        },
+        "privacy": {
+            "communications": {
+                "label": "Communications",
+                "description": "Recevoir les actus produit et les nouveautés par e-mail.",
+                "since": "Accepté le {{date}}."
+            },
+            "export": {
+                "label": "Exporter mes données",
+                "description": "Recevoir une copie de tes données personnelles."
+            }
         },
         "notifications": {
             "channelName": "Général",
