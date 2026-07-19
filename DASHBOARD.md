@@ -1,7 +1,7 @@
 # TryCast — Dashboard
 
 > Suivi d'avancement et décisions. Mis à jour à la fin de chaque session.
-> Dernière mise à jour : **2026-07-19** (tri du dashboard ; rebuild dev client Android **fait** cette nuit avec les toutes dernières modifs — expo-clipboard + expo-haptics + splash/icônes + overlay célébration ; EF `delete-account` **déployée**).
+> Dernière mise à jour : **2026-07-19 (bis)** (Lot 7 : code livré — changement d'e-mail + confirmation, RGPD minimal, anglais complet + sélecteur de langue ; reste des actions côté Corentin, voir plus bas).
 
 ## Avancement des lots
 
@@ -14,7 +14,7 @@
 | 5 | Ligues & classements (standings, RPC, leaderboards, Realtime) | ✅ Livré |
 | 5.5 | Design system + i18n (tokens light/dark, primitives, 4 onglets, i18next FR) | ✅ Livré (V0 + correctifs retours + tokens v2) |
 | **6** | **Push (expo-notifications, tokens, EF notify, deep links, préférences)** | 🔶 **Déployé et testé (FCM, EF, cron, dev build Android) — reste : checklist push réels** |
-| 7 | Finitions (confirmation email, EN si beta anglophone, RGPD, OAuth, iOS/APNs) | ⬜ À venir |
+| 7 | Finitions (confirmation email, changement d'e-mail, RGPD minimal, anglais + sélecteur de langue) | 🔶 **Code livré** — reste actions Corentin (dashboard Auth, deploy EF) ; OAuth + iOS/APNs **différés** |
 | Web | Site vitrine Astro (`web/` : landing, waitlist beta, pages légales) | ✅ Livré et déployé sur Vercel — reste : validation des textes légaux + domaine |
 
 ## Ce qu'il reste à faire
@@ -22,13 +22,15 @@
 ### Lot 6 — Push : reste la checklist device
 Tout est en place et déployé (tables + RPC, EF `notify` avec `verify_jwt=false`, cron `3-53/10` actif, FCM configuré, dev build Android testé, token en base). **Reste** : dérouler la checklist des push réels — rappel H-1 (pas de re-rappel au tick suivant, plus de rappel après avoir pronostiqué), push résultats après passe 1 avec les bons points (rien à la passe 2), taps → bons onglets (rappel → Matchs, résultat → Résultats). Types « Activité de ligue » et « Invitations » : v1.1+ (schéma prefs extensible). iOS/APNs au Lot 7.
 
-### Lot 7 — Finitions (pas encore commencé)
-- **Changement d'e-mail** (ligne « Modifier » des Réglages) → `supabase.auth.updateUser` **+ e-mails de confirmation** ; couplé à la réactivation de la confirmation email.
-- **Réévaluer la confirmation email** (désactivée aujourd'hui).
-- **RGPD** : sheet consentements (mesure d'audience, communications, dates de recueil) + « Exporter mes données » → table `consents` + EF d'export par e-mail ; n'a de sens qu'une fois un analytics en place.
-- **Sélecteur de langue actif** (aujourd'hui « Français » en lecture seule) → livraison de l'EN (infra prête, traduction avant RWC 2027).
-- **Compte social-only** (« Continuer avec Apple/Google » de la maquette Auth) → OAuth Apple/Google (v2).
-- **iOS/APNs** : notifications push sur device physique (compte Apple Developer requis).
+### Lot 7 — Finitions : code livré (2026-07-19 bis), reste des actions Corentin
+**Livré (7 commits `03350c5`→`4ab3b1e`, pas de push)** : changement d'e-mail (rangée Réglages + modale) et confirmation d'e-mail au signup (`emailRedirectTo` vers 2 pages d'atterrissage Astro `web/src/pages/app/`) ; RGPD minimal (table `consents` append-only + RLS, EF `export-data`, section Confidentialité = toggle communications + export via share sheet) ; **anglais complet** (`src/locales/en/`, 7 namespaces, test de parité) + sélecteur de langue Système/Français/English (bascule live vérifiée au simulateur) + messages de notification EN. **Différés (décision Corentin)** : OAuth Apple/Google (v2), iOS/APNs (compte Apple Developer).
+
+**Actions restant à Corentin (bloquées par le classifieur du mode auto) :**
+1. **Dashboard Supabase → Auth** : activer « Confirm email » (`enable_confirmations`, aujourd'hui `false` sur le projet hébergé — `config.toml` déjà passé à `true`) et **ajouter les URLs d'atterrissage à l'allow-list « Redirect URLs »** (`<site>/app/confirme` et `<site>/app/email-modifie`).
+2. **Déployer les Edge Functions** : `supabase functions deploy export-data` (nouvelle) **et** `supabase functions deploy notify` (redéploiement pour embarquer les messages EN de `_shared/`). *(La migration `consents` est déjà `db push` + typegen, RLS vérifiée par `bash scripts/e2e-privacy.sh`.)*
+3. **Vérifier `bash scripts/e2e-privacy.sh`** une fois `export-data` déployée (la section EF est ignorée tant qu'elle répond 404).
+4. **SMTP** : le SMTP par défaut de Supabase est plafonné (~2 e-mails/h projet) — OK pour tester, **insuffisant pour la beta** → prévoir un SMTP custom (Resend/SES) avant ouverture. Hors périmètre code.
+5. **`EXPO_PUBLIC_WEB_URL`** : ajouter au `.env` (modèle `.env.example`) l'URL du site (Vercel puis `trycast.fr`) — sert de base aux liens de confirmation. Couplé au **choix du domaine**.
 
 ### Site web / légal
 - **Relire et valider les pages légales** (`web/src/pages/cgu.astro`, `confidentialite.astro`, `mentions-legales.astro`) : compléter les `[Prénom Nom]`, vérifier l'âge minimum (15 ans proposé) et l'adresse de contact `salut@trycast.fr` (l'alias existe-t-il ?), puis retirer le bandeau « premier jet » (`draft-notice` dans `web/src/layouts/content-layout.astro`). Ensuite brancher les URLs dans le footer Auth et les Réglages de l'app (requis App Store).
@@ -67,6 +69,7 @@ Tout est en place et déployé (tables + RPC, EF `notify` avec `verify_jwt=false
 - Base dev : 6 matchs J1 NC ont `scored_at` mais 0 prono scoré → classement général NC vide (état donnée, pas un bug).
 
 ## Journal des sessions
+- **2026-07-19 (bis)** — **Lot 7 (finitions release) : code livré en 7 commits** (`03350c5`→`4ab3b1e`, pas de push). Périmètre arbitré avec Corentin : **e-mail** (changement d'adresse + réactivation confirmation, atterrissage sur 2 pages statiques du site `web/` plutôt que du deep-linking natif), **RGPD minimal** (table `consents` append-only + RLS own-rows, EF `export-data` sur le modèle `delete-account`, export via share sheet natif — pas d'e-mail, aucune brique SMTP), **anglais complet** (7 namespaces `src/locales/en/` + test de parité récursif FR/EN car le typage ne couvre que FR + messages de notification EN) et **sélecteur de langue** Système/Français/English (persisté, poussé dans `profiles.locale`). Contrainte respectée : **zéro nouvelle lib native, aucun rebuild** (Share du cœur RN, expo-clipboard/file-system déjà là). Vérifié : typecheck/lint/format + **271 tests**, `e2e-privacy.sh` (RLS consents live), pages web (light+dark), **simulateur iOS** (Réglages : rangée e-mail, section Confidentialité, bascule de langue FR↔EN en direct). Migration `consents` déjà `db push` + typegen. **Déploiement des EF `export-data` et `notify` + réglages Auth = actions Corentin** (classifieur), voir « reste à faire ». **Piège vécu** : `cd web` détourné par zoxide vers un autre projet (cernix) → toujours chemins absolus/`builtin cd` (mémoire `zoxide-cd-hijack`).
 - **2026-07-18 (bis)** — **Overlay de célébration des pronos gagnés** (nouveau domaine `src/features/celebration/`). À la première connexion après qu'un ou plusieurs pronos ont rapporté des points, un moment de récompense plein écran avec compteur animé et récap multi-matchs. **Décisions actées** : overlay plein écran (pas une sheet), périmètre **gagnés uniquement** (`points_awarded > 0`), persistance **locale device** (AsyncStorage, pas de migration), animation **sans nouvelle lib** (Reanimated + expo-haptics → aucun rebuild). Tout se calcule **client** depuis le cache existant (`useMyPredictions`/`useMatches`/`useActiveCompetition`), zéro réseau ni colonne DB. Livré : `celebrated-matches-store.ts` (**anti-rétroactif** : premier lancement absorbe l'historique sans rien afficher), `build-celebration-items.ts` (sélection pure testée), `use-celebration.ts` (évaluation une fois par montage), `celebration-overlay.tsx` (Modal, total `font-display` grenat, haptic Success, `useReducedMotion`), `animated-points-counter.tsx`, namespace i18n `celebration`, montage `CelebrationHost`. Vérifié : typecheck/lint/format + **264 tests**, simulateur (baseline puis overlay « 141 pts · 9 pronos gagnés »). 1 commit (`3290bc6`). Pas de push.
 - **2026-07-17 (quater)** — **Splash screen + icône d'app aux couleurs TryCast** (le splash/l'icône par défaut étaient ceux du template Expo, bleu). **Décision Corentin : fond d'icône = vert marque #14432a** (ballon grenat + traînée). Livré : splash natif (`splash-icon.png` régénéré, fond `bg` light+dark), icônes (iOS `icon.png` 1024, adaptive Android fond `#14432a`, favicon), overlay JS réécrit pour afficher le même splash sur fond sable (bascule invisible), nettoyage des assets template. Vérifié : typecheck/lint/format + 251 tests, smoke test simulateur. 3 commits (`48d5a2c`→`468a4ee`). Pas de push.
 - **2026-07-17 (ter)** — **Cross-fade au changement de thème : essayé puis abandonné** (décision Corentin). Implémentation complète livrée et vérifiée, mais la **latence ajoutée avant la bascule** (~0,3-0,5 s : capture PNG + affichage overlay) n'a pas plu → **reset à `562f162`**, la bascule reste instantanée. Voir mémoire `theme-crossfade-abandonne`. Aucun commit conservé côté app.
