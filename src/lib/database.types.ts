@@ -41,6 +41,30 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            consents: {
+                Row: {
+                    created_at: string;
+                    granted: boolean;
+                    id: string;
+                    type: string;
+                    user_id: string;
+                };
+                Insert: {
+                    created_at?: string;
+                    granted: boolean;
+                    id?: string;
+                    type: string;
+                    user_id: string;
+                };
+                Update: {
+                    created_at?: string;
+                    granted?: boolean;
+                    id?: string;
+                    type?: string;
+                    user_id?: string;
+                };
+                Relationships: [];
+            };
             job_runs: {
                 Row: {
                     api_calls_used: number;
