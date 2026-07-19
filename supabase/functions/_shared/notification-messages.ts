@@ -1,7 +1,7 @@
-// Contenus localisés des notifications push (Lot 6). FR est la seule langue
-// livrée ; ajouter une langue = une entrée dans MESSAGES. La locale vient de
-// profiles.locale (synchronisée au login par l'app), repli fr pour toute
-// locale inconnue. Module pur (zéro import Deno) : testé sous Vitest.
+// Contenus localisés des notifications push (Lot 6). Ajouter une langue = une
+// entrée dans MESSAGES. La locale vient de profiles.locale (synchronisée au
+// login par l'app), repli fr pour toute locale inconnue. Module pur (zéro
+// import Deno) : testé sous Vitest.
 
 export type NotificationContent = {
     title: string;
@@ -39,10 +39,22 @@ const MESSAGES: Record<string, LocaleMessages> = {
         resultBody: ({ homeTeam, awayTeam, homeScore, awayScore, points }) =>
             `${homeTeam} ${homeScore} – ${awayScore} ${awayTeam} : tu marques ${formatPointsFr(points)}.`,
     },
+    en: {
+        reminderTitle: 'Prediction reminder',
+        reminderBody: ({ homeTeam, awayTeam }) =>
+            `${homeTeam} – ${awayTeam}: kickoff in under an hour. Make your prediction!`,
+        resultTitle: 'Results & points',
+        resultBody: ({ homeTeam, awayTeam, homeScore, awayScore, points }) =>
+            `${homeTeam} ${homeScore} – ${awayScore} ${awayTeam}: you score ${formatPointsEn(points)}.`,
+    },
 };
 
 function formatPointsFr(points: number): string {
     return `${points} ${points > 1 ? 'pts' : 'pt'}`;
+}
+
+function formatPointsEn(points: number): string {
+    return `${points} ${points === 1 ? 'pt' : 'pts'}`;
 }
 
 /** « fr-FR » → fr ; locale inconnue ou absente → fr. */

@@ -24,6 +24,12 @@ describe('buildReminderMessage', () => {
         const message = buildReminderMessage('fr-FR', { homeTeam: 'A', awayTeam: 'B' });
         expect(message.title).toBe('Rappel de prono');
     });
+
+    it('compose le rappel en anglais', () => {
+        const message = buildReminderMessage('en-US', { homeTeam: 'France', awayTeam: 'Fiji' });
+        expect(message.title).toBe('Prediction reminder');
+        expect(message.body).toBe('France – Fiji: kickoff in under an hour. Make your prediction!');
+    });
 });
 
 describe('buildResultMessage', () => {
@@ -56,5 +62,24 @@ describe('buildResultMessage', () => {
         });
         expect(zero.body).toContain('0 pt.');
         expect(one.body).toContain('1 pt.');
+    });
+
+    it('accorde le pluriel anglais (0 pts, 1 pt)', () => {
+        const zero = buildResultMessage('en', {
+            homeTeam: 'A',
+            awayTeam: 'B',
+            homeScore: 10,
+            awayScore: 20,
+            points: 0,
+        });
+        const one = buildResultMessage('en', {
+            homeTeam: 'A',
+            awayTeam: 'B',
+            homeScore: 10,
+            awayScore: 20,
+            points: 1,
+        });
+        expect(zero.body).toContain('you score 0 pts.');
+        expect(one.body).toContain('you score 1 pt.');
     });
 });
