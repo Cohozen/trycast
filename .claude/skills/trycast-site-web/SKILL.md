@@ -10,7 +10,7 @@ Site **Astro statique** (pas d'adapter SSR) dans un sous-dossier autonome : son 
 ## Structure
 
 - `web/src/pages/` — `index.astro` (landing), `cgu.astro`, `confidentialite.astro`, `mentions-legales.astro`
-- `web/src/layouts/` — `base-layout.astro` (SEO, polices, thème, nav+footer), `content-layout.astro` (pages légales, bandeau « premier jet » à retirer après validation)
+- `web/src/layouts/` — `base-layout.astro` (SEO, polices, thème, nav+footer), `content-layout.astro` (pages légales ; validées le 2026-07-20, éditeur anonyme LCEN 6-III-2, contact `contact@trycast.fr` — à revoir au passage commercial/App Store)
 - `web/src/components/` — un composant par fichier, kebab-case, sections de la landing + `ball-logo`/`team-flag`/`section-heading`
 - `web/src/styles/tokens.css` — **copie** des tokens DS (custom properties, dark via `[data-theme='dark']`) ; source de vérité design : `docs/design/project/_ds/…/tokens/`. Piège : pas de `*/` dans un commentaire CSS (chemins avec glob → lightningcss casse en minify)
 - Polices **self-hostées** via `@fontsource/anton` + `@fontsource/inter` (RGPD : pas de CDN Google Fonts). Thème posé par un script inline dans `<head>` selon `prefers-color-scheme`
