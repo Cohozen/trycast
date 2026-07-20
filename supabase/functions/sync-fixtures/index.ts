@@ -137,9 +137,12 @@ async function syncCompetition(
         }
     }
 
-    // Cotes des matchs à J-7 → kickoff : chaque run réécrit, la dernière capture
-    // avant le coup d'envoi fait foi pour le scoring. Best-effort : un échec de
-    // cotes ne bloque jamais les fixtures (le scoring a un fallback cote 2.0).
+    // Cotes de TOUS les matchs à venir (du plus proche au plus lointain) : chaque
+    // run réécrit, la dernière capture avant le coup d'envoi fait foi pour le
+    // scoring. Best-effort : un échec de cotes ne bloque jamais les fixtures (le
+    // scoring a un fallback cote 2.0). Un match lointain dont les bookmakers n'ont
+    // pas encore ouvert les cotes reste simplement non renseigné (parseOddsResponse
+    // null → continue, sans écraser une capture précédente).
     let oddsCaptured = 0;
     let oddsError: string | undefined;
     for (const match of selectMatchesForOddsCapture(matchRows, new Date())) {

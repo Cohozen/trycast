@@ -119,20 +119,23 @@ export function buildMatchRows(
     return { rows, unknownStatuses: [...unknownStatuses] };
 }
 
-const ODDS_CAPTURE_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
-
-/** Matchs à venir dans la fenêtre J-7 → kickoff : cibles de la capture des cotes. */
+/**
+ * Tous les matchs à venir non joués, du plus proche au plus lointain : cibles de
+ * la capture des cotes. Le tri par kickoff croissant garantit que, si le budget
+ * API est atteint, les prochains matchs à scorer sont servis en premier.
+ */
 export function selectMatchesForOddsCapture<T extends { kickoff_at: string; status: MatchStatus }>(
     matches: T[],
     now: Date,
 ): T[] {
-    return matches.filter((match) => {
-        if (match.status !== 'scheduled') {
-            return false;
-        }
-        const kickoff = new Date(match.kickoff_at).getTime();
-        return kickoff > now.getTime() && kickoff <= now.getTime() + ODDS_CAPTURE_WINDOW_MS;
-    });
+    return matches
+        .filter((match) => {
+            if (match.status !== 'scheduled') {
+                return false;
+            }
+            return new Date(match.kickoff_at).getTime() > now.getTime();
+        })
+        .sort((a, b) => new Date(a.kickoff_at).getTime() - new Date(b.kickoff_at).getTime());
 }
 
 // Forme minimale de la réponse GET /odds?matchId= : marchés à plat, tous

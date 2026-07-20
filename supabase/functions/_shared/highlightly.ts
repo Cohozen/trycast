@@ -6,7 +6,7 @@ import type { ApiMatch, ApiOddsMarket } from '../sync-fixtures/transform.ts';
 
 const API_BASE = 'https://rugby.highlightly.net';
 const PAGE_SIZE = 100;
-export const MAX_API_CALLS_PER_RUN = 20;
+export const MAX_API_CALLS_PER_RUN = 500;
 
 export type ApiBudget = { apiCalls: number };
 

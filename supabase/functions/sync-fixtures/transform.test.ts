@@ -132,20 +132,23 @@ describe('selectMatchesForOddsCapture', () => {
         status,
     });
 
-    it('retient les matchs entre maintenant (exclus) et J+7 (inclus)', () => {
-        const inWindow = entry('2026-08-05T15:00:00Z');
-        const atBoundary = entry('2026-08-08T00:00:00Z');
-        expect(selectMatchesForOddsCapture([inWindow, atBoundary], now)).toEqual([
-            inWindow,
-            atBoundary,
+    it('retient tous les matchs à venir, même lointains, triés du plus proche au plus lointain', () => {
+        const soon = entry('2026-08-05T15:00:00Z');
+        const far = entry('2027-02-20T15:00:00Z');
+        const veryFar = entry('2027-09-01T15:00:00Z');
+        // Ordre d'entrée volontairement mélangé pour vérifier le tri
+        expect(selectMatchesForOddsCapture([far, veryFar, soon], now)).toEqual([
+            soon,
+            far,
+            veryFar,
         ]);
     });
 
-    it('écarte les matchs passés, trop lointains ou non scheduled', () => {
+    it('écarte les matchs passés (kickoff <= now) et non scheduled', () => {
         const past = entry('2026-07-31T15:00:00Z');
-        const tooFar = entry('2026-08-08T00:00:01Z');
+        const atNow = entry('2026-08-01T00:00:00Z');
         const finished = entry('2026-08-05T15:00:00Z', 'finished');
-        expect(selectMatchesForOddsCapture([past, tooFar, finished], now)).toEqual([]);
+        expect(selectMatchesForOddsCapture([past, atNow, finished], now)).toEqual([]);
     });
 });
 
