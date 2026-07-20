@@ -103,11 +103,14 @@ lointain) ; l'onglet **Résultats** montre le score réel, le prono et les point
   écriture, quelle que soit l'UI. Les colonnes de points ne sont accordées qu'au rôle serveur
   (grants par colonne) — un client ne peut pas s'attribuer de points.
 - **Barème dans `supabase/functions/_shared/scoring/`** (module TS pur, testé unitairement,
-  ré-exporté vers l'app par `src/features/scoring/`) : points vainqueur pondérés par le
-  multiplicateur du résultat prédit (×2.0 par défaut sans cotes), +50 pour le score exact,
-  volets écart, bonus défensif et offensif. L'aperçu « peut rapporter N pts » affiché à la
-  saisie utilise ce même module ; l'attribution officielle passe par le job serveur
-  (voir §Scoring) avec le barème versionné en base (`scoring_rules`).
+  ré-exporté vers l'app par `src/features/scoring/`) : points vainqueur = **15 × la cote** du
+  résultat prédit (×2.0 par défaut sans cotes), +50 pour le score exact, volets écart et bonus
+  défensif ; **bonus offensif indexé sur la cote de victoire de l'équipe cochée** (25 % × 15 ×
+  cote), avec un **malus −10** si la case est cochée mais que l'équipe reste sous 4 essais.
+  Mauvais vainqueur ⇒ 0 partout, total du match plafonné à 0. L'aperçu « peut rapporter N pts »
+  affiché à la saisie utilise ce même module et lit le barème actif depuis la base
+  (`scoring_rules`, hook `useActiveScoringRules`) ; l'attribution officielle passe par le job
+  serveur (voir §Scoring) avec le même barème versionné.
 - **Auto-enregistrement** : pas de bouton « Valider » — toute saisie complète part après un
   court debounce, avec une pastille de statut et un retour haptique de succès (expo-haptics,
   helper `src/lib/haptics.ts` — réservé aux confirmations, jamais de vibration décorative).
@@ -123,7 +126,12 @@ immédiatement — sans écriture ni appel API — si aucun match ne l'attend. S
    `apply_match_scores` (service_role uniquement, idempotente). Les bonus offensifs des
    pronos restent « en attente » tant que les essais ne sont pas saisis ;
 3. **passe 2** : après la saisie admin des essais (`scripts/admin-set-tries.sql`), le
-   tick suivant re-score le match — seuls les bonus offensifs s'ajoutent.
+   tick suivant re-score le match — les bonus offensifs se résolvent alors (crédit si
+   ≥ 4 essais, sinon malus).
+
+Un changement de barème (nouvelle version active dans `scoring_rules`) est **rejoué
+automatiquement** : `sync-results` re-score les matchs des compétitions actives dont les
+pronos portent une version périmée, jusqu'à convergence (auto-extincteur).
 
 Garde-fous : un match sans résultat 48 h après son coup d'envoi passe en
 `needs_review` (correction manuelle, exclu du scoring en attendant) ; chaque run utile
