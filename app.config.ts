@@ -6,7 +6,7 @@ import type { ConfigContext, ExpoConfig } from 'expo/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
     ...config,
-    name: config.name ?? 'trycast',
+    name: config.name ?? 'TryCast',
     slug: config.slug ?? 'trycast',
     android: {
         ...config.android,
