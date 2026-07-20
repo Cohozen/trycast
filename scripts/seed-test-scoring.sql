@@ -20,6 +20,16 @@
 delete from public.standings
 where competition_id = (select id from public.competitions where slug = 'e2e-test');
 
+-- Le standings est un agrégat ABSOLU par compétition : un prono scoré d'un
+-- autre match e2e (ex. -102 laissé par un run précédent) fausserait les totaux
+-- attendus. On remet à zéro l'état scoré de toute la compétition.
+update public.predictions p
+set points_awarded = null, points_breakdown = null,
+    scoring_rule_version = null, scored_at = null
+from public.matches m
+where p.match_id = m.id
+  and m.competition_id = (select id from public.competitions where slug = 'e2e-test');
+
 delete from public.matches where api_game_id in (-103, -104);
 
 with comp as (
