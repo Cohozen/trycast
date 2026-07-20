@@ -181,9 +181,12 @@ au tick suivant.
 
 À savoir :
 
-- **Cotes** : capturées à J-7 du kickoff, best-effort — requiert le plan Highlightly
-  Pro (en Basic, `/odds` répond 401, tracé dans `job_runs.detail.odds_error` sans
-  impacter les fixtures) ; le scoring a un fallback cote 2.0
+- **Cotes** : capturées pour **tous les matchs à venir** (du plus proche au plus
+  lointain), réécrites à chaque run — la dernière capture avant le kickoff fait foi ;
+  best-effort — requiert le plan Highlightly Pro (en Basic, `/odds` répond 401, tracé
+  dans `job_runs.detail.odds_error` sans impacter les fixtures) ; le scoring a un
+  fallback cote 2.0. Un match dont le fournisseur n'a pas encore ouvert les cotes reste
+  simplement non renseigné jusqu'à ce qu'elles existent
 - **Compétition active** : Nations Championship 2026, seedée via
   `scripts/seed-competitions.sql`
 
