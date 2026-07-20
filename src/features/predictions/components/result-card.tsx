@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { Badge } from '@/components/ui/badge';
 import { TeamFlag } from '@/features/matches/components/team-flag';
 import { formatKickoffTime, statusLabel, teamName } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
@@ -8,7 +9,7 @@ import { CommunityDistribution } from '@/features/predictions/components/communi
 import { PointsDetailSheet } from '@/features/predictions/components/points-detail-sheet';
 import { VerdictPill } from '@/features/predictions/components/verdict-pill';
 import type { PredictionDistribution, PredictionRow } from '@/features/predictions/types';
-import { verdictOf } from '@/features/predictions/verdict';
+import { parseBreakdown, verdictOf } from '@/features/predictions/verdict';
 import { i18n } from '@/lib/i18n';
 import { Pressable, Text, View } from '@/tw';
 import { cn } from '@/tw/variants';
@@ -62,6 +63,10 @@ export function ResultCard({ match, prediction, distribution, onOpenMatch }: Res
     if (prediction?.predicted_bonus_off_away) {
         bonusTags.push(match.away_team?.code ?? match.away_team?.name ?? '?');
     }
+    // Bonus défensif obtenu : signalé au coup d'œil, sans ouvrir le détail.
+    const defensiveEarned = prediction
+        ? (parseBreakdown(prediction)?.defensiveBonusPoints ?? 0) > 0
+        : false;
 
     const teamRow = (side: 'home' | 'away') => {
         const team = side === 'home' ? match.home_team : match.away_team;
@@ -151,8 +156,8 @@ export function ResultCard({ match, prediction, distribution, onOpenMatch }: Res
                                         {prediction.predicted_away_score}
                                     </Text>
                                 </View>
-                                {bonusTags.length > 0 ? (
-                                    <View className="mt-px flex-row flex-wrap gap-1.5">
+                                {bonusTags.length > 0 || defensiveEarned ? (
+                                    <View className="mt-px flex-row flex-wrap items-center gap-1.5">
                                         {bonusTags.map((code) => (
                                             <View
                                                 className="flex-row items-center gap-1 rounded-pill border border-border-strong px-2 py-0.5"
@@ -165,6 +170,11 @@ export function ResultCard({ match, prediction, distribution, onOpenMatch }: Res
                                                 </Text>
                                             </View>
                                         ))}
+                                        {defensiveEarned ? (
+                                            <Badge tone="info" variant="soft">
+                                                {t('predictions:breakdown.defensiveBadge')}
+                                            </Badge>
+                                        ) : null}
                                     </View>
                                 ) : null}
                             </View>

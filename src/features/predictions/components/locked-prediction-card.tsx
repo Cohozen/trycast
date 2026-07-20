@@ -5,8 +5,8 @@ import { TeamFlag } from '@/features/matches/components/team-flag';
 import { teamName } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
 import type { PredictionRow } from '@/features/predictions/types';
-import { BAREME_V1 } from '@/features/scoring/bareme';
 import { computePotentialPoints } from '@/features/scoring/compute-match-points';
+import { useActiveScoringRules } from '@/features/scoring/use-active-scoring-rules';
 import { Text, useThemeColor, View } from '@/tw';
 
 type LockedPredictionCardProps = {
@@ -25,6 +25,7 @@ type LockedPredictionCardProps = {
 export function LockedPredictionCard({ match, prediction }: LockedPredictionCardProps) {
     const { t } = useTranslation(['predictions', 'matches']);
     const textFaint = useThemeColor('text-faint');
+    const rules = useActiveScoringRules();
 
     const isLive = match.status === 'in_play';
     const homeScore = isLive ? (match.live_home_score ?? 0) : (match.home_score ?? '–');
@@ -39,7 +40,7 @@ export function LockedPredictionCard({ match, prediction }: LockedPredictionCard
                   bonusOffAway: prediction.predicted_bonus_off_away,
               },
               { home: match.odds_home, draw: match.odds_draw, away: match.odds_away },
-              BAREME_V1,
+              rules,
           )
         : null;
 

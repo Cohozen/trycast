@@ -1,7 +1,15 @@
 import { Text, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
-type BadgeTone = 'neutral' | 'brand' | 'accent' | 'live' | 'success' | 'warning' | 'info';
+type BadgeTone =
+    | 'neutral'
+    | 'brand'
+    | 'accent'
+    | 'live'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'danger';
 type BadgeVariant = 'solid' | 'soft' | 'outline';
 
 type BadgeProps = {
@@ -71,6 +79,14 @@ const toneClasses: Record<
         text: 'text-info',
         textOnSolid: 'text-on-accent',
         dot: 'bg-info',
+    },
+    danger: {
+        solid: 'bg-danger',
+        soft: 'bg-danger/15',
+        outline: 'border-danger',
+        text: 'text-danger',
+        textOnSolid: 'text-on-danger',
+        dot: 'bg-danger',
     },
 };
 

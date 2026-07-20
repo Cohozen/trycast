@@ -2,12 +2,14 @@ import { useTranslation } from 'react-i18next';
 import { Modal } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { teamName } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
 import type { PredictionRow } from '@/features/predictions/types';
 import { parseBreakdown, verdictOf } from '@/features/predictions/verdict';
-import { BAREME_V1 } from '@/features/scoring/bareme';
+import type { OffensiveSideBreakdown } from '@/features/scoring/types';
+import { useActiveScoringRules } from '@/features/scoring/use-active-scoring-rules';
 import { winnerPointsByOutcome } from '@/features/scoring/potential-by-outcome';
 import { i18n } from '@/lib/i18n';
 import { Pressable, Text, View } from '@/tw';
@@ -22,7 +24,14 @@ type PointsDetailSheetProps = {
     onClose: () => void;
 };
 
-type Row = { key: string; label: string; mark: 'ok' | 'ko' | 'info'; points: number | null };
+type Row = {
+    key: string;
+    label: string;
+    mark: 'ok' | 'ko' | 'info' | 'malus';
+    points: number | null;
+    /** Badge optionnel affiché après le libellé (ex. bonus défensif). */
+    badge?: string;
+};
 
 /**
  * Bottom sheet « détail des points » (maquette Résultats) : score final vs
@@ -32,6 +41,7 @@ type Row = { key: string; label: string; mark: 'ok' | 'ko' | 'info'; points: num
 export function PointsDetailSheet({ match, prediction, visible, onClose }: PointsDetailSheetProps) {
     const { t } = useTranslation(['predictions', 'common', 'matches']);
     const insets = useSafeAreaInsets();
+    const rules = useActiveScoringRules();
     const breakdown = parseBreakdown(prediction);
     if (!breakdown) {
         return null;
@@ -42,8 +52,10 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
     // calcul que la carte de prono : bon 1/N/2 seul, cote avec repli).
     const winnerPoints = winnerPointsByOutcome(
         { home: match.odds_home, draw: match.odds_draw, away: match.odds_away },
-        BAREME_V1,
+        rules,
     );
+    const homeCode = match.home_team?.code ?? match.home_team?.name ?? '?';
+    const awayCode = match.away_team?.code ?? match.away_team?.name ?? '?';
     const cells: { key: '1' | 'N' | '2'; outcome: 'home' | 'draw' | 'away' }[] = [
         { key: '1', outcome: 'home' },
         { key: 'N', outcome: 'draw' },
@@ -85,22 +97,57 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
             label: t('predictions:breakdown.defensive'),
             mark: 'ok',
             points: breakdown.defensiveBonusPoints,
+            badge: t('predictions:breakdown.defensiveBadge'),
         });
     }
-    if (breakdown.offensiveBonusPending) {
-        rows.push({
-            key: 'offensive',
-            label: t('predictions:breakdown.offensivePending'),
-            mark: 'info',
-            points: null,
-        });
-    } else if (prediction.predicted_bonus_off_home || prediction.predicted_bonus_off_away) {
-        rows.push({
-            key: 'offensive',
-            label: t('predictions:breakdown.offensive'),
-            mark: breakdown.offensiveBonusPoints > 0 ? 'ok' : 'ko',
-            points: breakdown.offensiveBonusPoints,
-        });
+    // Une ligne par équipe cochée (bonus ou malus), tolère un breakdown v1
+    // (offensiveHome/Away absents ⇒ non coché).
+    const offensiveSides: { key: string; side?: OffensiveSideBreakdown; code: string }[] = [
+        { key: 'offensive-home', side: breakdown.offensiveHome, code: homeCode },
+        { key: 'offensive-away', side: breakdown.offensiveAway, code: awayCode },
+    ];
+    for (const { key, side, code } of offensiveSides) {
+        if (!side?.checked) continue;
+        if (side.pending) {
+            rows.push({
+                key,
+                label: t('predictions:breakdown.offensivePendingTeam', { code }),
+                mark: 'info',
+                points: null,
+            });
+        } else if (side.points > 0) {
+            rows.push({
+                key,
+                label: t('predictions:breakdown.offensiveScored', {
+                    code,
+                    tries: side.tries ?? 0,
+                    odds: oddsFormatter.format(side.oddsUsed),
+                }),
+                mark: 'ok',
+                points: side.points,
+            });
+        } else if (side.points < 0) {
+            rows.push({
+                key,
+                label: t('predictions:breakdown.offensiveMissed', {
+                    code,
+                    tries: side.tries ?? 0,
+                }),
+                mark: 'malus',
+                points: side.points,
+            });
+        } else {
+            rows.push({
+                key,
+                label: t('predictions:breakdown.offensiveScored', {
+                    code,
+                    tries: side.tries ?? 0,
+                    odds: oddsFormatter.format(side.oddsUsed),
+                }),
+                mark: 'ko',
+                points: 0,
+            });
+        }
     }
     rows.push({
         key: 'odds',
@@ -224,6 +271,7 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
                                         'h-[22px] w-[22px] items-center justify-center rounded-pill',
                                         row.mark === 'ok' && 'bg-success/15',
                                         row.mark === 'ko' && 'bg-text/10',
+                                        row.mark === 'malus' && 'bg-danger/15',
                                         row.mark === 'info' && 'border border-border-strong',
                                     )}>
                                     <Text
@@ -231,21 +279,35 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
                                             'font-body-bold text-[12px]',
                                             row.mark === 'ok' && 'text-success',
                                             row.mark === 'ko' && 'text-text-faint',
+                                            row.mark === 'malus' && 'text-danger',
                                             row.mark === 'info' && 'text-text-faint',
                                         )}>
-                                        {row.mark === 'ok' ? '✓' : row.mark === 'ko' ? '✗' : 'i'}
+                                        {row.mark === 'ok' ? '✓' : row.mark === 'info' ? 'i' : '✗'}
                                     </Text>
                                 </View>
-                                <Text className="flex-1 font-body text-[14px] text-text">
-                                    {row.label}
-                                </Text>
+                                <View className="flex-1 flex-row items-center gap-2">
+                                    <Text className="shrink font-body text-[14px] text-text">
+                                        {row.label}
+                                    </Text>
+                                    {row.badge ? (
+                                        <Badge tone="info" variant="soft">
+                                            {row.badge}
+                                        </Badge>
+                                    ) : null}
+                                </View>
                                 {row.points !== null ? (
                                     <Text
                                         className={cn(
                                             'font-body-bold text-[14px]',
-                                            row.points > 0 ? 'text-text' : 'text-text-faint',
+                                            row.points > 0 && 'text-text',
+                                            row.points < 0 && 'text-danger',
+                                            row.points === 0 && 'text-text-faint',
                                         )}>
-                                        {row.points > 0 ? `+${row.points}` : '0'}
+                                        {row.points > 0
+                                            ? `+${row.points}`
+                                            : row.points < 0
+                                              ? `${row.points}`
+                                              : '0'}
                                     </Text>
                                 ) : null}
                             </View>
