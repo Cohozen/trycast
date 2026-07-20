@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BAREME_V1 } from '../_shared/scoring/bareme.ts';
+import { BAREME_V2 } from '../_shared/scoring/bareme.ts';
 import type { ApiMatch } from '../sync-fixtures/transform.ts';
 import {
     type ActionableMatch,
@@ -177,30 +177,30 @@ describe('buildScoringPayload', () => {
         const [entry] = buildScoringPayload(
             match,
             [prediction({ predicted_bonus_off_home: true })],
-            BAREME_V1,
+            BAREME_V2,
         );
         expect(entry.prediction_id).toBe('p1');
-        expect(entry.points_breakdown.winnerPoints).toBe(15); // 10 × 1.5
+        expect(entry.points_breakdown.winnerPoints).toBe(23); // 15 × 1.5 = 22.5 → 23
         expect(entry.points_breakdown.offensiveBonusPending).toBe(true);
-        expect(entry.points_breakdown.offensiveBonusPoints).toBe(0);
+        expect(entry.points_breakdown.offensiveHome.points).toBe(0);
     });
 
     it('passe 2 : essais saisis → bonus offensif crédité, pending éteint', () => {
         const [entry] = buildScoringPayload(
             { ...match, home_tries: 4, away_tries: 1 },
             [prediction({ predicted_bonus_off_home: true })],
-            BAREME_V1,
+            BAREME_V2,
         );
         expect(entry.points_breakdown.offensiveBonusPending).toBe(false);
-        expect(entry.points_breakdown.offensiveBonusPoints).toBe(4); // 25 % de 15
-        expect(entry.points_awarded).toBeGreaterThan(15);
+        expect(entry.points_breakdown.offensiveHome.points).toBe(6); // 0.25 × 15 × 1.5 = 5.625 → 6
+        expect(entry.points_awarded).toBeGreaterThan(23);
     });
 
     it('mauvais vainqueur → 0 partout', () => {
         const [entry] = buildScoringPayload(
             match,
             [prediction({ predicted_home_score: 10, predicted_away_score: 20 })],
-            BAREME_V1,
+            BAREME_V2,
         );
         expect(entry.points_awarded).toBe(0);
     });
@@ -209,7 +209,7 @@ describe('buildScoringPayload', () => {
         const [entry] = buildScoringPayload(
             { ...match, odds_home: null, odds_draw: null, odds_away: null },
             [prediction()],
-            BAREME_V1,
+            BAREME_V2,
         );
         expect(entry.points_breakdown.oddsFallback).toBe(true);
         expect(entry.points_breakdown.oddsUsed).toBe(2.0);
@@ -219,22 +219,22 @@ describe('buildScoringPayload', () => {
         const [entry] = buildScoringPayload(
             { ...match, odds_home: '1.5', odds_draw: '21', odds_away: '2.8' },
             [prediction()],
-            BAREME_V1,
+            BAREME_V2,
         );
         expect(entry.points_breakdown.oddsUsed).toBe(1.5);
         expect(entry.points_breakdown.oddsFallback).toBe(false);
     });
 
     it('aucun prono → payload vide', () => {
-        expect(buildScoringPayload(match, [], BAREME_V1)).toEqual([]);
+        expect(buildScoringPayload(match, [], BAREME_V2)).toEqual([]);
     });
 });
 
 describe('parseScoringRules', () => {
-    // Copie du seed de la migration 20260707000100 — doit rester identique à BAREME_V1
+    // Copie du seed de la migration 20260720000100 — doit rester identique à BAREME_V2
     const seed = {
-        version: 1,
-        winnerPointsPerOddsUnit: 10,
+        version: 2,
+        winnerPointsPerOddsUnit: 15,
         fallbackOdds: 2.0,
         exactScoreBonus: 50,
         exactGapBonus: 15,
@@ -244,10 +244,11 @@ describe('parseScoringRules', () => {
         defensiveBonusMaxGap: 7,
         offensiveBonusRatio: 0.25,
         offensiveBonusMinTries: 4,
+        offensiveMalusPoints: 10,
     };
 
-    it('accepte le seed v1 tel quel et coïncide avec BAREME_V1', () => {
-        expect(parseScoringRules(seed)).toEqual(BAREME_V1);
+    it('accepte le seed v2 tel quel et coïncide avec BAREME_V2', () => {
+        expect(parseScoringRules(seed)).toEqual(BAREME_V2);
     });
 
     it('rejette une clé manquante', () => {

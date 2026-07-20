@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BAREME_V1 } from './bareme.ts';
+import { BAREME_V2 } from './bareme.ts';
 import { computeMatchPoints, computePotentialPoints } from './compute-match-points.ts';
 import type { MatchOdds, MatchResultInput, PredictionInput } from './types.ts';
 
@@ -42,7 +42,7 @@ describe('computeMatchPoints — vainqueur et cotes', () => {
             prono(17, 20),
             resultat(20, 17, { home: 2, away: 1 }),
             cotes(1.5, 25, 2.6),
-            BAREME_V1,
+            BAREME_V2,
         );
         expect(total).toBe(0);
         expect(breakdown.winnerCorrect).toBe(false);
@@ -51,15 +51,15 @@ describe('computeMatchPoints — vainqueur et cotes', () => {
         expect(breakdown.defensiveBonusPoints).toBe(0);
     });
 
-    it('bon vainqueur : 10 × la cote du résultat prédit, arrondi entier', () => {
-        // Exemple de la feuille de route : cote 1.15 → 12 pts (pas 11, piège flottant)
+    it('bon vainqueur : 15 × la cote du résultat prédit, arrondi entier', () => {
+        // Cote 1.15 → 15 × 1.15 = 17.25 → 17 (arrondi stabilisé, pas de dérive flottante)
         const { breakdown } = computeMatchPoints(
             prono(30, 3),
             resultat(35, 10, { home: 5, away: 1 }),
             cotes(1.15, 30, 7.5),
-            BAREME_V1,
+            BAREME_V2,
         );
-        expect(breakdown.winnerPoints).toBe(12);
+        expect(breakdown.winnerPoints).toBe(17);
         expect(breakdown.oddsFallback).toBe(false);
     });
 
@@ -68,13 +68,13 @@ describe('computeMatchPoints — vainqueur et cotes', () => {
             prono(10, 20),
             resultat(12, 25, { home: 1, away: 3 }),
             cotes(1.3, 28, 9.0),
-            BAREME_V1,
+            BAREME_V2,
         );
-        expect(breakdown.winnerPoints).toBe(90);
+        expect(breakdown.winnerPoints).toBe(135);
         // Écart prédit -10, réel -13 : à ±5 → +8 ; pas de bonus défensif (écart prédit > 7)
         expect(breakdown.gapPoints).toBe(8);
         expect(breakdown.defensiveBonusPoints).toBe(0);
-        expect(total).toBe(98);
+        expect(total).toBe(143);
     });
 
     it('cote manquante ⇒ fallback 2.0, le scoring ne bloque jamais', () => {
@@ -82,11 +82,11 @@ describe('computeMatchPoints — vainqueur et cotes', () => {
             prono(24, 17),
             resultat(30, 3, { home: 4, away: 0 }),
             cotes(null, null, null),
-            BAREME_V1,
+            BAREME_V2,
         );
         expect(breakdown.oddsUsed).toBe(2.0);
         expect(breakdown.oddsFallback).toBe(true);
-        expect(breakdown.winnerPoints).toBe(20);
+        expect(breakdown.winnerPoints).toBe(30);
     });
 
     it('nul prédit et réalisé : cote du nul appliquée, pas de bonus défensif (pas de vaincu)', () => {
@@ -94,12 +94,12 @@ describe('computeMatchPoints — vainqueur et cotes', () => {
             prono(20, 20),
             resultat(20, 20, { home: 2, away: 2 }),
             cotes(1.8, 21, 4.2),
-            BAREME_V1,
+            BAREME_V2,
         );
-        expect(breakdown.winnerPoints).toBe(210);
+        expect(breakdown.winnerPoints).toBe(315);
         expect(breakdown.exactScorePoints).toBe(50);
         expect(breakdown.defensiveBonusPoints).toBe(0);
-        expect(total).toBe(260);
+        expect(total).toBe(365);
     });
 });
 
@@ -109,7 +109,7 @@ describe('computeMatchPoints — score exact et écarts (volets exclusifs)', () 
             prono(24, 17),
             resultat(24, 17, { home: 3, away: 2 }),
             cotes(1.5, 25, 2.6),
-            BAREME_V1,
+            BAREME_V2,
         );
         expect(breakdown.exactScorePoints).toBe(50);
         expect(breakdown.gapPoints).toBe(0);
@@ -122,7 +122,7 @@ describe('computeMatchPoints — score exact et écarts (volets exclusifs)', () 
             prono(20, 13),
             resultat(27, 20, { home: 3, away: 2 }),
             cotes(2.0, 25, 1.9),
-            BAREME_V1,
+            BAREME_V2,
         );
         expect(breakdown.exactScorePoints).toBe(0);
         expect(breakdown.gapPoints).toBe(15);
@@ -133,7 +133,7 @@ describe('computeMatchPoints — score exact et écarts (volets exclusifs)', () 
             prono(30, 10),
             resultat(28, 12, { home: 4, away: 1 }),
             cotes(1.4, 30, 6.0),
-            BAREME_V1,
+            BAREME_V2,
         );
         expect(breakdown.gapPoints).toBe(8);
     });
@@ -143,96 +143,120 @@ describe('computeMatchPoints — score exact et écarts (volets exclusifs)', () 
             prono(30, 10),
             resultat(16, 10, { home: 2, away: 1 }),
             cotes(1.4, 30, 6.0),
-            BAREME_V1,
+            BAREME_V2,
         );
         expect(breakdown.gapPoints).toBe(0);
     });
 });
 
-describe('computeMatchPoints — bonus offensif (scoring en 2 temps)', () => {
-    const oddsHome = cotes(1.5, 25, 2.6);
+describe('computeMatchPoints — bonus/malus offensif (scoring en 2 temps)', () => {
+    const odds = cotes(1.5, 25, 2.6);
 
-    it('case cochée et ≥ 4 essais : +25 % des points vainqueur', () => {
+    it('case cochée et ≥ 4 essais : + 25 % × 15 × cote de victoire de l’équipe', () => {
         const { breakdown } = computeMatchPoints(
             prono(35, 10, { home: true }),
             resultat(40, 12, { home: 5, away: 1 }),
-            oddsHome,
-            BAREME_V1,
+            odds,
+            BAREME_V2,
         );
-        // 25 % de 15 pts vainqueur → 4 (arrondi)
-        expect(breakdown.winnerPoints).toBe(15);
-        expect(breakdown.offensiveBonusPoints).toBe(4);
+        expect(breakdown.winnerPoints).toBe(23);
+        // 0.25 × 15 × 1.5 (cote domicile) = 5.625 → 6
+        expect(breakdown.offensiveHome.checked).toBe(true);
+        expect(breakdown.offensiveHome.oddsUsed).toBe(1.5);
+        expect(breakdown.offensiveHome.points).toBe(6);
+        expect(breakdown.offensiveHome.pending).toBe(false);
+        expect(breakdown.offensiveAway.checked).toBe(false);
+        expect(breakdown.offensiveAway.points).toBe(0);
         expect(breakdown.offensiveBonusPending).toBe(false);
     });
 
-    it('case cochée mais moins de 4 essais : 0, volet réglé', () => {
-        const { breakdown } = computeMatchPoints(
+    it('case cochée mais moins de 4 essais : malus −10', () => {
+        const { total, breakdown } = computeMatchPoints(
             prono(35, 10, { home: true }),
             resultat(40, 12, { home: 3, away: 1 }),
-            oddsHome,
-            BAREME_V1,
+            odds,
+            BAREME_V2,
         );
-        expect(breakdown.offensiveBonusPoints).toBe(0);
+        expect(breakdown.offensiveHome.points).toBe(-10);
         expect(breakdown.offensiveBonusPending).toBe(false);
+        // 23 (vainqueur) + 8 (écart proche : prédit 25, réel 28) − 10 (malus) = 21
+        expect(total).toBe(21);
     });
 
     it('essais non saisis (passe 1) : volet en attente, 0 point pour l’instant', () => {
         const { breakdown } = computeMatchPoints(
             prono(35, 10, { home: true }),
             resultat(40, 12),
-            oddsHome,
-            BAREME_V1,
+            odds,
+            BAREME_V2,
         );
-        expect(breakdown.offensiveBonusPoints).toBe(0);
+        expect(breakdown.offensiveHome.pending).toBe(true);
+        expect(breakdown.offensiveHome.points).toBe(0);
         expect(breakdown.offensiveBonusPending).toBe(true);
     });
 
-    it('deux cases validées : le bonus se cumule par équipe', () => {
+    it('deux cases validées : bonus par équipe, chacun sur sa propre cote', () => {
         const { breakdown } = computeMatchPoints(
             prono(35, 28, { home: true, away: true }),
             resultat(38, 31, { home: 5, away: 4 }),
             cotes(2.0, 25, 1.9),
-            BAREME_V1,
+            BAREME_V2,
         );
-        // 2 × 25 % de 20 pts vainqueur
-        expect(breakdown.offensiveBonusPoints).toBe(10);
+        // domicile : 0.25 × 15 × 2.0 = 7.5 → 8 ; extérieur : 0.25 × 15 × 1.9 = 7.125 → 7
+        expect(breakdown.offensiveHome.points).toBe(8);
+        expect(breakdown.offensiveAway.points).toBe(7);
     });
 
-    it('mauvais vainqueur : bonus offensif nul même à 4 essais et sans essais saisis', () => {
+    it('deux malus + petit socle : total plafonné à 0 (jamais négatif)', () => {
+        const { total, breakdown } = computeMatchPoints(
+            prono(40, 6, { home: true, away: true }),
+            resultat(50, 6, { home: 1, away: 1 }),
+            cotes(1.05, 30, 12),
+            BAREME_V2,
+        );
+        // 16 (15 × 1.05) − 10 − 10 = −4 → 0 ; écart prédit 34 / réel 44 (diff 10) → aucun volet écart
+        expect(breakdown.winnerPoints).toBe(16);
+        expect(breakdown.offensiveHome.points).toBe(-10);
+        expect(breakdown.offensiveAway.points).toBe(-10);
+        expect(total).toBe(0);
+    });
+
+    it('mauvais vainqueur : bonus/malus offensif neutralisés, rien en attente', () => {
         const { breakdown } = computeMatchPoints(
             prono(35, 10, { home: true }),
-            resultat(10, 35),
+            resultat(10, 35, { home: 1, away: 5 }),
             cotes(1.5, 25, 2.6),
-            BAREME_V1,
+            BAREME_V2,
         );
-        expect(breakdown.offensiveBonusPoints).toBe(0);
+        expect(breakdown.offensiveHome.points).toBe(0);
+        expect(breakdown.offensiveHome.pending).toBe(false);
         expect(breakdown.offensiveBonusPending).toBe(false);
     });
 });
 
 describe('computePotentialPoints — aperçu « peut rapporter N pts »', () => {
-    it('scénario prono réalisé : vainqueur + score exact + écart/défensif + bonus cochés', () => {
+    it('scénario prono réalisé : vainqueur + score exact + défensif + bonus coché', () => {
         const { total, breakdown } = computePotentialPoints(
             prono(24, 17, { home: true }),
             cotes(1.5, 25, 2.6),
-            BAREME_V1,
+            BAREME_V2,
         );
-        // 15 (vainqueur) + 50 (score exact) + 5 (défensif, écart 7) + 4 (25 % de 15)
-        expect(breakdown.winnerPoints).toBe(15);
+        // 23 (vainqueur) + 50 (score exact) + 5 (défensif, écart 7) + 6 (0.25 × 15 × 1.5)
+        expect(breakdown.winnerPoints).toBe(23);
         expect(breakdown.exactScorePoints).toBe(50);
         expect(breakdown.defensiveBonusPoints).toBe(5);
-        expect(breakdown.offensiveBonusPoints).toBe(4);
+        expect(breakdown.offensiveHome.points).toBe(6);
         expect(breakdown.offensiveBonusPending).toBe(false);
-        expect(total).toBe(74);
+        expect(total).toBe(84);
     });
 
     it('sans cotes : aperçu sur le multiplicateur fallback 2.0', () => {
         const { breakdown } = computePotentialPoints(
             prono(15, 12),
             cotes(null, null, null),
-            BAREME_V1,
+            BAREME_V2,
         );
         expect(breakdown.oddsFallback).toBe(true);
-        expect(breakdown.winnerPoints).toBe(20);
+        expect(breakdown.winnerPoints).toBe(30);
     });
 });

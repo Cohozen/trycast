@@ -22,8 +22,8 @@ T1=$(curl -s -X POST "$URL/auth/v1/token?grant_type=password" \
   python3 -c 'import json,sys; print(json.load(sys.stdin)["access_token"])') || fail "login user1"
 ok "login user1"
 
-# Barème actif lisible par un client authentifié, valeurs du seed v1 en place
-# (garde-fou de divergence avec BAREME_V1 côté app)
+# Barème actif lisible par un client authentifié, valeurs du seed v2 en place
+# (garde-fou de divergence avec BAREME_V2 côté app / hook useActiveScoringRules)
 RES=$(curl -s "$URL/rest/v1/scoring_rules?is_active=eq.true&select=version,rules" \
   -H "apikey: $KEY" -H "Authorization: Bearer $T1")
 echo "$RES" | python3 -c '
@@ -31,11 +31,12 @@ import json, sys
 rows = json.load(sys.stdin)
 assert len(rows) == 1, f"1 barème actif attendu, {len(rows)} reçu(s)"
 rules = rows[0]["rules"]
-assert rows[0]["version"] == 1 and rules["version"] == 1
-assert rules["winnerPointsPerOddsUnit"] == 10 and rules["fallbackOdds"] == 2.0
+assert rows[0]["version"] == 2 and rules["version"] == 2
+assert rules["winnerPointsPerOddsUnit"] == 15 and rules["fallbackOdds"] == 2.0
 assert rules["exactScoreBonus"] == 50 and rules["offensiveBonusRatio"] == 0.25
+assert rules["offensiveMalusPoints"] == 10
 ' || fail "lecture du barème actif ($RES)"
-ok "barème v1 actif lisible, valeurs conformes"
+ok "barème v2 actif lisible, valeurs conformes"
 
 # Écriture du barème par un client → 42501 (grants)
 RES=$(curl -s -X POST "$URL/rest/v1/scoring_rules" \

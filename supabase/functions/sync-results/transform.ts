@@ -194,6 +194,7 @@ const SCORING_RULES_KEYS = [
     'defensiveBonusMaxGap',
     'offensiveBonusRatio',
     'offensiveBonusMinTries',
+    'offensiveMalusPoints',
 ] as const;
 
 /** Garde-fou runtime sur le jsonb scoring_rules.rules avant de scorer avec. */

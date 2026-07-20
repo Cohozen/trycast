@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { BAREME_V1 } from './bareme';
+import { BAREME_V2 } from './bareme';
 import {
     impliedProbabilities,
     probabilityTone,
@@ -8,19 +8,19 @@ import {
 } from './potential-by-outcome';
 
 describe('winnerPointsByOutcome', () => {
-    it('calcule 10 × cote pour chaque issue', () => {
-        const points = winnerPointsByOutcome({ home: 1.3, draw: 18, away: 3.4 }, BAREME_V1);
-        expect(points).toEqual({ home: 13, draw: 180, away: 34 });
+    it('calcule 15 × cote pour chaque issue', () => {
+        const points = winnerPointsByOutcome({ home: 1.3, draw: 18, away: 3.4 }, BAREME_V2);
+        expect(points).toEqual({ home: 20, draw: 270, away: 51 });
     });
 
-    it('arrondit au point entier malgré les flottants IEEE 754 (10 × 1.15 → 12)', () => {
-        const points = winnerPointsByOutcome({ home: 1.15, draw: 20, away: 5 }, BAREME_V1);
-        expect(points.home).toBe(12);
+    it('arrondit au point entier malgré les flottants IEEE 754 (15 × 1.15 → 17)', () => {
+        const points = winnerPointsByOutcome({ home: 1.15, draw: 20, away: 5 }, BAREME_V2);
+        expect(points.home).toBe(17);
     });
 
     it('replie sur fallbackOdds quand une cote manque ou est invalide', () => {
-        const points = winnerPointsByOutcome({ home: null, draw: 0, away: 2.5 }, BAREME_V1);
-        expect(points).toEqual({ home: 20, draw: 20, away: 25 });
+        const points = winnerPointsByOutcome({ home: null, draw: 0, away: 2.5 }, BAREME_V2);
+        expect(points).toEqual({ home: 30, draw: 30, away: 38 });
     });
 });
 

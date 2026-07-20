@@ -3,6 +3,7 @@ import type {
     MatchOutcome,
     MatchPoints,
     MatchResultInput,
+    OffensiveSideBreakdown,
     PointsBreakdown,
     PredictionInput,
     ScoringRules,
@@ -25,6 +26,43 @@ function roundPoints(value: number): number {
 }
 
 /**
+ * Bonus offensif d'un côté (équipe) : indexé sur la cote de VICTOIRE de cette
+ * équipe (pas celle du vainqueur prédit) — une attaque d'un outsider rapporte
+ * plus. Case cochée mais essais < seuil ⇒ malus. Essais non saisis ⇒ en
+ * attente (passe 2). `evaluate` (= bon vainqueur) porte le couplage : sans lui,
+ * ni bonus ni malus, le volet reste neutre.
+ */
+function offensiveSide(
+    checked: boolean,
+    sideOdds: number | null,
+    tries: number | null,
+    rules: ScoringRules,
+    evaluate: boolean,
+): OffensiveSideBreakdown {
+    const side: OffensiveSideBreakdown = {
+        checked,
+        oddsUsed: sideOdds ?? rules.fallbackOdds,
+        oddsFallback: sideOdds === null,
+        tries,
+        pending: false,
+        points: 0,
+    };
+    if (!checked || !evaluate) {
+        return side;
+    }
+    if (tries === null) {
+        side.pending = true;
+    } else if (tries >= rules.offensiveBonusMinTries) {
+        side.points = roundPoints(
+            rules.offensiveBonusRatio * rules.winnerPointsPerOddsUnit * side.oddsUsed,
+        );
+    } else {
+        side.points = -rules.offensiveMalusPoints;
+    }
+    return side;
+}
+
+/**
  * Calcule les points d'un prono contre le résultat d'un match, selon le barème.
  * Fonction pure (zéro I/O) : partagée entre l'aperçu dans l'app et, au Lot 4,
  * l'Edge Function de scoring. Mauvais vainqueur ⇒ 0 partout — les volets
@@ -43,6 +81,23 @@ export function computeMatchPoints(
     const rawOdds = oddsFor(predictedOutcome, odds);
     const oddsUsed = rawOdds ?? rules.fallbackOdds;
 
+    // Bonus offensif par côté : indexé sur la cote de victoire de l'équipe
+    // (odds.home / odds.away), couplé au bon vainqueur via winnerCorrect.
+    const offensiveHome = offensiveSide(
+        prediction.bonusOffHome,
+        oddsFor('home', odds),
+        result.homeTries,
+        rules,
+        winnerCorrect,
+    );
+    const offensiveAway = offensiveSide(
+        prediction.bonusOffAway,
+        oddsFor('away', odds),
+        result.awayTries,
+        rules,
+        winnerCorrect,
+    );
+
     const breakdown: PointsBreakdown = {
         predictedOutcome,
         winnerCorrect,
@@ -52,8 +107,9 @@ export function computeMatchPoints(
         exactScorePoints: 0,
         gapPoints: 0,
         defensiveBonusPoints: 0,
-        offensiveBonusPoints: 0,
-        offensiveBonusPending: false,
+        offensiveHome,
+        offensiveAway,
+        offensiveBonusPending: offensiveHome.pending || offensiveAway.pending,
     };
 
     if (!winnerCorrect) {
@@ -85,26 +141,16 @@ export function computeMatchPoints(
         breakdown.defensiveBonusPoints = rules.defensiveBonusPoints;
     }
 
-    // Bonus offensif par équipe cochée : validé à N essais, en attente si essais non saisis
-    for (const side of ['home', 'away'] as const) {
-        const checked = side === 'home' ? prediction.bonusOffHome : prediction.bonusOffAway;
-        if (!checked) continue;
-        const tries = side === 'home' ? result.homeTries : result.awayTries;
-        if (tries === null) {
-            breakdown.offensiveBonusPending = true;
-        } else if (tries >= rules.offensiveBonusMinTries) {
-            breakdown.offensiveBonusPoints += roundPoints(
-                rules.offensiveBonusRatio * breakdown.winnerPoints,
-            );
-        }
-    }
-
-    const total =
+    // Total plafonné à 0 : le malus offensif ne rend jamais un match négatif.
+    const total = Math.max(
+        0,
         breakdown.winnerPoints +
-        breakdown.exactScorePoints +
-        breakdown.gapPoints +
-        breakdown.defensiveBonusPoints +
-        breakdown.offensiveBonusPoints;
+            breakdown.exactScorePoints +
+            breakdown.gapPoints +
+            breakdown.defensiveBonusPoints +
+            breakdown.offensiveHome.points +
+            breakdown.offensiveAway.points,
+    );
 
     return { total, breakdown };
 }

@@ -1,4 +1,6 @@
-/** Barème de scoring (v1 hardcodé dans bareme.ts, versionné en DB au Lot 4). */
+/** Barème de scoring, versionné en DB (table scoring_rules). L'app lit la
+ * version active via useActiveScoringRules ; bareme.ts en garde une copie
+ * typée (fallback + ancre du test de parité TS↔DB). */
 export type ScoringRules = {
     version: number;
     /** Points vainqueur = ce facteur × le multiplicateur (cote) du résultat prédit. */
@@ -13,10 +15,12 @@ export type ScoringRules = {
     defensiveBonusPoints: number;
     /** Écart max (prédit ET réel) pour le bonus défensif. */
     defensiveBonusMaxGap: number;
-    /** Part des points vainqueur gagnée par case bonus offensif validée. */
+    /** Part des points d'équipe (cote de victoire × facteur) gagnée par case bonus offensif validée. */
     offensiveBonusRatio: number;
     /** Nombre d'essais requis pour valider un bonus offensif. */
     offensiveBonusMinTries: number;
+    /** Malus (points retirés) par case bonus offensif cochée mais non atteinte. */
+    offensiveMalusPoints: number;
 };
 
 export type PredictionInput = {
@@ -42,6 +46,21 @@ export type MatchOdds = {
 
 export type MatchOutcome = 'home' | 'draw' | 'away';
 
+/** Détail du bonus offensif d'un côté (équipe), persisté dans le breakdown. */
+export type OffensiveSideBreakdown = {
+    /** La case bonus offensif de ce côté a-t-elle été cochée par le joueur. */
+    checked: boolean;
+    /** Cote de victoire de cette équipe, effectivement utilisée pour le bonus. */
+    oddsUsed: number;
+    oddsFallback: boolean;
+    /** Essais réels de l'équipe (null = pas encore saisis, passe 1). */
+    tries: number | null;
+    /** true = coché mais essais non saisis : volet en attente de la passe 2. */
+    pending: boolean;
+    /** Points de ce côté : + bonus, − malus, ou 0 (non coché / en attente). */
+    points: number;
+};
+
 /** Détail des points par volet — persisté en jsonb (predictions.points_breakdown) au Lot 4. */
 export type PointsBreakdown = {
     predictedOutcome: MatchOutcome;
@@ -53,8 +72,10 @@ export type PointsBreakdown = {
     exactScorePoints: number;
     gapPoints: number;
     defensiveBonusPoints: number;
-    offensiveBonusPoints: number;
-    /** true = bonus offensif coché mais essais non saisis : volet en attente de la passe 2. */
+    offensiveHome: OffensiveSideBreakdown;
+    offensiveAway: OffensiveSideBreakdown;
+    /** = offensiveHome.pending || offensiveAway.pending. Conservé à la racine :
+     * lu tel quel en SQL par le SELECT de la passe 2 (sync-results). */
     offensiveBonusPending: boolean;
 };
 

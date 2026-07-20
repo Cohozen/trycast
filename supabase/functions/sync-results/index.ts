@@ -23,6 +23,7 @@ type RunState = {
     needsReviewFlagged: number;
     scoredPass1: number;
     scoredPass2: number;
+    rescored: number;
     unknownStatuses: string[];
     errors: string[];
 };
@@ -61,12 +62,30 @@ Deno.serve(async (req: Request) => {
         return json({ skipped: true }, 200);
     }
 
-    const [actionable, pass1Ids, pass2Ids] = await Promise.all([
+    // Barème actif : indispensable pour scorer, et sa version sert à repérer
+    // les pronos figés sous un barème périmé (sélection D, à re-scorer).
+    const { data: activeRule, error: ruleError } = await admin
+        .from('scoring_rules')
+        .select('version, rules')
+        .eq('is_active', true)
+        .single();
+    if (ruleError || !activeRule) {
+        console.error('sync-results: select scoring_rules', ruleError?.message);
+        return json({ error: 'select_scoring_rules_failed' }, 500);
+    }
+
+    const [actionable, pass1Ids, pass2Ids, rescoreIds] = await Promise.all([
         selectActionableMatches(admin, competitionIds),
         selectPass1MatchIds(admin, competitionIds),
         selectPass2MatchIds(admin, competitionIds),
+        selectRescoreMatchIds(admin, competitionIds, activeRule.version),
     ]);
-    if (actionable.length === 0 && pass1Ids.length === 0 && pass2Ids.length === 0) {
+    if (
+        actionable.length === 0 &&
+        pass1Ids.length === 0 &&
+        pass2Ids.length === 0 &&
+        rescoreIds.length === 0
+    ) {
         return json({ skipped: true }, 200);
     }
 
@@ -86,6 +105,7 @@ Deno.serve(async (req: Request) => {
         needsReviewFlagged: 0,
         scoredPass1: 0,
         scoredPass2: 0,
+        rescored: 0,
         unknownStatuses: [],
         errors: [],
     };
@@ -93,15 +113,6 @@ Deno.serve(async (req: Request) => {
     try {
         await syncResults(admin, competitions ?? [], actionable, state);
 
-        // Barème actif : indispensable pour scorer, chargé une fois par run
-        const { data: activeRule, error: ruleError } = await admin
-            .from('scoring_rules')
-            .select('version, rules')
-            .eq('is_active', true)
-            .single();
-        if (ruleError || !activeRule) {
-            throw new Error(`select scoring_rules: ${ruleError?.message ?? 'aucun barème actif'}`);
-        }
         const rules = parseScoringRules(activeRule.rules);
 
         // Passe 1 re-sélectionnée : les scores viennent d'être écrits
@@ -111,6 +122,13 @@ Deno.serve(async (req: Request) => {
         }
         for (const matchId of pass2Ids) {
             await scoreMatch(admin, matchId, rules, state, 'pass2');
+        }
+        // Sélection D : re-scoring des matchs figés sous un barème périmé.
+        // Exclut ceux déjà repris ci-dessus pour ne pas scorer deux fois.
+        const alreadyScored = new Set([...freshPass1Ids, ...pass2Ids]);
+        for (const matchId of rescoreIds) {
+            if (alreadyScored.has(matchId)) continue;
+            await scoreMatch(admin, matchId, rules, state, 'rescore');
         }
 
         await finishRun(admin, run.id, state.errors.length === 0 ? 'success' : 'error', state);
@@ -184,6 +202,32 @@ async function selectPass2MatchIds(
         .not('matches.away_tries', 'is', null);
     if (error) {
         throw new Error(`select passe 2: ${error.message}`);
+    }
+    return [...new Set((data ?? []).map((row) => row.match_id))];
+}
+
+/**
+ * Sélection D : matchs déjà scorés dont au moins un prono porte une version de
+ * barème périmée (≠ version active) → re-scoring pour appliquer le barème
+ * courant. Auto-extincteur : le re-scoring pose scoring_rule_version = version
+ * active, donc le match sort de la sélection au run suivant.
+ */
+async function selectRescoreMatchIds(
+    admin: SupabaseClient,
+    competitionIds: string[],
+    activeVersion: number,
+): Promise<string[]> {
+    const { data, error } = await admin
+        .from('predictions')
+        .select('match_id, matches!inner(id)')
+        .not('scoring_rule_version', 'is', null)
+        .neq('scoring_rule_version', activeVersion)
+        .in('matches.competition_id', competitionIds)
+        .eq('matches.status', 'finished')
+        .eq('matches.needs_review', false)
+        .not('matches.scored_at', 'is', null);
+    if (error) {
+        throw new Error(`select re-scoring: ${error.message}`);
     }
     return [...new Set((data ?? []).map((row) => row.match_id))];
 }
@@ -263,7 +307,7 @@ async function scoreMatch(
     matchId: string,
     rules: ScoringRules,
     state: RunState,
-    pass: 'pass1' | 'pass2',
+    pass: 'pass1' | 'pass2' | 'rescore',
 ): Promise<void> {
     // Un match en échec ne bloque pas les autres (retenté au tick suivant)
     try {
@@ -306,8 +350,10 @@ async function scoreMatch(
         }
         if (pass === 'pass1') {
             state.scoredPass1 += 1;
-        } else {
+        } else if (pass === 'pass2') {
             state.scoredPass2 += 1;
+        } else {
+            state.rescored += 1;
         }
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
@@ -333,6 +379,7 @@ async function finishRun(
                 needs_review_flagged: state.needsReviewFlagged,
                 matches_scored_pass1: state.scoredPass1,
                 matches_scored_pass2: state.scoredPass2,
+                matches_rescored: state.rescored,
                 unknown_statuses: state.unknownStatuses,
                 ...(state.errors.length > 0 ? { errors: state.errors } : {}),
             },

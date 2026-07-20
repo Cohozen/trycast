@@ -13,7 +13,7 @@
 -- Pronos (insérés en service_role, la RLS deadline ne s'applique pas ici) :
 --   -103 user1 : 20-10 + bonus offensif domicile → bon vainqueur, bonus en attente
 --   -103 user2 : 10-20 → mauvais vainqueur, 0 point attendu
---   -104 user1 : 30-3 → score exact (12 pts vainqueur + 50 exact = 62)
+--   -104 user1 : 30-3 → score exact (18 pts vainqueur + 50 exact = 68)
 
 -- Standings : recalculés par la RPC uniquement pour les users des matchs
 -- scorés → reset explicite pour repartir d'un état propre
