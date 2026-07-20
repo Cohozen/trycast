@@ -14,10 +14,6 @@ const { title, description, heading, updatedAt } = Astro.props;
 
 <BaseLayout title={title} description={description}>
     <main>
-        <div class="draft-notice">
-            Premier jet en attente de validation — ce document n'a pas encore été relu par
-            l'éditeur du site.
-        </div>
         <h1>{heading}</h1>
         <p class="updated">Dernière mise à jour : {updatedAt}</p>
         <article>
@@ -31,17 +27,6 @@ const { title, description, heading, updatedAt } = Astro.props;
         max-width: 760px;
         margin: 0 auto;
         padding: 56px 24px 88px;
-    }
-
-    .draft-notice {
-        padding: 12px 16px;
-        border-radius: var(--radius-md);
-        border: 1px solid color-mix(in srgb, var(--warning-500) 45%, var(--border));
-        background: color-mix(in srgb, var(--warning-500) 10%, transparent);
-        color: var(--text);
-        font-size: 13px;
-        font-weight: 600;
-        margin-bottom: 36px;
     }
 
     h1 {
@@ -90,14 +75,6 @@ const { title, description, heading, updatedAt } = Astro.props;
     }
 
     article :global(strong) {
-        color: var(--text);
-    }
-
-    article :global(.placeholder) {
-        background: color-mix(in srgb, var(--warning-500) 16%, transparent);
-        border-radius: 4px;
-        padding: 0 4px;
-        font-weight: 600;
         color: var(--text);
     }
 </style>
