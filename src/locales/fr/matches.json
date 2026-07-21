@@ -51,6 +51,8 @@
         "kickoff": "Coup d'envoi",
         "notFound": "Match introuvable.",
         "singleLeague": "Une seule ligue",
+        "tries_one": "{{count}} essai",
+        "tries_other": "{{count}} essais",
         "tabs": {
             "predictions": "Pronos",
             "leaderboard": "Classement"

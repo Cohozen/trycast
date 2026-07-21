@@ -51,6 +51,8 @@
         "kickoff": "Kickoff",
         "notFound": "Match not found.",
         "singleLeague": "One league only",
+        "tries_one": "{{count}} try",
+        "tries_other": "{{count}} tries",
         "tabs": {
             "predictions": "Predictions",
             "leaderboard": "Leaderboard"

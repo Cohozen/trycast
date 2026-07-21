@@ -21,19 +21,35 @@ function formatKickoffDate(iso: string, locale: string): string {
     }).format(new Date(iso));
 }
 
-function TeamColumn({ team, muted }: { team: TeamRow | null; muted: boolean }) {
+function TeamColumn({
+    team,
+    muted,
+    tries,
+}: {
+    team: TeamRow | null;
+    muted: boolean;
+    /** Essais de l'équipe, affichés seulement s'ils sont renseignés. */
+    tries: number | null;
+}) {
     const { t } = useTranslation(['matches']);
     return (
         <View className="min-w-0 flex-1 items-center gap-2">
             <TeamFlag size="lg" team={team} />
-            <Text
-                className={cn(
-                    'text-center font-body-bold text-[14px] leading-[16px]',
-                    muted ? 'text-text-muted' : 'text-text',
-                )}
-                numberOfLines={2}>
-                {team ? teamName(team, t) : t('matches:teamTbd')}
-            </Text>
+            <View className="items-center gap-0.5">
+                <Text
+                    className={cn(
+                        'text-center font-body-bold text-[14px] leading-[16px]',
+                        muted ? 'text-text-muted' : 'text-text',
+                    )}
+                    numberOfLines={2}>
+                    {team ? teamName(team, t) : t('matches:teamTbd')}
+                </Text>
+                {tries !== null ? (
+                    <Text className="text-center font-body text-[11px] text-text-muted">
+                        {t('matches:detail.tries', { count: tries })}
+                    </Text>
+                ) : null}
+            </View>
         </View>
     );
 }
@@ -81,7 +97,11 @@ export function MatchHero({ match }: MatchHeroProps) {
             <MatchStatusChip match={match} />
 
             <View className="flex-row items-start gap-1.5">
-                <TeamColumn muted={homeWins === false} team={match.home_team} />
+                <TeamColumn
+                    muted={homeWins === false}
+                    team={match.home_team}
+                    tries={match.home_tries}
+                />
                 <View className="items-center px-1 pt-2">
                     {showScore ? (
                         <View className="flex-row items-baseline gap-2">
@@ -109,7 +129,11 @@ export function MatchHero({ match }: MatchHeroProps) {
                         </View>
                     )}
                 </View>
-                <TeamColumn muted={homeWins === true} team={match.away_team} />
+                <TeamColumn
+                    muted={homeWins === true}
+                    team={match.away_team}
+                    tries={match.away_tries}
+                />
             </View>
 
             <View className="items-center gap-2">
