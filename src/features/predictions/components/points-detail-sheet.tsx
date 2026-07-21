@@ -97,7 +97,9 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
             label: t('predictions:breakdown.defensive'),
             mark: 'ok',
             points: breakdown.defensiveBonusPoints,
-            badge: t('predictions:breakdown.defensiveBadge'),
+            badge: t('predictions:breakdown.defensiveGap', {
+                gap: rules.defensiveBonusMaxGap,
+            }),
         });
     }
     // Une ligne par équipe cochée (bonus ou malus), tolère un breakdown v1

@@ -251,6 +251,7 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
                     <Badge tone="info" variant="soft">
                         {t('predictions:form.defensiveHint', {
                             points: rules.defensiveBonusPoints,
+                            gap: rules.defensiveBonusMaxGap,
                         })}
                     </Badge>
                 </View>

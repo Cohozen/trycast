@@ -22,7 +22,7 @@
         "awayScore": "Score de l'équipe à l'extérieur",
         "bonusHome": "Bonus offensif domicile",
         "bonusAway": "Bonus offensif extérieur",
-        "defensiveHint": "Bonus défensif +{{points}} possible"
+        "defensiveHint": "Bonus défensif +{{points}} · écart ≤ {{gap}}"
     },
     "locked": {
         "header": "Prono verrouillé"
@@ -59,7 +59,8 @@
         "exactScore": "Score exact",
         "gap": "Bonus écart",
         "defensive": "Bonus défensif",
-        "defensiveBadge": "Défense",
+        "defensiveBadge": "Défense · écart ≤ {{gap}}",
+        "defensiveGap": "Écart ≤ {{gap}}",
         "offensiveScored": "Attaque {{code}} · {{tries}} essais (cote {{odds}})",
         "offensiveMissed": "Attaque {{code}} · {{tries}} essais",
         "offensivePendingTeam": "Attaque {{code}} · en attente des essais",

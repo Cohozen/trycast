@@ -22,7 +22,7 @@
         "awayScore": "Away team score",
         "bonusHome": "Home attacking bonus",
         "bonusAway": "Away attacking bonus",
-        "defensiveHint": "Defensive bonus +{{points}} possible"
+        "defensiveHint": "Defensive bonus +{{points}} · margin ≤ {{gap}}"
     },
     "locked": {
         "header": "Prediction locked"
@@ -59,7 +59,8 @@
         "exactScore": "Exact score",
         "gap": "Margin bonus",
         "defensive": "Defensive bonus",
-        "defensiveBadge": "Defense",
+        "defensiveBadge": "Defense · margin ≤ {{gap}}",
+        "defensiveGap": "Margin ≤ {{gap}}",
         "offensiveScored": "{{code}} attack · {{tries}} tries (odds {{odds}})",
         "offensiveMissed": "{{code}} attack · {{tries}} tries",
         "offensivePendingTeam": "{{code}} attack · awaiting tries",

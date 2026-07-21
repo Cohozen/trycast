@@ -10,6 +10,7 @@ import { PointsDetailSheet } from '@/features/predictions/components/points-deta
 import { VerdictPill } from '@/features/predictions/components/verdict-pill';
 import type { PredictionDistribution, PredictionRow } from '@/features/predictions/types';
 import { parseBreakdown, verdictOf } from '@/features/predictions/verdict';
+import { useActiveScoringRules } from '@/features/scoring/use-active-scoring-rules';
 import { i18n } from '@/lib/i18n';
 import { Pressable, Text, View } from '@/tw';
 import { cn } from '@/tw/variants';
@@ -35,6 +36,7 @@ type ResultCardProps = {
  */
 export function ResultCard({ match, prediction, distribution, onOpenMatch }: ResultCardProps) {
     const { t } = useTranslation(['predictions', 'matches']);
+    const rules = useActiveScoringRules();
     const [detailOpen, setDetailOpen] = useState(false);
     const [matchPressed, setMatchPressed] = useState(false);
     const [pointsPressed, setPointsPressed] = useState(false);
@@ -172,7 +174,9 @@ export function ResultCard({ match, prediction, distribution, onOpenMatch }: Res
                                         ))}
                                         {defensiveEarned ? (
                                             <Badge tone="info" variant="soft">
-                                                {t('predictions:breakdown.defensiveBadge')}
+                                                {t('predictions:breakdown.defensiveBadge', {
+                                                    gap: rules.defensiveBonusMaxGap,
+                                                })}
                                             </Badge>
                                         ) : null}
                                     </View>
