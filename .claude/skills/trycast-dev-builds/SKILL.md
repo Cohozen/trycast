@@ -42,6 +42,14 @@ npx expo prebuild --clean -p ios && npm run ios
 
 Non. Depuis que le projet a `expo-dev-client`, le QR de `npx expo start` est un deep link `…expo-development-client/…` qui **ouvre le dev build installé, pas Expo Go** — même scanné depuis l'app Expo Go. Un vieil APK reste donc le runtime quoi qu'on scanne. (La touche `s` dans Metro force Expo Go, mais ce n'est plus un chemin supporté pour TryCast : push FCM et config native absents d'Expo Go.)
 
+## Numéro de version (release store)
+
+- `app.json` → `expo.version` = **version marketing, seule source de vérité**, bumpée **à la main uniquement quand on prépare une release store** (MINOR = fonctionnalités, PATCH = correctifs). Pas de bump « par lot livré ». Aujourd'hui : `1.0.0`, rien n'étant encore publié — la beta TestFlight / Play interne se joue en 1.0.0 avec des builds 1, 2, 3…
+- **Ne jamais écrire de `versionCode` / `buildNumber` dans le repo** : `eas.json` est en `appVersionSource: "remote"` + `autoIncrement` (profil production), c'est EAS qui les incrémente. En écrire un dans `app.json` reprendrait la main à EAS et ferait diverger le compteur des stores.
+- `package.json` → `version` doit rester **identique** à `app.json` (garde-fou : `src/lib/app-version.test.ts`, la CI casse sinon). Bumper les deux dans le même commit.
+- Checklist avant un `eas build --profile production` : version bumpée dans les deux fichiers + `npm run typecheck && npm run lint && npm run format:check && npm run test` vert + `DASHBOARD.md` à jour.
+- L'écran Réglages lit `nativeApplicationVersion` / `nativeBuildVersion` d'`expo-application` (binaire installé), et non `Constants.expoConfig.version` (bundle JS) — c'est ce qui permet de comparer d'un coup d'œil avec ce que montre le store.
+
 ## Réflexe de fin de session
 
 Si la session a ajouté un déclencheur de rebuild (liste ci-dessus) : le rappeler dans le message final + l'inscrire dans les « actions Corentin en attente » du `DASHBOARD.md`.

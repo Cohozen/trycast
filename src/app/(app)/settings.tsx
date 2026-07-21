@@ -1,3 +1,4 @@
+import { nativeApplicationVersion, nativeBuildVersion } from 'expo-application';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import { BookOpen, ChevronRight, Globe, KeyRound, Mail } from 'lucide-react-native';
@@ -55,6 +56,12 @@ export default function SettingsScreen() {
     const [emailSent, setEmailSent] = useState(false);
     const brandColor = useThemeColor('brand');
     const textFaintColor = useThemeColor('text-faint');
+
+    // Version du binaire réellement installé (expo-application), pas celle du
+    // bundle JS : c'est le couple version marketing + numéro de build que
+    // voient les stores. Repli sur app.json hors build natif.
+    const appVersion = nativeApplicationVersion ?? Constants.expoConfig?.version ?? '?';
+    const versionLabel = nativeBuildVersion ? `${appVersion} (${nativeBuildVersion})` : appVersion;
 
     useEffect(() => {
         loadThemePreference().then(setTheme);
@@ -232,7 +239,7 @@ export default function SettingsScreen() {
                         {t('profile:settings.version')}
                     </Text>
                     <Text className="font-body-medium text-[14px] text-text-muted">
-                        {Constants.expoConfig?.version ?? '?'}
+                        {versionLabel}
                     </Text>
                 </Card>
                 <View className="mt-1">

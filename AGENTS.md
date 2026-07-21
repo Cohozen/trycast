@@ -40,6 +40,13 @@ Avant de considérer un lot terminé : `npm run typecheck && npm run lint && npm
 - Formulaire waitlist : RPC `join_waitlist` (migration `20260715000100_waitlist.sql`) appelée en fetch direct PostgREST, env `web/.env` (`PUBLIC_SUPABASE_URL`/`PUBLIC_SUPABASE_KEY`, modèle `web/.env.example`) ; anti-spam côté SQL (rate limit IP 3/h + plafond global 100/h + refus silencieux) + honeypot côté client — pas d'accès direct aux tables `waitlist_*`
 - Hébergement : **Vercel** (Root Directory `web`, build sur push GitHub) — le `installCommand` de `web/vercel.json` pose un stub `expo/tsconfig.base.json` requis par la découverte tsconfig de rolldown (piège détaillé dans le skill `trycast-site-web`) ; le connecteur Vercel de Claude ne voit pas le projet (scope), passer par git push
 
+## Versions
+
+- **`app.json` → `expo.version` est la seule source de vérité** de la version « marketing » (celle affichée dans Réglages et sur les stores). Semver `MAJOR.MINOR.PATCH`, bumpée **à la main, au moment de préparer une release store** — jamais à chaque lot livré : MINOR = nouvelles fonctionnalités, PATCH = correctifs. Valeur actuelle : `1.0.0` (rien n'est encore publié ; la beta TestFlight / Play interne se fait en 1.0.0, build 1, 2, 3…)
+- Le **numéro de build** (`versionCode` Android / `buildNumber` iOS) n'est **jamais** écrit dans le repo : EAS le gère seul (`appVersionSource: "remote"` + `autoIncrement` sur le profil production dans `eas.json`)
+- `package.json` → `version` duplique `app.json` par convention npm : `src/lib/app-version.test.ts` casse la CI si les deux divergent — **bumper les deux ensemble**
+- Réglages affiche `nativeApplicationVersion (nativeBuildVersion)` d'`expo-application` (le binaire réellement installé), pas la version du bundle JS
+
 ## Dev builds
 
 L'app tourne dans un dev build (`expo-dev-client`), pas Expo Go. **Toute lib native ajoutée/retirée, tout changement `app.json`/`app.config.ts`, toute montée de SDK ⇒ prévenir explicitement Corentin qu'un rebuild du dev client est nécessaire** (commande, quotas EAS et pièges : skill `trycast-dev-builds`).
