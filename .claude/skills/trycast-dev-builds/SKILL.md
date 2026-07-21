@@ -12,6 +12,7 @@ L'app tourne dans un **dev build** (`expo-dev-client`) sur le téléphone Androi
 ⚠️ **Dès qu'une de ces situations se présente dans une session, le dire explicitement à Corentin** (« ce changement demandera un rebuild du dev client Android ») et le noter dans le résumé de fin :
 
 1. **Installation/retrait d'une lib contenant du code natif** — en pratique quasi tout package `expo-*` et toute lib `react-native-*` non pure-JS. (Pur JS = pas de rebuild : TanStack Query, i18next, date-fns…)
+   - **Exception vérifiée** : un module natif déjà présent en **dépendance transitive** est déjà autolinké, donc déjà dans le binaire — l'expliciter dans `package.json` ne demande **aucun rebuild**. Vécu le 2026-07-21 avec `expo-application` (tiré par `expo-notifications`) : `npx expo install expo-application` puis lecture de `nativeApplicationVersion` a fonctionné du premier coup sur le dev build existant. Vérifier avant de conclure : `npx expo-modules-autolinking search | grep <module>` — s'il y apparaît, c'est déjà lié.
 2. **Changement dans `app.json` / `app.config.ts`** — permissions, config plugins, icône/splash, `android.package`/`ios.bundleIdentifier`, `googleServicesFile`.
 3. **Montée de version du SDK Expo** (ou de React Native).
 
