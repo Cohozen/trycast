@@ -4,6 +4,7 @@ import {
     validateEmail,
     validatePassword,
     validatePasswordConfirmation,
+    validateResetCode,
     validateUsername,
 } from './validation';
 
@@ -75,5 +76,20 @@ describe('validatePasswordConfirmation', () => {
         expect(validatePasswordConfirmation('12345678', '1234567')).toBe(
             'auth:validation.passwordMismatch',
         );
+    });
+});
+
+describe('validateResetCode', () => {
+    it('accepte 6 chiffres, espaces de recopie compris', () => {
+        expect(validateResetCode('418207')).toBeNull();
+        expect(validateResetCode(' 418207 ')).toBeNull();
+        expect(validateResetCode('000000')).toBeNull();
+    });
+
+    it('refuse une longueur ou un alphabet incorrects', () => {
+        expect(validateResetCode('41820')).toBe('auth:validation.invalidResetCode');
+        expect(validateResetCode('4182078')).toBe('auth:validation.invalidResetCode');
+        expect(validateResetCode('41820a')).toBe('auth:validation.invalidResetCode');
+        expect(validateResetCode('')).toBe('auth:validation.invalidResetCode');
     });
 });

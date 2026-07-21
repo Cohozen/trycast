@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,7 +15,6 @@ export default function ForgotPasswordScreen() {
     const { t } = useTranslation(['auth', 'common']);
     const [email, setEmail] = useState('');
     const [error, setError] = useState<string | null>(null);
-    const [sent, setSent] = useState(false);
     const [submitting, setSubmitting] = useState(false);
 
     const onSubmit = async () => {
@@ -25,26 +25,30 @@ export default function ForgotPasswordScreen() {
             return;
         }
         setSubmitting(true);
+        // Pas de `redirectTo` : l'e-mail de recovery porte un code à saisir dans
+        // l'app (template `recovery`), aucun lien à faire atterrir quelque part.
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim());
         setSubmitting(false);
         if (resetError) {
             setError(t(toAuthMessageKey(resetError)));
             return;
         }
-        setSent(true);
+        router.push({ pathname: '/reset-password', params: { email: email.trim() } });
     };
 
     return (
         <Screen contentClassName="max-w-[440px] gap-5 px-6 pb-8">
             <View className="gap-1.5">
-                <Text className="font-display text-h1 text-text">{t('auth:forgot.title')}</Text>
+                {/* leading explicite : le ratio de text-h1 (1.03) rogne les ascendantes d'Anton */}
+                <Text className="font-display text-h1 leading-[38px] text-text">
+                    {t('auth:forgot.title')}
+                </Text>
                 <Text className="font-body text-body text-text-muted">
                     {t('auth:forgot.subtitle')}
                 </Text>
             </View>
 
             {error ? <Toast message={error} tone="accent" /> : null}
-            {sent ? <Toast message={t('auth:forgot.sent')} tone="success" /> : null}
 
             <View className="gap-3.5">
                 <TextField
@@ -57,12 +61,12 @@ export default function ForgotPasswordScreen() {
                     value={email}
                 />
                 <Button
-                    disabled={!email || sent}
+                    disabled={!email}
                     fullWidth
                     loading={submitting}
                     onPress={onSubmit}
                     size="lg"
-                    title={t('auth:actions.sendResetLink')}
+                    title={t('auth:actions.sendResetCode')}
                 />
             </View>
 

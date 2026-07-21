@@ -5,7 +5,8 @@ export type AuthValidationKey =
     | 'auth:validation.usernameCharset'
     | 'auth:validation.invalidEmail'
     | 'auth:validation.passwordTooShort'
-    | 'auth:validation.passwordMismatch';
+    | 'auth:validation.passwordMismatch'
+    | 'auth:validation.invalidResetCode';
 
 // Miroir de la contrainte SQL username_format (profiles)
 export const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,20}$/;
@@ -33,6 +34,16 @@ export function validateEmail(email: string): AuthValidationKey | null {
 export function validatePassword(password: string): AuthValidationKey | null {
     if (password.length < 8) {
         return 'auth:validation.passwordTooShort';
+    }
+    return null;
+}
+
+/** Miroir de `auth.email.otp_length` (6) côté config Supabase. */
+export const RESET_CODE_LENGTH = 6;
+
+export function validateResetCode(code: string): AuthValidationKey | null {
+    if (!new RegExp(`^\\d{${RESET_CODE_LENGTH}}$`).test(code.trim())) {
+        return 'auth:validation.invalidResetCode';
     }
     return null;
 }

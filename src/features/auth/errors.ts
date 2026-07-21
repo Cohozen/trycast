@@ -11,6 +11,7 @@ const AUTH_ERROR_KEYS = {
     over_email_send_rate_limit: 'auth:errors.emailRateLimited',
     validation_failed: 'auth:errors.invalidEmail',
     user_not_found: 'auth:errors.userNotFound',
+    otp_expired: 'auth:errors.otpExpired',
     session_expired: 'auth:errors.sessionExpired',
 } as const;
 
