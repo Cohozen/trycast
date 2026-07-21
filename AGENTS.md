@@ -63,6 +63,7 @@ L'app tourne dans un dev build (`expo-dev-client`), pas Expo Go. **Toute lib nat
 - Toute règle de sécurité (deadline prono au kickoff, accès données) est imposée par RLS côté serveur, le client n'est qu'une UX
 - Edge Functions dans `supabase/functions/`, déploiement `supabase functions deploy <name>`
 - Vérification E2E auth/RLS : `bash scripts/e2e-auth.sh` (utilisateurs de test : `scripts/seed-test-users.sql`), `bash scripts/e2e-predictions.sh` (matchs de test : `scripts/seed-test-predictions.sql`, à seeder après les users), `bash scripts/e2e-scoring.sh` + `scripts/e2e-scoring.sql` côté serveur (seed : `scripts/seed-test-scoring.sql`, à rejouer avant chaque exécution du .sql) , `bash scripts/e2e-leagues.sh` (seed : `scripts/seed-test-leagues.sql`, à rejouer avant chaque exécution) et `bash scripts/e2e-notifications.sh` (tokens push par RPC, préférences, tables serveur — seuls les users de test sont requis)
+- E-mails d'auth : SMTP custom **Resend** (domaine `trycast.fr` vérifié, région EU) branché dans le dashboard Supabase Auth — rate limit relevé à 30 e-mails/h. Vérification : `EMAIL=une.vraie@adresse.fr bash scripts/e2e-email.sh` — ⚠️ envoie de vrais e-mails et crée des comptes de test (requête de nettoyage affichée en fin de run)
 
 ## Secrets
 
