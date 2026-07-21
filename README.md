@@ -217,3 +217,22 @@ Mise en route sur un nouveau projet (ordre important, secrets jamais dans le rep
 ## Builds (EAS)
 
 Projet EAS initialisé. Builds et soumission aux stores : à venir dans les lots suivants (`eas build`, `eas submit`).
+
+### Numéro de version
+
+Deux compteurs bien distincts :
+
+| | Où | Qui le bump |
+| --- | --- | --- |
+| Version « marketing » (`1.0.0`) | `app.json` → `expo.version` (dupliquée dans `package.json`) | **à la main**, au moment de préparer une release store |
+| Numéro de build (`versionCode` / `buildNumber`) | nulle part dans le repo | **EAS**, seul (`appVersionSource: "remote"` + `autoIncrement` sur le profil production) |
+
+La version marketing suit le semver : MINOR pour de nouvelles fonctionnalités,
+PATCH pour des correctifs — pas de bump à chaque lot livré. Elle vaut `1.0.0`
+tant que rien n'est publié ; la beta TestFlight / Play interne se joue en 1.0.0
+avec des builds 1, 2, 3… `src/lib/app-version.test.ts` casse la CI si `app.json`
+et `package.json` divergent, donc les deux se bumpent dans le même commit.
+
+L'écran Réglages affiche `nativeApplicationVersion (nativeBuildVersion)`
+d'`expo-application`, c'est-à-dire le binaire réellement installé — pas la
+version du bundle JS, qui pourrait en diverger.
