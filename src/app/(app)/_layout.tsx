@@ -10,7 +10,7 @@ import { useThemeColor } from '@/tw';
 // Les onglets vivent dans (tabs) ; les écrans ligue sont poussés au-dessus
 // (header natif visible, retour intégré).
 export default function AppLayout() {
-    const { t } = useTranslation(['leagues', 'matches', 'profile']);
+    const { t } = useTranslation(['leagues', 'matches', 'profile', 'scoring']);
     const competition = useActiveCompetition();
     const bgColor = useThemeColor('bg');
     const textColor = useThemeColor('text');
@@ -38,6 +38,10 @@ export default function AppLayout() {
                 <Stack.Screen
                     name="settings"
                     options={{ headerShown: true, title: t('profile:settings.title') }}
+                />
+                <Stack.Screen
+                    name="rules"
+                    options={{ headerShown: true, title: t('scoring:rules.screenTitle') }}
                 />
                 <Stack.Screen
                     name="league/new"

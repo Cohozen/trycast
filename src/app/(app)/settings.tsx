@@ -1,11 +1,13 @@
 import Constants from 'expo-constants';
-import { ChevronRight, Globe, KeyRound, Mail } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
+import { BookOpen, ChevronRight, Globe, KeyRound, Mail } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
+import { SectionLabel } from '@/components/ui/section-label';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Toast } from '@/components/ui/toast';
 import { AvatarEditor } from '@/features/profile/components/avatar-editor';
@@ -32,26 +34,14 @@ import { useDeleteAccount, useProfile } from '@/features/profile/use-profile';
 import { supabase } from '@/lib/supabase';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 
-function SectionLabel({ children, danger = false }: { children: string; danger?: boolean }) {
-    return (
-        <Text
-            className={
-                danger
-                    ? 'px-1.5 font-body-bold text-[11px] uppercase tracking-[1px] text-danger'
-                    : 'px-1.5 font-body-bold text-[11px] uppercase tracking-[1px] text-text-faint'
-            }>
-            {children}
-        </Text>
-    );
-}
-
 /**
  * Écran Réglages : compte (pseudo, e-mail, mot de passe), thème, langue,
  * notifications, version, déconnexion et zone de danger. Titre et retour
  * portés par le header natif (déclaré dans le layout (app)).
  */
 export default function SettingsScreen() {
-    const { t } = useTranslation(['profile', 'common']);
+    const { t } = useTranslation(['profile', 'scoring', 'common']);
+    const router = useRouter();
     const { session } = useSession();
     const { data: profile } = useProfile(session?.user.id ?? '');
     const deleteAccount = useDeleteAccount();
@@ -226,6 +216,17 @@ export default function SettingsScreen() {
             {/* À propos */}
             <View className="gap-2.5">
                 <SectionLabel>{t('profile:settings.sections.about')}</SectionLabel>
+                <Pressable accessibilityRole="button" onPress={() => router.push('/rules')}>
+                    <Card className="flex-row items-center gap-3 px-4 py-3.5">
+                        <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">
+                            <BookOpen color={brandColor} size={17} strokeWidth={1.9} />
+                        </View>
+                        <Text className="flex-1 font-body-semibold text-[15px] text-text">
+                            {t('scoring:rules.screenTitle')}
+                        </Text>
+                        <ChevronRight color={textFaintColor} size={18} strokeWidth={1.9} />
+                    </Card>
+                </Pressable>
                 <Card className="flex-row items-center gap-3 px-4 py-3.5">
                     <Text className="flex-1 font-body-semibold text-[15px] text-text">
                         {t('profile:settings.version')}

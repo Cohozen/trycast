@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Users } from 'lucide-react-native';
+import { CircleHelp, Users } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -26,7 +26,7 @@ import { ResultCard } from '@/features/predictions/components/result-card';
 import { useCommunityDistributions } from '@/features/predictions/use-community-distributions';
 import { useMatchLeaguePredictions } from '@/features/predictions/use-match-league-predictions';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
-import { Text, useThemeColor, View } from '@/tw';
+import { Pressable, Text, useThemeColor, View } from '@/tw';
 
 type LeagueView = 'predictions' | 'leaderboard';
 
@@ -38,12 +38,13 @@ type LeagueView = 'predictions' | 'leaderboard';
  * qu'après le kickoff (garanti serveur par la RPC, le client n'est qu'une UX).
  */
 export default function MatchScreen() {
-    const { t } = useTranslation(['matches', 'predictions', 'leagues', 'common']);
+    const { t } = useTranslation(['matches', 'predictions', 'leagues', 'scoring', 'common']);
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const { session } = useSession();
     const userId = session?.user.id;
     const accentColor = useThemeColor('accent');
+    const textFaintColor = useThemeColor('text-faint');
 
     const match = useMatch(id);
     const competitionId = match.data?.competition_id;
@@ -157,6 +158,18 @@ export default function MatchScreen() {
                 ) : (
                     <LockedPredictionCard match={currentMatch} prediction={prediction} />
                 )}
+                {/* Lien discret vers le référentiel des règles — texte faint,
+                    jamais de grenat (réservé CTA/live/sélection) */}
+                <Pressable
+                    accessibilityRole="button"
+                    className="flex-row items-center justify-center gap-1.5"
+                    hitSlop={8}
+                    onPress={() => router.push('/rules')}>
+                    <CircleHelp color={textFaintColor} size={14} strokeWidth={1.9} />
+                    <Text className="font-body-medium text-[12px] text-text-muted">
+                        {t('scoring:rules.link')}
+                    </Text>
+                </Pressable>
             </View>
 
             {/* Mes ligues : pronos des membres + classement */}
