@@ -15,6 +15,12 @@ Site **Astro statique** (pas d'adapter SSR) dans un sous-dossier autonome : son 
 - `web/src/styles/tokens.css` — **copie** des tokens DS (custom properties, dark via `[data-theme='dark']`) ; source de vérité design : `docs/design/project/_ds/…/tokens/`. Piège : pas de `*/` dans un commentaire CSS (chemins avec glob → lightningcss casse en minify)
 - Polices **self-hostées** via `@fontsource/anton` + `@fontsource/inter` (RGPD : pas de CDN Google Fonts). Thème posé par un script inline dans `<head>` selon `prefers-color-scheme`
 
+## Piège : `compressHTML` colle les mots aux balises inline
+
+`compressHTML` (actif par défaut chez Astro) supprime le retour à la ligne qui précède une balise inline : un texte coupé juste avant `<strong>`/`<a>` s'affiche **collé** en production (`parSupabase`, `écris àcontact@trycast.fr`) — invisible dans le source, bien réel à l'écran. Garder le dernier mot **sur la même ligne** que la balise ouvrante (`… hébergées\npar <strong>Supabase</strong>`), jamais la balise seule en début de ligne. Prettier ne reformate pas les `.astro` (pas de plugin à la racine), donc la mise en forme tient.
+
+Détection sur le build : `grep -roE '[a-zà-ÿ)]<(strong|a |em|code)[^>]*>' web/dist/` — doit ne rien renvoyer (4 occurrences corrigées le 2026-07-21 sur `confidentialite.astro`).
+
 ## Piège majeur : découverte tsconfig de rolldown (build cassé en CI/Vercel)
 
 La découverte automatique de tsconfig de vite/rolldown (Astro 7) **escalade au-dessus de `web/`** : un module `.astro` (ou un id à query `?astro…`) ne matche l'`include` d'aucun tsconfig (seuls .ts/.tsx, ou .js avec `allowJs`, matchent), donc la découverte continue vers le parent et **parse le tsconfig racine du repo** (`extends expo/tsconfig.base`). Sans `node_modules` racine (CI web, Vercel, clone frais avec install web seulement) : `Tsconfig not found expo/tsconfig.base`. En local ça passe car les deps racine sont installées.
@@ -36,6 +42,8 @@ CI dédiée `.github/workflows/web.yml` (paths `web/**`) ; `ci.yml` (app) ignore
 ## Preview navigateur
 
 `preview_start` avec la config `site-web` (port 4321, `.claude/launch.json`). **Piège capture** : après un scroll (action scroll, ancre, `window.scrollTo`), la capture d'écran du panneau rend une page vide alors que le DOM est sain. Contournement : rester à `scrollY = 0` et translater la page — `document.body.style.transform = 'translateY(-900px)'` — puis remettre `''` à la fin. Un reload répare aussi la capture.
+
+**Mesurer après le chargement des polices** : juste après un `navigate`/reload, Anton et Inter ne sont pas encore appliquées et le layout de repli est ~5× plus haut (`scrollHeight` 12 800 au lieu de 2 400) → la position calculée envoie la translation dans le vide et la capture ressort noire. Toujours `await document.fonts.ready` avant de lire un `getBoundingClientRect()`, ou recalculer si `scrollHeight` paraît aberrant.
 
 ## Waitlist
 
