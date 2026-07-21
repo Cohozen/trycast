@@ -54,8 +54,8 @@
     "breakdown": {
         "basePoints": "Base points",
         "bonusPredicted": "Predicted bonuses",
-        "winner": "Right winner · {{code}}",
-        "winnerDraw": "Right result · draw",
+        "winner": "Right winner · {{code}} (odds {{odds}})",
+        "winnerDraw": "Right result · draw (odds {{odds}})",
         "exactScore": "Exact score",
         "gap": "Margin bonus",
         "defensive": "Defensive bonus",
@@ -64,7 +64,6 @@
         "offensiveScored": "{{code}} attack · {{tries}} tries (odds {{odds}})",
         "offensiveMissed": "{{code}} attack · {{tries}} tries",
         "offensivePendingTeam": "{{code}} attack · awaiting tries",
-        "odds": "Odds weighting (×{{odds}})",
         "finalScore": "Final score",
         "totalWon": "Total won"
     },

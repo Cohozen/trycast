@@ -54,8 +54,8 @@
     "breakdown": {
         "basePoints": "Points de base",
         "bonusPredicted": "Bonus pronostiqués",
-        "winner": "Bon vainqueur · {{code}}",
-        "winnerDraw": "Bon résultat · match nul",
+        "winner": "Bon vainqueur · {{code}} (cote {{odds}})",
+        "winnerDraw": "Bon résultat · match nul (cote {{odds}})",
         "exactScore": "Score exact",
         "gap": "Bonus écart",
         "defensive": "Bonus défensif",
@@ -64,7 +64,6 @@
         "offensiveScored": "Attaque {{code}} · {{tries}} essais (cote {{odds}})",
         "offensiveMissed": "Attaque {{code}} · {{tries}} essais",
         "offensivePendingTeam": "Attaque {{code}} · en attente des essais",
-        "odds": "Pondération cote (×{{odds}})",
         "finalScore": "Score final",
         "totalWon": "Total gagné"
     },

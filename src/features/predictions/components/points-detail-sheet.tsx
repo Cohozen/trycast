@@ -1,3 +1,5 @@
+import { useRouter } from 'expo-router';
+import { CircleHelp } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { Modal } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,7 +14,7 @@ import type { OffensiveSideBreakdown } from '@/features/scoring/types';
 import { useActiveScoringRules } from '@/features/scoring/use-active-scoring-rules';
 import { winnerPointsByOutcome } from '@/features/scoring/potential-by-outcome';
 import { i18n } from '@/lib/i18n';
-import { Pressable, Text, View } from '@/tw';
+import { Pressable, Text, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
 import { VerdictPill } from './verdict-pill';
@@ -39,8 +41,10 @@ type Row = {
  * barème (✓/✗) depuis le breakdown persisté, total gagné.
  */
 export function PointsDetailSheet({ match, prediction, visible, onClose }: PointsDetailSheetProps) {
-    const { t } = useTranslation(['predictions', 'common', 'matches']);
+    const { t } = useTranslation(['predictions', 'common', 'matches', 'scoring']);
     const insets = useSafeAreaInsets();
+    const router = useRouter();
+    const textFaintColor = useThemeColor('text-faint');
     const rules = useActiveScoringRules();
     const breakdown = parseBreakdown(prediction);
     if (!breakdown) {
@@ -66,13 +70,16 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
             ? (match.home_team?.code ?? match.home_team?.name ?? '?')
             : (match.away_team?.code ?? match.away_team?.name ?? '?');
 
+    // La cote utilisée est portée par la ligne vainqueur (c'est elle qui
+    // explique le nombre de points) — pas de ligne « pondération » séparée.
+    const oddsLabel = oddsFormatter.format(breakdown.oddsUsed);
     const rows: Row[] = [
         {
             key: 'winner',
             label:
                 breakdown.predictedOutcome === 'draw'
-                    ? t('predictions:breakdown.winnerDraw')
-                    : t('predictions:breakdown.winner', { code: winnerCode }),
+                    ? t('predictions:breakdown.winnerDraw', { odds: oddsLabel })
+                    : t('predictions:breakdown.winner', { code: winnerCode, odds: oddsLabel }),
             mark: breakdown.winnerCorrect ? 'ok' : 'ko',
             points: breakdown.winnerPoints,
         },
@@ -91,17 +98,16 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
             points: breakdown.gapPoints,
         });
     }
-    if (breakdown.defensiveBonusPoints > 0) {
-        rows.push({
-            key: 'defensive',
-            label: t('predictions:breakdown.defensive'),
-            mark: 'ok',
-            points: breakdown.defensiveBonusPoints,
-            badge: t('predictions:breakdown.defensiveGap', {
-                gap: rules.defensiveBonusMaxGap,
-            }),
-        });
-    }
+    // Toujours affichée, même non obtenue : la ligne porte la règle du volet.
+    rows.push({
+        key: 'defensive',
+        label: t('predictions:breakdown.defensive'),
+        mark: breakdown.defensiveBonusPoints > 0 ? 'ok' : 'ko',
+        points: breakdown.defensiveBonusPoints,
+        badge: t('predictions:breakdown.defensiveGap', {
+            gap: rules.defensiveBonusMaxGap,
+        }),
+    });
     // Une ligne par équipe cochée (bonus ou malus), tolère un breakdown v1
     // (offensiveHome/Away absents ⇒ non coché).
     const offensiveSides: { key: string; side?: OffensiveSideBreakdown; code: string }[] = [
@@ -151,15 +157,6 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
             });
         }
     }
-    rows.push({
-        key: 'odds',
-        label: t('predictions:breakdown.odds', {
-            odds: oddsFormatter.format(breakdown.oddsUsed),
-        }),
-        mark: 'info',
-        points: null,
-    });
-
     const bonusTags: string[] = [];
     if (prediction.predicted_bonus_off_home) {
         bonusTags.push(match.home_team?.code ?? match.home_team?.name ?? '?');
@@ -338,7 +335,23 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
                         </View>
                     </View>
 
-                    <View className="mt-4">
+                    {/* Renvoi au référentiel du barème — la sheet se ferme
+                        d'abord, sinon elle reste au-dessus de l'écran Règles. */}
+                    <Pressable
+                        accessibilityRole="button"
+                        className="mt-3.5 flex-row items-center justify-center gap-1.5"
+                        hitSlop={8}
+                        onPress={() => {
+                            onClose();
+                            router.push('/rules');
+                        }}>
+                        <CircleHelp color={textFaintColor} size={14} strokeWidth={1.9} />
+                        <Text className="font-body-medium text-[12px] text-text-muted">
+                            {t('scoring:rules.link')}
+                        </Text>
+                    </Pressable>
+
+                    <View className="mt-3">
                         <Button
                             fullWidth
                             onPress={onClose}
