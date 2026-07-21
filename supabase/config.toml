@@ -243,16 +243,41 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
-# Uncomment to customize email template
-# [auth.email.template.invite]
-# subject = "You have been invited"
-# content_path = "./supabase/templates/invite.html"
+# Templates d'e-mails d'auth, en français. Les fichiers HTML sont GÉNÉRÉS :
+# éditer scripts/build-email-templates.mjs puis `npm run emails:build`, jamais
+# supabase/templates/*.html à la main. `npm run emails:check` garde les deux en phase.
+# Pas de magic_link : le parcours n'existe pas dans l'app.
+[auth.email.template.confirmation]
+subject = "Confirme ton adresse e-mail"
+content_path = "./supabase/templates/confirmation.html"
 
-# Uncomment to customize notification email template
-# [auth.email.notification.password_changed]
-# enabled = true
-# subject = "Your password has been changed"
-# content_path = "./templates/password_changed_notification.html"
+[auth.email.template.recovery]
+subject = "Ton code pour réinitialiser ton mot de passe"
+content_path = "./supabase/templates/recovery.html"
+
+[auth.email.template.email_change]
+subject = "Confirme ta nouvelle adresse e-mail"
+content_path = "./supabase/templates/email-change.html"
+
+[auth.email.template.invite]
+subject = "Tu es invité·e sur TryCast"
+content_path = "./supabase/templates/invite.html"
+
+[auth.email.template.reauthentication]
+subject = "Ton code de vérification TryCast"
+content_path = "./supabase/templates/reauthentication.html"
+
+# E-mails de sécurité : envoyés seulement si `enabled`, et jamais déclenchés par
+# une action volontaire côté app — c'est leur intérêt (alerte en cas de compromission).
+[auth.email.notification.password_changed]
+enabled = true
+subject = "Ton mot de passe TryCast a été modifié"
+content_path = "./supabase/templates/password-changed-notification.html"
+
+[auth.email.notification.email_changed]
+enabled = true
+subject = "L'adresse e-mail de ton compte TryCast a changé"
+content_path = "./supabase/templates/email-changed-notification.html"
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.

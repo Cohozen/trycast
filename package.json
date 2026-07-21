@@ -85,6 +85,8 @@
         "format": "biome format --write .",
         "format:check": "biome format .",
         "typecheck": "tsc --noEmit",
+        "emails:build": "node ./scripts/build-email-templates.mjs",
+        "emails:check": "node ./scripts/build-email-templates.mjs --check",
         "typegen": "supabase gen types typescript --project-id bmdzadvugtkclnqjpndr --schema public > src/lib/database.types.ts && biome format --write src/lib/database.types.ts"
     },
     "private": true
