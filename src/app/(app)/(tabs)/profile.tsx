@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { ChevronRight, Settings, Trophy, Users } from 'lucide-react-native';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Avatar } from '@/components/ui/avatar';
@@ -107,6 +107,41 @@ export default function ProfileScreen() {
     const tabsLoading =
         matches.isPending || predictions.isPending || standing.isPending || myLeagues.isPending;
 
+    // Onglet Pronos : contenu aplati pour que les en-têtes de date soient des
+    // enfants directs du ScrollView — condition de stickyHeaderIndices (même
+    // motif que l'accueil). Vide pour les autres onglets, qui ne collent rien.
+    const predictionChildren: ReactNode[] = [];
+    const stickyIndices: number[] = [];
+    if (!tabsLoading && tab === 'predictions') {
+        for (const [index, match] of finishedMatches.entries()) {
+            const dayTitle = dayTitleOf(match.kickoff_at);
+            const newDay =
+                index === 0 || dayTitle !== dayTitleOf(finishedMatches[index - 1].kickoff_at);
+            if (newDay) {
+                stickyIndices.push(predictionChildren.length);
+                // Fond opaque obligatoire : les cartes défilent dessous.
+                predictionChildren.push(
+                    <View className="bg-bg py-1" key={`day-${dayTitle}`}>
+                        <Text className="px-0.5 font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
+                            {dayTitle}
+                        </Text>
+                    </View>,
+                );
+            }
+            predictionChildren.push(
+                <ResultCard
+                    distribution={distributions.data?.get(match.id)}
+                    key={match.id}
+                    match={match}
+                    onOpenMatch={() =>
+                        router.push({ pathname: '/match/[id]', params: { id: match.id } })
+                    }
+                    prediction={predictions.data?.get(match.id)}
+                />,
+            );
+        }
+    }
+
     return (
         <View className="flex-1 bg-bg">
             {/* Bloc épinglé : identité, chiffres clés, compétition, onglets */}
@@ -193,7 +228,8 @@ export default function ProfileScreen() {
             <ScrollView
                 className="flex-1"
                 contentContainerClassName="w-full max-w-[800px] gap-3.5 self-center px-5 pt-3.5"
-                contentContainerStyle={{ paddingBottom: screenInsets.bottomTabBar }}>
+                contentContainerStyle={{ paddingBottom: screenInsets.bottomTabBar }}
+                stickyHeaderIndices={stickyIndices}>
                 {tabsLoading ? (
                     <View className="gap-2.5">
                         <Skeleton className="h-24" variant="block" />
@@ -214,34 +250,7 @@ export default function ProfileScreen() {
                             title={t('profile:predictions.emptyTitle')}
                         />
                     ) : (
-                        <View className="gap-3">
-                            {finishedMatches.map((match, index) => {
-                                const dayTitle = dayTitleOf(match.kickoff_at);
-                                const newDay =
-                                    index === 0 ||
-                                    dayTitle !== dayTitleOf(finishedMatches[index - 1].kickoff_at);
-                                return (
-                                    <View className="gap-3" key={match.id}>
-                                        {newDay ? (
-                                            <Text className="px-0.5 font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
-                                                {dayTitle}
-                                            </Text>
-                                        ) : null}
-                                        <ResultCard
-                                            distribution={distributions.data?.get(match.id)}
-                                            match={match}
-                                            onOpenMatch={() =>
-                                                router.push({
-                                                    pathname: '/match/[id]',
-                                                    params: { id: match.id },
-                                                })
-                                            }
-                                            prediction={predictions.data?.get(match.id)}
-                                        />
-                                    </View>
-                                );
-                            })}
-                        </View>
+                        predictionChildren
                     )
                 ) : leagues.length === 0 ? (
                     <EmptyState
