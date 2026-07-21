@@ -1,0 +1,55 @@
+{
+    "rules": {
+        "screenTitle": "Règles du jeu",
+        "link": "Comment sont calculés les points ?",
+        "intro": "Chaque prono est comparé au score final du match. Voici le barème appliqué, volet par volet.",
+        "sections": {
+            "bareme": "Le barème",
+            "general": "Règles générales"
+        },
+        "bareme": {
+            "winner": {
+                "title": "Bon vainqueur",
+                "value": "{{factor}} × cote",
+                "description": "Trouve le bon résultat (victoire ou nul) : tu marques {{factor}} points multipliés par la cote de ton pronostic. Mauvais vainqueur : 0 point sur tout le match, aucun bonus ne rattrape.",
+                "fallback": "Si aucune cote n'est disponible, une cote de {{odds}} s'applique."
+            },
+            "exactScore": {
+                "title": "Score exact",
+                "value": "+{{points}} pts",
+                "description": "Le jackpot : ton score prédit est exactement le score final."
+            },
+            "gap": {
+                "title": "Bon écart",
+                "value": "+{{exact}} pts",
+                "description": "Écart de points exact : +{{exact}} pts. Écart à {{tolerance}} points près : +{{close}} pts. Un seul des deux compte, et le score exact les remplace."
+            },
+            "defensive": {
+                "title": "Bonus défensif",
+                "value": "+{{points}} pts",
+                "description": "Tu as prédit un match serré, et il l'a été : écart prédit ET écart réel de {{gap}} points ou moins, hors match nul."
+            },
+            "offensive": {
+                "title": "Bonus offensif",
+                "value": "{{percent}} % × cote",
+                "description": "Coche une équipe que tu vois inscrire {{tries}} essais ou plus. Réussi : {{percent}} % de {{factor}} × sa cote de victoire. Coché mais raté : −{{malus}} pts.",
+                "note": "Le bonus n'est évalué que si tu as trouvé le bon vainqueur."
+            },
+            "floor": "Quoi qu'il arrive, le total d'un match ne descend jamais sous 0."
+        },
+        "general": {
+            "deadline": {
+                "title": "Deadline au coup d'envoi",
+                "description": "Ton prono est modifiable jusqu'au coup d'envoi, puis verrouillé. La limite est garantie côté serveur, pas seulement dans l'app."
+            },
+            "masked": {
+                "title": "Pronos masqués",
+                "description": "Les pronos des autres membres restent cachés jusqu'au coup d'envoi. Personne ne peut copier ton prono."
+            },
+            "leagues": {
+                "title": "Ligues et classement",
+                "description": "Crée une ligue ou rejoins-en une avec un code d'invitation. Chaque match rapporte des points, et le classement cumule tous tes matchs de la compétition."
+            }
+        }
+    }
+}

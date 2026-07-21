@@ -1,0 +1,55 @@
+{
+    "rules": {
+        "screenTitle": "Game rules",
+        "link": "How are points calculated?",
+        "intro": "Every prediction is compared to the final score. Here is the scoring system, step by step.",
+        "sections": {
+            "bareme": "Scoring",
+            "general": "General rules"
+        },
+        "bareme": {
+            "winner": {
+                "title": "Correct winner",
+                "value": "{{factor}} × odds",
+                "description": "Pick the right outcome (win or draw): you score {{factor}} points multiplied by the odds of your prediction. Wrong winner: 0 points for the whole match, no bonus can save it.",
+                "fallback": "If no odds are available, odds of {{odds}} apply."
+            },
+            "exactScore": {
+                "title": "Exact score",
+                "value": "+{{points}} pts",
+                "description": "The jackpot: your predicted score is exactly the final score."
+            },
+            "gap": {
+                "title": "Right margin",
+                "value": "+{{exact}} pts",
+                "description": "Exact points margin: +{{exact}} pts. Margin within {{tolerance}} points: +{{close}} pts. Only one of the two counts, and the exact score replaces both."
+            },
+            "defensive": {
+                "title": "Defensive bonus",
+                "value": "+{{points}} pts",
+                "description": "You predicted a tight game and it was one: predicted AND actual margin of {{gap}} points or less, draws excluded."
+            },
+            "offensive": {
+                "title": "Offensive bonus",
+                "value": "{{percent}}% × odds",
+                "description": "Tick a team you expect to score {{tries}} tries or more. Success: {{percent}}% of {{factor}} × its win odds. Ticked but missed: −{{malus}} pts.",
+                "note": "The bonus only counts if you picked the right winner."
+            },
+            "floor": "Whatever happens, a match total never drops below 0."
+        },
+        "general": {
+            "deadline": {
+                "title": "Kick-off deadline",
+                "description": "Your prediction can be edited until kick-off, then it locks. The deadline is enforced server-side, not just in the app."
+            },
+            "masked": {
+                "title": "Hidden predictions",
+                "description": "Other members' predictions stay hidden until kick-off. Nobody can copy yours."
+            },
+            "leagues": {
+                "title": "Leagues and standings",
+                "description": "Create a league or join one with an invite code. Every match earns points, and the standings add up all your matches in the competition."
+            }
+        }
+    }
+}

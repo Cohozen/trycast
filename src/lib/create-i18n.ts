@@ -8,6 +8,7 @@ import leaguesEn from '@/locales/en/leagues.json';
 import matchesEn from '@/locales/en/matches.json';
 import predictionsEn from '@/locales/en/predictions.json';
 import profileEn from '@/locales/en/profile.json';
+import scoringEn from '@/locales/en/scoring.json';
 import auth from '@/locales/fr/auth.json';
 import celebration from '@/locales/fr/celebration.json';
 import common from '@/locales/fr/common.json';
@@ -15,6 +16,7 @@ import leagues from '@/locales/fr/leagues.json';
 import matches from '@/locales/fr/matches.json';
 import predictions from '@/locales/fr/predictions.json';
 import profile from '@/locales/fr/profile.json';
+import scoring from '@/locales/fr/scoring.json';
 
 /**
  * Ressources i18n : FR = langue source, un namespace par domaine métier
@@ -24,7 +26,7 @@ import profile from '@/locales/fr/profile.json';
  * entrée ici, rien d'autre ne change.
  */
 export const resources = {
-    fr: { common, auth, matches, predictions, leagues, profile, celebration },
+    fr: { common, auth, matches, predictions, leagues, profile, scoring, celebration },
     en: {
         common: commonEn,
         auth: authEn,
@@ -32,6 +34,7 @@ export const resources = {
         predictions: predictionsEn,
         leagues: leaguesEn,
         profile: profileEn,
+        scoring: scoringEn,
         celebration: celebrationEn,
     },
 } as const;
