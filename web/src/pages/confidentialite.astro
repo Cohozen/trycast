@@ -6,7 +6,7 @@ import ContentLayout from '../layouts/content-layout.astro';
     title="Politique de confidentialité — TryCast"
     description="Comment TryCast collecte, utilise et protège tes données personnelles."
     heading="Politique de confidentialité"
-    updatedAt="15 juillet 2026">
+    updatedAt="22 juillet 2026">
     <h2>1. Qui est responsable ?</h2>
     <p>
         Le responsable du traitement est l'éditeur de TryCast, joignable
@@ -23,64 +23,153 @@ import ContentLayout from '../layouts/content-layout.astro';
             l'application et des étapes de la beta. Base légale : ton consentement (inscription
             volontaire). Aucune revente, aucun partage, pas de prospection tierce.
         </li>
+        <li>
+            <strong>Adresse IP, sous forme hachée</strong> — pour limiter le nombre d'inscriptions
+            par visiteur et protéger le formulaire des robots. Ton adresse n'est jamais enregistrée
+            en clair : seule une empreinte irréversible, recalculée avec une clé tirée au hasard
+            chaque jour, est conservée pendant 24 heures au maximum. Base légale : notre intérêt
+            légitime à protéger le service contre les abus.
+        </li>
     </ul>
     <p><strong>Dans l'application</strong></p>
     <ul>
-        <li><strong>E-mail et pseudo</strong> — création et gestion de ton compte.</li>
+        <li>
+            <strong>Adresse e-mail et pseudo</strong> — création, connexion et gestion de ton
+            compte. Base légale : l'exécution du contrat (les CGU).
+        </li>
+        <li>
+            <strong>Photo de profil</strong> — facultative. Si tu en ajoutes une, elle est
+            redimensionnée sur ton téléphone puis stockée sur nos serveurs. Base légale :
+            l'exécution du contrat. Tu peux la retirer à tout moment.
+        </li>
         <li>
             <strong>Pronostics, points et classements</strong> — le cœur du jeu : calcul des
-            scores et affichage des classements de tes ligues.
+            scores et affichage des classements de tes ligues. Base légale : l'exécution du
+            contrat.
+        </li>
+        <li>
+            <strong>Préférences</strong> (langue, thème, choix de notifications) — pour que
+            l'application se comporte comme tu l'as réglée, et pour t'écrire dans ta langue. Base
+            légale : l'exécution du contrat.
         </li>
         <li>
             <strong>Jeton de notifications push</strong> (si tu actives les notifications) — envoi
-            des rappels de match et de résultats ; il est supprimé si tu les désactives.
+            des rappels de match et de résultats. Base légale : ton consentement ; le jeton est
+            supprimé dès que tu désactives les notifications ou que tu te déconnectes.
+        </li>
+        <li>
+            <strong>Historique de tes consentements</strong> — la date à laquelle tu as accepté ou
+            refusé de recevoir nos communications. Base légale : notre obligation de pouvoir
+            prouver ton consentement.
         </li>
     </ul>
     <p>
-        Pas de publicité, pas de suivi publicitaire, pas de revente de données. Le site
-        n'utilise <strong>aucun cookie de suivi</strong>.
+        Nous ne collectons <strong>aucune donnée de localisation</strong>, aucun carnet d'adresses
+        et aucune donnée sensible.
     </p>
 
-    <h2>3. Où sont hébergées les données ?</h2>
+    <h2>3. Ce que les autres utilisateurs voient</h2>
     <p>
-        Les données du compte et du jeu sont hébergées
-        par <strong>Supabase</strong> (base de données et authentification), dans l'Union européenne
-        (région AWS eu-west-3, Paris). Le site est
-        hébergé par <strong>Vercel</strong>. Les e-mails liés au compte (confirmation d'adresse,
-        réinitialisation du mot de passe) sont acheminés par <strong>Resend</strong>, depuis des
-        serveurs situés dans l'Union européenne (Irlande). Ces prestataires agissent comme
-        sous-traitants au sens du RGPD.
+        TryCast est un jeu entre amis : à l'intérieur d'une ligue que tu as rejointe, les autres
+        membres voient ton <strong>pseudo</strong>, ta <strong>photo de profil</strong>,
+        tes <strong>pronostics</strong> une fois le coup d'envoi passé, et
+        tes <strong>points</strong>. Ton adresse e-mail n'est <strong>jamais</strong> visible par les
+        autres joueurs. Si tu ajoutes une photo, elle est servie depuis une adresse web publique :
+        elle n'est ni listée ni indexée, mais elle reste accessible à qui possède le lien.
     </p>
 
-    <h2>4. Combien de temps ?</h2>
+    <h2>4. Où sont hébergées les données, et qui d'autre y touche ?</h2>
+    <p>
+        Les données du compte et du jeu sont hébergées par <strong>Supabase</strong> (base de
+        données, authentification et stockage des photos) dans l'Union européenne (région AWS
+        eu-west-3, Paris). Interviennent également, en qualité de sous-traitants ou destinataires
+        au sens du RGPD :
+    </p>
+    <ul>
+        <li><strong>Vercel</strong> — hébergement de ce site. Société établie aux États-Unis ; les
+            transferts sont encadrés par les clauses contractuelles types de la Commission
+            européenne.</li>
+        <li><strong>Resend</strong> — acheminement des e-mails liés au compte (confirmation
+            d'adresse, réinitialisation du mot de passe), depuis des serveurs situés dans l'Union
+            européenne (Irlande).</li>
+        <li><strong>Expo</strong> puis <strong>Google (Firebase Cloud Messaging)</strong> ou <strong>Apple</strong> —
+            acheminement technique des notifications push jusqu'à ton
+            téléphone. Ils reçoivent le jeton de ton appareil et le texte de la notification ; ce
+            passage est imposé par les systèmes Android et iOS.</li>
+        <li><strong>Highlightly</strong> — fournisseur des calendriers, résultats et
+            cotes. <strong>Aucune donnée personnelle ne lui est transmise</strong> : les échanges ne
+            portent que sur des matchs.</li>
+    </ul>
+    <p>
+        Aucune de tes données n'est vendue, louée ou transmise à des fins publicitaires.
+    </p>
+
+    <h2>5. Combien de temps ?</h2>
     <ul>
         <li>
             <strong>Liste d'attente</strong> : jusqu'au lancement de l'application, puis au plus
             tard 6 mois après (ou dès ta demande de suppression).
         </li>
         <li>
+            <strong>Empreintes d'adresse IP</strong> (anti-abus du formulaire) : 24 heures maximum.
+        </li>
+        <li>
             <strong>Compte</strong> : tant que ton compte existe. La suppression du compte (depuis
             les réglages de l'application) efface immédiatement et définitivement tes données
-            personnelles.
+            personnelles, photo de profil comprise.
+        </li>
+        <li>
+            <strong>Compte inactif</strong> : si tu ne te connectes pas
+            pendant <strong>3 ans</strong>, ton compte et les données associées sont supprimés. Tu es
+            prévenu par e-mail avant la suppression, avec la possibilité de le conserver en te
+            reconnectant.
         </li>
     </ul>
 
-    <h2>5. Tes droits</h2>
+    <h2>6. Tes droits</h2>
     <p>
         Tu disposes des droits d'accès, de rectification, d'effacement, de limitation, d'opposition
-        et de portabilité sur tes données. Pour les exercer, écris
-        à <a href="mailto:contact@trycast.fr">contact@trycast.fr</a> — réponse sous un mois au plus. Tu
-        peux aussi introduire une réclamation auprès de la CNIL (cnil.fr).
+        et de portabilité sur tes données, ainsi que du droit de retirer ton consentement à tout
+        moment.
     </p>
-
-    <h2>6. Sécurité</h2>
     <p>
-        Les échanges avec nos serveurs sont chiffrés (HTTPS/TLS) et l'accès aux données est
-        restreint par des règles de sécurité côté serveur. Aucun système n'étant infaillible, tu
-        seras informé dans les meilleurs délais en cas d'incident affectant tes données.
+        Deux de ces droits s'exercent <strong>directement dans l'application</strong>, sans rien
+        demander à personne : <em>Réglages → Confidentialité → Exporter mes données</em> te remet
+        une copie lisible de l'ensemble de tes données,
+        et <em>Réglages → Supprimer mon compte</em> efface tout définitivement.
+    </p>
+    <p>
+        Pour toute autre demande, écris
+        à <a href="mailto:contact@trycast.fr">contact@trycast.fr</a> — réponse sous un mois au plus.
+        Tu peux aussi introduire une réclamation auprès de la CNIL (cnil.fr).
     </p>
 
-    <h2>7. Évolution de cette politique</h2>
+    <h2>7. Âge minimum</h2>
+    <p>
+        Le Service est réservé aux personnes d'au moins 15 ans, âge à partir duquel un mineur peut
+        consentir seul au traitement de ses données en France. Si nous apprenons qu'un compte a été
+        créé par un enfant plus jeune, il est supprimé.
+    </p>
+
+    <h2>8. Publicité et suivi</h2>
+    <p>
+        Pas de publicité, pas de suivi publicitaire, pas de revente de données. Ce site
+        n'utilise <strong>aucun cookie de suivi</strong> et l'application n'intègre
+        aujourd'hui <strong>aucun outil de mesure d'audience tiers</strong>. Si cela devait changer, cette
+        page serait mise à jour avant toute mise en service, et une mesure d'audience ne serait
+        activée qu'avec ton accord ou sous une forme strictement anonyme.
+    </p>
+
+    <h2>9. Sécurité</h2>
+    <p>
+        Les échanges avec nos serveurs sont chiffrés (HTTPS/TLS) et ton mot de passe n'est jamais
+        stocké en clair. L'accès aux données est cloisonné par des règles de sécurité appliquées
+        côté serveur : chaque compte ne peut lire et écrire que ce qui le concerne, indépendamment
+        de ce que fait l'application. Aucun système n'étant infaillible, tu seras informé dans les
+        meilleurs délais en cas d'incident affectant tes données.
+    </p>
+
+    <h2>10. Évolution de cette politique</h2>
     <p>
         Cette politique pourra être mise à jour, notamment au lancement de l'application. La date
         de dernière mise à jour figure en haut de page ; en cas de changement substantiel, tu seras
