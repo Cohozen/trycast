@@ -19,5 +19,17 @@
     "errors": {
         "generic": "Une erreur est survenue. Réessaie.",
         "network": "Connexion impossible. Vérifie ta connexion internet."
+    },
+    "legal": {
+        "terms": "Conditions d'utilisation",
+        "privacy": "Politique de confidentialité",
+        "notice": "Mentions légales",
+        "signupNotice": {
+            "before": "En créant un compte, tu acceptes les ",
+            "terms": "conditions d'utilisation",
+            "between": " et la ",
+            "privacy": "politique de confidentialité",
+            "after": "."
+        }
     }
 }

@@ -7,6 +7,7 @@ import { Screen } from '@/components/ui/screen';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { TextField } from '@/components/ui/text-field';
 import { Toast } from '@/components/ui/toast';
+import { LegalNotice } from '@/features/auth/components/legal-notice';
 import { toAuthMessageKey } from '@/features/auth/errors';
 import {
     validateEmail,
@@ -228,6 +229,7 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
                             title={t('auth:actions.signup')}
                         />
                     </View>
+                    <LegalNotice />
                 </View>
             )}
         </Screen>

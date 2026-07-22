@@ -5,6 +5,7 @@ import { BookOpen, ChevronRight, Globe, KeyRound, Mail } from 'lucide-react-nati
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { LegalLinks } from '@/components/legal-links';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
@@ -234,6 +235,7 @@ export default function SettingsScreen() {
                         <ChevronRight color={textFaintColor} size={18} strokeWidth={1.9} />
                     </Card>
                 </Pressable>
+                <LegalLinks />
                 <Card className="flex-row items-center gap-3 px-4 py-3.5">
                     <Text className="flex-1 font-body-semibold text-[15px] text-text">
                         {t('profile:settings.version')}
