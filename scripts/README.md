@@ -55,14 +55,22 @@ EMAIL1=e2e.user1@trycast.local EMAIL2=e2e.user2@trycast.local PASSWORD=motdepass
 | `e2e-notifications.sh` | Tokens push par RPC, isolation des préférences | `seed-test-users.sql` |
 | `e2e-privacy.sh` | `consents` append-only, Edge Function `export-data` | `seed-test-users.sql` |
 | `e2e-email.sh` | Transport SMTP Resend | aucun |
+| `e2e-password-reset.sh` | Reset par code : usage unique, ancien mot de passe révoqué | aucun |
 
-⚠️ **`e2e-email.sh` envoie de vrais e-mails et crée des comptes**, d'où une invocation différente :
+⚠️ **`e2e-email.sh` et `e2e-password-reset.sh` envoient de vrais e-mails et créent des comptes**, d'où une invocation différente :
 
 ```bash
 EMAIL=une.vraie@adresse.fr bash scripts/e2e-email.sh
 ```
 
-Il affiche en fin de run la requête de nettoyage des comptes créés. Il ne prouve que le transport : le rendu des templates se juge à l'œil dans une vraie boîte.
+Ils affichent en fin de run la requête de nettoyage des comptes créés. `e2e-email.sh` ne prouve que le transport : le rendu des templates se juge à l'œil dans une vraie boîte.
+
+`e2e-password-reset.sh` se joue en **deux passes**, le code n'étant lisible que dans l'e-mail (GoTrue n'en stocke que l'empreinte) :
+
+```bash
+EMAIL=une.vraie@adresse.fr bash scripts/e2e-password-reset.sh              # envoie le code
+EMAIL=une.vraie@adresse.fr CODE=418207 bash scripts/e2e-password-reset.sh  # déroule les assertions
+```
 
 `e2e-leagues.sh` et `e2e-scoring.sql` ne sont pas idempotents : **rejouer leur seed avant chaque exécution**.
 
