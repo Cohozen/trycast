@@ -45,7 +45,8 @@
                 {
                     "photosPermission": "TryCast accède à tes photos pour définir ta photo de profil."
                 }
-            ]
+            ],
+            "@sentry/react-native"
         ],
         "experiments": {
             "typedRoutes": true,

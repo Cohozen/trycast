@@ -9,6 +9,7 @@ import {
     Inter_600SemiBold,
     Inter_700Bold,
 } from '@expo-google-fonts/inter';
+import * as Sentry from '@sentry/react-native';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { Stack, ThemeProvider } from 'expo-router';
@@ -24,10 +25,18 @@ import { useRegisterPushToken } from '@/features/notifications/use-register-push
 import { applyStoredLanguagePreference } from '@/features/profile/language-preference';
 import { applyStoredThemePreference } from '@/features/profile/theme-preference';
 import { useSyncLocale } from '@/features/profile/use-sync-locale';
+import { hydrateTelemetryPreferences } from '@/features/privacy/telemetry-preference';
+import { initAnalytics } from '@/lib/analytics';
+import { initDiagnostics } from '@/lib/diagnostics';
 import { queryClient } from '@/lib/query';
 import { navigationThemes } from '@/tw/navigation-theme';
 
 SplashScreen.preventAutoHideAsync();
+
+// Au scope module, avant tout rendu : c'est ce qui permet de capturer un
+// plantage de démarrage. La préférence de l'utilisateur est relue juste après
+// et appliquée par le beforeSend, pas par une ré-initialisation.
+initDiagnostics();
 
 function RootNavigator() {
     const { session, isLoading } = useSession();
@@ -60,7 +69,7 @@ function RootNavigator() {
     );
 }
 
-export default function RootLayout() {
+function RootLayout() {
     const colorScheme = useColorScheme();
 
     // Ré-applique thème et langue choisis dans Réglages (effet : AsyncStorage
@@ -68,6 +77,9 @@ export default function RootLayout() {
     useEffect(() => {
         applyStoredThemePreference();
         applyStoredLanguagePreference();
+        // Les préférences de télémétrie d'abord : la mesure d'usage ne démarre
+        // qu'une fois qu'on sait que l'utilisateur ne l'a pas coupée.
+        hydrateTelemetryPreferences().then(initAnalytics);
     }, []);
 
     return (
@@ -83,3 +95,7 @@ export default function RootLayout() {
         </QueryClientProvider>
     );
 }
+
+// Sentry.wrap installe la capture des erreurs de rendu React au-dessus de tout
+// l'arbre. Sans DSN configuré, l'enveloppe est neutre.
+export default Sentry.wrap(RootLayout);
