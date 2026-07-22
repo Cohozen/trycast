@@ -79,6 +79,14 @@ Décision actée (2026-07-21) : le template `recovery` affiche `{{ .Token }}` et
 
 **Piège de l'ordre des appels** : `verifyOtp` **ouvre la session**, ce qui fait basculer `Stack.Protected` sur `(app)` et **démonte l'écran** dans la foulée. Une erreur renvoyée ensuite par `updateUser` n'aurait plus où s'afficher → le mot de passe doit être **validé côté client avant** d'appeler le hook (longueur, confirmation). Reste le cas `same_password`, bénin.
 
+**Renvoi du code** : GoTrue refuse deux e-mails de recovery rapprochés pour un même compte (`smtp_max_frequency`, **60 s** en ligne) et répond 429 `over_email_send_rate_limit`. L'app tient le même délai (`RESEND_COOLDOWN_MS` dans `src/features/auth/reset-code.ts`) pour ne pas proposer une action vouée à échouer — **les deux valeurs doivent rester d'accord**. Un renvoi **invalide le code précédent** côté serveur : l'écran vide la saisie et le dit.
+
+**`mailer_otp_length` doit rester à 6** : le projet dev était à 8 (défaut hérité), ce qui rendait le parcours impossible — l'app valide un code à 6 chiffres (`RESET_CODE_LENGTH`, miroir de ce réglage).
+
+**Toutes les erreurs de code se ressemblent** : code faux, expiré, déjà consommé **et e-mail inconnu** renvoient tous `403 / otp_expired / "Token has expired or is invalid"`. Un seul message i18n est donc possible (`auth:errors.otpExpired`), et il ne doit pas laisser croire que le compte n'existe pas.
+
 ## Vérification
 
 `EMAIL=une.vraie@adresse.fr bash scripts/e2e-email.sh` — ⚠️ envoie de **vrais** e-mails et crée des comptes de test (requête de nettoyage affichée en fin de run). Ne prouve que le transport : le rendu se juge à l'œil dans une vraie boîte.
+
+Parcours de reset complet : `scripts/e2e-password-reset.sh`, en **deux passes** (envoi, puis assertions avec `CODE=…`). Le code **n'est pas récupérable en base** — GoTrue ne stocke que son empreinte (`GenerateTokenHash(email, otp)`) — il faut donc le relever dans l'e-mail, aucun contournement SQL n'existe. L'assertion qui compte est la connexion avec l'**ancien** mot de passe : elle doit échouer, sinon le reset n'a pas pris. Validé 7/7 le 2026-07-22.
