@@ -28,8 +28,8 @@ export type AnalyticsEvent =
     | { name: 'league_created' }
     /** Une ligue a été rejointe via un code d'invitation. */
     | { name: 'league_joined' }
-    /** Un classement a été consulté, par ligue ou général. */
-    | { name: 'leaderboard_viewed'; props: { scope: 'league' | 'global' } }
+    /** Un classement a été consulté. Même vocabulaire que l'écran Classement. */
+    | { name: 'leaderboard_viewed'; props: { scope: 'leagues' | 'global' } }
     /** Les notifications push viennent d'être activées. */
     | { name: 'notifications_enabled' }
     /** Un export de données personnelles a été demandé (RGPD). */
@@ -43,7 +43,9 @@ export type AnalyticsEventName = AnalyticsEvent['name'];
  * Propriétés à transmettre au SDK. Aptabase n'accepte que des chaînes et des
  * nombres : les booléens sont convertis ici plutôt que dans chaque appelant.
  */
-export function toAptabaseProps(event: AnalyticsEvent): Record<string, string | number> | undefined {
+export function toAptabaseProps(
+    event: AnalyticsEvent,
+): Record<string, string | number> | undefined {
     if (!('props' in event)) return undefined;
 
     return Object.fromEntries(

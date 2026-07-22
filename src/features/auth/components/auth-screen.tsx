@@ -15,6 +15,7 @@ import {
     validatePasswordConfirmation,
     validateUsername,
 } from '@/features/auth/validation';
+import { trackEvent } from '@/lib/analytics';
 import { supabase } from '@/lib/supabase';
 import { EMAIL_CONFIRM_URL } from '@/lib/urls';
 import { Link, Text, View } from '@/tw';
@@ -59,7 +60,9 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
         setSubmitting(false);
         if (signInError) {
             setError(t(toAuthMessageKey(signInError)));
+            return;
         }
+        trackEvent({ name: 'signed_in' });
     };
 
     const onSignup = async () => {
@@ -105,6 +108,7 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
                 setError(t(toAuthMessageKey(signUpError)));
                 return;
             }
+            trackEvent({ name: 'account_created' });
             if (!data.session) {
                 // Confirmation email activée côté projet : pas de session immédiate
                 setInfo(t('auth:banners.accountCreated'));

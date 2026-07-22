@@ -26,10 +26,7 @@ export async function loadTelemetryPreference(kind: TelemetryKind): Promise<bool
     return enabled;
 }
 
-export async function setTelemetryPreference(
-    kind: TelemetryKind,
-    enabled: boolean,
-): Promise<void> {
+export async function setTelemetryPreference(kind: TelemetryKind, enabled: boolean): Promise<void> {
     // L'état mémoire d'abord : la bascule doit prendre effet immédiatement,
     // même si l'écriture disque traîne ou échoue.
     setTelemetryState(kind, enabled);
@@ -38,5 +35,8 @@ export async function setTelemetryPreference(
 
 /** À appeler au démarrage : hydrate l'état mémoire depuis le disque. */
 export async function hydrateTelemetryPreferences(): Promise<void> {
-    await Promise.all([loadTelemetryPreference('analytics'), loadTelemetryPreference('diagnostics')]);
+    await Promise.all([
+        loadTelemetryPreference('analytics'),
+        loadTelemetryPreference('diagnostics'),
+    ]);
 }

@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { Globe, Settings2, Users } from 'lucide-react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ import { useMyRank } from '@/features/leagues/use-my-rank';
 import { useMyStanding } from '@/features/leagues/use-my-standing';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
 import { useProfile } from '@/features/profile/use-profile';
+import { trackEvent } from '@/lib/analytics';
 import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
 import { useScreenInsets } from '@/tw/use-screen-insets';
 
@@ -54,6 +55,12 @@ export default function LeaderboardScreen() {
     const currentLeagueId = selectedLeagueId ?? leagues[0]?.id;
     const currentLeague = leagues.find((league) => league.id === currentLeagueId);
     const effectiveScope: Scope = leagues.length === 0 ? 'global' : scope;
+
+    // Un événement par portée consultée : au montage, puis à chaque bascule
+    // Ligues/Général.
+    useEffect(() => {
+        trackEvent({ name: 'leaderboard_viewed', props: { scope: effectiveScope } });
+    }, [effectiveScope]);
 
     const globalBoard = useGlobalLeaderboard(
         effectiveScope === 'global' ? competition.data?.id : undefined,

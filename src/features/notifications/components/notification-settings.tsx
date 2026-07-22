@@ -6,6 +6,7 @@ import { AppState, Linking, Platform } from 'react-native';
 
 import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { trackEvent } from '@/lib/analytics';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 import { deriveNotificationsUi, type PushPermission } from '../derive-notifications-ui';
 import { ensurePushPermission, registerPushToken } from '../register-push-token';
@@ -65,6 +66,7 @@ export function NotificationSettings({ userId }: { userId: string }) {
                 void registerPushToken();
             }
         }
+        if (next) trackEvent({ name: 'notifications_enabled' });
         updatePrefs.mutate({ ...prefs, master: next });
     };
 

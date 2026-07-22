@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { trackEvent } from '@/lib/analytics';
 import { supabase } from '@/lib/supabase';
 
 import type { LeagueColor } from './colors';
@@ -21,6 +22,7 @@ export function useCreateLeague() {
             return data;
         },
         onSuccess: () => {
+            trackEvent({ name: 'league_created' });
             queryClient.invalidateQueries({ queryKey: ['leagues'] });
         },
     });

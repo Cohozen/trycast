@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import type { PredictionDraft } from '@/features/predictions/types';
+import { trackEvent } from '@/lib/analytics';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -20,7 +21,15 @@ export function useUpsertPrediction(userId: string, competitionId: string | unde
             if (error) throw error;
             return data;
         },
-        onSuccess: () => {
+        onSuccess: (prediction) => {
+            // Le trigger predictions_set_updated_at ne touche updated_at qu'à
+            // l'UPDATE : à l'insertion les deux dates sont égales, ce qui
+            // distingue un premier prono d'une correction sans que l'appelant
+            // ait à le savoir.
+            trackEvent({
+                name: 'prediction_saved',
+                props: { first: prediction.created_at === prediction.updated_at },
+            });
             queryClient.invalidateQueries({ queryKey: ['predictions', competitionId] });
         },
     });

@@ -15,9 +15,11 @@ describe('toAptabaseProps', () => {
     });
 
     it('laisse les littéraux de chaîne intacts', () => {
-        expect(toAptabaseProps({ name: 'leaderboard_viewed', props: { scope: 'global' } })).toEqual({
-            scope: 'global',
-        });
+        expect(toAptabaseProps({ name: 'leaderboard_viewed', props: { scope: 'global' } })).toEqual(
+            {
+                scope: 'global',
+            },
+        );
     });
 });
 
@@ -40,7 +42,7 @@ describe('le catalogue interdit les données personnelles à la compilation', ()
     it('refuse une valeur hors du littéral fermé', () => {
         const event: AnalyticsEvent = {
             name: 'leaderboard_viewed',
-            // @ts-expect-error — seuls 'league' et 'global' sont admis
+            // @ts-expect-error — seuls 'leagues' et 'global' sont admis
             props: { scope: 'e2e.user1@trycast.local' },
         };
         expect(event.name).toBe('leaderboard_viewed');

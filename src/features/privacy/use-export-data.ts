@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { Share } from 'react-native';
 
+import { trackEvent } from '@/lib/analytics';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -18,6 +19,7 @@ export function useExportData() {
             if (error) throw error;
             const json = JSON.stringify(data, null, 2);
             await Share.share({ message: json });
+            trackEvent({ name: 'data_exported' });
         },
     });
 }

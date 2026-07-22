@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { trackEvent } from '@/lib/analytics';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -16,6 +17,7 @@ export function useJoinLeague() {
             return data;
         },
         onSuccess: () => {
+            trackEvent({ name: 'league_joined' });
             queryClient.invalidateQueries({ queryKey: ['leagues'] });
             queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
         },

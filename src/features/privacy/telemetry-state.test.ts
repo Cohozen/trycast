@@ -14,7 +14,7 @@ beforeEach(() => {
 });
 
 describe('parseStoredPreference', () => {
-    it("laisse la télémétrie active au premier lancement (aucune clé stockée)", () => {
+    it('laisse la télémétrie active au premier lancement (aucune clé stockée)', () => {
         expect(parseStoredPreference(null)).toBe(true);
         expect(parseStoredPreference(undefined)).toBe(true);
     });

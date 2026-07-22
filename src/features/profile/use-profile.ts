@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { trackEvent } from '@/lib/analytics';
 import { supabase } from '@/lib/supabase';
 
 export function useProfile(userId: string) {
@@ -45,6 +46,9 @@ export function useDeleteAccount() {
         mutationFn: async () => {
             const { error } = await supabase.functions.invoke('delete-account', { method: 'POST' });
             if (error) throw error;
+            // Avant le signOut : après, l'app bascule sur (auth) et démonte
+            // l'arbre, ce qui peut couper l'envoi en vol.
+            trackEvent({ name: 'account_deleted' });
             await supabase.auth.signOut();
         },
     });

@@ -35,8 +35,7 @@ export function initDiagnostics(): void {
         // il ne contient que des noms d'écrans et des appels réseau.
         enableAutoPerformanceTracing: false,
         beforeSend: (event) => (isTelemetryEnabled('diagnostics') ? event : null),
-        beforeBreadcrumb: (breadcrumb) =>
-            isTelemetryEnabled('diagnostics') ? breadcrumb : null,
+        beforeBreadcrumb: (breadcrumb) => (isTelemetryEnabled('diagnostics') ? breadcrumb : null),
     });
 }
 
