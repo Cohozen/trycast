@@ -60,7 +60,7 @@ Le lien de réinitialisation n'atterrissait nulle part (`resetPasswordForEmail` 
 - **Sentry (EU, Francfort)** : plantages et erreurs seuls (`tracesSampleRate: 0`, pas de rejeu de session), `sendDefaultPii: false`, **jamais de `setUser`**. Init au scope module pour attraper les plantages de démarrage, coupure par `beforeSend`.
 - Migration `20260722000200` : le `check` de `consents` s'élargit à `(communications, analytics, diagnostics)`. `e2e-privacy.sh` **11/11**.
 - **Vérifié en réel au simulateur** : `signed_in` puis `leaderboard_viewed {scope: leagues}` émis → interrupteur coupé → **plus aucun événement** → réactivé → `leaderboard_viewed {scope: global}` repart ; côté Sentry, une erreur volontaire donne `before send returned null, will not send event` quand l'interrupteur est coupé. Les traces de consentement sont bien écrites en base à chaque bascule. **Aucun `user` ni e-mail dans les charges utiles** (0 occurrence dans tout le journal).
-- ⚠️ **Réception côté tableaux de bord non vérifiée par Claude** (pas d'accès aux comptes Aptabase/Sentry) : à confirmer par Corentin.
+- **Réception confirmée par Corentin le 2026-07-22** : les événements arrivent dans le tableau de bord Aptabase et les erreurs dans celui de Sentry. La chaîne est validée de bout en bout.
 
 **Pièges rencontrés, documentés dans le skill `trycast-dev-builds`** :
 - `sentry-cli` fait **échouer tout build en erreur 65** sans `SENTRY_DISABLE_AUTO_UPLOAD=true` (organisation absente). Le mettre dans `.env` **ne marche pas** (Expo ne transmet que les `EXPO_PUBLIC_*` à Xcode) : le drapeau est porté par les scripts `npm run ios`/`android` et par les profils `development`/`preview` d'`eas.json`.
@@ -74,10 +74,10 @@ Le lien de réinitialisation n'atterrissait nulle part (`resetPasswordForEmail` 
 
 **Reste à faire** : appliquer `ios.privacyManifests` au premier build iOS (différé), remplir les fiches stores à la soumission, créer la boîte `contact@trycast.fr`, automatiser la purge des comptes inactifs (la règle des 3 ans est publiée, le cron n'existe pas), et brancher les source maps Sentry au premier build de release (`organization`/`project` dans le plugin `app.json` + `SENTRY_AUTH_TOKEN` en secret EAS).
 
-### ⚠️ Actions Corentin en attente
-1. **Rebuild du dev client Android** : `eas build -p android --profile development` (Sentry = module natif + plugin `app.json`). Le simulateur iOS est déjà rebuildé en local.
-2. **Redéployer le site** : la politique de confidentialité (RGPD + nouveau §8 sur la télémétrie) est commitée mais pas en ligne — un `git push` suffit, Vercel build sur push.
-3. **Confirmer la réception** dans les tableaux de bord Aptabase et Sentry (Claude n'a pas accès aux comptes).
+### Actions Corentin — lancées le 2026-07-22
+1. ~~Confirmer la réception dans les tableaux de bord~~ → **fait**, Aptabase et Sentry reçoivent.
+2. **Rebuild du dev client Android** : `eas build -p android --profile development` — **en file d'attente**. À installer sur le téléphone à la fin du build, puis vérifier que l'app démarre (Sentry = module natif : un dev client d'avant ce lot afficherait `Cannot find native module`).
+3. **Déploiement du site** : `git push` fait, build Vercel **en cours**. À vérifier une fois en ligne : `https://trycast.fr/confidentialite` doit afficher la date du 22 juillet 2026 et le §8 « Mesure d'usage et diagnostics » — c'est la page vers laquelle pointent les liens légaux de l'app.
 
 ### Site web / légal
 - ~~Relire et valider les pages légales~~ → **validées le 2026-07-20** : éditeur anonyme (particulier non-pro, LCEN 6-III-2 — ni nom ni adresse publics), contact `contact@trycast.fr`, bandeau brouillon retiré. À revoir au passage commercial/App Store (bascule éditeur « professionnel » ⇒ identité complète obligatoire).

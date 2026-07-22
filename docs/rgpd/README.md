@@ -23,6 +23,10 @@ plantages, e-mailing, hébergeur), il faut mettre à jour **dans le même lot** 
 3. `web/src/pages/confidentialite.astro` (la version publique)
 4. Les déclarations des stores si l'app est déjà publiée
 
+Côté code, la mécanique de la télémétrie (Aptabase, Sentry) est documentée dans le skill
+`trycast-telemetry` : catalogue d'événements typé, garde-fou par préférence locale, pièges
+de build.
+
 ## Ce qui est déjà en place côté code
 
 - **Portabilité** : Edge Function `export-data`, branchée sur Réglages → Confidentialité

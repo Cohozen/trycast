@@ -76,6 +76,7 @@ L'app tourne dans un dev build (`expo-dev-client`), pas Expo Go. **Toute lib nat
 - **Télémétrie en service** : **Aptabase** (EU, sessions anonymes) pour la mesure d'usage, **Sentry** (EU, Francfort) pour les plantages. Les deux sont **actifs par défaut et désactivables** dans Réglages → Confidentialité, et **inertes sans leur clé** (`EXPO_PUBLIC_APTABASE_KEY`, `EXPO_PUBLIC_SENTRY_DSN`) — la CI et un clone frais tournent sans configuration
 - Le garde-fou runtime est une **préférence locale** (`src/features/privacy/telemetry-state.ts`, lu de façon synchrone), **pas** la table `consents` : les SDK démarrent avant toute session, or `consents` est indexée sur `auth.uid()`. La table est la trace horodatée du choix
 - **Nouvel événement de mesure = une entrée dans le catalogue typé** `src/lib/analytics-events.ts`. Y passer un identifiant, un pseudo ou un e-mail est une erreur de compilation (verrouillée par des `@ts-expect-error`) — ne jamais contourner en élargissant le type des propriétés
+- Détails, pièges de build (erreur 65 de `sentry-cli`) et procédure de vérification : skill `trycast-telemetry`
 - Vérification : `bash scripts/e2e-privacy.sh` et `scripts/e2e-waitlist.sql`
 
 ## Secrets
