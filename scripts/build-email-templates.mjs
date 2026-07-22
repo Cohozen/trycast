@@ -26,10 +26,10 @@
 
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const OUT_DIR = join(ROOT, 'supabase', 'templates');
+export const OUT_DIR = join(ROOT, 'supabase', 'templates');
 const SITE = 'https://www.trycast.fr';
 
 /* ---- Tokens du design system, recopiés en hex (aucun var() en e-mail) ---- */
@@ -95,7 +95,7 @@ const callout = (html) => `
                                 </tr>
                             </table>`;
 
-const render = ({ preheader, title, blocks }) => `<!doctype html>
+export const render = ({ preheader, title, blocks }) => `<!doctype html>
 <html lang="fr" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -160,9 +160,11 @@ ${blocks.join('\n')}
 
 /* ---- Les 7 e-mails ---- */
 
-const TEMPLATES = [
+export const TEMPLATES = [
     {
         file: 'confirmation.html',
+        key: 'confirmation',
+        subject: 'Confirme ton adresse e-mail',
         preheader: 'Confirme ton adresse pour activer ton compte TryCast.',
         title: 'Bienvenue dans TryCast',
         blocks: [
@@ -178,6 +180,8 @@ const TEMPLATES = [
     },
     {
         file: 'recovery.html',
+        key: 'recovery',
+        subject: 'Ton code pour réinitialiser ton mot de passe',
         preheader: 'Ton code pour choisir un nouveau mot de passe.',
         title: 'Nouveau mot de passe',
         blocks: [
@@ -192,6 +196,8 @@ const TEMPLATES = [
     },
     {
         file: 'email-change.html',
+        key: 'email_change',
+        subject: 'Confirme ta nouvelle adresse e-mail',
         preheader: 'Confirme le changement d’adresse e-mail de ton compte.',
         title: 'Confirme ta nouvelle adresse',
         blocks: [
@@ -217,6 +223,8 @@ const TEMPLATES = [
     // S'il est activé un jour, ajouter le template avant, sinon le défaut anglais partira.
     {
         file: 'invite.html',
+        key: 'invite',
+        subject: 'Tu es invité·e sur TryCast',
         preheader: 'Tu es invité·e à rejoindre TryCast.',
         title: 'Tu es invité·e sur TryCast',
         blocks: [
@@ -230,6 +238,8 @@ const TEMPLATES = [
     },
     {
         file: 'reauthentication.html',
+        key: 'reauthentication',
+        subject: 'Ton code de vérification TryCast',
         preheader: 'Ton code de vérification TryCast.',
         title: 'Code de vérification',
         blocks: [
@@ -242,6 +252,8 @@ const TEMPLATES = [
     },
     {
         file: 'password-changed-notification.html',
+        key: 'password_changed_notification',
+        subject: 'Ton mot de passe TryCast a été modifié',
         preheader: 'Le mot de passe de ton compte TryCast vient d’être modifié.',
         title: 'Ton mot de passe a changé',
         blocks: [
@@ -260,6 +272,8 @@ const TEMPLATES = [
     },
     {
         file: 'email-changed-notification.html',
+        key: 'email_changed_notification',
+        subject: "L'adresse e-mail de ton compte TryCast a changé",
         preheader: 'L’adresse e-mail de ton compte TryCast vient de changer.',
         title: 'Ton adresse e-mail a changé',
         blocks: [
@@ -285,34 +299,52 @@ const TEMPLATES = [
 
 /* ---- Écriture / vérification ---- */
 
-const check = process.argv.includes('--check');
-mkdirSync(OUT_DIR, { recursive: true });
-
-let drifted = 0;
-for (const template of TEMPLATES) {
-    const html = render(template);
-    const path = join(OUT_DIR, template.file);
-    if (check) {
-        let current = null;
-        try {
-            current = readFileSync(path, 'utf8');
-        } catch {
-            /* fichier absent : traité comme une dérive */
-        }
-        if (current !== html) {
-            console.error(`✗ ${template.file} a dérivé de scripts/build-email-templates.mjs`);
-            drifted += 1;
-        }
-        continue;
+/** Les sujets vivent ici ; config.toml en garde une copie pour `supabase start`. */
+function checkConfigTomlSubjects() {
+    const toml = readFileSync(join(ROOT, 'supabase', 'config.toml'), 'utf8');
+    const missing = TEMPLATES.filter(({ subject }) => !toml.includes(`subject = "${subject}"`));
+    for (const { key } of missing) {
+        console.error(`✗ config.toml : sujet désynchronisé pour ${key}`);
     }
-    writeFileSync(path, html, 'utf8');
-    console.log(`✓ supabase/templates/${template.file}`);
+    return missing.length;
 }
 
-if (check) {
-    if (drifted > 0) {
-        console.error(`\n${drifted} template(s) à régénérer : npm run emails:build`);
-        process.exit(1);
+function main() {
+    const check = process.argv.includes('--check');
+    mkdirSync(OUT_DIR, { recursive: true });
+
+    let drifted = 0;
+    for (const template of TEMPLATES) {
+        const html = render(template);
+        const path = join(OUT_DIR, template.file);
+        if (check) {
+            let current = null;
+            try {
+                current = readFileSync(path, 'utf8');
+            } catch {
+                /* fichier absent : traité comme une dérive */
+            }
+            if (current !== html) {
+                console.error(`✗ ${template.file} a dérivé de scripts/build-email-templates.mjs`);
+                drifted += 1;
+            }
+            continue;
+        }
+        writeFileSync(path, html, 'utf8');
+        console.log(`✓ supabase/templates/${template.file}`);
     }
-    console.log(`✓ ${TEMPLATES.length} templates à jour`);
+
+    if (check) {
+        drifted += checkConfigTomlSubjects();
+        if (drifted > 0) {
+            console.error(`\n${drifted} écart(s) : npm run emails:build, puis recaler config.toml`);
+            process.exit(1);
+        }
+        console.log(`✓ ${TEMPLATES.length} templates à jour, sujets config.toml en phase`);
+    }
+}
+
+// Exécuté en CLI uniquement : scripts/push-email-config.mjs importe ce module.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+    main();
 }
