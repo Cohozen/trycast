@@ -114,17 +114,21 @@ export default function ResetPasswordScreen() {
                     <Text className="font-body-semibold text-[13px] text-text-muted">
                         {t('auth:fields.resetCode.label')}
                     </Text>
-                    <CodeInput
-                        accessibilityLabel={t('auth:fields.resetCode.label')}
-                        autoFocus
-                        error={!!fieldErrors.code}
-                        keyboardType="number-pad"
-                        length={RESET_CODE_LENGTH}
-                        onChange={setCode}
-                        sanitize={sanitizeResetCodeInput}
-                        textContentType="oneTimeCode"
-                        value={code}
-                    />
+                    {/* self-start : les cases se calent à gauche comme les autres
+                        champs (la primitive centre, ce dont les ligues ont besoin) */}
+                    <View className="self-start">
+                        <CodeInput
+                            accessibilityLabel={t('auth:fields.resetCode.label')}
+                            autoFocus
+                            error={!!fieldErrors.code}
+                            keyboardType="number-pad"
+                            length={RESET_CODE_LENGTH}
+                            onChange={setCode}
+                            sanitize={sanitizeResetCodeInput}
+                            textContentType="oneTimeCode"
+                            value={code}
+                        />
+                    </View>
                     {fieldErrors.code ? (
                         <Text className="font-body text-caption text-accent">
                             {fieldErrors.code}
