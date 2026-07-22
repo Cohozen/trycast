@@ -87,9 +87,3 @@ seed-test-scoring.sql  ·  seed-test-leagues.sql
 `seed-competitions.sql` est indépendant et **idempotent** (upsert sur le slug) : les compétitions réelles du pipeline.
 
 `admin-set-tries.sql` n'est pas un seed : saisie manuelle des essais d'un match terminé, utile tant qu'aucune interface admin n'existe.
-
----
-
-## Vestige
-
-`reset-project.js` vient du template `create-expo-app` (script `npm run reset-project`). Il **déplace `src/` et `scripts/` dans `example/`** pour repartir d'une app vierge — sans objet ici, et destructeur s'il est lancé par mégarde.
