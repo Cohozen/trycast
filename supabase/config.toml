@@ -282,12 +282,12 @@ content_path = "./supabase/templates/reauthentication.html"
 [auth.email.notification.password_changed]
 enabled = true
 subject = "Ton mot de passe TryCast a été modifié"
-content_path = "./supabase/templates/password-changed-notification.html"
+content_path = "./templates/password-changed-notification.html"
 
 [auth.email.notification.email_changed]
 enabled = true
 subject = "L'adresse e-mail de ton compte TryCast a changé"
-content_path = "./supabase/templates/email-changed-notification.html"
+content_path = "./templates/email-changed-notification.html"
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.
