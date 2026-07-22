@@ -53,7 +53,7 @@ EMAIL1=e2e.user1@trycast.local EMAIL2=e2e.user2@trycast.local PASSWORD=motdepass
 | `e2e-scoring.sh` | Barème lisible mais inviolable, `apply_match_scores` verrouillée | + `seed-test-scoring.sql` |
 | `e2e-leagues.sh` | Invisibilité aux non-membres, anti-énumération, quitter/exclure | + `seed-test-leagues.sql` |
 | `e2e-notifications.sh` | Tokens push par RPC, isolation des préférences | `seed-test-users.sql` |
-| `e2e-privacy.sh` | `consents` append-only, Edge Function `export-data` | `seed-test-users.sql` |
+| `e2e-privacy.sh` | `consents` append-only, Edge Function `export-data`, étanchéité des tables waitlist | `seed-test-users.sql` |
 | `e2e-email.sh` | Transport SMTP Resend | aucun |
 | `e2e-password-reset.sh` | Reset par code : usage unique, ancien mot de passe révoqué | aucun |
 
@@ -77,6 +77,8 @@ EMAIL=une.vraie@adresse.fr CODE=418207 bash scripts/e2e-password-reset.sh  # dé
 ### Côté serveur
 
 `e2e-scoring.sql` vérifie le comportement de la RPC `apply_match_scores` elle-même (points, idempotence, passes 1 et 2, ré-agrégation des classements) — à exécuter dans le SQL editor ou via le MCP Supabase, après avoir rejoué `seed-test-scoring.sql`.
+
+`e2e-waitlist.sql` vérifie l'anti-spam de la liste d'attente : plus aucune IP en clair (`ip_hash` en sha256 hex), rate limit de 3/h par IP intact après le passage au haché, refus silencieux au-delà, sel unique du jour. Idempotent — il nettoie ses propres données.
 
 ---
 

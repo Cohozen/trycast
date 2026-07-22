@@ -1,7 +1,7 @@
 # TryCast — Dashboard
 
 > Suivi d'avancement et décisions. Mis à jour à la fin de chaque session.
-> Dernière mise à jour : **2026-07-22 (bis)** (**e-mails d'auth en français en ligne** + **reset par code OTP complété et validé en réel** : renvoi du code avec décompte, saisie en 6 cases, script E2E 7/7 — le bloquant beta est levé).
+> Dernière mise à jour : **2026-07-22 (ter)** (**mise en conformité RGPD avant la beta** : liens légaux dans l'app, politique de confidentialité complétée, `docs/rgpd/` créé, IP de la waitlist hachées — analytics et crash reporting arbitrés mais reportés au lot suivant).
 
 ## Avancement des lots
 
@@ -42,9 +42,29 @@ Le lien de réinitialisation n'atterrissait nulle part (`resetPasswordForEmail` 
 
 **Validé de bout en bout le 2026-07-22** avec un vrai code reçu par e-mail (`e2e-password-reset.sh`, 7/7) : mauvais code refusé en 403 `otp_expired`, code vérifié et session ouverte, nouveau mot de passe enregistré, connexion OK avec le nouveau, **ancien mot de passe refusé** (la seule assertion qui prouve le reset), code à usage unique, renvoi rapproché refusé en 429. **Le bloquant beta est levé.**
 
+### RGPD & analytics
+
+**Conformité livrée le 2026-07-22 (ter)** (5 commits `29b192c`→`49e8d00`). Ce qui manquait a été traité :
+
+- **Liens légaux dans l'app** (bloquant App Store — rien n'y menait) : `src/components/legal-links.tsx`, 3 rangées dans la section À propos des Réglages, ouvertes par `expo-web-browser` (déjà en dépendance, **aucun rebuild**). URLs dans `src/lib/urls.ts` sur la base `WEB_BASE_URL` existante.
+- **Mention à l'inscription** : `src/features/auth/components/legal-notice.tsx`, sous le bouton. **Mention informative et non case à cocher** — la base légale du compte est le contrat, pas le consentement ; une case obligatoire ne serait pas un consentement libre.
+- **Politique de confidentialité complétée** : avatars, IP waitlist, bases légales par traitement, sous-traitants au complet (dont **Expo puis FCM/Apple** pour les push, jamais mentionnés), nouveau §3 sur ce que voient les autres membres d'une ligue, suppression des comptes inactifs à **3 ans**, âge minimum 15 ans, absence d'analytics rendue explicite.
+- **`docs/rgpd/`** : registre des traitements (art. 30 — l'exemption « moins de 250 salariés » ne joue pas, les traitements sont réguliers), sous-traitants, procédure de réponse aux demandes de droits, brouillon des fiches Data Safety / Nutrition Labels + bloc `ios.privacyManifests`.
+- **IP de la waitlist hachées** (migration `20260722000100`) : `waitlist_attempts.ip` → `ip_hash` = sha256(ip ‖ sel du jour), sel tiré au hasard chaque jour dans `waitlist_salts` et purgé avec les tentatives. Rate limit 3/h **vérifié inchangé** en réel. `scripts/e2e-waitlist.sql` (5 assertions) + `e2e-privacy.sh` **10/10**.
+- Vérifié au simulateur iOS, **clair et sombre** : les 3 rangées ouvrent bien le navigateur intégré, la mention d'inscription s'affiche avec ses deux liens.
+
+**Décisions actées pour la mesure (lot suivant, rien n'est branché) :**
+- **Analytics produit = Aptabase (EU)** — sessions anonymes, sel rotatif quotidien, pas d'identifiant utilisateur. Ses dépendances (`expo-application`, `expo-device`, `expo-localization`) sont déjà installées : **à confirmer qu'aucun rebuild n'est requis**. Ne jamais passer d'`user_id`, de pseudo ni d'e-mail dans les propriétés d'événement.
+- **Crash reporting = Sentry région EU** — module natif ⇒ **rebuild du dev client obligatoire**, `sendDefaultPii: false`, source maps via EAS.
+- **Site vitrine : rien** — la courbe d'inscriptions se lit déjà dans `waitlist_signups.created_at`, et la promesse « aucun cookie de suivi » reste intacte.
+- À la mise en service : élargir le `check` de `consents` à `('communications', 'analytics', 'diagnostics')`, ajouter deux toggles dans `privacy-settings.tsx`, et **publier la section « Mesure d'audience et diagnostics » de la politique avant** le premier envoi de données.
+
+**Reste à faire** : appliquer `ios.privacyManifests` au premier build iOS (différé), remplir les fiches stores à la soumission, créer la boîte `contact@trycast.fr`, automatiser la purge des comptes inactifs (la règle des 3 ans est publiée, le cron n'existe pas).
+
 ### Site web / légal
 - ~~Relire et valider les pages légales~~ → **validées le 2026-07-20** : éditeur anonyme (particulier non-pro, LCEN 6-III-2 — ni nom ni adresse publics), contact `contact@trycast.fr`, bandeau brouillon retiré. À revoir au passage commercial/App Store (bascule éditeur « professionnel » ⇒ identité complète obligatoire).
-- **Brancher les URLs légales dans l'app** (footer Auth + Réglages, requis App Store) — pas encore fait ; le domaine est prêt (`https://trycast.fr/cgu`, `/confidentialite`, `/mentions-legales`).
+- ~~Brancher les URLs légales dans l'app~~ → **fait le 2026-07-22 (ter)** (Réglages + mention à l'inscription, cf. section RGPD ci-dessus).
+- **Redéployer le site** : la politique de confidentialité complétée est commitée mais pas encore en ligne (le lien depuis l'app affiche toujours la version du 15 juillet) — un `git push` suffit, Vercel build sur push.
 - **Créer la boîte `contact@trycast.fr`** (l'adresse est référencée partout sur le site).
 - ~~Domaine du site~~ → **fait le 2026-07-20** : `trycast.fr` branché sur Vercel (canonique `www.`, redirection 308 depuis l'apex).
 

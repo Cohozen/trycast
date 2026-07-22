@@ -67,6 +67,14 @@ L'app tourne dans un dev build (`expo-dev-client`), pas Expo Go. **Toute lib nat
 - Réinitialisation du mot de passe : **par code à 6 chiffres saisi dans l'app** (template `recovery` = `{{ .Token }}`, jamais un lien). Vérification en deux passes (le code n'est lisible que dans l'e-mail) : `EMAIL=… bash scripts/e2e-password-reset.sh` puis `EMAIL=… CODE=… bash scripts/e2e-password-reset.sh`
 - Templates d'e-mails : `supabase/templates/*.html` sont **générés** par `scripts/build-email-templates.mjs` (`npm run emails:build`, `npm run emails:check`) — ne jamais les éditer à la main. Mise en ligne par `npm run emails:push` (API Management, champs e-mail uniquement, `--dry-run` disponible) — **pas** `supabase config push`, qui pousse toute la config sans dry-run et échoue sur ce projet. Contraintes du HTML d'e-mail et pièges : skill `trycast-emails`
 - Outillage : `scripts/README.md` recense les scripts (e-mails, vérifications E2E et leurs seeds, ordre de seeding)
+- ⚠️ Piège `db push` : dans `supabase/config.toml`, les `content_path` de `[auth.email.template.*]` sont relatifs à la **racine du projet** (`./supabase/templates/…`) alors que ceux de `[auth.email.notification.*]` le sont au **dossier `supabase/`** (`./templates/…`). Aligner les deux blocs sur la même forme fait échouer `supabase db push` à la validation de la config, avant toute écriture
+
+## RGPD
+
+- Documentation de conformité dans **`docs/rgpd/`** : registre des traitements (art. 30), sous-traitants, procédure de réponse aux demandes de droits, brouillon des fiches stores. Rien de secret n'y figure — **jamais de nom réel ni d'adresse personnelle**, l'éditeur y est toujours `contact@trycast.fr`
+- **Un traitement se déclare avant sa mise en service.** Brancher un outil qui voit des données d'utilisateurs (analytics, crash reporting, e-mailing, hébergeur) impose de mettre à jour dans le **même lot** : `docs/rgpd/registre-des-traitements.md`, `docs/rgpd/sous-traitants.md`, `web/src/pages/confidentialite.astro` et, si l'app est publiée, les déclarations des stores
+- Décidé, pas encore branché : **Aptabase** (EU, sessions anonymes) pour la mesure d'usage et **Sentry région EU** pour les plantages. Sentry est un module natif ⇒ rebuild du dev client. Le `check` de la table `consents` devra être élargi à `('communications', 'analytics', 'diagnostics')`
+- Vérification : `bash scripts/e2e-privacy.sh` et `scripts/e2e-waitlist.sql`
 
 ## Secrets
 
