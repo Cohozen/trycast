@@ -1,3 +1,13 @@
+import { RESET_CODE_LENGTH } from './validation';
+
+/**
+ * Ne garde que les chiffres : le code est souvent recopié depuis l'e-mail avec
+ * des espaces, et un clavier numérique laisse quand même passer de la ponctuation.
+ */
+export function sanitizeResetCodeInput(raw: string): string {
+    return raw.replaceAll(/\D/g, '').slice(0, RESET_CODE_LENGTH);
+}
+
 /**
  * Renvoi du code de réinitialisation : GoTrue refuse deux e-mails de recovery
  * rapprochés pour un même compte (`max_frequency`, 60 s sur le projet hébergé)

@@ -1,8 +1,29 @@
 import { describe, expect, it } from 'vitest';
 
-import { RESEND_COOLDOWN_MS, resendCooldownSeconds } from './reset-code';
+import { RESEND_COOLDOWN_MS, resendCooldownSeconds, sanitizeResetCodeInput } from './reset-code';
 
 const T0 = 1_784_662_519_000;
+
+describe('sanitizeResetCodeInput', () => {
+    it('garde les 6 chiffres, y compris les zéros de tête', () => {
+        expect(sanitizeResetCodeInput('418207')).toBe('418207');
+        expect(sanitizeResetCodeInput('000000')).toBe('000000');
+    });
+
+    it('retire ce qui vient du copier-coller', () => {
+        expect(sanitizeResetCodeInput('418 207')).toBe('418207');
+        expect(sanitizeResetCodeInput('418-207')).toBe('418207');
+        expect(sanitizeResetCodeInput('code : 418207')).toBe('418207');
+    });
+
+    it('tronque au-delà de la longueur attendue', () => {
+        expect(sanitizeResetCodeInput('4182078901')).toBe('418207');
+    });
+
+    it("refuse les chiffres non latins, qu'un clavier localisé peut produire", () => {
+        expect(sanitizeResetCodeInput('١٢٣٤٥٦')).toBe('');
+    });
+});
 
 describe('resendCooldownSeconds', () => {
     it("autorise le renvoi quand aucun code n'a encore été envoyé", () => {

@@ -3,11 +3,12 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
+import { CodeInput } from '@/components/ui/code-input';
 import { Screen } from '@/components/ui/screen';
 import { TextField } from '@/components/ui/text-field';
 import { Toast } from '@/components/ui/toast';
 import { toAuthMessageKey } from '@/features/auth/errors';
-import { resendCooldownSeconds } from '@/features/auth/reset-code';
+import { resendCooldownSeconds, sanitizeResetCodeInput } from '@/features/auth/reset-code';
 import { useResetPassword } from '@/features/auth/use-reset-password';
 import {
     RESET_CODE_LENGTH,
@@ -107,18 +108,29 @@ export default function ResetPasswordScreen() {
             {resent ? <Toast message={t('auth:reset.resent')} tone="success" /> : null}
 
             <View className="gap-3.5">
-                <TextField
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    error={fieldErrors.code}
-                    keyboardType="number-pad"
-                    label={t('auth:fields.resetCode.label')}
-                    maxLength={RESET_CODE_LENGTH}
-                    onChangeText={setCode}
-                    placeholder={t('auth:fields.resetCode.placeholder')}
-                    textContentType="oneTimeCode"
-                    value={code}
-                />
+                {/* Cases séparées : le libellé et le message d'erreur que porte
+                    TextField sont reproduits ici avec les mêmes styles */}
+                <View className="w-full gap-1.5">
+                    <Text className="font-body-semibold text-[13px] text-text-muted">
+                        {t('auth:fields.resetCode.label')}
+                    </Text>
+                    <CodeInput
+                        accessibilityLabel={t('auth:fields.resetCode.label')}
+                        autoFocus
+                        error={!!fieldErrors.code}
+                        keyboardType="number-pad"
+                        length={RESET_CODE_LENGTH}
+                        onChange={setCode}
+                        sanitize={sanitizeResetCodeInput}
+                        textContentType="oneTimeCode"
+                        value={code}
+                    />
+                    {fieldErrors.code ? (
+                        <Text className="font-body text-caption text-accent">
+                            {fieldErrors.code}
+                        </Text>
+                    ) : null}
+                </View>
                 <TextField
                     autoCapitalize="none"
                     autoComplete="new-password"
