@@ -9,11 +9,11 @@ Les 7 e-mails d'auth (GoTrue) : confirmation d'inscription, réinitialisation de
 
 ## Ne jamais éditer `supabase/templates/*.html` à la main
 
-Ces fichiers sont **générés**. La source est `scripts/build-email-templates.mjs` :
+Ces fichiers sont **générés**. La source est `scripts/build-email-templates.mjs`, qui porte aussi **les sujets et les clés GoTrue** de chaque template :
 
 ```bash
 npm run emails:build   # régénère les 7 fichiers
-npm run emails:check   # échoue si un fichier a dérivé de sa source (garde-fou type app-version.test.ts)
+npm run emails:check   # échoue si un fichier a dérivé, ou si les sujets de config.toml ne correspondent plus
 ```
 
 Pourquoi un générateur : un e-mail HTML ne peut ni inclure un partiel ni charger une feuille de style externe, donc l'habillage commun (bandeau vert, bouton, encadré, pied de page) serait dupliqué 7 fois. Il vit une seule fois dans le script ; seul le contenu change d'un template à l'autre.
@@ -47,13 +47,31 @@ Pourquoi pas un lockup complet en image : la machine n'a **ni rasteriseur SVG av
 
 Les templates contiennent des `{{ .Variables }}` non rendues. Recette : copier les fichiers dans un dossier temporaire en substituant des valeurs d'exemple et en pointant le logo sur une copie locale, servir avec `python3 -m http.server`, puis ouvrir dans le panneau navigateur.
 
-## ⚠️ Mise en ligne : `supabase config push` est un piège
+## Mise en ligne : `npm run emails:push`, jamais `supabase config push`
 
-Les sujets FR et les `content_path` sont câblés dans `supabase/config.toml`, mais **`supabase config push` pousse toute la section `[auth]`**, pas seulement les templates — et la CLI **n'a pas de mode diff / dry-run**.
+```bash
+export SUPABASE_ACCESS_TOKEN='sbp_...'   # https://supabase.com/dashboard/account/tokens
+npm run emails:push -- --dry-run          # diff champ par champ, n'écrit rien
+npm run emails:push
+```
 
-Or le `config.toml` du repo **n'est pas un miroir du dashboard** : il contient encore `rate_limit.email_sent = 2` (le vrai plafond est à **30**), un `site_url` en `127.0.0.1`, et le bloc SMTP commenté. **Le pousser tel quel casserait la config Resend.**
+`scripts/push-email-config.mjs` PATCHe l'API Management avec les seuls champs e-mail (sujets, contenus, `mailer_otp_length`, activation des 2 notifications) et **relit la config après écriture** au lieu de se fier au code retour.
 
-Avant tout `config push` : aligner d'abord l'intégralité du `[auth]` sur les valeurs réelles du dashboard. Sinon, coller les templates à la main dans Authentication → Emails.
+**⚠️ Ne pas utiliser `supabase config push`**, pour deux raisons distinctes :
+
+1. Il pousse **toute** la configuration du projet, sans dry-run. Le `config.toml` a été aligné sur le live le 2026-07-21, mais toute dérive future (le bloc `[auth.email.smtp]` recommenté, `rate_limit.email_sent` revenu à 2) **débranche Resend** au passage. Les valeurs par défaut de `supabase init` sont des pièges : elles désactivaient aussi le TOTP.
+2. Il **échoue de toute façon** sur ce projet : `failed to read Storage config: SchemaError(Missing key at ["databasePoolMode"])` — la CLI lit toute la config distante avant de pousser et bute sur un décalage de schéma avec la plateforme (constaté en 2.106.0). L'échec est en lecture, donc rien n'est écrit.
+
+Le `[auth]` du `config.toml` reste la référence versionnée (et sert à `supabase start`), mais ce n'est plus le mécanisme de déploiement.
+
+### Comparer le repo au live
+
+```bash
+curl -s -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  https://api.supabase.com/v1/projects/bmdzadvugtkclnqjpndr/config/auth > ~/auth-live.json
+```
+
+⚠️ La réponse contient **`smtp_pass`** : fichier local uniquement, à supprimer après usage, jamais dans le repo. Correspondances utiles : `uri_allow_list` ↔ `additional_redirect_urls`, `mailer_autoconfirm` ↔ l'inverse d'`enable_confirmations`, `smtp_max_frequency` (secondes) ↔ `email.max_frequency`, `rate_limit_verify` ↔ `sign_in_sign_ups`, `rate_limit_otp` ↔ `token_verifications`.
 
 ## Reset de mot de passe : code OTP, pas de lien
 
