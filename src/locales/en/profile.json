@@ -117,6 +117,14 @@
                 "description": "Receive product news and updates by email.",
                 "since": "Accepted on {{date}}."
             },
+            "analytics": {
+                "label": "Usage measurement",
+                "description": "Anonymous stats on which features get used. No identifier, no personal data."
+            },
+            "diagnostics": {
+                "label": "Crash reports",
+                "description": "Send technical errors to help fix them. Neither your username nor your email."
+            },
             "export": {
                 "label": "Export my data",
                 "description": "Get a copy of your personal data."

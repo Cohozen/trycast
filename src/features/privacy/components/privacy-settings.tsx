@@ -11,6 +11,7 @@ import { i18n } from '@/lib/i18n';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 import { useCommunicationsConsent, useSetCommunicationsConsent } from '../use-consent';
 import { useExportData } from '../use-export-data';
+import { useTelemetrySetting } from '../use-telemetry-setting';
 
 /**
  * Section Confidentialité de l'écran Réglages (RGPD) : consentement aux
@@ -27,7 +28,27 @@ export function PrivacySettings({ userId }: { userId: string }) {
     const setConsent = useSetCommunicationsConsent(userId);
     const exportData = useExportData();
 
+    const analytics = useTelemetrySetting('analytics', userId);
+    const diagnostics = useTelemetrySetting('diagnostics', userId);
+
     const [exportError, setExportError] = useState<string | null>(null);
+
+    const telemetryRows = [
+        {
+            key: 'analytics',
+            label: t('profile:settings.privacy.analytics.label'),
+            description: t('profile:settings.privacy.analytics.description'),
+            enabled: analytics.enabled,
+            toggle: analytics.toggle,
+        },
+        {
+            key: 'diagnostics',
+            label: t('profile:settings.privacy.diagnostics.label'),
+            description: t('profile:settings.privacy.diagnostics.description'),
+            enabled: diagnostics.enabled,
+            toggle: diagnostics.toggle,
+        },
+    ];
 
     const granted = consent?.granted ?? false;
     const recordedAt =
@@ -75,6 +96,29 @@ export function PrivacySettings({ userId }: { userId: string }) {
                         onToggle={onToggleConsent}
                     />
                 </View>
+
+                {/* Télémétrie : mesure d'usage et diagnostics. Actives par
+                    défaut (opt-out), coupées par une préférence locale — cf.
+                    use-telemetry-setting.ts. */}
+                {telemetryRows.map((row) => (
+                    <View
+                        className="flex-row items-center gap-3 border-t border-border px-[15px] py-[13px]"
+                        key={row.key}>
+                        <View className="min-w-0 flex-1 gap-0.5">
+                            <Text className="font-body-semibold text-[15px] text-text">
+                                {row.label}
+                            </Text>
+                            <Text className="font-body text-[12px] leading-[16px] text-text-muted">
+                                {row.description}
+                            </Text>
+                        </View>
+                        <Switch
+                            accessibilityLabel={row.label}
+                            checked={row.enabled}
+                            onToggle={row.toggle}
+                        />
+                    </View>
+                ))}
 
                 {/* Export des données */}
                 <Pressable

@@ -117,6 +117,14 @@
                 "description": "Recevoir les actus produit et les nouveautés par e-mail.",
                 "since": "Accepté le {{date}}."
             },
+            "analytics": {
+                "label": "Mesure d'usage",
+                "description": "Statistiques anonymes sur les fonctionnalités utilisées. Aucun identifiant, aucune donnée personnelle."
+            },
+            "diagnostics": {
+                "label": "Rapports de plantage",
+                "description": "Envoyer les erreurs techniques pour aider à les corriger. Ni ton pseudo, ni ton e-mail."
+            },
             "export": {
                 "label": "Exporter mes données",
                 "description": "Recevoir une copie de tes données personnelles."

@@ -67,6 +67,25 @@ RES=$(curl -s -X POST "$URL/rest/v1/consents" \
 echo "$RES" | grep -q '42501' || fail "insert au nom d'autrui (attendu 42501, obtenu $RES)"
 ok "insert de consentement au nom d'un autre refusé"
 
+# Les types de télémétrie du Lot B sont acceptés, et le check reste fermé :
+# la table est la trace horodatée du choix (le garde-fou runtime, lui, est une
+# préférence locale à l'appareil — les SDK démarrent avant toute session).
+for TYPE in analytics diagnostics; do
+  RES=$(curl -s -X POST "$URL/rest/v1/consents" \
+    -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+    -H "Content-Type: application/json" -H "Prefer: return=representation" \
+    -d "{\"user_id\":\"$U1\",\"type\":\"$TYPE\",\"granted\":false}")
+  echo "$RES" | grep -q '"granted":false' || fail "insert consent $TYPE (obtenu $RES)"
+done
+ok "consentements analytics et diagnostics enregistrables"
+
+RES=$(curl -s -X POST "$URL/rest/v1/consents" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" \
+  -d "{\"user_id\":\"$U1\",\"type\":\"tracking_publicitaire\",\"granted\":true}")
+echo "$RES" | grep -q '23514' || fail "type de consentement inconnu (attendu 23514, obtenu $RES)"
+ok "type de consentement hors catalogue refusé"
+
 # Append-only : pas de grant update/delete → écriture directe refusée
 RES=$(curl -s -X PATCH "$URL/rest/v1/consents?type=eq.communications" \
   -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
