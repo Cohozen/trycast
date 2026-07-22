@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Screen } from '@/components/ui/screen';
 import { TextField } from '@/components/ui/text-field';
 import { Toast } from '@/components/ui/toast';
 import { toAuthMessageKey } from '@/features/auth/errors';
+import { resendCooldownSeconds } from '@/features/auth/reset-code';
 import { useResetPassword } from '@/features/auth/use-reset-password';
 import {
     RESET_CODE_LENGTH,
@@ -14,6 +15,7 @@ import {
     validatePasswordConfirmation,
     validateResetCode,
 } from '@/features/auth/validation';
+import { supabase } from '@/lib/supabase';
 import { Link, Text, View } from '@/tw';
 
 type FieldErrors = Partial<Record<'code' | 'password' | 'confirm', string | null>>;
@@ -25,7 +27,7 @@ type FieldErrors = Partial<Record<'code' | 'password' | 'confirm', string | null
  */
 export default function ResetPasswordScreen() {
     const { t } = useTranslation(['auth', 'common']);
-    const { email } = useLocalSearchParams<{ email: string }>();
+    const { email, sentAt } = useLocalSearchParams<{ email: string; sentAt?: string }>();
 
     const [code, setCode] = useState('');
     const [password, setPassword] = useState('');
@@ -33,6 +35,39 @@ export default function ResetPasswordScreen() {
     const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
     const [error, setError] = useState<string | null>(null);
     const resetPassword = useResetPassword();
+
+    const [lastSentAt, setLastSentAt] = useState(() => Number(sentAt) || Date.now());
+    const [resending, setResending] = useState(false);
+    const [resent, setResent] = useState(false);
+    const [now, setNow] = useState(() => Date.now());
+    const cooldown = resendCooldownSeconds(lastSentAt, now);
+    const cooling = cooldown > 0;
+
+    // Le tic n'existe que pendant le décompte : au-delà, plus rien ne bouge
+    useEffect(() => {
+        if (!cooling) {
+            return;
+        }
+        const id = setInterval(() => setNow(Date.now()), 1000);
+        return () => clearInterval(id);
+    }, [cooling]);
+
+    const onResend = async () => {
+        setError(null);
+        setResent(false);
+        setResending(true);
+        const { error: resendError } = await supabase.auth.resetPasswordForEmail(email.trim());
+        setResending(false);
+        if (resendError) {
+            setError(t(toAuthMessageKey(resendError)));
+            return;
+        }
+        // Le serveur vient d'invalider le code précédent : on vide la saisie
+        setLastSentAt(Date.now());
+        setCode('');
+        setFieldErrors((previous) => ({ ...previous, code: null }));
+        setResent(true);
+    };
 
     const onSubmit = () => {
         setError(null);
@@ -69,6 +104,7 @@ export default function ResetPasswordScreen() {
             </View>
 
             {error ? <Toast message={error} tone="accent" /> : null}
+            {resent ? <Toast message={t('auth:reset.resent')} tone="success" /> : null}
 
             <View className="gap-3.5">
                 <TextField
@@ -114,6 +150,19 @@ export default function ResetPasswordScreen() {
                     />
                 </View>
             </View>
+
+            <Button
+                disabled={cooling || resending}
+                fullWidth
+                loading={resending}
+                onPress={onResend}
+                title={
+                    cooling
+                        ? t('auth:reset.resendIn', { seconds: cooldown })
+                        : t('auth:reset.resend')
+                }
+                variant="ghost"
+            />
 
             <Link
                 className="text-center font-body-medium text-[13px] text-text-muted"

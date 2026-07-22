@@ -33,7 +33,11 @@ export default function ForgotPasswordScreen() {
             setError(t(toAuthMessageKey(resetError)));
             return;
         }
-        router.push({ pathname: '/reset-password', params: { email: email.trim() } });
+        // `sentAt` amorce le décompte avant renvoi sur l'écran suivant
+        router.push({
+            pathname: '/reset-password',
+            params: { email: email.trim(), sentAt: String(Date.now()) },
+        });
     };
 
     return (
