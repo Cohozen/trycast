@@ -7,7 +7,8 @@
 **Responsable du traitement** : l'éditeur de TryCast, joignable à `contact@trycast.fr`.
 **Délégué à la protection des données** : aucun (non requis — pas de suivi à grande échelle,
 pas de données sensibles).
-**Dernière mise à jour** : 22 juillet 2026.
+**Dernière mise à jour** : 22 juillet 2026 (ajout des traitements §7 mesure d'usage et
+§8 diagnostics).
 
 Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](procedure-droits.md),
 [fiches-stores.md](fiches-stores.md). Version publique : `web/src/pages/confidentialite.astro`.
@@ -98,7 +99,35 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 | **Conservation** | 24 heures maximum (purge à chaque appel). Le sel est détruit avec les tentatives, ce qui rend l'empreinte non vérifiable a posteriori |
 | **Sécurité** | Tables sans policy RLS ni grant : illisibles par tout client. Vérifié par `scripts/e2e-waitlist.sql` et `scripts/e2e-privacy.sh` |
 
-## 7. Support et exercice des droits
+## 7. Mesure d'usage de l'application
+
+| | |
+|---|---|
+| **Finalité** | Savoir quelles fonctionnalités sont utilisées, pour décider quoi améliorer |
+| **Base légale** | Intérêt légitime — art. 6.1.f. Mesure d'audience anonyme, sans identifiant ni traceur : impact nul sur la vie privée, et désactivable à tout moment dans l'application |
+| **Personnes concernées** | Utilisateurs de l'application n'ayant pas coupé la mesure |
+| **Catégories de données** | 9 événements de parcours nommés (compte créé, pronostic enregistré, ligue créée ou rejointe, classement consulté, notifications activées, export demandé, compte supprimé), la version de l'app et le système d'exploitation. **Aucun identifiant utilisateur, aucun identifiant d'appareil** |
+| **Où** | Aptabase, région UE. Rien n'est stocké dans notre base |
+| **Destinataires** | Aptabase |
+| **Transferts hors UE** | Aucun |
+| **Conservation** | Selon la politique de rétention d'Aptabase ; les événements ne sont rattachables à personne |
+| **Sécurité** | Sessions anonymes par construction (sel rotatif quotidien côté Aptabase). Le catalogue d'événements est **typé** côté code (`src/lib/analytics-events.ts`) : transmettre un identifiant, un pseudo ou une adresse e-mail est une erreur de compilation, verrouillée par des tests |
+
+## 8. Diagnostics techniques (plantages)
+
+| | |
+|---|---|
+| **Finalité** | Être informé des plantages et erreurs pour les corriger |
+| **Base légale** | Intérêt légitime — art. 6.1.f (maintenir un service qui fonctionne), désactivable à tout moment |
+| **Personnes concernées** | Utilisateurs de l'application n'ayant pas coupé les diagnostics |
+| **Catégories de données** | Message et pile d'appel de l'erreur, modèle d'appareil, version du système et de l'app, fil d'Ariane des écrans traversés |
+| **Où** | Sentry, organisation en résidence de données européenne (Francfort) |
+| **Destinataires** | Sentry |
+| **Transferts hors UE** | Aucun |
+| **Conservation** | Selon la politique de rétention de Sentry (90 jours par défaut) |
+| **Sécurité** | `sendDefaultPii: false` et **aucun identifiant utilisateur attaché** (`Sentry.setUser` n'est jamais appelé). Périmètre restreint aux plantages : ni mesure de performance, ni rejeu de session |
+
+## 9. Support et exercice des droits
 
 | | |
 |---|---|
@@ -115,13 +144,11 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 ## Ce qui n'est pas traité
 
 À la date de ce registre, TryCast **ne met en œuvre aucun** des traitements suivants :
-mesure d'audience ou analytics, collecte de rapports de plantage, profilage, décision
-automatisée, publicité, géolocalisation, accès au carnet d'adresses, données sensibles au
-sens de l'article 9.
+profilage, décision automatisée, publicité ou suivi publicitaire, géolocalisation, accès au
+carnet d'adresses, rejeu de session, données sensibles au sens de l'article 9.
 
-L'ajout d'une mesure d'audience (Aptabase, EU) et d'un outil de suivi des plantages
-(Sentry, région EU) est prévu : **ce registre et la politique de confidentialité doivent
-être mis à jour avant leur mise en service**, pas après.
+La mesure d'usage et les diagnostics (§7 et §8) sont **anonymes, désactivables et sans
+identifiant** : ils ne servent ni à profiler ni à cibler qui que ce soit.
 
 ## Journaux techniques
 

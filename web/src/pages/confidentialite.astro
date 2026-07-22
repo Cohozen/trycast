@@ -59,8 +59,8 @@ import ContentLayout from '../layouts/content-layout.astro';
         </li>
         <li>
             <strong>Historique de tes consentements</strong> — la date à laquelle tu as accepté ou
-            refusé de recevoir nos communications. Base légale : notre obligation de pouvoir
-            prouver ton consentement.
+            refusé nos communications, la mesure d'usage et les rapports de plantage (voir §8).
+            Base légale : notre obligation de pouvoir prouver ton choix.
         </li>
     </ul>
     <p>
@@ -96,6 +96,9 @@ import ContentLayout from '../layouts/content-layout.astro';
             acheminement technique des notifications push jusqu'à ton
             téléphone. Ils reçoivent le jeton de ton appareil et le texte de la notification ; ce
             passage est imposé par les systèmes Android et iOS.</li>
+        <li><strong>Aptabase</strong> (Union européenne) et <strong>Sentry</strong> (Allemagne) —
+            mesure d'usage anonyme et rapports de plantage, tous deux désactivables. Détail au
+            paragraphe 8.</li>
         <li><strong>Highlightly</strong> — fournisseur des calendriers, résultats et
             cotes. <strong>Aucune donnée personnelle ne lui est transmise</strong> : les échanges ne
             portent que sur des matchs.</li>
@@ -151,16 +154,40 @@ import ContentLayout from '../layouts/content-layout.astro';
         créé par un enfant plus jeune, il est supprimé.
     </p>
 
-    <h2>8. Publicité et suivi</h2>
+    <h2>8. Mesure d'usage et diagnostics</h2>
     <p>
-        Pas de publicité, pas de suivi publicitaire, pas de revente de données. Ce site
-        n'utilise <strong>aucun cookie de suivi</strong> et l'application n'intègre
-        aujourd'hui <strong>aucun outil de mesure d'audience tiers</strong>. Si cela devait changer, cette
-        page serait mise à jour avant toute mise en service, et une mesure d'audience ne serait
-        activée qu'avec ton accord ou sous une forme strictement anonyme.
+        Pour savoir quelles fonctionnalités servent vraiment et pour être prévenu quand
+        l'application plante, elle transmet deux types d'informations techniques. Les deux se
+        coupent d'un geste dans <em>Réglages → Confidentialité</em>, et rien n'est perdu à les
+        refuser : l'application fonctionne exactement pareil.
+    </p>
+    <ul>
+        <li>
+            <strong>Mesure d'usage</strong> — une poignée d'événements nommés (« pronostic
+            enregistré », « ligue rejointe »…), avec la version de l'application et le système
+            d'exploitation. <strong>Aucun identifiant de compte ni d'appareil</strong> : ces
+            événements ne sont rattachables à personne, pas même à nous. Prestataire :
+            <strong>Aptabase</strong>, dans l'Union européenne.
+        </li>
+        <li>
+            <strong>Rapports de plantage</strong> — quand une erreur survient, son message, sa
+            pile d'appel technique, le modèle de ton appareil et les écrans traversés juste
+            avant. Ni ton pseudo, ni ton adresse e-mail, ni tes pronostics n'y figurent.
+            Prestataire : <strong>Sentry</strong>, sur des serveurs situés en Allemagne.
+        </li>
+    </ul>
+    <p>
+        Base légale : notre intérêt légitime à maintenir une application qui fonctionne. Rien de
+        tout cela ne sert à te profiler ni à te cibler.
     </p>
 
-    <h2>9. Sécurité</h2>
+    <h2>9. Publicité</h2>
+    <p>
+        Pas de publicité, pas de suivi publicitaire, pas de revente de données, aucun traceur
+        tiers à des fins commerciales. Ce site n'utilise <strong>aucun cookie de suivi</strong>.
+    </p>
+
+    <h2>10. Sécurité</h2>
     <p>
         Les échanges avec nos serveurs sont chiffrés (HTTPS/TLS) et ton mot de passe n'est jamais
         stocké en clair. L'accès aux données est cloisonné par des règles de sécurité appliquées
@@ -169,7 +196,7 @@ import ContentLayout from '../layouts/content-layout.astro';
         meilleurs délais en cas d'incident affectant tes données.
     </p>
 
-    <h2>10. Évolution de cette politique</h2>
+    <h2>11. Évolution de cette politique</h2>
     <p>
         Cette politique pourra être mise à jour, notamment au lancement de l'application. La date
         de dernière mise à jour figure en haut de page ; en cas de changement substantiel, tu seras

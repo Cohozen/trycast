@@ -73,7 +73,9 @@ L'app tourne dans un dev build (`expo-dev-client`), pas Expo Go. **Toute lib nat
 
 - Documentation de conformité dans **`docs/rgpd/`** : registre des traitements (art. 30), sous-traitants, procédure de réponse aux demandes de droits, brouillon des fiches stores. Rien de secret n'y figure — **jamais de nom réel ni d'adresse personnelle**, l'éditeur y est toujours `contact@trycast.fr`
 - **Un traitement se déclare avant sa mise en service.** Brancher un outil qui voit des données d'utilisateurs (analytics, crash reporting, e-mailing, hébergeur) impose de mettre à jour dans le **même lot** : `docs/rgpd/registre-des-traitements.md`, `docs/rgpd/sous-traitants.md`, `web/src/pages/confidentialite.astro` et, si l'app est publiée, les déclarations des stores
-- Décidé, pas encore branché : **Aptabase** (EU, sessions anonymes) pour la mesure d'usage et **Sentry région EU** pour les plantages. Sentry est un module natif ⇒ rebuild du dev client. Le `check` de la table `consents` devra être élargi à `('communications', 'analytics', 'diagnostics')`
+- **Télémétrie en service** : **Aptabase** (EU, sessions anonymes) pour la mesure d'usage, **Sentry** (EU, Francfort) pour les plantages. Les deux sont **actifs par défaut et désactivables** dans Réglages → Confidentialité, et **inertes sans leur clé** (`EXPO_PUBLIC_APTABASE_KEY`, `EXPO_PUBLIC_SENTRY_DSN`) — la CI et un clone frais tournent sans configuration
+- Le garde-fou runtime est une **préférence locale** (`src/features/privacy/telemetry-state.ts`, lu de façon synchrone), **pas** la table `consents` : les SDK démarrent avant toute session, or `consents` est indexée sur `auth.uid()`. La table est la trace horodatée du choix
+- **Nouvel événement de mesure = une entrée dans le catalogue typé** `src/lib/analytics-events.ts`. Y passer un identifiant, un pseudo ou un e-mail est une erreur de compilation (verrouillée par des `@ts-expect-error`) — ne jamais contourner en élargissant le type des propriétés
 - Vérification : `bash scripts/e2e-privacy.sh` et `scripts/e2e-waitlist.sql`
 
 ## Secrets

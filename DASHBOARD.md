@@ -1,7 +1,7 @@
 # TryCast — Dashboard
 
 > Suivi d'avancement et décisions. Mis à jour à la fin de chaque session.
-> Dernière mise à jour : **2026-07-22 (ter)** (**mise en conformité RGPD avant la beta** : liens légaux dans l'app, politique de confidentialité complétée, `docs/rgpd/` créé, IP de la waitlist hachées — analytics et crash reporting arbitrés mais reportés au lot suivant).
+> Dernière mise à jour : **2026-07-22 (quater)** (**conformité RGPD + télémétrie** : liens légaux dans l'app, politique complétée, `docs/rgpd/`, IP de la waitlist hachées, puis **Aptabase et Sentry en région EU** avec interrupteurs vérifiés en réel — reste un **rebuild du dev client Android** et le redéploiement du site).
 
 ## Avancement des lots
 
@@ -53,13 +53,31 @@ Le lien de réinitialisation n'atterrissait nulle part (`resetPasswordForEmail` 
 - **IP de la waitlist hachées** (migration `20260722000100`) : `waitlist_attempts.ip` → `ip_hash` = sha256(ip ‖ sel du jour), sel tiré au hasard chaque jour dans `waitlist_salts` et purgé avec les tentatives. Rate limit 3/h **vérifié inchangé** en réel. `scripts/e2e-waitlist.sql` (5 assertions) + `e2e-privacy.sh` **10/10**.
 - Vérifié au simulateur iOS, **clair et sombre** : les 3 rangées ouvrent bien le navigateur intégré, la mention d'inscription s'affiche avec ses deux liens.
 
-**Décisions actées pour la mesure (lot suivant, rien n'est branché) :**
+**Lot B livré le 2026-07-22 (quater)** — la mesure est en service.
+
+- **Socle de consentement local** : `telemetry-state.ts` (module pur, état mémoire lu de façon **synchrone** par le `beforeSend` de Sentry qui n'attend personne) + `telemetry-preference.ts` (AsyncStorage). **La table `consents` ne pouvait pas jouer ce rôle** : les SDK démarrent avant toute session, or ses policies sont indexées sur `auth.uid()` — un plantage sur l'écran de connexion échapperait au réglage. Elle reste la trace horodatée.
+- **Aptabase (EU)** : catalogue d'événements **typé** (`src/lib/analytics-events.ts`) — passer un `user_id`, un pseudo ou un e-mail est une **erreur de compilation**, verrouillée par 4 `@ts-expect-error` que `tsc` valide. 9 événements branchés sur les `onSuccess` existants. **Aucun rebuild** (le SDK 0.5.0 n'a aucune dépendance de production).
+- **Sentry (EU, Francfort)** : plantages et erreurs seuls (`tracesSampleRate: 0`, pas de rejeu de session), `sendDefaultPii: false`, **jamais de `setUser`**. Init au scope module pour attraper les plantages de démarrage, coupure par `beforeSend`.
+- Migration `20260722000200` : le `check` de `consents` s'élargit à `(communications, analytics, diagnostics)`. `e2e-privacy.sh` **11/11**.
+- **Vérifié en réel au simulateur** : `signed_in` puis `leaderboard_viewed {scope: leagues}` émis → interrupteur coupé → **plus aucun événement** → réactivé → `leaderboard_viewed {scope: global}` repart ; côté Sentry, une erreur volontaire donne `before send returned null, will not send event` quand l'interrupteur est coupé. Les traces de consentement sont bien écrites en base à chaque bascule. **Aucun `user` ni e-mail dans les charges utiles** (0 occurrence dans tout le journal).
+- ⚠️ **Réception côté tableaux de bord non vérifiée par Claude** (pas d'accès aux comptes Aptabase/Sentry) : à confirmer par Corentin.
+
+**Pièges rencontrés, documentés dans le skill `trycast-dev-builds`** :
+- `sentry-cli` fait **échouer tout build en erreur 65** sans `SENTRY_DISABLE_AUTO_UPLOAD=true` (organisation absente). Le mettre dans `.env` **ne marche pas** (Expo ne transmet que les `EXPO_PUBLIC_*` à Xcode) : le drapeau est porté par les scripts `npm run ios`/`android` et par les profils `development`/`preview` d'`eas.json`.
+- Un `expo run:ios` lancé alors que le shell était resté dans `web/` a **traité le site Astro comme un projet Expo** (ajout d'`expo`/`react`/`react-native` à `web/package.json`, création d'un `web/ios/`). Nettoyé ; toujours vérifier `pwd` avant un build.
+
+**Décisions actées pour la mesure :**
 - **Analytics produit = Aptabase (EU)** — sessions anonymes, sel rotatif quotidien, pas d'identifiant utilisateur. Ses dépendances (`expo-application`, `expo-device`, `expo-localization`) sont déjà installées : **à confirmer qu'aucun rebuild n'est requis**. Ne jamais passer d'`user_id`, de pseudo ni d'e-mail dans les propriétés d'événement.
 - **Crash reporting = Sentry région EU** — module natif ⇒ **rebuild du dev client obligatoire**, `sendDefaultPii: false`, source maps via EAS.
 - **Site vitrine : rien** — la courbe d'inscriptions se lit déjà dans `waitlist_signups.created_at`, et la promesse « aucun cookie de suivi » reste intacte.
 - À la mise en service : élargir le `check` de `consents` à `('communications', 'analytics', 'diagnostics')`, ajouter deux toggles dans `privacy-settings.tsx`, et **publier la section « Mesure d'audience et diagnostics » de la politique avant** le premier envoi de données.
 
-**Reste à faire** : appliquer `ios.privacyManifests` au premier build iOS (différé), remplir les fiches stores à la soumission, créer la boîte `contact@trycast.fr`, automatiser la purge des comptes inactifs (la règle des 3 ans est publiée, le cron n'existe pas).
+**Reste à faire** : appliquer `ios.privacyManifests` au premier build iOS (différé), remplir les fiches stores à la soumission, créer la boîte `contact@trycast.fr`, automatiser la purge des comptes inactifs (la règle des 3 ans est publiée, le cron n'existe pas), et brancher les source maps Sentry au premier build de release (`organization`/`project` dans le plugin `app.json` + `SENTRY_AUTH_TOKEN` en secret EAS).
+
+### ⚠️ Actions Corentin en attente
+1. **Rebuild du dev client Android** : `eas build -p android --profile development` (Sentry = module natif + plugin `app.json`). Le simulateur iOS est déjà rebuildé en local.
+2. **Redéployer le site** : la politique de confidentialité (RGPD + nouveau §8 sur la télémétrie) est commitée mais pas en ligne — un `git push` suffit, Vercel build sur push.
+3. **Confirmer la réception** dans les tableaux de bord Aptabase et Sentry (Claude n'a pas accès aux comptes).
 
 ### Site web / légal
 - ~~Relire et valider les pages légales~~ → **validées le 2026-07-20** : éditeur anonyme (particulier non-pro, LCEN 6-III-2 — ni nom ni adresse publics), contact `contact@trycast.fr`, bandeau brouillon retiré. À revoir au passage commercial/App Store (bascule éditeur « professionnel » ⇒ identité complète obligatoire).

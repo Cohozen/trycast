@@ -14,6 +14,8 @@
 | **Expo** | Passerelle d'envoi des notifications push | Jeton d'appareil, titre et corps de la notification | États-Unis | Oui |
 | **Google (Firebase Cloud Messaging)** | Livraison des notifications sur Android | Jeton d'appareil, contenu de la notification | États-Unis | Oui |
 | **Apple (APNs)** | Livraison des notifications sur iOS *(pas encore actif — iOS différé)* | Jeton d'appareil, contenu de la notification | États-Unis | Oui |
+| **Aptabase** | Mesure d'usage de l'application | Événements de parcours nommés, version de l'app, système d'exploitation. **Aucun identifiant** | UE (région encodée dans la clé `A-EU-…`) | Non |
+| **Sentry** | Rapports de plantage | Pile d'appel, modèle d'appareil, versions, fil d'Ariane des écrans | UE — Francfort (`ingest.de.sentry.io`) | Non |
 | **Highlightly** | Fournisseur de calendriers, résultats et cotes | **Aucune donnée personnelle** — les appels ne portent que sur des matchs | — | Sans objet |
 
 ## Points de vigilance
@@ -35,5 +37,16 @@
 
 - [ ] Créer la boîte `contact@trycast.fr` et noter ici son fournisseur (il devient
       sous-traitant du traitement « support », cf. registre §7).
-- [ ] Si Aptabase et Sentry sont mis en service, les ajouter à ce tableau **et** au §4 de
-      la politique de confidentialité **avant** le premier envoi de données.
+- [x] ~~Ajouter Aptabase et Sentry~~ → fait le 22 juillet 2026, avant leur mise en service.
+
+## Le cas d'Aptabase et de Sentry
+
+Les deux ont été retenus **pour leur région** : Aptabase encode l'UE dans la clé
+d'application, Sentry impose de choisir la résidence des données à la création de
+l'organisation — **ce choix est définitif**, il ne se change pas après coup. Recréer
+l'organisation ailleurs invaliderait les deux lignes ci-dessus.
+
+Aptabase ne pose pas d'identifiant d'appareil et fait tourner son sel chaque jour : ses
+événements ne sont rattachables à personne, ce qui le sort du champ des traceurs soumis à
+consentement. Sentry, lui, voit des piles d'appel : c'est la raison du `sendDefaultPii:
+false` et de l'absence totale de `setUser`.

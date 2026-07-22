@@ -39,6 +39,14 @@ npx expo prebuild --clean -p ios && npm run ios
 
 ⚠️ Le `--clean` est **obligatoire** : un `expo run:ios` sur un `ios/` préexistant ne ré-applique pas les config plugins (vécu : `NSPhotoLibraryUsageDescription` manquant → crash TCC au picker photo). Même logique côté Android local le jour venu.
 
+⚠️ **Toujours lancer via `npm run ios` / `npm run android`, jamais `npx expo run:*` à la main** (vécu 2026-07-22, Lot B) : depuis l'ajout de Sentry, ces scripts portent `SENTRY_DISABLE_AUTO_UPLOAD=true`. Sans ce drapeau, la phase de build `sentry-cli` tente d'envoyer les source maps, ne trouve ni organisation ni jeton, et **fait échouer tout le build en erreur 65** (`An organization ID or slug is required`). Le mettre dans `.env` **ne marche pas** : Expo ne transmet que les variables `EXPO_PUBLIC_*` à la phase Xcode. `ios/.xcode.env.local` marcherait aussi mais est effacé par `prebuild --clean`. Côté EAS, le drapeau est dans les profils `development` et `preview` d'`eas.json`. Il sautera le jour où les source maps de release seront branchées (organisation + projet dans le plugin `app.json` + `SENTRY_AUTH_TOKEN` en secret EAS).
+
+## Piège : le répertoire de travail du shell (vécu 2026-07-22)
+
+`npx expo run:ios` lancé alors que le shell était resté dans `web/` (après un `cd web && npm run check` d'une commande précédente) a **traité le site Astro comme un projet Expo** : ajout d'`expo`, `react` et `react-native` à `web/package.json`, création d'un `web/ios/` et d'un `web/app.json`, le tout en violation de la règle « pas de deps Expo dans le site ». Symptôme dans les logs : `Apple bundle identifier: com.cohozen.trycast-web` et `env: export PUBLIC_SUPABASE_KEY` (les variables du site, pas de l'app).
+
+**Toujours vérifier `pwd` avant une commande de build**, ou préfixer par un `cd` absolu. Le répertoire de travail de l'outil Bash persiste d'un appel à l'autre — c'est le même piège que zoxide sur `cd web`, par une autre porte.
+
 ## Piège : « mais je passe par Expo Go »
 
 Non. Depuis que le projet a `expo-dev-client`, le QR de `npx expo start` est un deep link `…expo-development-client/…` qui **ouvre le dev build installé, pas Expo Go** — même scanné depuis l'app Expo Go. Un vieil APK reste donc le runtime quoi qu'on scanne. (La touche `s` dans Metro force Expo Go, mais ce n'est plus un chemin supporté pour TryCast : push FCM et config native absents d'Expo Go.)

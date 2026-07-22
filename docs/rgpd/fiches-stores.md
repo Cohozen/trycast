@@ -5,8 +5,9 @@
 > Elles doivent rester cohérentes avec `web/src/pages/confidentialite.astro` et
 > [registre-des-traitements.md](registre-des-traitements.md).
 
-**Dernière mise à jour** : 22 juillet 2026 — état du produit : aucun analytics, aucun
-outil de suivi des plantages, aucune publicité.
+**Dernière mise à jour** : 22 juillet 2026 — état du produit : mesure d'usage anonyme
+(Aptabase, UE) et rapports de plantage (Sentry, UE) actifs par défaut et désactivables dans
+l'app ; **aucune publicité, aucun suivi publicitaire**.
 
 ## URL à fournir aux deux stores
 
@@ -36,12 +37,18 @@ outil de suivi des plantages, aucune publicité.
 | Contenu utilisateur | Autre contenu généré (pronostics) | Oui | Fonctionnalité de l'app |
 | Identifiants | Identifiant d'appareil (jeton de push) | Non | Fonctionnalité de l'app (notifications) |
 | Activité de l'app | Autres actions dans l'app (points, classements) | Oui | Fonctionnalité de l'app |
+| Activité de l'app | Interactions dans l'app | Non | **Analytics** |
+| Diagnostics de l'app | Journaux de plantage | Non | **Analytics** |
+| Diagnostics de l'app | Diagnostics | Non | **Analytics** |
 
-⚠️ Ne **pas** cocher « Analytics » ni « Personnalisation » tant qu'Aptabase n'est pas en
-service. Le jour où il l'est, ajouter une ligne « Activité de l'app → interactions dans
-l'app », finalité **Analytics** — et seulement si les événements sont rattachables à un
-appareil, ce qui n'est pas le cas du modèle anonyme d'Aptabase (à revérifier à ce
-moment-là).
+Les trois dernières lignes correspondent à Aptabase et Sentry. Elles sont déclarées
+**collectées mais non partagées**, facultatives (l'utilisateur peut les couper dans
+Réglages → Confidentialité), et **jamais** avec la finalité « Publicité ou marketing ».
+
+⚠️ Google demande de déclarer une donnée dès qu'elle **quitte l'appareil**, même anonyme :
+c'est pourquoi Aptabase est déclaré malgré l'absence d'identifiant. Ne pas s'en dispenser
+au motif que les événements ne sont rattachables à personne — le formulaire ne pose pas
+cette question.
 
 ---
 
@@ -61,7 +68,18 @@ l'autorisation de suivi.
 | Identifiers | User ID | App Functionality |
 | Usage Data | Product Interaction (points, classements) | App Functionality |
 
-**Données non liées à l'utilisateur** : aucune.
+**Données non liées à l'utilisateur** (« Data Not Linked to You ») :
+
+| Catégorie Apple | Détail | Finalité |
+|---|---|---|
+| Usage Data | Product Interaction | Analytics |
+| Diagnostics | Crash Data | App Functionality |
+| Diagnostics | Other Diagnostic Data | App Functionality |
+
+Ces trois lignes sont bien en **« non liées »** : Aptabase ne pose aucun identifiant, et
+Sentry n'attache aucun identifiant de compte (`sendDefaultPii: false`, jamais de
+`setUser`). Si cela devait changer un jour, elles basculeraient en « liées ».
+
 **Données utilisées pour le suivi** : aucune.
 
 ---
@@ -117,4 +135,7 @@ ce bloc puis rebuilder.
 - [ ] Nutrition Labels remplies sur App Store Connect
 - [ ] `ios.privacyManifests` ajouté à `app.json` et build iOS régénéré
 - [ ] Boîte `contact@trycast.fr` opérationnelle (adresse de support déclarée aux deux stores)
-- [ ] Si Aptabase / Sentry sont en service : déclarations mises à jour **avant** soumission
+- [x] ~~Si Aptabase / Sentry sont en service : déclarations mises à jour~~ → fait le
+      22 juillet 2026, avant leur mise en service
+- [ ] `SENTRY_AUTH_TOKEN` en secret EAS + `organization`/`project` dans le plugin
+      `app.json`, pour l'envoi des source maps au premier build de release
