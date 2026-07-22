@@ -575,17 +575,32 @@ export type Database = {
                 Row: {
                     created_at: string;
                     id: string;
-                    ip: string;
+                    ip_hash: string;
                 };
                 Insert: {
                     created_at?: string;
                     id?: string;
-                    ip: string;
+                    ip_hash: string;
                 };
                 Update: {
                     created_at?: string;
                     id?: string;
-                    ip?: string;
+                    ip_hash?: string;
+                };
+                Relationships: [];
+            };
+            waitlist_salts: {
+                Row: {
+                    day: string;
+                    salt: string;
+                };
+                Insert: {
+                    day: string;
+                    salt?: string;
+                };
+                Update: {
+                    day?: string;
+                    salt?: string;
                 };
                 Relationships: [];
             };

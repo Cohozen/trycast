@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 # Vérification E2E RGPD (Lot 7) : RLS own-rows de la table `consents` (append-only,
-# isolation par user, écriture directe update/delete refusée) et Edge Function
-# `export-data` (auth par JWT, JSON du compte appelant). La section export-data
-# est ignorée tant que l'EF n'est pas déployée (`supabase functions deploy export-data`).
+# isolation par user, écriture directe update/delete refusée), Edge Function
+# `export-data` (auth par JWT, JSON du compte appelant) et étanchéité des tables
+# de la waitlist (aucune lecture cliente). La section export-data est ignorée tant
+# que l'EF n'est pas déployée (`supabase functions deploy export-data`).
+#
+# Ce script n'utilise que la clé publishable : les assertions qui demandent un
+# accès privilégié (format du haché d'IP, plafond du rate limit) sont dans
+# scripts/e2e-waitlist.sql, à jouer dans l'éditeur SQL du dashboard.
+#
 # Prérequis : scripts/seed-test-users.sql.
 # Usage : EMAIL1=... EMAIL2=... PASSWORD=... ./scripts/e2e-privacy.sh
 set -euo pipefail
@@ -70,6 +76,19 @@ RES=$(curl -s -X DELETE "$URL/rest/v1/consents?type=eq.communications" \
   -H "apikey: $KEY" -H "Authorization: Bearer $T1")
 echo "$RES" | grep -q '42501' || fail "delete direct consents (attendu 42501, obtenu $RES)"
 ok "update/delete direct de consents refusé (append-only)"
+
+# --- waitlist : aucune donnée lisible côté client ---
+
+# RLS sans policy + aucun grant : les trois tables sont muettes pour anon comme
+# pour un utilisateur connecté. C'est ce qui protège la liste d'e-mails et, pour
+# waitlist_salts, le sel qui rend les hachés d'IP irréversibles.
+for TABLE in waitlist_signups waitlist_attempts waitlist_salts; do
+  RES=$(curl -s "$URL/rest/v1/$TABLE?select=*" -H "apikey: $KEY")
+  echo "$RES" | grep -qE '42501|PGRST' || fail "lecture de $TABLE (attendu un refus, obtenu $RES)"
+  RES=$(curl -s "$URL/rest/v1/$TABLE?select=*" -H "apikey: $KEY" -H "Authorization: Bearer $T1")
+  echo "$RES" | grep -qE '42501|PGRST' || fail "lecture de $TABLE authentifiée (attendu un refus, obtenu $RES)"
+done
+ok "tables waitlist illisibles (anon et authentifié)"
 
 # --- export-data : Edge Function ---
 
