@@ -429,6 +429,7 @@ export type Database = {
                     id: string;
                     locale: string | null;
                     username: string;
+                    username_chosen: boolean;
                 };
                 Insert: {
                     avatar_url?: string | null;
@@ -436,6 +437,7 @@ export type Database = {
                     id: string;
                     locale?: string | null;
                     username: string;
+                    username_chosen?: boolean;
                 };
                 Update: {
                     avatar_url?: string | null;
@@ -443,6 +445,7 @@ export type Database = {
                     id?: string;
                     locale?: string | null;
                     username?: string;
+                    username_chosen?: boolean;
                 };
                 Relationships: [];
             };
@@ -690,6 +693,23 @@ export type Database = {
                     p_rule_version: number;
                 };
                 Returns: Json;
+            };
+            claim_username: {
+                Args: { candidate: string };
+                Returns: {
+                    avatar_url: string | null;
+                    created_at: string;
+                    id: string;
+                    locale: string | null;
+                    username: string;
+                    username_chosen: boolean;
+                };
+                SetofOptions: {
+                    from: '*';
+                    to: 'profiles';
+                    isOneToOne: true;
+                    isSetofReturn: false;
+                };
             };
             create_league: {
                 Args: { p_color?: string; p_name: string };
