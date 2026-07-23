@@ -624,9 +624,65 @@ export type Database = {
             };
         };
         Views: {
-            [_ in never]: never;
+            admin_matches_pending_tries: {
+                Row: {
+                    api_game_id: number | null;
+                    away: string | null;
+                    away_score: number | null;
+                    away_tries: number | null;
+                    competition: string | null;
+                    etat: string | null;
+                    home: string | null;
+                    home_score: number | null;
+                    home_tries: number | null;
+                    kickoff_at: string | null;
+                    needs_review: boolean | null;
+                    pending_predictions: number | null;
+                    round: string | null;
+                };
+                Relationships: [];
+            };
         };
         Functions: {
+            admin_set_match_tries: {
+                Args: {
+                    p_api_game_id: number;
+                    p_away_tries: number;
+                    p_home_tries: number;
+                };
+                Returns: {
+                    api_game_id: number;
+                    away_score: number | null;
+                    away_team_id: string | null;
+                    away_tries: number | null;
+                    competition_id: string;
+                    home_score: number | null;
+                    home_team_id: string | null;
+                    home_tries: number | null;
+                    id: string;
+                    kickoff_at: string;
+                    live_away_score: number | null;
+                    live_home_score: number | null;
+                    live_period: string | null;
+                    live_updated_at: string | null;
+                    needs_review: boolean;
+                    odds_away: number | null;
+                    odds_captured_at: string | null;
+                    odds_draw: number | null;
+                    odds_home: number | null;
+                    odds_source: string | null;
+                    round: string | null;
+                    scored_at: string | null;
+                    status: Database['public']['Enums']['match_status'];
+                    tries_missing: boolean;
+                };
+                SetofOptions: {
+                    from: '*';
+                    to: 'matches';
+                    isOneToOne: true;
+                    isSetofReturn: false;
+                };
+            };
             apply_match_scores: {
                 Args: {
                     p_match_id: string;
