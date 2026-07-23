@@ -21,8 +21,24 @@ const AUTH_ERROR_KEYS = {
  */
 export type AuthMessageKey =
     | (typeof AUTH_ERROR_KEYS)[keyof typeof AUTH_ERROR_KEYS]
+    | 'auth:errors.playServicesUnavailable'
     | 'common:errors.network'
     | 'common:errors.generic';
+
+/**
+ * Échec propre à un fournisseur d'identité, porteur de sa clé i18n.
+ *
+ * Les SDK des fournisseurs ont leurs propres codes d'erreur, et les importer ici
+ * ferait entrer un module natif dans un fichier couvert par les tests unitaires.
+ * La traduction se fait donc au plus près du SDK (`google-sign-in.ts`), et cette
+ * classe transporte le résultat jusqu'à `toAuthMessageKey`.
+ */
+export class AuthProviderError extends Error {
+    constructor(readonly messageKey: AuthMessageKey) {
+        super(messageKey);
+        this.name = 'AuthProviderError';
+    }
+}
 
 /**
  * Traduit une erreur Supabase (ou réseau) en clé i18n affichable.
@@ -30,6 +46,9 @@ export type AuthMessageKey =
  * traduction se fait dans l'écran via t() (convention i18n du Lot 5.5).
  */
 export function toAuthMessageKey(error: unknown): AuthMessageKey {
+    if (error instanceof AuthProviderError) {
+        return error.messageKey;
+    }
     if (isAuthError(error) && error.code && error.code in AUTH_ERROR_KEYS) {
         return AUTH_ERROR_KEYS[error.code as keyof typeof AUTH_ERROR_KEYS];
     }

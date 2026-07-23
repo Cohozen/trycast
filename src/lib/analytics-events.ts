@@ -17,11 +17,23 @@
  * cadre.
  */
 
+/**
+ * Moyen de connexion. Littéraux fermés : le fournisseur, jamais l'identité.
+ * `'apple'` est déclaré d'avance pour que brancher Sign in with Apple ne
+ * demande pas de toucher au catalogue.
+ */
+type SignInMethodProp = { method: 'password' | 'google' | 'apple' };
+
 export type AnalyticsEvent =
-    /** Un compte vient d'être créé (signup accepté par Supabase). */
-    | { name: 'account_created' }
+    /**
+     * Un compte vient d'être créé. Émis au moment où le compte devient
+     * utilisable : signup accepté pour le parcours e-mail, choix du pseudo pour
+     * un parcours OAuth (avant, le compte existe mais n'a pas d'identité dans
+     * l'app).
+     */
+    | { name: 'account_created'; props: SignInMethodProp }
     /** Connexion réussie sur un compte existant. */
-    | { name: 'signed_in' }
+    | { name: 'signed_in'; props: SignInMethodProp }
     /** Un pronostic a été enregistré. `first` distingue la création d'une correction. */
     | { name: 'prediction_saved'; props: { first: boolean } }
     /** Une ligue a été créée. */

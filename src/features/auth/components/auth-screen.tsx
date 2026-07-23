@@ -1,14 +1,19 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Platform } from 'react-native';
 
 import { BrandMark } from '@/components/brand-mark';
 import { Button } from '@/components/ui/button';
+import { Divider } from '@/components/ui/divider';
 import { Screen } from '@/components/ui/screen';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { TextField } from '@/components/ui/text-field';
 import { Toast } from '@/components/ui/toast';
 import { LegalNotice } from '@/features/auth/components/legal-notice';
+import { OAuthButton } from '@/features/auth/components/oauth-button';
 import { toAuthMessageKey } from '@/features/auth/errors';
+import { resolveProviders } from '@/features/auth/providers';
+import { useOAuthSignIn } from '@/features/auth/use-oauth-sign-in';
 import {
     validateEmail,
     validatePassword,
@@ -23,6 +28,10 @@ import { Link, Text, View } from '@/tw';
 type AuthMode = 'login' | 'signup';
 
 type FieldErrors = Partial<Record<'username' | 'email' | 'password' | 'confirm', string | null>>;
+
+// Ni la plateforme ni les identifiants configurés ne changent pendant la vie de
+// l'app : la liste se résout une fois pour toutes.
+const PROVIDERS = resolveProviders(Platform.OS);
 
 /**
  * Écran d'authentification unique (maquette TryCast Auth) : zone de marque,
@@ -42,12 +51,14 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
     const [error, setError] = useState<string | null>(null);
     const [info, setInfo] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
+    const oauthSignIn = useOAuthSignIn();
 
     const switchMode = (next: AuthMode) => {
         setMode(next);
         setFieldErrors({});
         setError(null);
         setInfo(null);
+        oauthSignIn.reset();
     };
 
     const onLogin = async () => {
@@ -62,7 +73,7 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
             setError(t(toAuthMessageKey(signInError)));
             return;
         }
-        trackEvent({ name: 'signed_in' });
+        trackEvent({ name: 'signed_in', props: { method: 'password' } });
     };
 
     const onSignup = async () => {
@@ -108,7 +119,7 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
                 setError(t(toAuthMessageKey(signUpError)));
                 return;
             }
-            trackEvent({ name: 'account_created' });
+            trackEvent({ name: 'account_created', props: { method: 'password' } });
             if (!data.session) {
                 // Confirmation email activée côté projet : pas de session immédiate
                 setInfo(t('auth:banners.accountCreated'));
@@ -119,6 +130,12 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
     };
 
     const isLogin = mode === 'login';
+    // Un fournisseur sert indifféremment à se connecter et à s'inscrire : la
+    // mention légale doit donc suivre les boutons jusque sur l'onglet Connexion,
+    // sinon elle disparaît du parcours d'inscription le plus court.
+    const showsLegalNotice = !isLogin || PROVIDERS.length > 0;
+    // Erreur du formulaire ou du fournisseur : même bandeau, une seule à la fois.
+    const displayedError = error ?? (oauthSignIn.error && t(toAuthMessageKey(oauthSignIn.error)));
 
     return (
         <Screen contentClassName="max-w-[440px] gap-5 px-6 pb-8">
@@ -141,8 +158,25 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
                 value={mode}
             />
 
-            {error ? <Toast message={error} tone="accent" /> : null}
+            {displayedError ? <Toast message={displayedError} tone="accent" /> : null}
             {info ? <Toast message={info} tone="success" /> : null}
+
+            {PROVIDERS.length > 0 ? (
+                <View className="gap-3">
+                    {PROVIDERS.map((provider) => (
+                        <OAuthButton
+                            disabled={oauthSignIn.isPending}
+                            key={provider.id}
+                            loading={
+                                oauthSignIn.isPending && oauthSignIn.variables?.id === provider.id
+                            }
+                            onPress={oauthSignIn.mutate}
+                            provider={provider}
+                        />
+                    ))}
+                    <Divider label={t('auth:dividers.or')} />
+                </View>
+            ) : null}
 
             {isLogin ? (
                 <View className="gap-3.5">
@@ -233,9 +267,10 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
                             title={t('auth:actions.signup')}
                         />
                     </View>
-                    <LegalNotice />
                 </View>
             )}
+
+            {showsLegalNotice ? <LegalNotice /> : null}
         </Screen>
     );
 }

@@ -4,7 +4,7 @@ import { type AnalyticsEvent, toAptabaseProps } from './analytics-events';
 
 describe('toAptabaseProps', () => {
     it("n'envoie aucune propriété pour un événement qui n'en déclare pas", () => {
-        expect(toAptabaseProps({ name: 'account_created' })).toBeUndefined();
+        expect(toAptabaseProps({ name: 'league_created' })).toBeUndefined();
         expect(toAptabaseProps({ name: 'league_joined' })).toBeUndefined();
     });
 
@@ -26,8 +26,17 @@ describe('toAptabaseProps', () => {
 describe('le catalogue interdit les données personnelles à la compilation', () => {
     it("refuse une propriété d'identification sur un événement sans propriétés", () => {
         // @ts-expect-error — aucun événement ne doit pouvoir porter d'user_id
-        const event: AnalyticsEvent = { name: 'account_created', props: { user_id: 'abc' } };
-        expect(event.name).toBe('account_created');
+        const event: AnalyticsEvent = { name: 'league_created', props: { user_id: 'abc' } };
+        expect(event.name).toBe('league_created');
+    });
+
+    it("refuse un moyen de connexion hors des littéraux (l'identité n'y passe pas)", () => {
+        const event: AnalyticsEvent = {
+            name: 'signed_in',
+            // @ts-expect-error — seuls 'password', 'google' et 'apple' sont admis
+            props: { method: 'corentin@trycast.fr' },
+        };
+        expect(event.name).toBe('signed_in');
     });
 
     it('refuse une propriété non déclarée sur un événement qui en a', () => {
