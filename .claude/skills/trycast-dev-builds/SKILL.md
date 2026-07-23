@@ -50,6 +50,15 @@ npx expo prebuild --clean -p ios && npm run ios
 
 Toute future dépendance de l'écosystème Google/Firebase côté iOS peut rallonger cette liste : lire le nom des pods cités dans le message d'erreur et les y ajouter. **Android n'est pas concerné.**
 
+⚠️ **`pod install` échoue en `Encoding::CompatibilityError` tant que la locale du shell n'est pas UTF-8** (vécu 2026-07-23, ajout de `react-native-keyboard-controller`). Message : *« Unicode Normalization not appropriate for ASCII-8BIT (Encoding::CompatibilityError) »* au tout début de l'étape CocoaPods du `prebuild --clean`. Cause : le shell non-interactif de l'agent tourne avec `LANG` vide / `LC_CTYPE=C`, et CocoaPods normalise le chemin d'installation. Correctif : préfixer les commandes de build par la locale UTF-8. Le `prebuild` régénère quand même `ios/`, seul `pod install` plante — on peut donc relancer les pods seuls puis le build.
+
+```bash
+LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 npx expo prebuild --clean -p ios
+# ou, si prebuild a déjà généré ios/ et n'a planté qu'aux pods :
+cd ios && LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 pod install && cd ..
+LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 npm run ios
+```
+
 ⚠️ **Toujours lancer via `npm run ios` / `npm run android`, jamais `npx expo run:*` à la main** (vécu 2026-07-22, Lot B) : depuis l'ajout de Sentry, ces scripts portent `SENTRY_DISABLE_AUTO_UPLOAD=true`. Sans ce drapeau, la phase de build `sentry-cli` tente d'envoyer les source maps, ne trouve ni organisation ni jeton, et **fait échouer tout le build en erreur 65** (`An organization ID or slug is required`). Le mettre dans `.env` **ne marche pas** : Expo ne transmet que les variables `EXPO_PUBLIC_*` à la phase Xcode. `ios/.xcode.env.local` marcherait aussi mais est effacé par `prebuild --clean`. Côté EAS, le drapeau est dans les profils `development` et `preview` d'`eas.json`. Il sautera le jour où les source maps de release seront branchées (organisation + projet dans le plugin `app.json` + `SENTRY_AUTH_TOKEN` en secret EAS).
 
 ## Piège : les `EXPO_PUBLIC_*` ne suivent pas le même chemin selon le profil
