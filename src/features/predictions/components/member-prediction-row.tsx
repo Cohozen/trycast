@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Avatar } from '@/components/ui/avatar';
 import type { MatchWithTeams } from '@/features/matches/types';
 import type { MemberPrediction } from '@/features/predictions/types';
-import { Text, View } from '@/tw';
+import { Pressable, Text, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
 type MemberPredictionRowProps = {
@@ -11,6 +11,8 @@ type MemberPredictionRowProps = {
     /** Met en évidence la ligne de l'utilisateur connecté. */
     isMe: boolean;
     match: MatchWithTeams;
+    /** Ouvre le profil public du membre. Absent sur ma propre ligne. */
+    onPress?: () => void;
 };
 
 /**
@@ -20,8 +22,8 @@ type MemberPredictionRowProps = {
  * Le marqueur « Score exact » est dérivé côté client : la RPC n'expose pas
  * le breakdown des autres.
  */
-export function MemberPredictionRow({ entry, isMe, match }: MemberPredictionRowProps) {
-    const { t } = useTranslation(['predictions']);
+export function MemberPredictionRow({ entry, isMe, match, onPress }: MemberPredictionRowProps) {
+    const { t } = useTranslation(['predictions', 'leagues']);
 
     const hasPrediction =
         entry.predicted_home_score !== null && entry.predicted_away_score !== null;
@@ -34,7 +36,7 @@ export function MemberPredictionRow({ entry, isMe, match }: MemberPredictionRowP
         entry.predicted_away_score === match.away_score;
     const scored = entry.points_awarded !== null;
 
-    return (
+    const content = (
         <View
             className={cn(
                 'flex-row items-center gap-3 rounded-md border bg-surface px-3.5 py-2.5',
@@ -84,5 +86,17 @@ export function MemberPredictionRow({ entry, isMe, match }: MemberPredictionRowP
                 </View>
             ) : null}
         </View>
+    );
+
+    if (!onPress) return content;
+    return (
+        <Pressable
+            accessibilityLabel={t('leagues:leaderboard.row.openProfile', {
+                username: entry.username,
+            })}
+            accessibilityRole="button"
+            onPress={onPress}>
+            {content}
+        </Pressable>
     );
 }

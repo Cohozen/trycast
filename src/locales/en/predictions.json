@@ -49,7 +49,9 @@
         "pointsWon": "Points won",
         "notPredicted": "You didn't predict this match.",
         "seeDetails": "See points breakdown",
-        "bonusTag": "{{code}} bonus"
+        "bonusTag": "{{code}} bonus",
+        "theirProno": "Their prediction",
+        "notPredictedOther": "No prediction on this match."
     },
     "breakdown": {
         "basePoints": "Base points",

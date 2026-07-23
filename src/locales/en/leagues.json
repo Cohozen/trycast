@@ -37,7 +37,8 @@
             "predictions_one": "{{count}} prediction",
             "predictions_other": "{{count}} predictions",
             "exacts_one": "{{count}} exact score",
-            "exacts_other": "{{count}} exact scores"
+            "exacts_other": "{{count}} exact scores",
+            "openProfile": "View {{username}}'s profile"
         }
     },
     "new": {
@@ -84,7 +85,6 @@
         }
     },
     "detail": {
-        "screenTitle": "League",
         "members_one": "{{count}} member",
         "members_other": "{{count}} members",
         "invite": "Invite friends",

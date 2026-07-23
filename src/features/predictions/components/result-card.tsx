@@ -26,15 +26,27 @@ type ResultCardProps = {
      * détail elle-même.
      */
     onOpenMatch?: () => void;
+    /**
+     * À qui appartient le prono affiché. `other` (profil public d'un autre
+     * joueur) bascule sur des libellés neutres : sans ça, la carte tutoie le
+     * lecteur à propos des pronos de quelqu'un d'autre.
+     */
+    owner?: 'self' | 'other';
 };
 
 /**
  * Carte de la page Résultats (maquette « carte à deux zones tactiles ») :
  * la ligne pointillée est une frontière d'interaction. Zone A (équipes +
  * score, et la partie basse quand il n'y a pas de prono) → page de détail
- * du match ; zone B (ton prono + points gagnés) → bottom sheet du barème.
+ * du match ; zone B (le prono + points gagnés) → bottom sheet du barème.
  */
-export function ResultCard({ match, prediction, distribution, onOpenMatch }: ResultCardProps) {
+export function ResultCard({
+    match,
+    prediction,
+    distribution,
+    onOpenMatch,
+    owner = 'self',
+}: ResultCardProps) {
     const { t } = useTranslation(['predictions', 'matches']);
     const rules = useActiveScoringRules();
     const [detailOpen, setDetailOpen] = useState(false);
@@ -150,7 +162,11 @@ export function ResultCard({ match, prediction, distribution, onOpenMatch }: Res
                         <View className="flex-row items-center justify-between gap-3">
                             <View className="min-w-0 gap-1.5">
                                 <Text className="font-body-semibold text-[11px] uppercase tracking-[0.44px] text-text-faint">
-                                    {t('predictions:reconciliation.yourProno')}
+                                    {t(
+                                        owner === 'self'
+                                            ? 'predictions:reconciliation.yourProno'
+                                            : 'predictions:reconciliation.theirProno',
+                                    )}
                                 </Text>
                                 <View className="self-start rounded-pill bg-surface-sunken px-2.5 py-0.5">
                                     <Text className="font-body-bold text-[13px] text-text-muted">
@@ -237,7 +253,11 @@ export function ResultCard({ match, prediction, distribution, onOpenMatch }: Res
                         onPressIn={() => setMatchPressed(true)}
                         onPressOut={() => setMatchPressed(false)}>
                         <Text className="flex-1 font-body text-[13px] text-text-muted">
-                            {t('predictions:reconciliation.notPredicted')}
+                            {t(
+                                owner === 'self'
+                                    ? 'predictions:reconciliation.notPredicted'
+                                    : 'predictions:reconciliation.notPredictedOther',
+                            )}
                         </Text>
                         <View className="flex-row items-baseline gap-1">
                             <Text className="font-display text-[22px] leading-[23px] text-text-faint">

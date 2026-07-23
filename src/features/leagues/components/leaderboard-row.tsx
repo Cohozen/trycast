@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Avatar } from '@/components/ui/avatar';
 import type { LeaderboardEntry } from '@/features/leagues/types';
-import { Text, View } from '@/tw';
+import { Pressable, Text, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
 type LeaderboardRowProps = {
@@ -11,6 +11,11 @@ type LeaderboardRowProps = {
     isMe: boolean;
     /** Rang partagé avec au moins une autre entrée (mention « ex æquo »). */
     tie?: boolean;
+    /**
+     * Ouvre le profil public du joueur. Absent = ligne inerte : c'est le cas
+     * de ma propre ligne, qu'on n'ouvre pas depuis un classement.
+     */
+    onPress?: () => void;
 };
 
 /**
@@ -18,7 +23,7 @@ type LeaderboardRowProps = {
  * avatar initiales, pseudo + stats, points Anton. Ma ligne porte la bordure
  * accent (l'étincelle marque ma position).
  */
-export function LeaderboardRow({ entry, isMe, tie = false }: LeaderboardRowProps) {
+export function LeaderboardRow({ entry, isMe, tie = false, onPress }: LeaderboardRowProps) {
     const { t } = useTranslation(['leagues']);
     const sub = [
         t('leagues:leaderboard.row.predictions', { count: entry.predictions_scored }),
@@ -29,7 +34,7 @@ export function LeaderboardRow({ entry, isMe, tie = false }: LeaderboardRowProps
         .filter(Boolean)
         .join(' · ');
 
-    return (
+    const content = (
         <View
             className={cn(
                 'flex-row items-center gap-3 rounded-md border bg-surface px-3.5 py-3',
@@ -68,5 +73,17 @@ export function LeaderboardRow({ entry, isMe, tie = false }: LeaderboardRowProps
                 <Text className="font-body-bold text-[11px] text-text-muted">pts</Text>
             </View>
         </View>
+    );
+
+    if (!onPress) return content;
+    return (
+        <Pressable
+            accessibilityLabel={t('leagues:leaderboard.row.openProfile', {
+                username: entry.username,
+            })}
+            accessibilityRole="button"
+            onPress={onPress}>
+            {content}
+        </Pressable>
     );
 }

@@ -787,6 +787,30 @@ export type Database = {
                     match_id: string;
                 }[];
             };
+            get_user_predictions: {
+                Args: { p_competition_id: string; p_user_id: string };
+                Returns: {
+                    created_at: string;
+                    id: string;
+                    match_id: string;
+                    points_awarded: number | null;
+                    points_breakdown: Json | null;
+                    predicted_away_score: number;
+                    predicted_bonus_off_away: boolean;
+                    predicted_bonus_off_home: boolean;
+                    predicted_home_score: number;
+                    scored_at: string | null;
+                    scoring_rule_version: number | null;
+                    updated_at: string;
+                    user_id: string;
+                }[];
+                SetofOptions: {
+                    from: '*';
+                    to: 'predictions';
+                    isOneToOne: false;
+                    isSetofReturn: true;
+                };
+            };
             is_league_member: { Args: { p_league_id: string }; Returns: boolean };
             is_league_owner: { Args: { p_league_id: string }; Returns: boolean };
             join_league: {

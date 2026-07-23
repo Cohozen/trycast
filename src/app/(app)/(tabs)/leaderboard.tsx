@@ -20,6 +20,7 @@ import { useMyLeagues } from '@/features/leagues/use-my-leagues';
 import { useMyRank } from '@/features/leagues/use-my-rank';
 import { useMyStanding } from '@/features/leagues/use-my-standing';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
+import { useOpenPlayerProfile } from '@/features/profile/use-open-player-profile';
 import { useProfile } from '@/features/profile/use-profile';
 import { trackEvent } from '@/lib/analytics';
 import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
@@ -42,6 +43,7 @@ export default function LeaderboardScreen() {
     const competition = useActiveCompetition();
     const myLeagues = useMyLeagues();
     const { data: profile } = useProfile(userId ?? '');
+    const openPlayerProfile = useOpenPlayerProfile(userId);
 
     const [scope, setScope] = useState<Scope>('leagues');
     const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(null);
@@ -242,7 +244,13 @@ export default function LeaderboardScreen() {
                 ) : (
                     <View className="gap-4">
                         {entries.length >= 3 ? (
-                            <Podium entries={entries} meUserId={userId} />
+                            <Podium
+                                entries={entries}
+                                meUserId={userId}
+                                onSelect={(id) =>
+                                    router.push({ pathname: '/player/[id]', params: { id } })
+                                }
+                            />
                         ) : null}
 
                         <View className="gap-2">
@@ -259,6 +267,7 @@ export default function LeaderboardScreen() {
                                     entry={entry}
                                     isMe={entry.user_id === userId}
                                     key={entry.user_id}
+                                    onPress={openPlayerProfile(entry.user_id)}
                                     tie={entry.tie}
                                 />
                             ))}
