@@ -86,6 +86,8 @@ Livré le 2026-07-23 (bis). **Décision : Google seul, pas Apple** — « Sign i
 
 **Reste** : dérouler la checklist sur le téléphone Android (le parcours natif n'existe que là) — nouveau compte Google → feuille native → écran pseudo → accueil, le pseudo apparaît au classement ; reconnexion sans redemander le pseudo ; **compte e-mail existant à la même adresse → même compte** (liaison d'identité, pronostics et ligues intacts) ; Réglages sans rangée mot de passe ; déconnexion → la feuille de choix du compte réapparaît ; annulation → aucun message d'erreur ; et le **parcours e-mail inchangé** (c'est lui qu'on risquait le plus de casser).
 
+**Variables d'environnement EAS — à faire avant le premier build `preview` ou `production`** (mis de côté le 2026-07-23, non bloquant aujourd'hui) : `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` et `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID` doivent exister dans les environnements EAS correspondants. Le build `development` s'en passe : son bundle JS vient de Metro, qui lit le `.env` local. Un build `preview`/`production` inline les `EXPO_PUBLIC_*` **au moment du bundling sur les serveurs EAS** — sans elles, le bouton Google **disparaît silencieusement** (c'est le comportement voulu de `providers.ts` : pas d'identifiants, pas de fournisseur) au lieu de planter. À poser par `eas env:create` ou depuis le dashboard Expo.
+
 ⚠️ **À l'ouverture de l'alpha Play** : créer un **second client OAuth Android** dans Google Cloud avec la SHA-1 de la clé **Play App Signing** (un client = un couple package + SHA-1 ; Play re-signe l'app). Sans ça, la connexion marche sur le dev build et échoue en `DEVELOPER_ERROR` sur le build distribué.
 
 ### Site web / légal
