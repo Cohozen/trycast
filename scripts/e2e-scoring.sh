@@ -54,6 +54,23 @@ RES=$(curl -s -X POST "$URL/rest/v1/rpc/apply_match_scores" \
 echo "$RES" | grep -q '42501' || fail "rpc apply_match_scores (attendu 42501, obtenu $RES)"
 ok "la RPC apply_match_scores est verrouillée (service_role uniquement)"
 
+# Outillage admin des essais (migration 20260723000100) : réservé à service_role,
+# donc invisible depuis l'app — la vue expose pourtant des données déjà lisibles,
+# c'est la RPC d'écriture qui compte vraiment ici.
+RES=$(curl -s "$URL/rest/v1/admin_matches_pending_tries?select=api_game_id" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1")
+echo "$RES" | grep -q '42501' ||
+  fail "select admin_matches_pending_tries (attendu 42501, obtenu $RES)"
+ok "la vue admin des essais est invisible côté client"
+
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/admin_set_match_tries" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" \
+  -d '{"p_api_game_id":-103,"p_home_tries":99,"p_away_tries":99}')
+echo "$RES" | grep -q '42501' ||
+  fail "rpc admin_set_match_tries (attendu 42501, obtenu $RES)"
+ok "la RPC admin_set_match_tries est verrouillée (service_role uniquement)"
+
 # Accès anonyme au barème → refusé (aucun grant anon)
 RES=$(curl -s "$URL/rest/v1/scoring_rules?select=version" -H "apikey: $KEY")
 echo "$RES" | grep -q '42501' || fail "accès anonyme scoring_rules (attendu 42501, obtenu $RES)"
