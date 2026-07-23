@@ -52,6 +52,14 @@ Toute future dépendance de l'écosystème Google/Firebase côté iOS peut rallo
 
 ⚠️ **Toujours lancer via `npm run ios` / `npm run android`, jamais `npx expo run:*` à la main** (vécu 2026-07-22, Lot B) : depuis l'ajout de Sentry, ces scripts portent `SENTRY_DISABLE_AUTO_UPLOAD=true`. Sans ce drapeau, la phase de build `sentry-cli` tente d'envoyer les source maps, ne trouve ni organisation ni jeton, et **fait échouer tout le build en erreur 65** (`An organization ID or slug is required`). Le mettre dans `.env` **ne marche pas** : Expo ne transmet que les variables `EXPO_PUBLIC_*` à la phase Xcode. `ios/.xcode.env.local` marcherait aussi mais est effacé par `prebuild --clean`. Côté EAS, le drapeau est dans les profils `development` et `preview` d'`eas.json`. Il sautera le jour où les source maps de release seront branchées (organisation + projet dans le plugin `app.json` + `SENTRY_AUTH_TOKEN` en secret EAS).
 
+## Piège : les `EXPO_PUBLIC_*` ne suivent pas le même chemin selon le profil
+
+Un build **`development`** n'embarque pas de bundle JS : il le télécharge depuis **Metro**, qui lit le **`.env` local**. Une variable ajoutée à `.env` est donc active sans rebuild, et un dev build « marche » alors même que la variable n'existe nulle part côté EAS.
+
+Un build **`preview`/`production`** bundle **sur les serveurs EAS** : les `EXPO_PUBLIC_*` y sont **inlinées à ce moment-là**, depuis l'**environnement EAS** (`eas env:create`, ou le dashboard Expo), jamais depuis le `.env` de la machine — il n'est pas envoyé.
+
+⚠️ **L'oubli est silencieux** quand le code traite l'absence d'une clé comme « fonctionnalité non configurée » — c'est le cas d'Aptabase, de Sentry et des fournisseurs d'identité (`src/features/auth/providers.ts` n'affiche pas un bouton dont les identifiants manquent). Pas de crash, pas de log : la fonctionnalité **disparaît de l'app distribuée**. Réflexe : toute nouvelle `EXPO_PUBLIC_*` se pose dans `.env`, dans `.env.example` **et** dans les environnements EAS avant la première distribution.
+
 ## Piège : le répertoire de travail du shell (vécu 2026-07-22)
 
 `npx expo run:ios` lancé alors que le shell était resté dans `web/` (après un `cd web && npm run check` d'une commande précédente) a **traité le site Astro comme un projet Expo** : ajout d'`expo`, `react` et `react-native` à `web/package.json`, création d'un `web/ios/` et d'un `web/app.json`, le tout en violation de la règle « pas de deps Expo dans le site ». Symptôme dans les logs : `Apple bundle identifier: com.cohozen.trycast-web` et `env: export PUBLIC_SUPABASE_KEY` (les variables du site, pas de l'app).
