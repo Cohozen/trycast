@@ -25,6 +25,17 @@ Schéma **uniquement par migrations** dans `supabase/migrations/`. Jamais d'édi
 - **Piège récursion RLS** : une policy de `league_members` qui interroge `league_members`/`leagues` boucle (« infinite recursion detected in policy »). Utiliser des helpers `security definer` (`is_league_member` / `is_league_owner`) pour casser le cycle — toujours passer par eux dans les policies de ces tables.
 - Contraintes miroir côté client : quand tu ajoutes un `check` (ex. nom 3-40, format code), mets à jour `validation.ts` du domaine.
 
+## Vues
+
+Une vue destinée aux **clients** n'est presque jamais la bonne réponse : préférer une **RPC** (une vue `security definer` déclenche l'advisor ERROR `security_definer_view`, cf. `get_prediction_distributions`).
+
+Pour une vue d'**outillage** (lue depuis le SQL editor ou par `service_role`), deux réflexes obligatoires — modèle : `admin_matches_pending_tries`, migration `20260723000100` :
+
+- `create view … with (security_invoker = on)` : sans ça la vue est « security definer » au sens de l'advisor. Sans effet pratique quand seuls `postgres` et `service_role` la lisent, mais on ne laisse pas traîner une vue privilégiée dans `public`.
+- **Les default privileges legacy s'appliquent aux vues comme aux tables** sur le projet dev : sans `revoke all … from anon, authenticated`, la vue est lisible par toute l'app. Le `grant select … to service_role` explicite complète le durcissement.
+
+Une fonction d'outillage réservée à `service_role` n'a **pas besoin d'être `security definer`** : `service_role` a déjà `grant all` sur les tables métier. Rester en invoker évite de créer une élévation de privilège tant qu'aucun client n'est à autoriser (`admin_set_match_tries`). Ne pas oublier le `revoke execute … from public, anon, authenticated` : une fonction naît exécutable par `public`.
+
 ## Storage (buckets & policies)
 
 - Bucket via `insert into storage.buckets (id, name, public) values (...) on conflict do nothing;` — passe bien en `db push` (contrairement à la crainte fréquente ; les policies sur `storage.objects` aussi, testé le 2026-07-13 sur `avatars`).
