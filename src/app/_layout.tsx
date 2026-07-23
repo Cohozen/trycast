@@ -17,6 +17,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { AnimatedSplashOverlay } from '@/components/animated-splash-overlay';
 import { SessionProvider, useSession } from '@/features/auth/session-context';
@@ -96,16 +97,20 @@ function RootLayout() {
     }, []);
 
     return (
-        <QueryClientProvider client={queryClient}>
-            <SessionProvider>
-                <ThemeProvider
-                    value={colorScheme === 'dark' ? navigationThemes.dark : navigationThemes.light}>
-                    <AnimatedSplashOverlay />
-                    <RootNavigator />
-                    <StatusBar style="auto" animated />
-                </ThemeProvider>
-            </SessionProvider>
-        </QueryClientProvider>
+        <KeyboardProvider>
+            <QueryClientProvider client={queryClient}>
+                <SessionProvider>
+                    <ThemeProvider
+                        value={
+                            colorScheme === 'dark' ? navigationThemes.dark : navigationThemes.light
+                        }>
+                        <AnimatedSplashOverlay />
+                        <RootNavigator />
+                        <StatusBar style="auto" animated />
+                    </ThemeProvider>
+                </SessionProvider>
+            </QueryClientProvider>
+        </KeyboardProvider>
     );
 }
 

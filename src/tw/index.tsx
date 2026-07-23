@@ -9,6 +9,7 @@ import {
     View as RNView,
 } from 'react-native';
 import { useCssElement } from 'react-native-css';
+import { KeyboardAwareScrollView as RNKeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 // CSS-enabled Link (cast: typed-routes prop unions are too complex for tsc)
 export const Link = (props: React.ComponentProps<typeof RouterLink> & { className?: string }) => {
@@ -78,6 +79,45 @@ export const ScrollView = ({
     });
 };
 ScrollView.displayName = 'CSS(ScrollView)';
+
+// Même interop que ScrollView, mais la vue de keyboard-controller qui suit le
+// champ focalisé au clavier sur iOS *et* Android (le `automaticallyAdjust…` de
+// RN est iOS-only). Nécessite <KeyboardProvider> à la racine et un module natif
+// (rebuild du dev client requis après ajout de la lib).
+export const KeyboardAwareScrollView = ({
+    contentContainerStyle,
+    ...props
+}: React.ComponentProps<typeof RNKeyboardAwareScrollView> & {
+    className?: string;
+    contentContainerClassName?: string;
+}) => {
+    const element = useCssElement(
+        RNKeyboardAwareScrollView as React.ComponentType<Record<string, unknown>>,
+        props,
+        {
+            className: 'style',
+            contentContainerClassName: 'contentContainerStyle',
+        },
+    );
+    if (contentContainerStyle == null) {
+        return element;
+    }
+    // Même raison que ScrollView : react-native-css ne fusionne classes + inline
+    // que pour `style`, on fusionne donc `contentContainerStyle` à la main.
+    if (element.type !== RNKeyboardAwareScrollView) {
+        if (__DEV__) {
+            console.warn(
+                'tw/KeyboardAwareScrollView : contentContainerStyle ignoré (élément enveloppé)',
+            );
+        }
+        return element;
+    }
+    const resolved = (element.props as { contentContainerStyle?: unknown }).contentContainerStyle;
+    return React.cloneElement(element as React.ReactElement<Record<string, unknown>>, {
+        contentContainerStyle: [resolved, contentContainerStyle],
+    });
+};
+KeyboardAwareScrollView.displayName = 'CSS(KeyboardAwareScrollView)';
 
 export const Pressable = (
     props: React.ComponentProps<typeof RNPressable> & { className?: string },

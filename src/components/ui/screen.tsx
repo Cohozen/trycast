@@ -1,11 +1,11 @@
 import type { ComponentProps } from 'react';
 import { Platform } from 'react-native';
 
-import { ScrollView } from '@/tw';
+import { KeyboardAwareScrollView } from '@/tw';
 import { useScreenInsets } from '@/tw/use-screen-insets';
 import { cn } from '@/tw/variants';
 
-type ScreenProps = ComponentProps<typeof ScrollView> & {
+type ScreenProps = ComponentProps<typeof KeyboardAwareScrollView> & {
     /** Classes du conteneur de contenu (padding, gap…) */
     contentClassName?: string;
     /**
@@ -39,8 +39,9 @@ export function Screen({
 }: ScreenProps) {
     const screenInsets = useScreenInsets();
     return (
-        <ScrollView
-            automaticallyAdjustKeyboardInsets
+        <KeyboardAwareScrollView
+            // Marge entre le champ focalisé et le haut du clavier (iOS + Android).
+            bottomOffset={24}
             keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
             keyboardShouldPersistTaps="handled"
             {...props}
@@ -55,6 +56,6 @@ export function Screen({
                 contentContainerStyle,
             ]}>
             {children}
-        </ScrollView>
+        </KeyboardAwareScrollView>
     );
 }

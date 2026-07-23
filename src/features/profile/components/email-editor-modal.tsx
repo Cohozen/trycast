@@ -1,7 +1,8 @@
 import { Mail } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Modal, Platform, StyleSheet } from 'react-native';
+import { Modal, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 
 import { Button } from '@/components/ui/button';
 import { TextField } from '@/components/ui/text-field';
@@ -77,9 +78,7 @@ export function EmailEditorModal({
 
     return (
         <Modal animationType="fade" onRequestClose={close} transparent visible={visible}>
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                style={StyleSheet.absoluteFill}>
+            <KeyboardAvoidingView behavior="padding" style={StyleSheet.absoluteFill}>
                 <View className="flex-1 items-center justify-center bg-[#0B1A11]/50 p-4">
                     <View className="w-full max-w-[420px] overflow-hidden rounded-lg bg-surface tc-shadow-lg">
                         <View className="gap-3.5 px-5 pb-4 pt-6">
