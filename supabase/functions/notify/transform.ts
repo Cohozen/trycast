@@ -16,6 +16,8 @@ export type ReminderTargetRow = {
     locale: string;
     home_team: string;
     away_team: string;
+    home_code: string | null;
+    away_code: string | null;
     kickoff_at: string;
 };
 
@@ -26,6 +28,8 @@ export type ResultTargetRow = {
     locale: string;
     home_team: string;
     away_team: string;
+    home_code: string | null;
+    away_code: string | null;
     home_score: number;
     away_score: number;
     points_awarded: number | null;
@@ -66,8 +70,8 @@ export function groupTargets<Row extends { user_id: string; match_id: string; to
 /** Un message par token du groupe (tickets alignés 1:1, cf. _shared/expo-push). */
 export function reminderMessages(group: TargetGroup<ReminderTargetRow>): ExpoPushMessage[] {
     const content = buildReminderMessage(group.row.locale, {
-        homeTeam: group.row.home_team,
-        awayTeam: group.row.away_team,
+        home: { name: group.row.home_team, code: group.row.home_code },
+        away: { name: group.row.away_team, code: group.row.away_code },
     });
     return group.tokens.map((to) => ({
         to,
@@ -80,8 +84,8 @@ export function reminderMessages(group: TargetGroup<ReminderTargetRow>): ExpoPus
 
 export function resultMessages(group: TargetGroup<ResultTargetRow>): ExpoPushMessage[] {
     const content = buildResultMessage(group.row.locale, {
-        homeTeam: group.row.home_team,
-        awayTeam: group.row.away_team,
+        home: { name: group.row.home_team, code: group.row.home_code },
+        away: { name: group.row.away_team, code: group.row.away_code },
         homeScore: group.row.home_score,
         awayScore: group.row.away_score,
         points: group.row.points_awarded ?? 0,

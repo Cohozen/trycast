@@ -14,7 +14,9 @@ function reminderRow(overrides: Partial<ReminderTargetRow>): ReminderTargetRow {
         token: 'tok-1',
         locale: 'fr',
         home_team: 'France',
-        away_team: 'Italie',
+        away_team: 'Italy',
+        home_code: 'FRA',
+        away_code: 'ITA',
         kickoff_at: '2026-07-11T20:00:00Z',
         ...overrides,
     };
@@ -53,6 +55,7 @@ describe('reminderMessages', () => {
         expect(messages).toHaveLength(2);
         expect(messages.map((message) => message.to)).toEqual(['tok-1', 'tok-2']);
         expect(messages[0].title).toBe('Rappel de prono');
+        // Nom API en base (« Italy »), nom français dans la notification
         expect(messages[0].body).toContain('France – Italie');
         expect(messages[0].data).toEqual({ url: '/(app)/(tabs)/' });
         expect(messages[0].channelId).toBe('default');
@@ -67,7 +70,9 @@ describe('resultMessages', () => {
             token: 'tok-1',
             locale: 'fr',
             home_team: 'France',
-            away_team: 'Italie',
+            away_team: 'Italy',
+            home_code: 'FRA',
+            away_code: 'ITA',
             home_score: 28,
             away_score: 10,
             points_awarded: 27,
@@ -88,6 +93,8 @@ describe('resultMessages', () => {
             locale: 'fr',
             home_team: 'A',
             away_team: 'B',
+            home_code: null,
+            away_code: null,
             home_score: 3,
             away_score: 6,
             points_awarded: null,

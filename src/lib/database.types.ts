@@ -811,7 +811,9 @@ export type Database = {
             notify_reminder_targets: {
                 Args: never;
                 Returns: {
+                    away_code: string;
                     away_team: string;
+                    home_code: string;
                     home_team: string;
                     kickoff_at: string;
                     locale: string;
@@ -823,8 +825,10 @@ export type Database = {
             notify_result_targets: {
                 Args: never;
                 Returns: {
+                    away_code: string;
                     away_score: number;
                     away_team: string;
+                    home_code: string;
                     home_score: number;
                     home_team: string;
                     locale: string;

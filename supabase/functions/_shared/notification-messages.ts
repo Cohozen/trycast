@@ -14,10 +14,39 @@ export type NotificationContent = {
 export const REMINDER_URL = '/(app)/(tabs)/';
 export const RESULT_URL = '/(app)/(tabs)/results';
 
-type ReminderParams = { homeTeam: string; awayTeam: string };
+/**
+ * Noms d'équipes : `teams.name` est le nom API, donc anglais. Les nations
+ * connues sont traduites par tricode (`teams.code`), comme l'app le fait avec
+ * teamName() et les clés `matches:teams.<code>` — la table FR ci-dessous est
+ * la copie serveur de `src/locales/fr/matches.json`, tenue par un test de
+ * parité. Toute équipe hors table (code null, nation non couverte) garde son
+ * nom brut : c'est déjà le comportement de l'app.
+ */
+const TEAM_NAMES_FR: Record<string, string> = {
+    FRA: 'France',
+    IRL: 'Irlande',
+    ITA: 'Italie',
+    ARG: 'Argentine',
+    JPN: 'Japon',
+    ENG: 'Angleterre',
+    SCO: 'Écosse',
+    WAL: 'Pays de Galles',
+    NZL: 'Nouvelle-Zélande',
+    AUS: 'Australie',
+    RSA: 'Afrique du Sud',
+    FIJ: 'Fidji',
+};
+
+// L'anglais n'a rien à traduire : le nom API est déjà anglais.
+const TEAM_NAMES_EN: Record<string, string> = {};
+
+/** Une équipe telle que la rendent les RPC notify_*_targets. */
+export type TeamRef = { name: string; code?: string | null };
+
+type ReminderParams = { home: TeamRef; away: TeamRef };
 type ResultParams = {
-    homeTeam: string;
-    awayTeam: string;
+    home: TeamRef;
+    away: TeamRef;
     homeScore: number;
     awayScore: number;
     points: number;
@@ -25,9 +54,16 @@ type ResultParams = {
 
 type LocaleMessages = {
     reminderTitle: string;
-    reminderBody: (params: ReminderParams) => string;
+    reminderBody: (params: { homeTeam: string; awayTeam: string }) => string;
     resultTitle: string;
-    resultBody: (params: ResultParams) => string;
+    resultBody: (params: {
+        homeTeam: string;
+        awayTeam: string;
+        homeScore: number;
+        awayScore: number;
+        points: number;
+    }) => string;
+    teamNames: Record<string, string>;
 };
 
 const MESSAGES: Record<string, LocaleMessages> = {
@@ -38,6 +74,7 @@ const MESSAGES: Record<string, LocaleMessages> = {
         resultTitle: 'Résultats & points',
         resultBody: ({ homeTeam, awayTeam, homeScore, awayScore, points }) =>
             `${homeTeam} ${homeScore} – ${awayScore} ${awayTeam} : tu marques ${formatPointsFr(points)}.`,
+        teamNames: TEAM_NAMES_FR,
     },
     en: {
         reminderTitle: 'Prediction reminder',
@@ -46,6 +83,7 @@ const MESSAGES: Record<string, LocaleMessages> = {
         resultTitle: 'Results & points',
         resultBody: ({ homeTeam, awayTeam, homeScore, awayScore, points }) =>
             `${homeTeam} ${homeScore} – ${awayScore} ${awayTeam}: you score ${formatPointsEn(points)}.`,
+        teamNames: TEAM_NAMES_EN,
     },
 };
 
@@ -63,12 +101,23 @@ function resolveMessages(locale: string | null): LocaleMessages {
     return MESSAGES[base] ?? MESSAGES.fr;
 }
 
+/** Nom affiché d'une équipe : traduction par tricode, sinon le nom brut. */
+function teamLabel(messages: LocaleMessages, team: TeamRef): string {
+    return (team.code ? messages.teamNames[team.code] : undefined) ?? team.name;
+}
+
 export function buildReminderMessage(
     locale: string | null,
     params: ReminderParams,
 ): NotificationContent {
     const messages = resolveMessages(locale);
-    return { title: messages.reminderTitle, body: messages.reminderBody(params) };
+    return {
+        title: messages.reminderTitle,
+        body: messages.reminderBody({
+            homeTeam: teamLabel(messages, params.home),
+            awayTeam: teamLabel(messages, params.away),
+        }),
+    };
 }
 
 export function buildResultMessage(
@@ -76,5 +125,14 @@ export function buildResultMessage(
     params: ResultParams,
 ): NotificationContent {
     const messages = resolveMessages(locale);
-    return { title: messages.resultTitle, body: messages.resultBody(params) };
+    return {
+        title: messages.resultTitle,
+        body: messages.resultBody({
+            homeTeam: teamLabel(messages, params.home),
+            awayTeam: teamLabel(messages, params.away),
+            homeScore: params.homeScore,
+            awayScore: params.awayScore,
+            points: params.points,
+        }),
+    };
 }
