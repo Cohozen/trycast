@@ -46,7 +46,13 @@
                     "photosPermission": "TryCast accède à tes photos pour définir ta photo de profil."
                 }
             ],
-            "@sentry/react-native"
+            "@sentry/react-native",
+            [
+                "@react-native-google-signin/google-signin",
+                {
+                    "iosUrlScheme": "com.googleusercontent.apps.261035883568-oqs9h5jb2njq0a9k1t421la93crse0if"
+                }
+            ]
         ],
         "experiments": {
             "typedRoutes": true,
