@@ -82,4 +82,13 @@ L'app tourne dans un dev build (`expo-dev-client`), pas Expo Go. **Toute lib nat
 
 ## Secrets
 
-`.env` (non versionné, modèle `.env.example`) : `EXPO_PUBLIC_SUPABASE_URL` et `EXPO_PUBLIC_SUPABASE_KEY` (clé publishable uniquement — jamais de service role key côté client ni dans le repo).
+`.env` (non versionné, modèle `.env.example`) : `EXPO_PUBLIC_SUPABASE_URL` et `EXPO_PUBLIC_SUPABASE_KEY` (clé publishable uniquement — jamais de service role key côté client ni dans le repo). S'y ajoutent les identifiants publics des fournisseurs d'identité (`EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`, `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`) ; le *client secret* Google ne vit **que** dans le dashboard Supabase.
+
+## Connexion par fournisseur d'identité
+
+- **Ajouter un fournisseur se fait dans `src/features/auth/providers.ts`, et nulle part ailleurs** : il déclare par plateforme la mécanique d'ouverture de session (`native-id-token` via `signInWithIdToken`, ou `web-redirect` via le navigateur système et `trycast://auth/callback`). Les écrans itèrent sur `resolveProviders(Platform.OS)` et **ne nomment aucun fournisseur** — un `if (provider === 'google')` dans un écran est une régression
+- Un fournisseur dont les identifiants ne sont pas configurés n'est **pas** proposé : la CI et un clone frais tournent sans configuration, comme pour Aptabase/Sentry
+- **Google en service** (Android + simulateur iOS). Le client OAuth **web** est celui que l'app Android passe à `GoogleSignin.configure({ webClientId })` — pas le client Android, qui n'existe que pour la validation par empreinte **SHA-1**. ⚠️ À l'ouverture de l'alpha Play, créer un **second client Android** avec la SHA-1 de la clé Play App Signing (un client = un couple package + SHA-1), sinon `DEVELOPER_ERROR` sur le build distribué
+- **Apple : différé**, faute d'abonnement Apple Developer (99 €/an, seul moyen d'obtenir un Services ID) — le code l'attend, cf. le commentaire d'extension dans `providers.ts`. Rappel : l'App Store impose Sign in with Apple dès qu'un autre login social est proposé ; Play non
+- Un compte créé via un fournisseur n'apporte **pas de pseudo** : `profiles.username_chosen` vaut alors `false` et un troisième `Stack.Protected` envoie sur `(onboarding)` avant l'accueil. Seule la RPC `claim_username` peut repasser la colonne à `true`
+- Ces comptes n'ont ni mot de passe ni adresse modifiable : les rangées correspondantes des Réglages sont masquées via `hasPasswordIdentity()` de `src/features/auth/identity.ts`
