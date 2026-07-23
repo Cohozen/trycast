@@ -7,10 +7,11 @@ import { useStandingsRealtime } from '@/features/leagues/use-standings-realtime'
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
 import { useThemeColor } from '@/tw';
 
-// Les onglets vivent dans (tabs) ; les écrans ligue sont poussés au-dessus
-// (header natif visible, retour intégré).
+// Les onglets vivent dans (tabs) ; les autres écrans sont poussés au-dessus.
+// Les pages de détail (match, ligue, profil public) n'ont pas de header natif :
+// elles portent leur propre en-tête avec le bouton retour.
 export default function AppLayout() {
-    const { t } = useTranslation(['leagues', 'matches', 'profile', 'scoring']);
+    const { t } = useTranslation(['leagues', 'profile', 'scoring']);
     const competition = useActiveCompetition();
     const bgColor = useThemeColor('bg');
     const textColor = useThemeColor('text');
@@ -47,14 +48,13 @@ export default function AppLayout() {
                     name="league/new"
                     options={{ headerShown: true, title: t('leagues:new.screenTitle') }}
                 />
-                <Stack.Screen
-                    name="league/[id]"
-                    options={{ headerShown: true, title: t('leagues:detail.screenTitle') }}
-                />
-                <Stack.Screen
-                    name="match/[id]"
-                    options={{ headerShown: true, title: t('matches:detail.screenTitle') }}
-                />
+                {/* Pages détail : pas de header natif — elles portent leur
+                    propre en-tête repliable (CollapsingHeader), avec le bouton
+                    retour toujours accessible dans la barre compacte. */}
+                <Stack.Screen name="league/[id]" options={{ headerShown: false }} />
+                <Stack.Screen name="match/[id]" options={{ headerShown: false }} />
+                {/* Profil public : bouton retour inline dans le bloc épinglé */}
+                <Stack.Screen name="player/[id]" options={{ headerShown: false }} />
             </Stack>
             <CelebrationHost />
         </ToastProvider>

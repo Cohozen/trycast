@@ -46,7 +46,6 @@
         }
     },
     "detail": {
-        "screenTitle": "Match",
         "upcoming": "Upcoming",
         "kickoff": "Kickoff",
         "notFound": "Match not found.",
