@@ -39,6 +39,17 @@ npx expo prebuild --clean -p ios && npm run ios
 
 ⚠️ Le `--clean` est **obligatoire** : un `expo run:ios` sur un `ios/` préexistant ne ré-applique pas les config plugins (vécu : `NSPhotoLibraryUsageDescription` manquant → crash TCC au picker photo). Même logique côté Android local le jour venu.
 
+⚠️ **`pod install` refuse les pods Swift dont les dépendances ne définissent pas de module** (vécu 2026-07-23, ajout de `@react-native-google-signin/google-signin`). Message : *« The Swift pod `AppCheckCore` depends upon `GoogleUtilities` and `RecaptchaInterop`, which do not define modules »* — le prebuild s'arrête net à l'étape CocoaPods. Correctif **dans `app.json`**, jamais dans le `Podfile` (généré, effacé par `--clean`) : plugin `expo-build-properties` avec les pods fautifs en `modular_headers`.
+
+```json
+["expo-build-properties", { "ios": { "extraPods": [
+    { "name": "GoogleUtilities", "modular_headers": true },
+    { "name": "RecaptchaInterop", "modular_headers": true }
+] } }]
+```
+
+Toute future dépendance de l'écosystème Google/Firebase côté iOS peut rallonger cette liste : lire le nom des pods cités dans le message d'erreur et les y ajouter. **Android n'est pas concerné.**
+
 ⚠️ **Toujours lancer via `npm run ios` / `npm run android`, jamais `npx expo run:*` à la main** (vécu 2026-07-22, Lot B) : depuis l'ajout de Sentry, ces scripts portent `SENTRY_DISABLE_AUTO_UPLOAD=true`. Sans ce drapeau, la phase de build `sentry-cli` tente d'envoyer les source maps, ne trouve ni organisation ni jeton, et **fait échouer tout le build en erreur 65** (`An organization ID or slug is required`). Le mettre dans `.env` **ne marche pas** : Expo ne transmet que les variables `EXPO_PUBLIC_*` à la phase Xcode. `ios/.xcode.env.local` marcherait aussi mais est effacé par `prebuild --clean`. Côté EAS, le drapeau est dans les profils `development` et `preview` d'`eas.json`. Il sautera le jour où les source maps de release seront branchées (organisation + projet dans le plugin `app.json` + `SENTRY_AUTH_TOKEN` en secret EAS).
 
 ## Piège : le répertoire de travail du shell (vécu 2026-07-22)

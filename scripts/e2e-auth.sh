@@ -69,6 +69,44 @@ RES=$(curl -s -X POST "$URL/rest/v1/rpc/username_available" -H "apikey: $KEY" \
 [ "$RES" = "false" ] || fail "username_available pseudo pris (attendu false)"
 ok "username_available (pris, insensible à la casse)"
 
+# RPC claim_username (revendication du pseudo à la première connexion OAuth).
+# Le cas « username_chosen à false » vient d'un compte créé sans pseudo dans
+# raw_user_meta_data : il n'est reproductible qu'avec un vrai parcours
+# fournisseur, donc vérifié sur device et non ici.
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/claim_username" -H "apikey: $KEY" \
+  -H "Content-Type: application/json" -d '{"candidate":"Anonyme1"}')
+echo "$RES" | grep -q '42501' || fail "claim_username anonyme (attendu 42501, obtenu $RES)"
+ok "claim_username refuse les appels non authentifiés"
+
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/claim_username" -H "apikey: $KEY" \
+  -H "Authorization: Bearer $T1" -H "Content-Type: application/json" \
+  -d '{"candidate":"E2eClaimed1"}')
+echo "$RES" | grep -q '"username":"E2eClaimed1"' || fail "claim_username pseudo libre ($RES)"
+echo "$RES" | grep -q '"username_chosen":true' || fail "claim_username n'a pas marqué le pseudo comme choisi ($RES)"
+ok "claim_username écrit le pseudo et le marque comme choisi"
+
+# Le pseudo de user2, pour tester le conflit d'unicité
+TAKEN=$(curl -s "$URL/rest/v1/profiles?id=eq.$U2&select=username" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" |
+  python3 -c 'import json,sys; print(json.load(sys.stdin)[0]["username"])')
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/claim_username" -H "apikey: $KEY" \
+  -H "Authorization: Bearer $T1" -H "Content-Type: application/json" \
+  -d "{\"candidate\":\"$TAKEN\"}")
+echo "$RES" | grep -q '23505' || fail "claim_username pseudo pris (attendu 23505, obtenu $RES)"
+ok "claim_username refuse un pseudo déjà pris"
+
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/claim_username" -H "apikey: $KEY" \
+  -H "Authorization: Bearer $T1" -H "Content-Type: application/json" -d '{"candidate":"ab"}')
+echo "$RES" | grep -q '23514' || fail "claim_username format invalide (attendu 23514, obtenu $RES)"
+ok "claim_username refuse un pseudo mal formé"
+
+# Volontairement rejouable : un ré-appui après un aléa réseau ne doit pas échouer
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/claim_username" -H "apikey: $KEY" \
+  -H "Authorization: Bearer $T1" -H "Content-Type: application/json" \
+  -d '{"candidate":"E2eRenamed1"}')
+echo "$RES" | grep -q '"username":"E2eRenamed1"' || fail "claim_username rejouable ($RES)"
+ok "claim_username est rejouable"
+
 # Edge Function : suppression sans token refusée
 CODE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$URL/functions/v1/delete-account" -H "apikey: $KEY")
 [ "$CODE" = "401" ] || fail "delete-account sans token (attendu 401, obtenu $CODE)"
