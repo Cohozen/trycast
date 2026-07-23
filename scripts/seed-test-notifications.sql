@@ -28,7 +28,7 @@ insert into public.matches (
 )
 select
   c.id, -601, now() + interval '45 minutes', 'Test notifications', 'scheduled',
-  1.8, 24, 3.4, 'seed', now()
+  1.8, 24, 3.4, 'api', now()
 from public.competitions c
 where c.slug = 'nc-2026';
 
@@ -48,7 +48,7 @@ insert into public.matches (
 select
   c.id, -602, now() - interval '3 hours', 'Test notifications', 'finished',
   27, 24, 3, 2, false, false,
-  1.9, 22, 3.1, 'seed', now() - interval '1 day'
+  1.9, 22, 3.1, 'api', now() - interval '1 day'
 from public.competitions c
 where c.slug = 'nc-2026';
 
