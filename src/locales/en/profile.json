@@ -102,6 +102,11 @@
             "confirm": "Save",
             "updated": "Password updated!"
         },
+        "provider": {
+            "row": "Connection",
+            "google": "Google",
+            "apple": "Apple"
+        },
         "email": {
             "row": "Email address",
             "modalTitle": "Change email",

@@ -102,6 +102,11 @@
             "confirm": "Enregistrer",
             "updated": "Mot de passe mis à jour !"
         },
+        "provider": {
+            "row": "Connexion",
+            "google": "Google",
+            "apple": "Apple"
+        },
         "email": {
             "row": "Adresse e-mail",
             "modalTitle": "Changer d'adresse",

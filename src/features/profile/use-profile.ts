@@ -3,18 +3,24 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { trackEvent } from '@/lib/analytics';
 import { supabase } from '@/lib/supabase';
 
-export function useProfile(userId: string) {
+/**
+ * `userId` optionnel : le navigateur racine interroge le profil dès qu'une
+ * session existe, avant même de savoir s'il faut afficher l'app ou l'écran de
+ * choix du pseudo. La requête reste désactivée tant qu'il n'y a personne.
+ */
+export function useProfile(userId: string | undefined) {
     return useQuery({
         queryKey: ['profile', userId],
         queryFn: async () => {
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
-                .eq('id', userId)
+                .eq('id', userId as string)
                 .single();
             if (error) throw error;
             return data;
         },
+        enabled: Boolean(userId),
     });
 }
 

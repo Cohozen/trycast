@@ -1,7 +1,7 @@
 import { nativeApplicationVersion, nativeBuildVersion } from 'expo-application';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
-import { BookOpen, ChevronRight, Globe, KeyRound, Mail } from 'lucide-react-native';
+import { BookOpen, ChevronRight, Globe, KeyRound, Mail, ShieldCheck } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -17,7 +17,9 @@ import { DeleteAccountModal } from '@/features/profile/components/delete-account
 import { EmailEditorModal } from '@/features/profile/components/email-editor-modal';
 import { PasswordEditorModal } from '@/features/profile/components/password-editor-modal';
 import { UsernameEditor } from '@/features/profile/components/username-editor';
+import { hasPasswordIdentity, signInMethods } from '@/features/auth/identity';
 import { useSession } from '@/features/auth/session-context';
+import { signOutFromProviders } from '@/features/auth/sign-in-with-provider';
 import { NotificationSettings } from '@/features/notifications/components/notification-settings';
 import { unregisterPushToken } from '@/features/notifications/register-push-token';
 import { PrivacySettings } from '@/features/privacy/components/privacy-settings';
@@ -45,7 +47,7 @@ export default function SettingsScreen() {
     const { t } = useTranslation(['profile', 'scoring', 'common']);
     const router = useRouter();
     const { session } = useSession();
-    const { data: profile } = useProfile(session?.user.id ?? '');
+    const { data: profile } = useProfile(session?.user.id);
     const deleteAccount = useDeleteAccount();
 
     const [theme, setTheme] = useState<ThemePreference>('system');
@@ -57,6 +59,11 @@ export default function SettingsScreen() {
     const [emailSent, setEmailSent] = useState(false);
     const brandColor = useThemeColor('brand');
     const textFaintColor = useThemeColor('text-faint');
+
+    // Un compte créé via un fournisseur n'a ni mot de passe à changer, ni adresse
+    // modifiable : ces deux rangées cèdent la place à une ligne d'information.
+    const hasPassword = hasPasswordIdentity(session?.user);
+    const providerMethod = signInMethods(session?.user).find((method) => method !== 'email');
 
     // Version du binaire réellement installé (expo-application), pas celle du
     // bundle JS : c'est le couple version marketing + numéro de build que
@@ -99,6 +106,9 @@ export default function SettingsScreen() {
     // push de celui-ci)
     const onLogout = async () => {
         await unregisterPushToken();
+        // Avant le signOut Supabase : sans ça, la connexion suivante
+        // resélectionne le compte du fournisseur sans laisser le choix.
+        await signOutFromProviders();
         await supabase.auth.signOut();
     };
 
@@ -124,46 +134,69 @@ export default function SettingsScreen() {
                 ) : null}
                 <AvatarEditor userId={session?.user.id ?? ''} />
                 <UsernameEditor userId={session?.user.id ?? ''} />
-                <Pressable
-                    accessibilityRole="button"
-                    onPress={() => {
-                        setEmailSent(false);
-                        setEditingEmail(true);
-                    }}>
+                {providerMethod ? (
+                    // Compte créé via un fournisseur : rien à modifier ici. Le mot
+                    // de passe n'existe pas, et changer l'adresse romprait la
+                    // correspondance d'e-mail qui porte la liaison d'identité.
                     <Card className="flex-row items-center gap-3 px-4 py-3.5">
                         <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">
-                            <Mail color={brandColor} size={17} strokeWidth={1.9} />
+                            <ShieldCheck color={brandColor} size={17} strokeWidth={1.9} />
                         </View>
                         <Text className="font-body-semibold text-[15px] text-text">
-                            {t('profile:settings.email.row')}
+                            {t('profile:settings.provider.row')}
                         </Text>
                         <Text
                             className="flex-1 text-right font-body-medium text-[14px] text-text-muted"
                             numberOfLines={1}>
-                            {session?.user.email ?? ''}
+                            {t(`profile:settings.provider.${providerMethod}`)}
+                            {session?.user.email ? ` · ${session.user.email}` : ''}
                         </Text>
-                        <ChevronRight color={textFaintColor} size={18} strokeWidth={1.9} />
                     </Card>
-                </Pressable>
-                <Pressable
-                    accessibilityRole="button"
-                    onPress={() => {
-                        setPasswordSaved(false);
-                        setEditingPassword(true);
-                    }}>
-                    <Card className="flex-row items-center gap-3 px-4 py-3.5">
-                        <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">
-                            <KeyRound color={brandColor} size={17} strokeWidth={1.9} />
-                        </View>
-                        <Text className="flex-1 font-body-semibold text-[15px] text-text">
-                            {t('profile:settings.password.row')}
-                        </Text>
-                        <Text className="font-body-medium text-[14px] text-text-muted">
-                            {t('profile:settings.password.rowValue')}
-                        </Text>
-                        <ChevronRight color={textFaintColor} size={18} strokeWidth={1.9} />
-                    </Card>
-                </Pressable>
+                ) : null}
+                {hasPassword ? (
+                    <>
+                        <Pressable
+                            accessibilityRole="button"
+                            onPress={() => {
+                                setEmailSent(false);
+                                setEditingEmail(true);
+                            }}>
+                            <Card className="flex-row items-center gap-3 px-4 py-3.5">
+                                <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">
+                                    <Mail color={brandColor} size={17} strokeWidth={1.9} />
+                                </View>
+                                <Text className="font-body-semibold text-[15px] text-text">
+                                    {t('profile:settings.email.row')}
+                                </Text>
+                                <Text
+                                    className="flex-1 text-right font-body-medium text-[14px] text-text-muted"
+                                    numberOfLines={1}>
+                                    {session?.user.email ?? ''}
+                                </Text>
+                                <ChevronRight color={textFaintColor} size={18} strokeWidth={1.9} />
+                            </Card>
+                        </Pressable>
+                        <Pressable
+                            accessibilityRole="button"
+                            onPress={() => {
+                                setPasswordSaved(false);
+                                setEditingPassword(true);
+                            }}>
+                            <Card className="flex-row items-center gap-3 px-4 py-3.5">
+                                <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">
+                                    <KeyRound color={brandColor} size={17} strokeWidth={1.9} />
+                                </View>
+                                <Text className="flex-1 font-body-semibold text-[15px] text-text">
+                                    {t('profile:settings.password.row')}
+                                </Text>
+                                <Text className="font-body-medium text-[14px] text-text-muted">
+                                    {t('profile:settings.password.rowValue')}
+                                </Text>
+                                <ChevronRight color={textFaintColor} size={18} strokeWidth={1.9} />
+                            </Card>
+                        </Pressable>
+                    </>
+                ) : null}
             </View>
 
             {/* Préférences */}

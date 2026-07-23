@@ -24,6 +24,7 @@ import { useNotificationObserver } from '@/features/notifications/use-notificati
 import { useRegisterPushToken } from '@/features/notifications/use-register-push-token';
 import { applyStoredLanguagePreference } from '@/features/profile/language-preference';
 import { applyStoredThemePreference } from '@/features/profile/theme-preference';
+import { useProfile } from '@/features/profile/use-profile';
 import { useSyncLocale } from '@/features/profile/use-sync-locale';
 import { hydrateTelemetryPreferences } from '@/features/privacy/telemetry-preference';
 import { initAnalytics } from '@/lib/analytics';
@@ -43,6 +44,7 @@ function RootNavigator() {
     useSyncLocale(session?.user.id);
     useRegisterPushToken(session?.user.id);
     useNotificationObserver();
+    const profile = useProfile(session?.user.id);
     const [fontsLoaded] = useFonts({
         Anton_400Regular,
         Inter_400Regular,
@@ -52,15 +54,26 @@ function RootNavigator() {
     });
 
     // Le splash overlay reste affiché tant que la session n'est pas restaurée
-    // et que les polices du design system ne sont pas prêtes
-    if (isLoading || !fontsLoaded) {
+    // et que les polices du design system ne sont pas prêtes. Le profil s'y
+    // ajoute : sans lui, un compte à qui il manque un pseudo verrait l'accueil
+    // clignoter avant d'être renvoyé sur l'onboarding. `isLoading` (et non
+    // `isPending`) est délibéré : il retombe à faux sans session comme en cas
+    // d'échec réseau — un profil illisible ne doit pas bloquer sur le splash.
+    if (isLoading || !fontsLoaded || profile.isLoading) {
         return null;
     }
 
+    // Un pseudo « subi » (repli du trigger pour un compte OAuth) n'entre pas
+    // dans l'app : il serait affiché aux autres dans les ligues et classements.
+    const needsUsername = profile.data ? !profile.data.username_chosen : false;
+
     return (
         <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Protected guard={!!session}>
+            <Stack.Protected guard={!!session && !needsUsername}>
                 <Stack.Screen name="(app)" />
+            </Stack.Protected>
+            <Stack.Protected guard={!!session && needsUsername}>
+                <Stack.Screen name="(onboarding)" />
             </Stack.Protected>
             <Stack.Protected guard={!session}>
                 <Stack.Screen name="(auth)" />

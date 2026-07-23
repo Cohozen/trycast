@@ -22,7 +22,9 @@
  * `'apple'` est déclaré d'avance pour que brancher Sign in with Apple ne
  * demande pas de toucher au catalogue.
  */
-type SignInMethodProp = { method: 'password' | 'google' | 'apple' };
+export type SignInMethod = 'password' | 'google' | 'apple';
+
+type SignInMethodProp = { method: SignInMethod };
 
 export type AnalyticsEvent =
     /**
