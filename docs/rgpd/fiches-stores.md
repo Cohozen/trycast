@@ -33,6 +33,8 @@ l'app ; **aucune publicité, aucun suivi publicitaire**.
 |---|---|---|---|
 | Informations personnelles | Adresse e-mail | Oui | Fonctionnalité de l'app, gestion du compte |
 | Informations personnelles | Nom d'utilisateur (pseudo) | Oui | Fonctionnalité de l'app |
+| Informations personnelles | Nom | Non | Fonctionnalité de l'app — transmis par Google avec « Continuer avec Google », jamais affiché |
+| Identifiants | Identifiants utilisateur | Non | Fonctionnalité de l'app — identifiant de compte Google, comptes créés via Google uniquement |
 | Photos et vidéos | Photos | Non | Fonctionnalité de l'app (photo de profil) |
 | Contenu utilisateur | Autre contenu généré (pronostics) | Oui | Fonctionnalité de l'app |
 | Identifiants | Identifiant d'appareil (jeton de push) | Non | Fonctionnalité de l'app (notifications) |
@@ -40,6 +42,11 @@ l'app ; **aucune publicité, aucun suivi publicitaire**.
 | Activité de l'app | Interactions dans l'app | Non | **Analytics** |
 | Diagnostics de l'app | Journaux de plantage | Non | **Analytics** |
 | Diagnostics de l'app | Diagnostics | Non | **Analytics** |
+
+Les deux lignes « transmis par Google » ne concernent que les comptes créés avec « Continuer
+avec Google » : Supabase Auth conserve ces métadonnées telles que Google les envoie, elles
+sortent donc de l'appareil même si l'app ne les affiche jamais. Google demande de déclarer
+ce qui est **collecté**, pas ce qui est **utilisé**.
 
 Les trois dernières lignes correspondent à Aptabase et Sentry. Elles sont déclarées
 **collectées mais non partagées**, facultatives (l'utilisateur peut les couper dans

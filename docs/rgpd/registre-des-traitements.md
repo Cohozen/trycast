@@ -7,8 +7,7 @@
 **Responsable du traitement** : l'éditeur de TryCast, joignable à `contact@trycast.fr`.
 **Délégué à la protection des données** : aucun (non requis — pas de suivi à grande échelle,
 pas de données sensibles).
-**Dernière mise à jour** : 22 juillet 2026 (ajout des traitements §7 mesure d'usage et
-§8 diagnostics).
+**Dernière mise à jour** : 23 juillet 2026 (Sign in with Google dans le traitement §1).
 
 Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](procedure-droits.md),
 [fiches-stores.md](fiches-stores.md). Version publique : `web/src/pages/confidentialite.astro`.
@@ -22,12 +21,18 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 | **Finalité** | Créer et gérer un compte, authentifier l'utilisateur, lui permettre de se faire reconnaître par ses amis |
 | **Base légale** | Exécution du contrat (CGU) — art. 6.1.b |
 | **Personnes concernées** | Utilisateurs de l'application (≥ 15 ans) |
-| **Catégories de données** | Adresse e-mail, mot de passe (haché, jamais en clair), pseudo, photo de profil (facultative), langue, dates de création et de dernière connexion |
-| **Où** | `auth.users` (Supabase Auth), `public.profiles`, bucket Storage `avatars` |
-| **Destinataires** | Supabase (hébergement), Resend (e-mails de compte). Le pseudo et la photo sont visibles des autres membres des ligues rejointes ; l'e-mail ne l'est jamais |
-| **Transferts hors UE** | Aucun |
+| **Catégories de données** | Adresse e-mail, mot de passe (haché, jamais en clair — **absent** des comptes créés via un fournisseur d'identité), pseudo, photo de profil (facultative), langue, dates de création et de dernière connexion. Pour un compte créé via **Sign in with Google** : identifiant de compte Google, et les métadonnées transmises par Google (nom complet, URL de la photo de profil Google) conservées telles quelles par Supabase Auth |
+| **Où** | `auth.users` (Supabase Auth — dont `raw_user_meta_data` pour les métadonnées du fournisseur), `public.profiles`, bucket Storage `avatars` |
+| **Destinataires** | Supabase (hébergement), Resend (e-mails de compte), **Google** pour les comptes utilisant Sign in with Google (Google connaît alors la connexion à TryCast). Le pseudo et la photo sont visibles des autres membres des ligues rejointes ; l'e-mail ne l'est jamais |
+| **Transferts hors UE** | Oui, vers Google (États-Unis), **uniquement** pour les comptes utilisant Sign in with Google — encadré par le Data Privacy Framework et les clauses contractuelles types |
 | **Conservation** | Durée de vie du compte ; suppression immédiate et définitive à la demande de l'utilisateur ; suppression automatique après 3 ans d'inactivité (préavis par e-mail) |
-| **Sécurité** | RLS PostgreSQL (chaque compte ne lit/écrit que ses lignes), TLS, mot de passe haché par GoTrue, suppression via Edge Function `delete-account` qui purge aussi le dossier avatar |
+| **Sécurité** | RLS PostgreSQL (chaque compte ne lit/écrit que ses lignes), TLS, mot de passe haché par GoTrue, suppression via Edge Function `delete-account` qui purge aussi le dossier avatar. Sign in with Google : jeton d'identité vérifié par Supabase Auth, aucun mot de passe ni jeton Google conservé |
+
+> **Sur les données transmises par Google** : seule l'adresse e-mail est utilisée (elle
+> identifie le compte et porte la liaison avec un compte e-mail préexistant). Le nom
+> complet et la photo Google ne sont **jamais** affichés ni recopiés : le pseudo est choisi
+> par l'utilisateur au premier lancement, et l'avatar reste celui qu'il téléverse dans le
+> bucket `avatars`. Ces métadonnées disparaissent avec le compte (cascade `auth.users`).
 
 ## 2. Jeu : pronostics, points et classements
 
