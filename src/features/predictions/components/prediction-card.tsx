@@ -1,4 +1,5 @@
 import type { PostgrestError } from '@supabase/supabase-js';
+import { Shield } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -19,10 +20,9 @@ import {
     winnerPointsByOutcome,
 } from '@/features/scoring/potential-by-outcome';
 import { useActiveScoringRules } from '@/features/scoring/use-active-scoring-rules';
-import { Badge } from '@/components/ui/badge';
 import { hapticSuccess } from '@/lib/haptics';
 import { i18n } from '@/lib/i18n';
-import { Text, View } from '@/tw';
+import { Text, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
 type PredictionCardProps = {
@@ -76,21 +76,28 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
 
     const draft = complete
         ? {
-              match_id: match.id,
-              predicted_home_score: parsePredictedScore(homeRaw),
-              predicted_away_score: parsePredictedScore(awayRaw),
-              predicted_bonus_off_home: bonusHome,
-              predicted_bonus_off_away: bonusAway,
-          }
+            match_id: match.id,
+            predicted_home_score: parsePredictedScore(homeRaw),
+            predicted_away_score: parsePredictedScore(awayRaw),
+            predicted_bonus_off_home: bonusHome,
+            predicted_bonus_off_away: bonusAway,
+        }
         : null;
 
-    const saved =
-        prediction !== undefined &&
+    // La saisie courante correspond-elle à une rangée déjà enregistrée ?
+    // On compare au prono serveur (query) mais aussi au retour de la mutation :
+    // l'upsert n'est pas optimiste (il invalide puis refetch), et sans ce
+    // second cas la pastille retomberait sur « à pronostiquer » le temps du
+    // refetch, entre « enregistrement » et « enregistré ».
+    const matchesSaved = (row: PredictionRow | null | undefined): boolean =>
+        row != null &&
         draft !== null &&
-        draft.predicted_home_score === prediction.predicted_home_score &&
-        draft.predicted_away_score === prediction.predicted_away_score &&
-        draft.predicted_bonus_off_home === prediction.predicted_bonus_off_home &&
-        draft.predicted_bonus_off_away === prediction.predicted_bonus_off_away;
+        draft.predicted_home_score === row.predicted_home_score &&
+        draft.predicted_away_score === row.predicted_away_score &&
+        draft.predicted_bonus_off_home === row.predicted_bonus_off_home &&
+        draft.predicted_bonus_off_away === row.predicted_bonus_off_away;
+
+    const saved = matchesSaved(prediction) || (upsert.isSuccess && matchesSaved(upsert.data));
 
     // Auto-save : toute saisie complète différente du prono serveur part
     // après un court debounce (sauvegarde optimiste, aucun bouton)
@@ -106,15 +113,15 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
     const odds = { home: match.odds_home, draw: match.odds_draw, away: match.odds_away };
     const potential = draft
         ? computePotentialPoints(
-              {
-                  homeScore: draft.predicted_home_score,
-                  awayScore: draft.predicted_away_score,
-                  bonusOffHome: draft.predicted_bonus_off_home,
-                  bonusOffAway: draft.predicted_bonus_off_away,
-              },
-              odds,
-              rules,
-          )
+            {
+                homeScore: draft.predicted_home_score,
+                awayScore: draft.predicted_away_score,
+                bonusOffHome: draft.predicted_bonus_off_home,
+                bonusOffAway: draft.predicted_bonus_off_away,
+            },
+            odds,
+            rules,
+        )
         : null;
     const winnerPoints = winnerPointsByOutcome(odds, rules);
     const probabilities = impliedProbabilities(odds);
@@ -125,21 +132,40 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
     const offensiveBonus = (sideOdds: number | null): number =>
         Math.round(
             rules.offensiveBonusRatio *
-                rules.winnerPointsPerOddsUnit *
-                (sideOdds && sideOdds > 0 ? sideOdds : rules.fallbackOdds),
+            rules.winnerPointsPerOddsUnit *
+            (sideOdds && sideOdds > 0 ? sideOdds : rules.fallbackOdds),
         );
     const bonusHomeValue = offensiveBonus(match.odds_home);
     const bonusAwayValue = offensiveBonus(match.odds_away);
 
     // Indicateur bonus défensif : l'écart pronostiqué courant qualifie-t-il
-    // (match serré, pas de nul) ?
+    // (match serré, pas de nul) ? Le bonus va au perdant pronostiqué (celui qui
+    // défend bien) — extérieur si l'écart est positif (domicile gagne), domicile
+    // sinon.
     const predictedGap = draft ? draft.predicted_home_score - draft.predicted_away_score : null;
-    const defensivePossible =
+    const defensiveSide: 'home' | 'away' | null =
         predictedGap !== null &&
         predictedGap !== 0 &&
-        Math.abs(predictedGap) <= rules.defensiveBonusMaxGap;
+        Math.abs(predictedGap) <= rules.defensiveBonusMaxGap
+            ? predictedGap > 0
+                ? 'away'
+                : 'home'
+            : null;
+    const infoColor = useThemeColor('info');
+    const defensiveLabel = t('predictions:form.defensiveHint', {
+        points: rules.defensiveBonusPoints,
+        gap: rules.defensiveBonusMaxGap,
+    });
 
-    const status: SaveStatus = upsert.isPending ? 'saving' : saved ? 'saved' : 'toPredict';
+    // « à pronostiquer » ne s'affiche que s'il n'y a rien à enregistrer : dès
+    // qu'une saisie complète diffère du serveur (debounce compris), on est en
+    // « enregistrement ». En cas d'échec (deadline RLS), retour à l'état initial
+    // avec le message d'erreur affiché plus bas.
+    const status: SaveStatus = saved
+        ? 'saved'
+        : complete && !upsert.isError
+            ? 'saving'
+            : 'toPredict';
     const statusClasses = STATUS_CLASSES[status];
     const statusLabels: Record<SaveStatus, string> = {
         toPredict: t('predictions:status.toPredict'),
@@ -176,15 +202,30 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
                 </View>
             </View>
 
-            {/* Noms + drapeaux + saisie du score */}
+            {/* Noms + drapeaux + saisie du score. Bouclier bleu = bonus défensif
+                armé pour le vainqueur pronostiqué (match serré). */}
             <View className="flex-row items-center justify-between">
-                <Text className="flex-1 text-center font-body-bold text-[18px] text-text">
-                    {match.home_team ? teamName(match.home_team, t) : t('matches:teamTbd')}
-                </Text>
+                <View className="flex-1 flex-row items-center justify-center gap-1.5">
+                    <Text className="text-center font-body-bold text-[18px] text-text">
+                        {match.home_team ? teamName(match.home_team, t) : t('matches:teamTbd')}
+                    </Text>
+                    {defensiveSide === 'home' ? (
+                        <View accessibilityLabel={defensiveLabel} accessible>
+                            <Shield color={infoColor} size={16} strokeWidth={2} />
+                        </View>
+                    ) : null}
+                </View>
                 <View className="w-6" />
-                <Text className="flex-1 text-center font-body-bold text-[18px] text-text">
-                    {match.away_team ? teamName(match.away_team, t) : t('matches:teamTbd')}
-                </Text>
+                <View className="flex-1 flex-row items-center justify-center gap-1.5">
+                    <Text className="text-center font-body-bold text-[18px] text-text">
+                        {match.away_team ? teamName(match.away_team, t) : t('matches:teamTbd')}
+                    </Text>
+                    {defensiveSide === 'away' ? (
+                        <View accessibilityLabel={defensiveLabel} accessible>
+                            <Shield color={infoColor} size={16} strokeWidth={2} />
+                        </View>
+                    ) : null}
+                </View>
             </View>
             <View className="flex-row items-center justify-between gap-2.5">
                 <View className="flex flex-row items-center gap-2.5">
@@ -245,23 +286,8 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
                 </View>
             </View>
 
-            {/* Indicateur bonus défensif : match serré pronostiqué */}
-            {defensivePossible ? (
-                <View className="items-center">
-                    <Badge tone="info" variant="soft">
-                        {t('predictions:form.defensiveHint', {
-                            points: rules.defensiveBonusPoints,
-                            gap: rules.defensiveBonusMaxGap,
-                        })}
-                    </Badge>
-                </View>
-            ) : null}
-
             {/* Points potentiels · 1 N 2 */}
             <View className="gap-2">
-                <Text className="text-center font-body-semibold text-[11px] uppercase tracking-[0.66px] text-text-faint">
-                    {t('predictions:form.potentialLabel')}
-                </Text>
                 <View className="flex-row gap-2">
                     {cells.map(({ key, outcome }) => {
                         const active = predictedOutcome === outcome;

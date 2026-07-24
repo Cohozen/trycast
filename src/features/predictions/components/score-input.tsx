@@ -24,6 +24,7 @@ export function ScoreInput({ value, onChangeText, accessibilityLabel, invalid }:
             maxLength={3}
             onChangeText={onChangeText}
             placeholder=""
+            selectTextOnFocus
             value={value}
         />
     );

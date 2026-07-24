@@ -53,6 +53,8 @@
         "singleLeague": "One league only",
         "tries_one": "{{count}} try",
         "tries_other": "{{count}} tries",
+        "potentialPoints_one": "{{count}} pt",
+        "potentialPoints_other": "{{count}} pts",
         "tabs": {
             "predictions": "Predictions",
             "leaderboard": "Leaderboard"

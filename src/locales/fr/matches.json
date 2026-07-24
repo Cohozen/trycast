@@ -53,6 +53,8 @@
         "singleLeague": "Une seule ligue",
         "tries_one": "{{count}} essai",
         "tries_other": "{{count}} essais",
+        "potentialPoints_one": "{{count}} pt",
+        "potentialPoints_other": "{{count}} pts",
         "tabs": {
             "predictions": "Pronos",
             "leaderboard": "Classement"
