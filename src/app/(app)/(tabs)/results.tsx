@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useDeferredValue, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,10 @@ export default function ResultsScreen() {
     const predictions = useMyPredictions(competition.data?.id);
     const distributions = useCommunityDistributions(competition.data?.id);
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
+    // Sélection différée : au clic, la bande se met à jour tout de suite
+    // (currentDay), pendant que la liste — lourde à re-monter — se recalcule en
+    // tâche interruptible via listDay, sans geler le tap.
+    const deferredSelectedDay = useDeferredValue(selectedDay);
     const screenInsets = useScreenInsets();
 
     const refreshControl = usePullToRefresh(() =>
@@ -49,7 +53,7 @@ export default function ResultsScreen() {
                     paddingBottom: screenInsets.bottomTabBar,
                 }}>
                 <Skeleton className="h-9 w-44" variant="block" />
-                <Skeleton className="h-[74px]" variant="block" />
+                <Skeleton className="h-18.5" variant="block" />
                 <Skeleton className="h-52" variant="block" />
                 <Skeleton className="h-52" variant="block" />
             </View>
@@ -89,8 +93,14 @@ export default function ResultsScreen() {
     const days = MATCH_DAYS_ONLY ? fullRange.filter((day) => day.hasMatches) : fullRange;
     // La plage s'arrête à aujourd'hui : le dernier jour avec matchs est donc
     // le plus proche de la date courante — c'est lui qu'on présélectionne.
-    const currentDay = selectedDay ?? days.findLast((day) => day.hasMatches)?.key ?? null;
-    const dayResults = results.filter((m) => dayKeyOf(m.kickoff_at) === currentDay);
+    const defaultDay = days.findLast((day) => day.hasMatches)?.key ?? null;
+    // currentDay = valeur urgente (bande, feedback instantané au tap).
+    const currentDay = selectedDay ?? defaultDay;
+    // listDay = valeur différée (filtrage de la liste). Tant qu'elle n'a pas
+    // rattrapé currentDay, on estompe la liste pour signaler la transition.
+    const listDay = deferredSelectedDay ?? defaultDay;
+    const isDayPending = listDay !== currentDay;
+    const dayResults = results.filter((m) => dayKeyOf(m.kickoff_at) === listDay);
     const dayTitle =
         dayResults.length > 0
             ? new Intl.DateTimeFormat(i18n.language, {
@@ -102,9 +112,9 @@ export default function ResultsScreen() {
 
     return (
         <View className="flex-1 bg-bg">
-            <View className="flex-none px-5 pb-3" style={{ paddingTop: screenInsets.top }}>
+            <View className="flex-none px-5 pb-1" style={{ paddingTop: screenInsets.top }}>
                 <View className="gap-1">
-                    <Text className="font-display text-[30px] leading-[30px] tracking-[0.3px] text-text">
+                    <Text className="font-display text-3xl leading-7.5 tracking-[0.3px] text-text">
                         {t('matches:results.title')}
                     </Text>
                     {competition.data ? (
@@ -135,7 +145,8 @@ export default function ResultsScreen() {
                         className="flex-1"
                         contentContainerClassName="w-full max-w-[800px] gap-3 self-center px-5 pt-4"
                         contentContainerStyle={{ paddingBottom: screenInsets.bottomTabBar }}
-                        refreshControl={refreshControl}>
+                        refreshControl={refreshControl}
+                        style={{ opacity: isDayPending ? 0.5 : 1 }}>
                         <View className="flex-row items-baseline justify-between gap-3 px-0.5">
                             <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
                                 {dayTitle}

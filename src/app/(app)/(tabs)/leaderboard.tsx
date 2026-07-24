@@ -124,7 +124,7 @@ export default function LeaderboardScreen() {
                     paddingBottom: screenInsets.bottomTabBar,
                 }}>
                 <View className="gap-1">
-                    <Text className="font-display text-[30px] leading-[30px] tracking-[0.3px] text-text">
+                    <Text className="font-display text-3xl leading-7.5 tracking-[0.3px] text-text">
                         {t('leagues:leaderboard.title')}
                     </Text>
                     {competition.data ? (
@@ -162,8 +162,8 @@ export default function LeaderboardScreen() {
                             trailing={
                                 currentLeague
                                     ? t('leagues:detail.members', {
-                                          count: currentLeague.member_count,
-                                      })
+                                        count: currentLeague.member_count,
+                                    })
                                     : undefined
                             }
                             value={currentLeagueId}
