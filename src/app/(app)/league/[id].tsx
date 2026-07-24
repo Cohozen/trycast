@@ -1,5 +1,5 @@
 import * as Clipboard from 'expo-clipboard';
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
     ArrowLeftRight,
     ChevronRight,
@@ -109,13 +109,11 @@ export default function LeagueScreen() {
     return (
         <ScrollView
             className="flex-1 bg-bg"
-            contentContainerClassName="w-full max-w-[800px] gap-4 self-center p-5">
-            <Stack.Screen options={{ title: league.name }} />
-
+            contentContainerClassName="w-full max-w-[800px] gap-4 self-center px-5">
             {/* Identité */}
             <View className="flex-row items-center gap-3.5">
                 <LeagueIcon color={league.color} name={league.name} />
-                <View className="min-w-0 flex-1 gap-1.5">
+                <View className="min-w-0 flex-1">
                     <Text
                         className="font-display text-[28px] leading-[29px] text-text"
                         numberOfLines={1}>
@@ -346,10 +344,10 @@ function ResultsTab({
     const selectedRound = rounds.find((round) => roundKeyOf(round.round) === selected);
     const meta = selectedRound
         ? new Intl.DateTimeFormat(i18n.language, {
-              weekday: 'short',
-              day: 'numeric',
-              month: 'short',
-          }).format(new Date(selectedRound.firstKickoff))
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+        }).format(new Date(selectedRound.firstKickoff))
         : '';
 
     return (
@@ -565,8 +563,8 @@ function SettingsTab({
                                             numberOfLines={1}>
                                             {isMe
                                                 ? t('leagues:detail.settings.memberYou', {
-                                                      username: member.username,
-                                                  })
+                                                    username: member.username,
+                                                })
                                                 : member.username}
                                         </Text>
                                         <Text className="font-body-semibold text-[11px] text-text-faint">

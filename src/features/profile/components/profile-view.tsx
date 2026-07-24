@@ -20,9 +20,9 @@ import { useMatches } from '@/features/matches/use-matches';
 import { ResultCard } from '@/features/predictions/components/result-card';
 import { useCommunityDistributions } from '@/features/predictions/use-community-distributions';
 import { useUserPredictions } from '@/features/predictions/use-user-predictions';
+import { ProfileStatsPanel } from '@/features/profile/components/profile-stats';
 import { computePointsByRound } from '@/features/profile/compute-points-by-round';
 import { computeProfileStats } from '@/features/profile/compute-profile-stats';
-import { ProfileStatsPanel } from '@/features/profile/components/profile-stats';
 import { useProfile } from '@/features/profile/use-profile';
 import { i18n } from '@/lib/i18n';
 import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
@@ -85,8 +85,8 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
     const trend = computePointsByRound(predictions.data ?? new Map(), matches.data ?? []);
     const memberSince = profile
         ? new Intl.DateTimeFormat(i18n.language, { month: 'long', year: 'numeric' }).format(
-              new Date(profile.created_at),
-          )
+            new Date(profile.created_at),
+        )
         : null;
 
     const figures: { key: string; label: string; value: string }[] = [
@@ -185,7 +185,7 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                 )}
 
                 {/* Identité (+ accès réglages sur mon profil) */}
-                <View className="flex-row items-center gap-3.5">
+                <View className="flex-row gap-3.5">
                     {profilePending ? (
                         <Skeleton className="h-[56px] flex-1" variant="block" />
                     ) : (
@@ -197,7 +197,7 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                                 uri={profile?.avatar_url}
                             />
                             <View className="min-w-0 flex-1 gap-1">
-                                <Text className="font-display text-[27px] leading-[27px] text-text">
+                                <Text className="font-display text-[27px] leading-6.75 text-text">
                                     {profile?.username}
                                 </Text>
                                 {memberSince ? (
@@ -224,7 +224,7 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                         <View
                             className={`flex-1 items-center gap-1 px-1 py-3 ${index > 0 ? 'border-l border-border' : ''}`}
                             key={figure.key}>
-                            <Text className="font-display text-[23px] leading-[23px] text-text">
+                            <Text className="font-display text-[23px] leading-5.75 text-text">
                                 {figure.value}
                             </Text>
                             <Text className="font-body-bold text-[9.5px] uppercase tracking-[0.57px] text-text-faint">
@@ -296,7 +296,7 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                 ) : leagues.length === 0 ? (
                     <EmptyState
                         action={
-                            <View className="w-full min-w-[240px] gap-2.5">
+                            <View className="w-full min-w-60 gap-2.5">
                                 <Button
                                     fullWidth
                                     onPress={() => router.push('/league/new')}
@@ -331,7 +331,7 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                                     })
                                 }>
                                 <Card className="flex-row items-center gap-3 px-4 py-3.5">
-                                    <View className="h-[34px] w-[34px] items-center justify-center rounded-sm bg-accent/10">
+                                    <View className="h-9 w-9 items-center justify-center rounded-sm bg-accent/10">
                                         <Users color={accentColor} size={17} strokeWidth={1.9} />
                                     </View>
                                     <Text className="min-w-0 flex-1 font-body-bold text-[15px] text-text">

@@ -77,10 +77,10 @@ export function MatchHero({ match }: MatchHeroProps) {
         new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 2 }).format(value);
     const oddsPills = hasOdds
         ? [
-              { key: '1', label: match.home_team?.code ?? '1', value: match.odds_home as number },
-              { key: 'N', label: 'N', value: match.odds_draw as number },
-              { key: '2', label: match.away_team?.code ?? '2', value: match.odds_away as number },
-          ]
+            { key: '1', label: match.home_team?.code ?? '1', value: match.odds_home as number },
+            { key: 'N', label: 'N', value: match.odds_draw as number },
+            { key: '2', label: match.away_team?.code ?? '2', value: match.odds_away as number },
+        ]
         : [];
 
     const competitionLine = [

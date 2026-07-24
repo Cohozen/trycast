@@ -128,7 +128,7 @@ export default function MatchScreen() {
     // ScrollView de Screen, avec un fond opaque (cf. MatchHero).
     return (
         <Screen
-            contentClassName="gap-5 p-6"
+            contentClassName="gap-5 px-6"
             refreshControl={refreshControl}
             stickyHeaderIndices={[0]}
             top="none">
@@ -228,8 +228,8 @@ export default function MatchScreen() {
                             trailing={
                                 currentLeague
                                     ? t('leagues:detail.members', {
-                                          count: currentLeague.member_count,
-                                      })
+                                        count: currentLeague.member_count,
+                                    })
                                     : undefined
                             }
                             value={currentLeagueId}
