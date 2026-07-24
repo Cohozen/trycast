@@ -162,8 +162,8 @@ export default function LeaderboardScreen() {
                             trailing={
                                 currentLeague
                                     ? t('leagues:detail.members', {
-                                        count: currentLeague.member_count,
-                                    })
+                                          count: currentLeague.member_count,
+                                      })
                                     : undefined
                             }
                             value={currentLeagueId}
