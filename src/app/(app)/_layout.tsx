@@ -37,23 +37,48 @@ export default function AppLayout() {
                 <Stack.Screen name="(tabs)" options={{ title: '' }} />
                 <Stack.Screen
                     name="settings"
-                    options={{ headerShown: true, title: t('profile:settings.title') }}
+                    options={{
+                        headerShown: true,
+                        title: t('profile:settings.title'),
+                        gestureEnabled: true,
+                        animation: 'simple_push',
+                    }}
                 />
                 <Stack.Screen
                     name="rules"
-                    options={{ headerShown: true, title: t('scoring:rules.screenTitle') }}
+                    options={{
+                        headerShown: true,
+                        title: t('scoring:rules.screenTitle'),
+                        gestureEnabled: true,
+                        animation: 'simple_push',
+                    }}
                 />
                 <Stack.Screen
                     name="league/new"
-                    options={{ headerShown: true, title: t('leagues:new.screenTitle') }}
+                    options={{
+                        headerShown: true,
+                        title: t('leagues:new.screenTitle'),
+                        gestureEnabled: true,
+                        animation: 'simple_push',
+                    }}
                 />
                 <Stack.Screen
                     name="league/[id]"
-                    options={{ headerShown: true, title: t('leagues:detail.screenTitle') }}
+                    options={{
+                        headerShown: true,
+                        title: t('leagues:detail.screenTitle'),
+                        gestureEnabled: true,
+                        animation: 'simple_push',
+                    }}
                 />
                 <Stack.Screen
                     name="match/[id]"
-                    options={{ headerShown: true, title: t('matches:detail.screenTitle') }}
+                    options={{
+                        headerShown: true,
+                        title: t('matches:detail.screenTitle'),
+                        gestureEnabled: true,
+                        animation: 'simple_push',
+                    }}
                 />
             </Stack>
             <CelebrationHost />

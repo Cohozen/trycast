@@ -7,8 +7,8 @@ import {
     TabTrigger,
     TabTriggerSlotProps,
 } from 'expo-router/ui';
-import { BarChart3, CheckCircle, List, User } from 'lucide-react-native';
 import type { LucideIcon } from 'lucide-react-native';
+import { BarChart3, CheckCircle, List, User } from 'lucide-react-native';
 import {
     createContext,
     useCallback,
@@ -166,7 +166,7 @@ function FloatingTabList(props: TabListProps) {
             <View
                 className="items-center px-4"
                 style={{ paddingBottom: Math.max(insets.bottom, 16) }}>
-                <View className="w-full max-w-[500px] flex-row gap-1 rounded-[34px] border border-white/70 bg-surface/95 p-2 tc-shadow-lg dark:border-white/12">
+                <View className="w-full max-w-125 flex-row gap-1 rounded-[34px] border border-text-faint/50 bg-surface/95 p-2 tc-shadow-lg dark:border-white/12">
                     <SlidingPill />
                     {props.children}
                 </View>
@@ -210,7 +210,7 @@ function SlidingPill() {
 
     return (
         <Animated.View pointerEvents="none" style={[styles.pill, style]}>
-            <View className="flex-1 rounded-[28px] border border-white/50 bg-white/55 tc-shadow-sm dark:border-accent/30 dark:bg-accent/15" />
+            <View className="flex-1 rounded-xl border tc-shadow-sm border-accent/30 bg-accent/15" />
         </Animated.View>
     );
 }
@@ -236,7 +236,7 @@ export function TabButton({ icon: Icon, label, isFocused, index, ...props }: Tab
             {...props}
             className="flex-1"
             onLayout={(e) => onMeasure(index, e.nativeEvent.layout)}>
-            <View className="flex-1 items-center justify-center gap-1.5 px-2 py-3">
+            <View className="flex-1 items-center justify-center gap-1 px-2 py-3">
                 {/* Couche de base : état inactif (grisé) */}
                 <Icon color={faint} size={24} strokeWidth={1.9} />
                 <Text className="font-body-bold text-[10px] tracking-[0.3px] text-text-faint">
@@ -244,7 +244,7 @@ export function TabButton({ icon: Icon, label, isFocused, index, ...props }: Tab
                 </Text>
                 {/* Couche active (grenat), fondue par-dessus selon la progression */}
                 <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, activeLayer]}>
-                    <View className="flex-1 items-center justify-center gap-1.5 px-2 py-3">
+                    <View className="flex-1 items-center justify-center gap-1 px-2 py-3">
                         <Icon color={accent} size={24} strokeWidth={2.4} />
                         <Text className="font-body-bold text-[10px] tracking-[0.3px] text-accent">
                             {label}

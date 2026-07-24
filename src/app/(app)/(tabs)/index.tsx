@@ -154,12 +154,54 @@ export default function MatchesScreen() {
     const myRank = leaderboard.data?.find((row) => row.user_id === userId)?.rank ?? null;
     const totalPoints = standing.data?.total_points ?? 0;
     const played = standing.data?.predictions_scored ?? 0;
-    const currentRound = upcoming[0]?.round ?? null;
 
     // Contenu défilant aplati : stickyHeaderIndices exige que les en-têtes de
     // date soient des enfants directs du ScrollView.
     const listChildren: ReactNode[] = [];
     const stickyIndices: number[] = [];
+
+    // Mini-dashboard (points / joués / rang) : premier bloc du scroll, il
+    // disparaît en défilant — seuls les 2 titres restent épinglés en haut.
+    if (hasLeagues) {
+        listChildren.push(
+            <View
+                className="flex-row items-stretch justify-between gap-4 rounded-md border border-border bg-surface p-4.5 tc-shadow-sm"
+                key="dashboard">
+                <View className="gap-0.5">
+                    <View className="flex-row items-center gap-1.5">
+                        <View className="h-1.75 w-1.75 rounded-pill bg-accent" />
+                        <Text className="font-body-bold text-[11px] uppercase tracking-[1.1px] text-text-faint">
+                            {t('predictions:dashboard.points')}
+                        </Text>
+                    </View>
+                    <Text className="font-display text-[52px] leading-12.5 text-text">
+                        {totalPoints}
+                    </Text>
+                </View>
+                <View className="w-px bg-border" />
+                <View className="min-w-29 justify-center gap-3.5">
+                    <View className="gap-px">
+                        <Text className="font-display text-[22px] leading-5.5 text-text">
+                            {played}
+                        </Text>
+                        <Text className="font-body text-[12px] text-text-muted">
+                            {t('predictions:dashboard.played')}
+                        </Text>
+                    </View>
+                    {myRank !== null ? (
+                        <View className="gap-px">
+                            <Text className="font-display text-[22px] leading-5.5 text-text">
+                                {myRank === 1 ? '1ᵉʳ' : `${myRank}ᵉ`}
+                            </Text>
+                            <Text className="font-body text-[12px] text-text-muted">
+                                {t('predictions:dashboard.globalRank')}
+                            </Text>
+                        </View>
+                    ) : null}
+                </View>
+            </View>,
+        );
+    }
 
     // Carte(s) LIVE en tête (vide tant que sync-live n'est pas activé),
     // pressables vers la page de détail — seule entrée du lot (décision
@@ -294,66 +336,16 @@ export default function MatchesScreen() {
 
     return (
         <View className="flex-1 bg-bg">
-            {/* Bloc épinglé : en-tête + mini-dashboard */}
+            {/* Bloc épinglé : nom de la compétition (seul élément permanent en haut) */}
             <View
-                className="w-full max-w-200 flex-none gap-4.5 self-center px-5 pb-1"
+                className="w-full max-w-200 flex-none gap-1.5 self-center px-5 pb-1"
                 style={{ paddingTop: screenInsets.top }}>
-                {/* En-tête : compétition + journée */}
-                <View className="flex-row items-start justify-between gap-3">
-                    <View className="flex-1 gap-1.5">
-                        <Text className="font-body-bold text-[11px] uppercase tracking-[1.54px] text-text-faint">
-                            {t('matches:header.overline')}
-                        </Text>
-                        <Text className="font-display text-[27px] leading-7 tracking-[0.27px] text-text">
-                            {competition.data.name}
-                        </Text>
-                    </View>
-                    {currentRound ? (
-                        <View className="mt-5 h-6 justify-center rounded-pill border border-border bg-surface-sunken px-2.5">
-                            <Text className="font-body-bold text-[11px] uppercase tracking-[0.44px] text-text-muted">
-                                {t('matches:results.number_day_short', { count: currentRound })}
-                            </Text>
-                        </View>
-                    ) : null}
-                </View>
-
-                {/* Mini-dashboard */}
-                {hasLeagues ? (
-                    <View className="flex-row items-stretch justify-between gap-4 rounded-md border border-border bg-surface p-4.5 tc-shadow-sm">
-                        <View className="gap-0.5">
-                            <View className="flex-row items-center gap-1.5">
-                                <View className="h-1.75 w-1.75 rounded-pill bg-accent" />
-                                <Text className="font-body-bold text-[11px] uppercase tracking-[1.1px] text-text-faint">
-                                    {t('predictions:dashboard.points')}
-                                </Text>
-                            </View>
-                            <Text className="font-display text-[52px] leading-12.5 text-text">
-                                {totalPoints}
-                            </Text>
-                        </View>
-                        <View className="w-px bg-border" />
-                        <View className="min-w-29 justify-center gap-3.5">
-                            <View className="gap-px">
-                                <Text className="font-display text-[22px] leading-5.5 text-text">
-                                    {played}
-                                </Text>
-                                <Text className="font-body text-[12px] text-text-muted">
-                                    {t('predictions:dashboard.played')}
-                                </Text>
-                            </View>
-                            {myRank !== null ? (
-                                <View className="gap-px">
-                                    <Text className="font-display text-[22px] leading-5.5 text-text">
-                                        {myRank === 1 ? '1ᵉʳ' : `${myRank}ᵉ`}
-                                    </Text>
-                                    <Text className="font-body text-[12px] text-text-muted">
-                                        {t('predictions:dashboard.globalRank')}
-                                    </Text>
-                                </View>
-                            ) : null}
-                        </View>
-                    </View>
-                ) : null}
+                <Text className="font-body-bold text-[11px] uppercase tracking-[1.54px] text-text-faint">
+                    {t('matches:header.overline')}
+                </Text>
+                <Text className="font-display text-[27px] leading-7 tracking-[0.27px] text-text">
+                    {competition.data.name}
+                </Text>
             </View>
 
             {/* Le scroll des pronos porte les inputs de score : Screen gère le
