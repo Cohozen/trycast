@@ -68,7 +68,17 @@ function useTabBar(): TabBarContextValue {
 export default function AppTabs() {
     const { t } = useTranslation('common');
     const pathname = usePathname();
-    const activeIndex = Math.max(0, TAB_ROUTES.indexOf(pathname as (typeof TAB_ROUTES)[number]));
+    // La barre reste montée sous les écrans poussés au-dessus des onglets
+    // (Réglages, Règles, ligue…) : leur pathname n'est pas un onglet, donc on
+    // CONSERVE le dernier onglet actif au lieu de retomber sur l'index 0 —
+    // sinon la pastille file (invisiblement) vers la gauche pendant qu'on est
+    // sur l'écran poussé, puis re-coulisse depuis la gauche au retour. Motif
+    // React « ajuster un état sur changement de prop » (sans effet).
+    const matchedIndex = TAB_ROUTES.indexOf(pathname as (typeof TAB_ROUTES)[number]);
+    const [activeIndex, setActiveIndex] = useState(matchedIndex < 0 ? 0 : matchedIndex);
+    if (matchedIndex >= 0 && matchedIndex !== activeIndex) {
+        setActiveIndex(matchedIndex);
+    }
 
     // Géométrie mesurée de chaque onglet (x/y/width/height dans la barre) : la
     // pastille se cale dessus plutôt que sur une arithmétique gap/padding fragile.
