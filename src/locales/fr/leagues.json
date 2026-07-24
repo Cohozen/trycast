@@ -85,6 +85,7 @@
         }
     },
     "detail": {
+        "screenTitle": "Ligue",
         "members_one": "{{count}} membre",
         "members_other": "{{count}} membres",
         "invite": "Inviter des amis",

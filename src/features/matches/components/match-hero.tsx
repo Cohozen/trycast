@@ -90,10 +90,10 @@ export function MatchHero({ match }: MatchHeroProps) {
         .filter(Boolean)
         .join(' · ');
 
-    // Contenu déplié du CollapsingHeader de la page de détail : c'est l'en-tête
-    // qui porte le fond opaque et le séparateur, le hero n'a plus à les poser.
+    // bg-bg : le hero est épinglé (sticky) sur la page de détail, fond opaque
+    // obligatoire pour masquer le contenu défilant dessous.
     return (
-        <View className="gap-3 pb-4">
+        <View className="gap-3 border-b border-border bg-bg pb-4">
             <MatchStatusChip match={match} />
 
             <View className="flex-row items-start gap-1.5">

@@ -85,6 +85,7 @@
         }
     },
     "detail": {
+        "screenTitle": "League",
         "members_one": "{{count}} member",
         "members_other": "{{count}} members",
         "invite": "Invite friends",

@@ -1,5 +1,5 @@
 import * as Clipboard from 'expo-clipboard';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import {
     ArrowLeftRight,
     ChevronRight,
@@ -15,13 +15,11 @@ import {
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Share } from 'react-native';
-import Animated, { useAnimatedRef, useScrollViewOffset } from 'react-native-reanimated';
 
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { CollapsingHeader } from '@/components/ui/collapsing-header';
 import { EmptyState } from '@/components/ui/empty-state';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -51,7 +49,7 @@ import { useMatches } from '@/features/matches/use-matches';
 import { useOpenPlayerProfile } from '@/features/profile/use-open-player-profile';
 import { hapticLight } from '@/lib/haptics';
 import { i18n } from '@/lib/i18n';
-import { Pressable, Text, useThemeColor, View } from '@/tw';
+import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
 type DetailTab = 'standings' | 'results' | 'settings';
@@ -71,127 +69,108 @@ export default function LeagueScreen() {
     const router = useRouter();
     const { session } = useSession();
     const userId = session?.user.id;
-    const bgColor = useThemeColor('bg');
 
     const [tab, setTab] = useState<DetailTab>('standings');
-    const [headerHeight, setHeaderHeight] = useState(0);
-    const scrollRef = useAnimatedRef<Animated.ScrollView>();
-    const scrollY = useScrollViewOffset(scrollRef);
 
     const leagues = useMyLeagues();
     const leaderboard = useLeagueLeaderboard(id);
     const league = leagues.data?.find((row) => row.id === id);
     const isOwner = !!league && league.owner_id === userId;
+
+    if (leagues.isPending || leaderboard.isPending) {
+        return (
+            <View className="flex-1 gap-2.5 bg-bg p-6">
+                <View className="flex-row items-center gap-3.5">
+                    <Skeleton className="h-[58px] w-[58px]" variant="block" />
+                    <View className="flex-1 gap-2">
+                        <Skeleton className="h-6 w-40" variant="line" />
+                        <Skeleton className="h-3.5 w-24" variant="line" />
+                    </View>
+                </View>
+                <Skeleton className="h-12" variant="block" />
+                <Skeleton className="h-16" variant="block" />
+                <Skeleton className="h-16" variant="block" />
+                <Skeleton className="h-16" variant="block" />
+            </View>
+        );
+    }
+
+    // RLS : un non-membre (exclu, parti) ne voit ni la ligue ni son classement
+    if (!league || leaderboard.isError || !leaderboard.data) {
+        return (
+            <View className="flex-1 items-center justify-center bg-bg p-6">
+                <EmptyState title={t('leagues:detail.notFound')} />
+            </View>
+        );
+    }
+
     const members = leaderboard.data;
 
-    const loading = leagues.isPending || leaderboard.isPending;
-    // RLS : un non-membre (exclu, parti) ne voit ni la ligue ni son classement
-    const missing = !loading && (!league || leaderboard.isError || !members);
-
-    // Ouvert par deep link, l'écran n'a pas de pile derrière lui : repli sur
-    // l'onglet Classement plutôt qu'un GO_BACK dans le vide.
-    const goBack = () => (router.canGoBack() ? router.back() : router.replace('/leaderboard'));
-
     return (
-        <View className="flex-1 bg-bg">
-            <Animated.ScrollView
-                ref={scrollRef}
-                scrollEventThrottle={16}
-                style={{ flex: 1, backgroundColor: bgColor }}
-                contentContainerStyle={{ paddingTop: headerHeight }}>
-                <View className="w-full max-w-[800px] gap-4 self-center px-5 pb-8 pt-4">
-                    {loading ? (
-                        <>
-                            <Skeleton className="h-12" variant="block" />
-                            <Skeleton className="h-16" variant="block" />
-                            <Skeleton className="h-16" variant="block" />
-                            <Skeleton className="h-16" variant="block" />
-                        </>
-                    ) : missing || !league || !members ? (
-                        <View className="items-center justify-center py-16">
-                            <EmptyState title={t('leagues:detail.notFound')} />
-                        </View>
-                    ) : (
-                        <>
-                            <SegmentedControl
-                                onChange={setTab}
-                                options={[
-                                    {
-                                        value: 'standings',
-                                        label: t('leagues:detail.tabs.standings'),
-                                    },
-                                    { value: 'results', label: t('leagues:detail.tabs.results') },
-                                    { value: 'settings', label: t('leagues:detail.tabs.settings') },
-                                ]}
-                                value={tab}
-                            />
+        <ScrollView
+            className="flex-1 bg-bg"
+            contentContainerClassName="w-full max-w-[800px] gap-4 self-center p-5">
+            <Stack.Screen options={{ title: league.name }} />
 
-                            {tab === 'standings' ? (
-                                <StandingsTab
-                                    inviteCode={league.invite_code}
-                                    members={members}
-                                    onInvite={() => setTab('settings')}
-                                    userId={userId}
-                                />
-                            ) : null}
-                            {tab === 'results' ? (
-                                <ResultsTab
-                                    competitionId={league.competition_id}
-                                    leagueId={league.id}
-                                    userId={userId}
-                                />
-                            ) : null}
-                            {tab === 'settings' ? (
-                                <SettingsTab
-                                    isOwner={isOwner}
-                                    league={league}
-                                    members={members}
-                                    onLeft={goBack}
-                                    userId={userId}
-                                />
-                            ) : null}
-                        </>
-                    )}
+            {/* Identité */}
+            <View className="flex-row items-center gap-3.5">
+                <LeagueIcon color={league.color} name={league.name} />
+                <View className="min-w-0 flex-1 gap-1.5">
+                    <Text
+                        className="font-display text-[28px] leading-[29px] text-text"
+                        numberOfLines={1}>
+                        {league.name}
+                    </Text>
+                    <View className="flex-row flex-wrap items-center gap-2">
+                        <MembersLine count={members.length} />
+                        <Badge tone={isOwner ? 'brand' : 'neutral'} variant="soft">
+                            {isOwner
+                                ? t('leagues:detail.badges.admin')
+                                : t('leagues:detail.badges.member')}
+                        </Badge>
+                    </View>
                 </View>
-            </Animated.ScrollView>
+            </View>
 
-            {/* Rendu même en chargement/erreur : sans header natif, c'est le
-                seul bouton retour de l'écran. */}
-            <CollapsingHeader
-                compactTitle={
-                    league ? (
-                        <Text className="font-body-bold text-[16px] text-text" numberOfLines={1}>
-                            {league.name}
-                        </Text>
-                    ) : null
-                }
-                expanded={
-                    league && members ? (
-                        <View className="flex-row items-center gap-3.5 pb-4 pt-1">
-                            <LeagueIcon color={league.color} name={league.name} />
-                            <View className="min-w-0 flex-1 gap-1.5">
-                                <Text
-                                    className="font-display text-[28px] leading-[29px] text-text"
-                                    numberOfLines={1}>
-                                    {league.name}
-                                </Text>
-                                <View className="flex-row flex-wrap items-center gap-2">
-                                    <MembersLine count={members.length} />
-                                    <Badge tone={isOwner ? 'brand' : 'neutral'} variant="soft">
-                                        {isOwner
-                                            ? t('leagues:detail.badges.admin')
-                                            : t('leagues:detail.badges.member')}
-                                    </Badge>
-                                </View>
-                            </View>
-                        </View>
-                    ) : null
-                }
-                onBack={goBack}
-                onHeightChange={setHeaderHeight}
-                scrollY={scrollY}
+            <SegmentedControl
+                onChange={setTab}
+                options={[
+                    { value: 'standings', label: t('leagues:detail.tabs.standings') },
+                    { value: 'results', label: t('leagues:detail.tabs.results') },
+                    { value: 'settings', label: t('leagues:detail.tabs.settings') },
+                ]}
+                value={tab}
             />
-        </View>
+
+            {tab === 'standings' ? (
+                <StandingsTab
+                    inviteCode={league.invite_code}
+                    members={members}
+                    onInvite={() => setTab('settings')}
+                    userId={userId}
+                />
+            ) : null}
+            {tab === 'results' ? (
+                <ResultsTab
+                    competitionId={league.competition_id}
+                    leagueId={league.id}
+                    userId={userId}
+                />
+            ) : null}
+            {tab === 'settings' ? (
+                <SettingsTab
+                    isOwner={isOwner}
+                    league={league}
+                    members={members}
+                    // Ouvert par deep link, l'écran n'a pas de pile derrière lui :
+                    // repli sur l'onglet Classement plutôt qu'un GO_BACK dans le vide
+                    onLeft={() =>
+                        router.canGoBack() ? router.back() : router.replace('/leaderboard')
+                    }
+                    userId={userId}
+                />
+            ) : null}
+        </ScrollView>
     );
 }
 
