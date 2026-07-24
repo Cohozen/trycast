@@ -1,31 +1,35 @@
 import { useRouter } from 'expo-router';
-import { useDeferredValue, useState } from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View as RNView } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { runOnJS } from 'react-native-reanimated';
+import {
+    type FlatList,
+    type ListRenderItemInfo,
+    type NativeScrollEvent,
+    type NativeSyntheticEvent,
+    useWindowDimensions,
+} from 'react-native';
+import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
-import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { DayStrip } from '@/features/matches/components/day-strip';
-import { buildDayRange, dayKeyOf, MATCH_DAYS_ONLY, stepDayKey } from '@/features/matches/day-range';
+import {
+    buildDayRange,
+    dayKeyOf,
+    MATCH_DAYS_ONLY,
+    type StripDay,
+} from '@/features/matches/day-range';
+import type { MatchWithTeams } from '@/features/matches/types';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
 import { useMatches } from '@/features/matches/use-matches';
-import { ResultCard } from '@/features/predictions/components/result-card';
+import { ResultsDayPage } from '@/features/predictions/components/results-day-page';
 import { splitMatches } from '@/features/predictions/split-matches';
 import { useCommunityDistributions } from '@/features/predictions/use-community-distributions';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
 import { hapticLight } from '@/lib/haptics';
-import { i18n } from '@/lib/i18n';
-import { ScrollView, Text, View } from '@/tw';
+import { Text, View } from '@/tw';
 import { useScreenInsets } from '@/tw/use-screen-insets';
-
-// Balayage horizontal de la liste : distance (px) ou vitesse (px/s) minimale
-// pour valider un changement de jour, sous les seuils on annule.
-const SWIPE_DISTANCE = 48;
-const SWIPE_VELOCITY = 500;
 
 export default function ResultsScreen() {
     const { t } = useTranslation(['matches', 'predictions', 'common']);
@@ -34,21 +38,26 @@ export default function ResultsScreen() {
     const matches = useMatches(competition.data?.id);
     const predictions = useMyPredictions(competition.data?.id);
     const distributions = useCommunityDistributions(competition.data?.id);
-    const [selectedDay, setSelectedDay] = useState<string | null>(null);
-    // Sélection différée : au clic, la bande se met à jour tout de suite
-    // (currentDay), pendant que la liste — lourde à re-monter — se recalcule en
-    // tâche interruptible via listDay, sans geler le tap.
-    const deferredSelectedDay = useDeferredValue(selectedDay);
     const screenInsets = useScreenInsets();
+    const { width } = useWindowDimensions();
 
-    const refreshControl = usePullToRefresh(() =>
+    // Décalage du carrousel partagé avec la bande (index fractionnaire côté strip).
+    const scrollX = useSharedValue(0);
+    const onScroll = useAnimatedScrollHandler((event) => {
+        scrollX.value = event.contentOffset.x;
+    });
+    const flatListRef = useRef<FlatList<StripDay>>(null);
+    // Jour courant (index de page) — en ref pour un tick haptique à chaque arrivée
+    // sur un nouveau jour, sans déclencher de re-render.
+    const currentIndexRef = useRef(-1);
+
+    const onRefresh = () =>
         Promise.all([
             competition.refetch(),
             matches.refetch(),
             predictions.refetch(),
             distributions.refetch(),
-        ]),
-    );
+        ]);
 
     if (
         competition.isPending ||
@@ -100,47 +109,53 @@ export default function ResultsScreen() {
         : [];
     // Par défaut on n'expose que les jours avec des matchs (cf. MATCH_DAYS_ONLY).
     const days = MATCH_DAYS_ONLY ? fullRange.filter((day) => day.hasMatches) : fullRange;
-    // La plage s'arrête à aujourd'hui : le dernier jour avec matchs est donc
-    // le plus proche de la date courante — c'est lui qu'on présélectionne.
-    const defaultDay = days.findLast((day) => day.hasMatches)?.key ?? null;
-    // currentDay = valeur urgente (bande, feedback instantané au tap).
-    const currentDay = selectedDay ?? defaultDay;
-    // listDay = valeur différée (filtrage de la liste). Tant qu'elle n'a pas
-    // rattrapé currentDay, on estompe la liste pour signaler la transition.
-    const listDay = deferredSelectedDay ?? defaultDay;
-    const isDayPending = listDay !== currentDay;
-    const dayResults = results.filter((m) => dayKeyOf(m.kickoff_at) === listDay);
-    const dayTitle =
-        dayResults.length > 0
-            ? new Intl.DateTimeFormat(i18n.language, {
-                  weekday: 'long',
-                  day: 'numeric',
-                  month: 'long',
-              }).format(new Date(dayResults[0].kickoff_at))
-            : '';
 
-    // Passe au jour de match voisin (en sautant les jours vides). currentDay
-    // pilote la bande, la mise à jour de selectedDay est reprise par listDay.
-    const goToAdjacentDay = (direction: 1 | -1) => {
-        const nextDay = stepDayKey(days, currentDay, direction);
-        if (nextDay === null) return;
-        setSelectedDay(nextDay);
-        hapticLight();
+    // Résultats groupés par jour : chaque page du carrousel lit sa liste.
+    const resultsByDay = new Map<string, MatchWithTeams[]>();
+    for (const match of results) {
+        const key = dayKeyOf(match.kickoff_at);
+        const bucket = resultsByDay.get(key);
+        if (bucket) bucket.push(match);
+        else resultsByDay.set(key, [match]);
+    }
+
+    // Jour présélectionné = le dernier à matchs (le plus proche d'aujourd'hui).
+    let initialIndex = 0;
+    for (let i = days.length - 1; i >= 0; i--) {
+        if (days[i].hasMatches) {
+            initialIndex = i;
+            break;
+        }
+    }
+
+    // Amorce la ref au montage (événement : interdit d'écrire une ref au rendu)
+    // pour qu'aucun tick haptique ne parte sur la position initiale.
+    const onListLayout = () => {
+        if (currentIndexRef.current === -1) currentIndexRef.current = initialIndex;
     };
 
-    // Geste horizontal sur la liste : gauche → jour plus récent (droite de la
-    // bande), droite → plus ancien. Les offsets laissent le scroll vertical
-    // primer (activation seulement après un franc mouvement horizontal).
-    const swipeDays = Gesture.Pan()
-        .activeOffsetX([-24, 24])
-        .failOffsetY([-18, 18])
-        .onEnd((event) => {
-            if (event.translationX <= -SWIPE_DISTANCE || event.velocityX <= -SWIPE_VELOCITY) {
-                runOnJS(goToAdjacentDay)(1);
-            } else if (event.translationX >= SWIPE_DISTANCE || event.velocityX >= SWIPE_VELOCITY) {
-                runOnJS(goToAdjacentDay)(-1);
-            }
-        });
+    const onSelectDay = (index: number) => {
+        flatListRef.current?.scrollToOffset({ offset: index * width, animated: true });
+    };
+
+    const onMomentumEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+        const index = Math.round(event.nativeEvent.contentOffset.x / width);
+        if (index !== currentIndexRef.current) {
+            currentIndexRef.current = index;
+            hapticLight();
+        }
+    };
+
+    const renderItem = ({ item }: ListRenderItemInfo<StripDay>) => (
+        <ResultsDayPage
+            distributions={distributions.data}
+            matches={resultsByDay.get(item.key) ?? []}
+            onOpenMatch={(id) => router.push({ pathname: '/match/[id]', params: { id } })}
+            onRefresh={onRefresh}
+            predictions={predictions.data}
+            width={width}
+        />
+    );
 
     return (
         <View className="flex-1 bg-bg">
@@ -169,45 +184,33 @@ export default function ResultsScreen() {
                     {days.length > 0 ? (
                         <DayStrip
                             days={days}
-                            onSelect={setSelectedDay}
-                            selected={currentDay ?? ''}
+                            onSelect={onSelectDay}
+                            pageWidth={width}
+                            scrollX={scrollX}
                         />
                     ) : null}
-                    <GestureDetector gesture={swipeDays}>
-                        <RNView style={{ flex: 1 }}>
-                            <ScrollView
-                                className="flex-1"
-                                contentContainerClassName="w-full max-w-[800px] gap-3 self-center px-5 pt-4"
-                                contentContainerStyle={{
-                                    paddingBottom: screenInsets.bottomTabBar,
-                                }}
-                                refreshControl={refreshControl}
-                                style={{ opacity: isDayPending ? 0.5 : 1 }}>
-                                <View className="flex-row items-baseline justify-between gap-3 px-0.5">
-                                    <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
-                                        {dayTitle}
-                                    </Text>
-                                    <Text className="font-body-bold text-[11px] uppercase tracking-[0.66px] text-text-faint">
-                                        {t('matches:results.count', { count: dayResults.length })}
-                                    </Text>
-                                </View>
-                                {dayResults.map((match) => (
-                                    <ResultCard
-                                        distribution={distributions.data?.get(match.id)}
-                                        key={match.id}
-                                        match={match}
-                                        onOpenMatch={() =>
-                                            router.push({
-                                                pathname: '/match/[id]',
-                                                params: { id: match.id },
-                                            })
-                                        }
-                                        prediction={predictions.data?.get(match.id)}
-                                    />
-                                ))}
-                            </ScrollView>
-                        </RNView>
-                    </GestureDetector>
+                    <Animated.FlatList
+                        bounces={false}
+                        data={days}
+                        getItemLayout={(_, index) => ({
+                            length: width,
+                            offset: width * index,
+                            index,
+                        })}
+                        horizontal
+                        initialScrollIndex={initialIndex}
+                        keyExtractor={(day: StripDay) => day.key}
+                        onLayout={onListLayout}
+                        onMomentumScrollEnd={onMomentumEnd}
+                        onScroll={onScroll}
+                        pagingEnabled
+                        ref={flatListRef}
+                        renderItem={renderItem}
+                        scrollEventThrottle={16}
+                        showsHorizontalScrollIndicator={false}
+                        style={{ flex: 1 }}
+                        windowSize={3}
+                    />
                 </>
             )}
         </View>
