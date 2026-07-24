@@ -70,3 +70,21 @@ export function buildDayRange(options: DayRangeOptions): StripDay[] {
     }
     return days;
 }
+
+/**
+ * Jour sélectionnable voisin dans la bande, en sautant les jours sans match :
+ * `direction` +1 va vers un jour plus récent (droite de la bande), -1 vers un
+ * plus ancien. Renvoie null si `current` est inconnu ou déjà au bord — le geste
+ * de balayage n'a alors rien à faire.
+ */
+export function stepDayKey(
+    days: StripDay[],
+    current: string | null,
+    direction: 1 | -1,
+): string | null {
+    if (current === null) return null;
+    const selectable = days.filter((day) => day.hasMatches).map((day) => day.key);
+    const index = selectable.indexOf(current);
+    if (index < 0) return null;
+    return selectable[index + direction] ?? null;
+}

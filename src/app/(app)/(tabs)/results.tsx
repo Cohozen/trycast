@@ -1,22 +1,31 @@
 import { useRouter } from 'expo-router';
 import { useDeferredValue, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { View as RNView } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { runOnJS } from 'react-native-reanimated';
 
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { DayStrip } from '@/features/matches/components/day-strip';
-import { buildDayRange, dayKeyOf, MATCH_DAYS_ONLY } from '@/features/matches/day-range';
+import { buildDayRange, dayKeyOf, MATCH_DAYS_ONLY, stepDayKey } from '@/features/matches/day-range';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
 import { useMatches } from '@/features/matches/use-matches';
 import { ResultCard } from '@/features/predictions/components/result-card';
 import { splitMatches } from '@/features/predictions/split-matches';
 import { useCommunityDistributions } from '@/features/predictions/use-community-distributions';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
+import { hapticLight } from '@/lib/haptics';
 import { i18n } from '@/lib/i18n';
 import { ScrollView, Text, View } from '@/tw';
 import { useScreenInsets } from '@/tw/use-screen-insets';
+
+// Balayage horizontal de la liste : distance (px) ou vitesse (px/s) minimale
+// pour valider un changement de jour, sous les seuils on annule.
+const SWIPE_DISTANCE = 48;
+const SWIPE_VELOCITY = 500;
 
 export default function ResultsScreen() {
     const { t } = useTranslation(['matches', 'predictions', 'common']);
@@ -110,6 +119,29 @@ export default function ResultsScreen() {
               }).format(new Date(dayResults[0].kickoff_at))
             : '';
 
+    // Passe au jour de match voisin (en sautant les jours vides). currentDay
+    // pilote la bande, la mise à jour de selectedDay est reprise par listDay.
+    const goToAdjacentDay = (direction: 1 | -1) => {
+        const nextDay = stepDayKey(days, currentDay, direction);
+        if (nextDay === null) return;
+        setSelectedDay(nextDay);
+        hapticLight();
+    };
+
+    // Geste horizontal sur la liste : gauche → jour plus récent (droite de la
+    // bande), droite → plus ancien. Les offsets laissent le scroll vertical
+    // primer (activation seulement après un franc mouvement horizontal).
+    const swipeDays = Gesture.Pan()
+        .activeOffsetX([-24, 24])
+        .failOffsetY([-18, 18])
+        .onEnd((event) => {
+            if (event.translationX <= -SWIPE_DISTANCE || event.velocityX <= -SWIPE_VELOCITY) {
+                runOnJS(goToAdjacentDay)(1);
+            } else if (event.translationX >= SWIPE_DISTANCE || event.velocityX >= SWIPE_VELOCITY) {
+                runOnJS(goToAdjacentDay)(-1);
+            }
+        });
+
     return (
         <View className="flex-1 bg-bg">
             <View className="flex-none px-5 pb-1" style={{ paddingTop: screenInsets.top }}>
@@ -141,35 +173,41 @@ export default function ResultsScreen() {
                             selected={currentDay ?? ''}
                         />
                     ) : null}
-                    <ScrollView
-                        className="flex-1"
-                        contentContainerClassName="w-full max-w-[800px] gap-3 self-center px-5 pt-4"
-                        contentContainerStyle={{ paddingBottom: screenInsets.bottomTabBar }}
-                        refreshControl={refreshControl}
-                        style={{ opacity: isDayPending ? 0.5 : 1 }}>
-                        <View className="flex-row items-baseline justify-between gap-3 px-0.5">
-                            <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
-                                {dayTitle}
-                            </Text>
-                            <Text className="font-body-bold text-[11px] uppercase tracking-[0.66px] text-text-faint">
-                                {t('matches:results.count', { count: dayResults.length })}
-                            </Text>
-                        </View>
-                        {dayResults.map((match) => (
-                            <ResultCard
-                                distribution={distributions.data?.get(match.id)}
-                                key={match.id}
-                                match={match}
-                                onOpenMatch={() =>
-                                    router.push({
-                                        pathname: '/match/[id]',
-                                        params: { id: match.id },
-                                    })
-                                }
-                                prediction={predictions.data?.get(match.id)}
-                            />
-                        ))}
-                    </ScrollView>
+                    <GestureDetector gesture={swipeDays}>
+                        <RNView style={{ flex: 1 }}>
+                            <ScrollView
+                                className="flex-1"
+                                contentContainerClassName="w-full max-w-[800px] gap-3 self-center px-5 pt-4"
+                                contentContainerStyle={{
+                                    paddingBottom: screenInsets.bottomTabBar,
+                                }}
+                                refreshControl={refreshControl}
+                                style={{ opacity: isDayPending ? 0.5 : 1 }}>
+                                <View className="flex-row items-baseline justify-between gap-3 px-0.5">
+                                    <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
+                                        {dayTitle}
+                                    </Text>
+                                    <Text className="font-body-bold text-[11px] uppercase tracking-[0.66px] text-text-faint">
+                                        {t('matches:results.count', { count: dayResults.length })}
+                                    </Text>
+                                </View>
+                                {dayResults.map((match) => (
+                                    <ResultCard
+                                        distribution={distributions.data?.get(match.id)}
+                                        key={match.id}
+                                        match={match}
+                                        onOpenMatch={() =>
+                                            router.push({
+                                                pathname: '/match/[id]',
+                                                params: { id: match.id },
+                                            })
+                                        }
+                                        prediction={predictions.data?.get(match.id)}
+                                    />
+                                ))}
+                            </ScrollView>
+                        </RNView>
+                    </GestureDetector>
                 </>
             )}
         </View>

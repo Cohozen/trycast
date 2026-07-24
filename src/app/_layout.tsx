@@ -17,6 +17,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { AnimatedSplashOverlay } from '@/components/animated-splash-overlay';
@@ -97,20 +98,27 @@ function RootLayout() {
     }, []);
 
     return (
-        <KeyboardProvider>
-            <QueryClientProvider client={queryClient}>
-                <SessionProvider>
-                    <ThemeProvider
-                        value={
-                            colorScheme === 'dark' ? navigationThemes.dark : navigationThemes.light
-                        }>
-                        <AnimatedSplashOverlay />
-                        <RootNavigator />
-                        <StatusBar style="auto" animated />
-                    </ThemeProvider>
-                </SessionProvider>
-            </QueryClientProvider>
-        </KeyboardProvider>
+        // Racine unique des gestes (react-native-gesture-handler) : nécessaire à
+        // tout GestureDetector de l'app (balayage de la page Résultats…). Le
+        // bottom-sheet garde son propre wrapper local, redondant mais inoffensif.
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <KeyboardProvider>
+                <QueryClientProvider client={queryClient}>
+                    <SessionProvider>
+                        <ThemeProvider
+                            value={
+                                colorScheme === 'dark'
+                                    ? navigationThemes.dark
+                                    : navigationThemes.light
+                            }>
+                            <AnimatedSplashOverlay />
+                            <RootNavigator />
+                            <StatusBar style="auto" animated />
+                        </ThemeProvider>
+                    </SessionProvider>
+                </QueryClientProvider>
+            </KeyboardProvider>
+        </GestureHandlerRootView>
     );
 }
 

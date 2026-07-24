@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildDayRange, dayKeyOf } from './day-range';
+import { buildDayRange, dayKeyOf, stepDayKey } from './day-range';
+import type { StripDay } from './day-range';
 
 describe('dayKeyOf', () => {
     it('produit une clé locale YYYY-MM-DD', () => {
@@ -62,5 +63,39 @@ describe('buildDayRange', () => {
             today,
         });
         expect(days).toEqual([]);
+    });
+});
+
+describe('stepDayKey', () => {
+    const day = (key: string, hasMatches: boolean): StripDay => ({
+        key,
+        date: new Date(`${key}T00:00:00`),
+        hasMatches,
+        isToday: false,
+    });
+    const days = [day('2026-07-05', true), day('2026-07-12', true), day('2026-07-19', true)];
+
+    it('avance vers un jour plus récent (+1) et recule vers un plus ancien (-1)', () => {
+        expect(stepDayKey(days, '2026-07-12', 1)).toBe('2026-07-19');
+        expect(stepDayKey(days, '2026-07-12', -1)).toBe('2026-07-05');
+    });
+
+    it('renvoie null aux bords', () => {
+        expect(stepDayKey(days, '2026-07-19', 1)).toBeNull();
+        expect(stepDayKey(days, '2026-07-05', -1)).toBeNull();
+    });
+
+    it('saute les jours sans match', () => {
+        const withGap = [
+            day('2026-07-05', true),
+            day('2026-07-06', false),
+            day('2026-07-12', true),
+        ];
+        expect(stepDayKey(withGap, '2026-07-05', 1)).toBe('2026-07-12');
+    });
+
+    it('renvoie null pour un jour inconnu ou une sélection absente', () => {
+        expect(stepDayKey(days, '2026-01-01', 1)).toBeNull();
+        expect(stepDayKey(days, null, 1)).toBeNull();
     });
 });
