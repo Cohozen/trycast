@@ -101,11 +101,21 @@ export function BottomSheet({
                 return;
             }
             if (next === 1) {
+                // Réouverture : on repart d'un glissé nul, au cas où une sortie
+                // aurait été interrompue avant que son callback ne le remette à 0.
+                dragY.value = 0;
                 progress.value = withTiming(1, reduce ? { duration: 0 } : OPEN);
             } else {
-                dragY.value = withTiming(0, { duration: 200 });
+                // On ne ramène plus `dragY` à 0 pendant la sortie : ça le
+                // ferait remonter (vers le haut) pendant que `progress` pousse
+                // le volet vers le bas, d'où le petit sursaut visible quand on
+                // ferme en plein glissé. On laisse `dragY` tel quel — le volet
+                // descend alors de façon strictement monotone (translateY va de
+                // `dragY` à `height + dragY`) — et on le remet à zéro dans le
+                // callback, hors écran, avant la prochaine ouverture.
                 progress.value = withTiming(0, reduce ? { duration: 0 } : CLOSE, (finished) => {
                     if (finished) {
+                        dragY.value = 0;
                         runOnJS(finishClose)();
                     }
                 });
