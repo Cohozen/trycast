@@ -135,7 +135,19 @@ export default function ResultsScreen() {
     };
 
     const onSelectDay = (index: number) => {
-        flatListRef.current?.scrollToOffset({ offset: index * width, animated: true });
+        const delta = Math.abs(index - currentIndexRef.current);
+        if (delta === 0) return;
+        // Voisin : on garde le glissé. Jour lointain : saut instantané — un
+        // scroll animé ferait défiler (et monter/démonter) toutes les pages
+        // intermédiaires. Sans animation, la FlatList ne rend que la cible.
+        const animated = delta === 1;
+        if (!animated) {
+            // Pas de momentum sur un saut instantané : on avance la ref et le
+            // tick haptique ici (sinon onMomentumEnd s'en charge).
+            currentIndexRef.current = index;
+            hapticLight();
+        }
+        flatListRef.current?.scrollToOffset({ offset: index * width, animated });
     };
 
     const onMomentumEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
