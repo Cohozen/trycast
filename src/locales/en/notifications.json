@@ -8,6 +8,11 @@
         "title": "No notifications",
         "message": "Prediction reminders and your match results will show up here."
     },
+    "time": {
+        "minutes": "{{value}} min ago",
+        "hours": "{{value}} hr ago",
+        "days": "{{value}}d ago"
+    },
     "actions": {
         "markRead": "Mark as read",
         "predict": "Make my prediction",

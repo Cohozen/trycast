@@ -47,8 +47,8 @@ function markReadAction(): Notifications.NotificationAction {
  * arrivée de notification : une catégorie inconnue de l'appareil au moment de
  * la réception donne une notification sans bouton.
  *
- * Les libellés sont figés à l'enregistrement — d'où le ré-appel au changement
- * de langue (cf. src/features/profile/language-preference.ts).
+ * Les libellés sont figés à l'enregistrement — d'où le ré-appel à chaque
+ * changement de langue (effet piloté par `i18n.language` dans src/app/_layout.tsx).
  */
 export async function setupNotificationCategories(): Promise<void> {
     if (Platform.OS === 'web') return;

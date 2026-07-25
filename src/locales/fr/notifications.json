@@ -8,6 +8,11 @@
         "title": "Aucune notification",
         "message": "Les rappels de prono et tes résultats de match apparaîtront ici."
     },
+    "time": {
+        "minutes": "il y a {{value}} min",
+        "hours": "il y a {{value}} h",
+        "days": "il y a {{value}} j"
+    },
     "actions": {
         "markRead": "Marquer comme lu",
         "predict": "Faire mon prono",

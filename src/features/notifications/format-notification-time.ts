@@ -1,33 +1,41 @@
 /**
- * Horodatage relatif d'une notification (« il y a 20 min », « il y a 3 j »),
- * puis date absolue au-delà d'une semaine — passé ce délai, « il y a 12 jours »
- * n'aide plus personne. Tout passe par Intl avec la langue courante : aucune
- * chaîne en dur, donc aucune clé i18n non plus.
+ * Ancienneté d'une notification : relative jusqu'à une semaine, date absolue
+ * au-delà — passé ce délai, « il y a 12 jours » n'aide plus personne.
+ *
+ * Fonction de domaine : elle rend une clé i18n et sa valeur, la traduction se
+ * fait dans le composant. ⚠️ Ne pas la « simplifier » en Intl.RelativeTimeFormat :
+ * Hermes ne l'implémente pas et l'écran plante (vécu le 25/07/2026 sur
+ * simulateur). Intl.DateTimeFormat, lui, est bien disponible.
  */
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 const WEEK = 7 * DAY;
 
-export function formatNotificationTime(iso: string, locale: string, now = Date.now()): string {
-    const elapsed = now - new Date(iso).getTime();
+export type NotificationTime =
+    /** À traduire : t(key, { value }) */
+    | { kind: 'relative'; key: 'time.minutes' | 'time.hours' | 'time.days'; value: number }
+    /** À formater : Intl.DateTimeFormat avec i18n.language */
+    | { kind: 'absolute'; date: Date };
+
+export function notificationTime(iso: string, now = Date.now()): NotificationTime {
+    const date = new Date(iso);
+    const elapsed = now - date.getTime();
 
     if (elapsed >= WEEK) {
-        return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short' }).format(
-            new Date(iso),
-        );
+        return { kind: 'absolute', date };
     }
-
-    // style 'short' : « il y a 20 min » plutôt que « il y a 20 minutes » (long,
-    // trop bavard sur une ligne de liste) ou « -20 min » (narrow, illisible).
-    const relative = new Intl.RelativeTimeFormat(locale, { numeric: 'auto', style: 'short' });
     if (elapsed >= DAY) {
-        return relative.format(-Math.floor(elapsed / DAY), 'day');
+        return { kind: 'relative', key: 'time.days', value: Math.floor(elapsed / DAY) };
     }
     if (elapsed >= HOUR) {
-        return relative.format(-Math.floor(elapsed / HOUR), 'hour');
+        return { kind: 'relative', key: 'time.hours', value: Math.floor(elapsed / HOUR) };
     }
-    // Plancher à 1 minute : « il y a 0 minute » n'a pas de sens, et une
+    // Plancher à 1 minute : « il y a 0 min » n'a pas de sens, et une
     // notification tout juste reçue se lit très bien en « il y a 1 min ».
-    return relative.format(-Math.max(1, Math.floor(elapsed / MINUTE)), 'minute');
+    return {
+        kind: 'relative',
+        key: 'time.minutes',
+        value: Math.max(1, Math.floor(elapsed / MINUTE)),
+    };
 }

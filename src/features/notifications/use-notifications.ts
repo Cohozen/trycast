@@ -58,13 +58,13 @@ export function useUnreadNotificationCount(userId: string | undefined) {
  * lanceur le supporte, et iOS exige la permission `allowBadge`.
  */
 export function useNotificationBadgeSync(userId: string | undefined) {
-    const unread = useUnreadNotificationCount(userId);
-    const hasData = !!useNotifications(userId).data;
+    const { data } = useNotifications(userId);
+    const unread = data?.filter((notification) => !notification.read_at).length ?? 0;
 
     useEffect(() => {
-        if (Platform.OS === 'web' || !hasData) return;
+        if (Platform.OS === 'web' || !data) return;
         Notifications.setBadgeCountAsync(unread).catch(() => {
             // Lanceur Android sans badge, permission iOS refusée : sans effet.
         });
-    }, [hasData, unread]);
+    }, [data, unread]);
 }

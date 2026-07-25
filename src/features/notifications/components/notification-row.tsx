@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Card } from '@/components/ui/card';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
-import { formatNotificationTime } from '../format-notification-time';
+import { notificationTime } from '../format-notification-time';
 import type { AppNotification } from '../types';
 
 type NotificationRowProps = {
@@ -19,11 +19,19 @@ type NotificationRowProps = {
  * non-lu — l'accent est une étincelle, une pastille de 8 px en est une.
  */
 export function NotificationRow({ notification, onPress }: NotificationRowProps) {
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation(['notifications']);
     const [pressed, setPressed] = useState(false);
     const iconColor = useThemeColor('text-muted');
     const isRead = !!notification.read_at;
     const Icon = notification.type === 'result' ? Trophy : CalendarClock;
+
+    const time = notificationTime(notification.created_at);
+    const timeLabel =
+        time.kind === 'relative'
+            ? t(`notifications:${time.key}`, { value: time.value })
+            : new Intl.DateTimeFormat(i18n.language, { day: 'numeric', month: 'short' }).format(
+                  time.date,
+              );
 
     return (
         <Pressable
@@ -47,7 +55,7 @@ export function NotificationRow({ notification, onPress }: NotificationRowProps)
                         {notification.body}
                     </Text>
                     <Text className="mt-0.5 font-body text-[11.5px] text-text-faint">
-                        {formatNotificationTime(notification.created_at, i18n.language)}
+                        {timeLabel}
                     </Text>
                 </View>
             </Card>
