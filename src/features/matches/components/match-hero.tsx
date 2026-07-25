@@ -94,9 +94,19 @@ export function MatchHero({ match }: MatchHeroProps) {
               : 'draw'
         : null;
     const pointsPills: { key: string; label: string; value: number; outcome: MatchOutcome }[] = [
-        { key: '1', label: match.home_team?.code ?? '1', value: winnerPoints.home, outcome: 'home' },
+        {
+            key: '1',
+            label: match.home_team?.code ?? '1',
+            value: winnerPoints.home,
+            outcome: 'home',
+        },
         { key: 'N', label: 'N', value: winnerPoints.draw, outcome: 'draw' },
-        { key: '2', label: match.away_team?.code ?? '2', value: winnerPoints.away, outcome: 'away' },
+        {
+            key: '2',
+            label: match.away_team?.code ?? '2',
+            value: winnerPoints.away,
+            outcome: 'away',
+        },
     ];
 
     const competitionLine = [

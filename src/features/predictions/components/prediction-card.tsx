@@ -76,12 +76,12 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
 
     const draft = complete
         ? {
-            match_id: match.id,
-            predicted_home_score: parsePredictedScore(homeRaw),
-            predicted_away_score: parsePredictedScore(awayRaw),
-            predicted_bonus_off_home: bonusHome,
-            predicted_bonus_off_away: bonusAway,
-        }
+              match_id: match.id,
+              predicted_home_score: parsePredictedScore(homeRaw),
+              predicted_away_score: parsePredictedScore(awayRaw),
+              predicted_bonus_off_home: bonusHome,
+              predicted_bonus_off_away: bonusAway,
+          }
         : null;
 
     // La saisie courante correspond-elle à une rangée déjà enregistrée ?
@@ -113,15 +113,15 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
     const odds = { home: match.odds_home, draw: match.odds_draw, away: match.odds_away };
     const potential = draft
         ? computePotentialPoints(
-            {
-                homeScore: draft.predicted_home_score,
-                awayScore: draft.predicted_away_score,
-                bonusOffHome: draft.predicted_bonus_off_home,
-                bonusOffAway: draft.predicted_bonus_off_away,
-            },
-            odds,
-            rules,
-        )
+              {
+                  homeScore: draft.predicted_home_score,
+                  awayScore: draft.predicted_away_score,
+                  bonusOffHome: draft.predicted_bonus_off_home,
+                  bonusOffAway: draft.predicted_bonus_off_away,
+              },
+              odds,
+              rules,
+          )
         : null;
     const winnerPoints = winnerPointsByOutcome(odds, rules);
     const probabilities = impliedProbabilities(odds);
@@ -132,8 +132,8 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
     const offensiveBonus = (sideOdds: number | null): number =>
         Math.round(
             rules.offensiveBonusRatio *
-            rules.winnerPointsPerOddsUnit *
-            (sideOdds && sideOdds > 0 ? sideOdds : rules.fallbackOdds),
+                rules.winnerPointsPerOddsUnit *
+                (sideOdds && sideOdds > 0 ? sideOdds : rules.fallbackOdds),
         );
     const bonusHomeValue = offensiveBonus(match.odds_home);
     const bonusAwayValue = offensiveBonus(match.odds_away);
@@ -164,8 +164,8 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
     const status: SaveStatus = saved
         ? 'saved'
         : complete && !upsert.isError
-            ? 'saving'
-            : 'toPredict';
+          ? 'saving'
+          : 'toPredict';
     const statusClasses = STATUS_CLASSES[status];
     const statusLabels: Record<SaveStatus, string> = {
         toPredict: t('predictions:status.toPredict'),

@@ -200,7 +200,7 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                                 size="lg"
                                 uri={profile?.avatar_url}
                             />
-                            <View className="min-w-0 flex-1 gap-1">
+                            <View className="min-w-0 flex-1">
                                 <Text className="font-display text-[27px] leading-6.75 text-text">
                                     {profile?.username}
                                 </Text>

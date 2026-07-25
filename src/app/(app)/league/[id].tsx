@@ -344,10 +344,10 @@ function ResultsTab({
     const selectedRound = rounds.find((round) => roundKeyOf(round.round) === selected);
     const meta = selectedRound
         ? new Intl.DateTimeFormat(i18n.language, {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short',
-        }).format(new Date(selectedRound.firstKickoff))
+              weekday: 'short',
+              day: 'numeric',
+              month: 'short',
+          }).format(new Date(selectedRound.firstKickoff))
         : '';
 
     return (
@@ -563,8 +563,8 @@ function SettingsTab({
                                             numberOfLines={1}>
                                             {isMe
                                                 ? t('leagues:detail.settings.memberYou', {
-                                                    username: member.username,
-                                                })
+                                                      username: member.username,
+                                                  })
                                                 : member.username}
                                         </Text>
                                         <Text className="font-body-semibold text-[11px] text-text-faint">
