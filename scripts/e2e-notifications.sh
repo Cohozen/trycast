@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Vérification E2E RLS des notifications push (Lot 6) : tokens écrits par RPC
 # uniquement (register/unregister, réaffectation entre comptes), isolation des
-# tokens et préférences par user, notification_sends et RPC de sélection des
-# cibles inaccessibles aux clients.
+# tokens et préférences par user, RPC de sélection des cibles inaccessibles aux
+# clients, et boîte de réception notification_sends (lecture de ses propres
+# lignes, read_at seule colonne écrivable, contenu et statut hors de portée).
 # Prérequis : scripts/seed-test-users.sql.
 # Usage : EMAIL1=... EMAIL2=... PASSWORD=... ./scripts/e2e-notifications.sh
 set -euo pipefail
@@ -123,11 +124,63 @@ curl -s -X POST "$URL/rest/v1/notification_prefs" \
   -d "{\"user_id\":\"$U1\",\"master\":true,\"reminder_enabled\":true,\"results_enabled\":true}" > /dev/null
 ok "préférences : upsert own, isolées, pas d'écriture pour autrui"
 
-# Table serveur pure : notification_sends inaccessible aux clients
-RES=$(curl -s "$URL/rest/v1/notification_sends?select=id" \
+# Boîte de réception : notification_sends est lisible en lecture seule sur ses
+# propres lignes, et seul read_at est écrivable (le contenu et le statut
+# d'envoi restent la propriété du serveur).
+RES=$(curl -s "$URL/rest/v1/notification_sends?select=id,user_id,title,body,url,read_at" \
   -H "apikey: $KEY" -H "Authorization: Bearer $T1")
-echo "$RES" | grep -q '42501' || fail "select notification_sends (attendu 42501, obtenu $RES)"
-ok "notification_sends inaccessible aux clients"
+echo "$RES" | grep -q '42501' && fail "select notification_sends own (refusé : $RES)"
+# Quelles que soient les lignes présentes, aucune ne doit appartenir à autrui
+echo "$RES" | python3 -c "
+import json,sys
+rows = json.load(sys.stdin)
+assert all(row['user_id'] == '$U1' for row in rows), rows
+" || fail "isolation notification_sends (lignes d'autrui visibles : $RES)"
+ok "notification_sends : lecture de ses propres lignes uniquement"
+
+# Colonnes non accordées : invisibles même sur ses propres lignes
+RES=$(curl -s "$URL/rest/v1/notification_sends?select=ticket_ids" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1")
+echo "$RES" | grep -q '42501' || fail "select ticket_ids (attendu 42501, obtenu $RES)"
+RES=$(curl -s "$URL/rest/v1/notification_sends?select=status" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1")
+echo "$RES" | grep -q '42501' || fail "select status (attendu 42501, obtenu $RES)"
+ok "ticket_ids et status hors de portée du client"
+
+# read_at : seule colonne écrivable (0 ligne touchée si la boîte est vide,
+# ce qui suffit à prouver le grant — un refus renverrait 42501)
+RES=$(curl -s -X PATCH "$URL/rest/v1/notification_sends?read_at=is.null" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" \
+  -d '{"read_at":"2026-07-25T12:00:00Z"}')
+echo "$RES" | grep -q '42501' && fail "update read_at own (refusé : $RES)"
+RES=$(curl -s -X PATCH "$URL/rest/v1/notification_sends?read_at=is.null" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" -d '{"title":"pirate"}')
+echo "$RES" | grep -q '42501' || fail "update title (attendu 42501, obtenu $RES)"
+RES=$(curl -s -X PATCH "$URL/rest/v1/notification_sends?read_at=is.null" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" -d '{"status":"error"}')
+echo "$RES" | grep -q '42501' || fail "update status (attendu 42501, obtenu $RES)"
+ok "seul read_at est écrivable"
+
+# Insert et delete restent interdits : l'historique n'est écrit que par l'EF
+RES=$(curl -s -X POST "$URL/rest/v1/notification_sends" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" \
+  -d "{\"user_id\":\"$U1\",\"match_id\":\"00000000-0000-0000-0000-000000000000\",\"type\":\"reminder\"}")
+echo "$RES" | grep -q '42501' || fail "insert notification_sends (attendu 42501, obtenu $RES)"
+RES=$(curl -s -X DELETE "$URL/rest/v1/notification_sends?read_at=not.is.null" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1")
+echo "$RES" | grep -q '42501' || fail "delete notification_sends (attendu 42501, obtenu $RES)"
+ok "insert et delete de notification_sends refusés"
+
+# Comptage des non-lues : RPC de service, jamais appelée par un client
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/notify_unread_counts" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" -d "{\"p_user_ids\":[\"$U1\"]}")
+echo "$RES" | grep -q '42501' || fail "notify_unread_counts authenticated (attendu 42501, obtenu $RES)"
+ok "notify_unread_counts réservée au service_role"
 
 # RPC de sélection des cibles : réservées au service_role
 RES=$(curl -s -X POST "$URL/rest/v1/rpc/notify_reminder_targets" \
@@ -147,6 +200,8 @@ RES=$(curl -s -X POST "$URL/rest/v1/rpc/register_push_token" \
 echo "$RES" | grep -q '42501' || fail "register anonyme (attendu 42501, obtenu $RES)"
 RES=$(curl -s "$URL/rest/v1/push_tokens?select=token" -H "apikey: $KEY")
 echo "$RES" | grep -q '42501' || fail "select tokens anonyme (attendu 42501, obtenu $RES)"
+RES=$(curl -s "$URL/rest/v1/notification_sends?select=title" -H "apikey: $KEY")
+echo "$RES" | grep -q '42501' || fail "select notification_sends anonyme (attendu 42501, obtenu $RES)"
 ok "tout refusé en anonyme"
 
 echo
