@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { Globe, Settings2, Users } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
+import { useDeferredValue, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
@@ -57,6 +57,12 @@ export default function LeaderboardScreen() {
     const currentLeagueId = selectedLeagueId ?? leagues[0]?.id;
     const currentLeague = leagues.find((league) => league.id === currentLeagueId);
     const effectiveScope: Scope = leagues.length === 0 ? 'global' : scope;
+    // La pastille suit `effectiveScope` (bascule immédiate au tap) ; tout le
+    // contenu (board affiché, chrome de portée, liste des lignes) est piloté
+    // par la valeur différée pour que le tap ne soit pas bloqué par le montage
+    // synchrone des LeaderboardRow. Les requêtes, elles, se lancent tout de
+    // suite sur `effectiveScope`.
+    const deferredScope = useDeferredValue(effectiveScope);
 
     // Un événement par portée consultée : au montage, puis à chaque bascule
     // Ligues/Général.
@@ -71,7 +77,7 @@ export default function LeaderboardScreen() {
     const leagueBoard = useLeagueLeaderboard(
         effectiveScope === 'leagues' ? currentLeagueId : undefined,
     );
-    const board = effectiveScope === 'global' ? globalBoard : leagueBoard;
+    const board = deferredScope === 'global' ? globalBoard : leagueBoard;
 
     const standing = useMyStanding(competition.data?.id, userId);
     const myRank = useMyRank(competition.data?.id, standing.isPending ? undefined : standing.data);
@@ -79,7 +85,7 @@ export default function LeaderboardScreen() {
     const loading =
         competition.isPending ||
         myLeagues.isPending ||
-        (effectiveScope === 'global'
+        (deferredScope === 'global'
             ? globalBoard.isPending
             : !!currentLeagueId && leagueBoard.isPending);
 
@@ -107,7 +113,7 @@ export default function LeaderboardScreen() {
     const entries = markTies(board.data ?? []);
     const hasTies = entries.some((entry) => entry.tie);
     const showPinnedMe =
-        effectiveScope === 'global' &&
+        deferredScope === 'global' &&
         standing.data != null &&
         myRank.data?.rank != null &&
         profile != null &&
@@ -145,7 +151,7 @@ export default function LeaderboardScreen() {
                     />
                 ) : null}
 
-                {effectiveScope === 'leagues' && leagues.length > 0 && currentLeagueId ? (
+                {deferredScope === 'leagues' && leagues.length > 0 && currentLeagueId ? (
                     <View className="gap-2.5">
                         <Select
                             accessibilityLabel={t('leagues:leaderboard.select.overline')}
@@ -187,7 +193,7 @@ export default function LeaderboardScreen() {
                     </View>
                 ) : null}
 
-                {effectiveScope === 'global' ? (
+                {deferredScope === 'global' ? (
                     <Card className="flex-row items-center gap-2.5 px-3.5 py-2.75">
                         <View className="h-[34px] w-[34px] items-center justify-center rounded-sm bg-brand/10">
                             <Globe color={brandColor} size={18} strokeWidth={1.9} />
@@ -276,7 +282,7 @@ export default function LeaderboardScreen() {
                                     {t('leagues:leaderboard.tieNote')}
                                 </Text>
                             ) : null}
-                            {effectiveScope === 'global' && entries.length === limit ? (
+                            {deferredScope === 'global' && entries.length === limit ? (
                                 <Pressable
                                     accessibilityRole="button"
                                     className="items-center py-3"

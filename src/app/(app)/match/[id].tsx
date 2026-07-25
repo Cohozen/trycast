@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { CircleHelp, Users } from 'lucide-react-native';
-import { useState } from 'react';
+import { useDeferredValue, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
@@ -59,6 +59,11 @@ export default function MatchScreen() {
 
     const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(null);
     const [view, setView] = useState<LeagueView>('predictions');
+    // La pastille suit `view` (bascule immédiate au tap) ; le sélecteur de
+    // contenu (liste des pronos ↔ classement de la ligue) est piloté par la
+    // valeur différée pour ne pas bloquer le tap. Les requêtes s'activent tout
+    // de suite sur `view`.
+    const deferredView = useDeferredValue(view);
 
     const leagues = myLeagues.data ?? [];
     const currentLeagueId = selectedLeagueId ?? leagues[0]?.id;
@@ -228,8 +233,8 @@ export default function MatchScreen() {
                             trailing={
                                 currentLeague
                                     ? t('leagues:detail.members', {
-                                        count: currentLeague.member_count,
-                                    })
+                                          count: currentLeague.member_count,
+                                      })
                                     : undefined
                             }
                             value={currentLeagueId}
@@ -264,7 +269,7 @@ export default function MatchScreen() {
                         </View>
                     ) : null}
 
-                    {view === 'predictions' ? (
+                    {deferredView === 'predictions' ? (
                         !kickoffPassed ? (
                             <MaskedPredictions />
                         ) : leaguePredictions.isPending ? (

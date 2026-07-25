@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { ChevronLeft, ChevronRight, Settings, Trophy, Users } from 'lucide-react-native';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useDeferredValue, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -55,6 +55,10 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
     const competitions = useCompetitions();
     const [selectedCompetitionId, setSelectedCompetitionId] = useState<string | null>(null);
     const [tab, setTab] = useState<ProfileTab>('stats');
+    // La pastille (SegmentedControl) suit `tab` et bouge au tap ; le contenu
+    // lourd (liste de ResultCard des Pronos) est piloté par la valeur différée
+    // pour ne pas bloquer le thread JS pendant le changement d'onglet.
+    const deferredTab = useDeferredValue(tab);
 
     const competitionList = competitions.data ?? [];
     const competitionId =
@@ -85,8 +89,8 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
     const trend = computePointsByRound(predictions.data ?? new Map(), matches.data ?? []);
     const memberSince = profile
         ? new Intl.DateTimeFormat(i18n.language, { month: 'long', year: 'numeric' }).format(
-            new Date(profile.created_at),
-        )
+              new Date(profile.created_at),
+          )
         : null;
 
     const figures: { key: string; label: string; value: string }[] = [
@@ -132,7 +136,7 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
     // motif que l'accueil). Vide pour les autres onglets, qui ne collent rien.
     const predictionChildren: ReactNode[] = [];
     const stickyIndices: number[] = [];
-    if (!tabsLoading && tab === 'predictions') {
+    if (!tabsLoading && deferredTab === 'predictions') {
         for (const [index, match] of finishedMatches.entries()) {
             const dayTitle = dayTitleOf(match.kickoff_at);
             const newDay =
@@ -276,7 +280,7 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                         <Skeleton className="h-24" variant="block" />
                         <Skeleton className="h-24" variant="block" />
                     </View>
-                ) : tab === 'stats' ? (
+                ) : deferredTab === 'stats' ? (
                     <ProfileStatsPanel
                         points={standing.data?.total_points ?? null}
                         rank={myRank.data?.rank ?? null}
@@ -284,7 +288,7 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                         totalPlayers={myRank.data?.total ?? null}
                         trend={trend}
                     />
-                ) : tab === 'predictions' ? (
+                ) : deferredTab === 'predictions' ? (
                     finishedMatches.length === 0 ? (
                         <EmptyState
                             message={t('profile:predictions.emptyMessage')}
