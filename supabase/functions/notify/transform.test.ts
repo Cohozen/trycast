@@ -51,14 +51,24 @@ describe('reminderMessages', () => {
             reminderRow({ token: 'tok-1' }),
             reminderRow({ token: 'tok-2' }),
         ]);
-        const messages = reminderMessages(group);
+        const messages = reminderMessages(group, { sendId: 'send-1', badge: 3 });
         expect(messages).toHaveLength(2);
         expect(messages.map((message) => message.to)).toEqual(['tok-1', 'tok-2']);
         expect(messages[0].title).toBe('Rappel de prono');
         // Nom API en base (« Italy »), nom français dans la notification
         expect(messages[0].body).toContain('France – Italie');
-        expect(messages[0].data).toEqual({ url: '/(app)/(tabs)/' });
+        expect(messages[0].data).toEqual({ url: '/(app)/(tabs)/', id: 'send-1' });
         expect(messages[0].channelId).toBe('default');
+    });
+
+    it('porte la catégorie d’actions et le badge sur chaque message', () => {
+        const [group] = groupTargets([
+            reminderRow({ token: 'tok-1' }),
+            reminderRow({ token: 'tok-2' }),
+        ]);
+        const messages = reminderMessages(group, { sendId: 'send-1', badge: 3 });
+        expect(messages.map((message) => message.categoryId)).toEqual(['reminder', 'reminder']);
+        expect(messages.map((message) => message.badge)).toEqual([3, 3]);
     });
 });
 
@@ -78,11 +88,13 @@ describe('resultMessages', () => {
             points_awarded: 27,
         };
         const [group] = groupTargets([row]);
-        const messages = resultMessages(group);
+        const messages = resultMessages(group, { sendId: 'send-2', badge: 1 });
         expect(messages).toHaveLength(1);
         expect(messages[0].title).toBe('Résultats & points');
         expect(messages[0].body).toBe('France 28 – 10 Italie : tu marques 27 pts.');
-        expect(messages[0].data).toEqual({ url: '/(app)/(tabs)/results' });
+        expect(messages[0].data).toEqual({ url: '/(app)/(tabs)/results', id: 'send-2' });
+        expect(messages[0].categoryId).toBe('result');
+        expect(messages[0].badge).toBe(1);
     });
 
     it('replie des points absents sur 0', () => {
@@ -100,6 +112,8 @@ describe('resultMessages', () => {
             points_awarded: null,
         };
         const [group] = groupTargets([row]);
-        expect(resultMessages(group)[0].body).toContain('tu marques 0 pt.');
+        expect(resultMessages(group, { sendId: 'send-3', badge: 1 })[0].body).toContain(
+            'tu marques 0 pt.',
+        );
     });
 });

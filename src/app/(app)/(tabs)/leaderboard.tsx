@@ -3,6 +3,7 @@ import { Globe, Settings2, Users } from 'lucide-react-native';
 import { useDeferredValue, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { NotificationsBell } from '@/components/notifications-bell';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -129,15 +130,18 @@ export default function LeaderboardScreen() {
                     paddingTop: screenInsets.top,
                     paddingBottom: screenInsets.bottomTabBar,
                 }}>
-                <View className="gap-1">
-                    <Text className="font-display text-3xl leading-7.5 tracking-[0.3px] text-text">
-                        {t('leagues:leaderboard.title')}
-                    </Text>
-                    {competition.data ? (
-                        <Text className="font-body text-[13px] text-text-muted">
-                            {competition.data.name}
+                <View className="flex-row items-start gap-3">
+                    <View className="min-w-0 flex-1 gap-1">
+                        <Text className="font-display text-3xl leading-7.5 tracking-[0.3px] text-text">
+                            {t('leagues:leaderboard.title')}
                         </Text>
-                    ) : null}
+                        {competition.data ? (
+                            <Text className="font-body text-[13px] text-text-muted">
+                                {competition.data.name}
+                            </Text>
+                        ) : null}
+                    </View>
+                    <NotificationsBell />
                 </View>
 
                 {leagues.length > 0 ? (

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BrandMark } from '@/components/brand-mark';
+import { NotificationsBell } from '@/components/notifications-bell';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Screen } from '@/components/ui/screen';
@@ -338,14 +339,17 @@ export default function MatchesScreen() {
         <View className="flex-1 bg-bg">
             {/* Bloc épinglé : nom de la compétition (seul élément permanent en haut) */}
             <View
-                className="w-full max-w-200 flex-none gap-1.5 self-center px-5 pb-1"
+                className="w-full max-w-200 flex-none flex-row items-start gap-3 self-center px-5 pb-1"
                 style={{ paddingTop: screenInsets.top }}>
-                <Text className="font-body-bold text-[11px] uppercase tracking-[1.54px] text-text-faint">
-                    {t('matches:header.overline')}
-                </Text>
-                <Text className="font-display text-[27px] leading-7 tracking-[0.27px] text-text">
-                    {competition.data.name}
-                </Text>
+                <View className="min-w-0 flex-1 gap-1.5">
+                    <Text className="font-body-bold text-[11px] uppercase tracking-[1.54px] text-text-faint">
+                        {t('matches:header.overline')}
+                    </Text>
+                    <Text className="font-display text-[27px] leading-7 tracking-[0.27px] text-text">
+                        {competition.data.name}
+                    </Text>
+                </View>
+                <NotificationsBell />
             </View>
 
             {/* Le scroll des pronos porte les inputs de score : Screen gère le

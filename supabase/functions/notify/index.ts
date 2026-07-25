@@ -35,6 +35,9 @@ type SendType = 'reminder' | 'result';
 
 type PendingReceiptRow = { id: string; ticket_ids: TicketPair[] | null };
 
+/** Contenu recopié dans notification_sends pour l'écran Notifications de l'app. */
+type InboxContent = { title: string; body: string; url: string };
+
 type RunState = {
     remindersSent: number;
     resultsSent: number;
@@ -200,15 +203,38 @@ async function processTargets<Row extends { user_id: string; match_id: string; t
             return;
         }
 
+        // Badge d'icône (iOS) : non-lues déjà en boîte + celles de ce tick. Les
+        // lignes qu'on vient de claimer n'ont pas encore de title, donc ne sont
+        // pas comptées par la RPC — d'où l'incrément manuel groupe par groupe
+        // (un user peut recevoir deux notifications dans le même tick).
+        const unreadByUser = await selectUnreadCounts(
+            admin,
+            claimedGroups.map((group) => group.userId),
+        );
+
         // Un message par token, avec en parallèle l'id du claim de chaque message
         const messages: ExpoPushMessage[] = [];
         const sendIds: string[] = [];
+        // Contenu envoyé, par claim : recopié en base pour la boîte de réception
+        const contentBySend = new Map<string, InboxContent>();
         for (const group of claimedGroups) {
+            const sendId = claimIdByKey.get(`${group.userId}:${group.matchId}`)!;
+            const badge = (unreadByUser.get(group.userId) ?? 0) + 1;
+            unreadByUser.set(group.userId, badge);
+            const context = { sendId, badge };
             const groupMessages =
                 type === 'reminder'
-                    ? reminderMessages(group as unknown as TargetGroup<ReminderTargetRow>)
-                    : resultMessages(group as unknown as TargetGroup<ResultTargetRow>);
-            const sendId = claimIdByKey.get(`${group.userId}:${group.matchId}`)!;
+                    ? reminderMessages(group as unknown as TargetGroup<ReminderTargetRow>, context)
+                    : resultMessages(group as unknown as TargetGroup<ResultTargetRow>, context);
+            // Contenu identique dans un groupe (un groupe = un user = une locale)
+            const [first] = groupMessages;
+            if (first) {
+                contentBySend.set(sendId, {
+                    title: first.title,
+                    body: first.body,
+                    url: String(first.data?.url ?? ''),
+                });
+            }
             for (const message of groupMessages) {
                 messages.push(message);
                 sendIds.push(sendId);
@@ -243,9 +269,16 @@ async function processTargets<Row extends { user_id: string; match_id: string; t
         }
         for (const [key, sendId] of claimIdByKey) {
             const pairs = pairsBySend.get(sendId);
+            // Le contenu n'est recopié qu'avec le statut 'sent' : une ligne sans
+            // title n'entre jamais dans la boîte de réception (cf. migration
+            // 20260725000100_notifications_inbox.sql).
             const { error } = await admin
                 .from('notification_sends')
-                .update(pairs ? { status: 'sent', ticket_ids: pairs } : { status: 'error' })
+                .update(
+                    pairs
+                        ? { status: 'sent', ticket_ids: pairs, ...contentBySend.get(sendId) }
+                        : { status: 'error' },
+                )
                 .eq('id', sendId);
             if (error) {
                 state.errors.push(`update send ${key}: ${error.message}`);
@@ -264,6 +297,32 @@ async function processTargets<Row extends { user_id: string; match_id: string; t
         console.error(`notify: ${type} failed`, message);
         state.errors.push(message);
     }
+}
+
+/**
+ * Non-lues déjà en boîte de réception, par user. Un échec ne doit pas empêcher
+ * l'envoi : le badge repart alors de zéro, l'app le resynchronisera à la
+ * prochaine ouverture de l'écran Notifications.
+ */
+async function selectUnreadCounts(
+    admin: SupabaseClient,
+    userIds: string[],
+): Promise<Map<string, number>> {
+    const unique = [...new Set(userIds)];
+    if (unique.length === 0) {
+        return new Map();
+    }
+    const { data, error } = await admin.rpc('notify_unread_counts', { p_user_ids: unique });
+    if (error) {
+        console.error('notify: notify_unread_counts failed', error.message);
+        return new Map();
+    }
+    return new Map(
+        ((data ?? []) as { user_id: string; unread: number }[]).map((row) => [
+            row.user_id,
+            row.unread,
+        ]),
+    );
 }
 
 /** Supprime les tokens morts — plus jamais ciblés dès le prochain scan. */

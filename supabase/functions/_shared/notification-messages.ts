@@ -14,6 +14,13 @@ export type NotificationContent = {
 export const REMINDER_URL = '/(app)/(tabs)/';
 export const RESULT_URL = '/(app)/(tabs)/results';
 
+// Catégories d'actions (boutons de la barre de notification), enregistrées par
+// l'app dans src/features/notifications/notification-categories.ts — les deux
+// listes doivent rester alignées. ⚠️ Un identifiant de catégorie ne doit
+// contenir ni « : » ni « - » (les actions ne s'afficheraient pas).
+export const REMINDER_CATEGORY = 'reminder';
+export const RESULT_CATEGORY = 'result';
+
 /**
  * Noms d'équipes : `teams.name` est le nom API, donc anglais. Les nations
  * connues sont traduites par tricode (`teams.code`), comme l'app le fait avec

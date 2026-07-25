@@ -1,0 +1,16 @@
+{
+    "screenTitle": "Notifications",
+    "bell": "Notifications",
+    "unread_one": "{{count}} non lue",
+    "unread_other": "{{count}} non lues",
+    "markAllRead": "Tout marquer comme lu",
+    "empty": {
+        "title": "Aucune notification",
+        "message": "Les rappels de prono et tes résultats de match apparaîtront ici."
+    },
+    "actions": {
+        "markRead": "Marquer comme lu",
+        "predict": "Faire mon prono",
+        "points": "Voir mes points"
+    }
+}

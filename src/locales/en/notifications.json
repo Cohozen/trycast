@@ -1,0 +1,16 @@
+{
+    "screenTitle": "Notifications",
+    "bell": "Notifications",
+    "unread_one": "{{count}} unread",
+    "unread_other": "{{count}} unread",
+    "markAllRead": "Mark all as read",
+    "empty": {
+        "title": "No notifications",
+        "message": "Prediction reminders and your match results will show up here."
+    },
+    "actions": {
+        "markRead": "Mark as read",
+        "predict": "Make my prediction",
+        "points": "See my points"
+    }
+}

@@ -4,6 +4,7 @@ import { type ReactNode, useDeferredValue, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { NotificationsBell } from '@/components/notifications-bell';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -213,12 +214,15 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                         </>
                     )}
                     {isSelf ? (
-                        <IconButton
-                            accessibilityLabel={t('profile:settings.title')}
-                            onPress={() => router.push('/settings')}
-                            variant="soft">
-                            <Settings color={textColor} size={20} strokeWidth={1.9} />
-                        </IconButton>
+                        <View className="flex-row gap-2">
+                            <NotificationsBell />
+                            <IconButton
+                                accessibilityLabel={t('profile:settings.title')}
+                                onPress={() => router.push('/settings')}
+                                variant="soft">
+                                <Settings color={textColor} size={20} strokeWidth={1.9} />
+                            </IconButton>
+                        </View>
                     ) : null}
                 </View>
 

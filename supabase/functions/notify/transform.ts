@@ -4,7 +4,9 @@ import type { ExpoPushMessage } from '../_shared/expo-push.ts';
 import {
     buildReminderMessage,
     buildResultMessage,
+    REMINDER_CATEGORY,
     REMINDER_URL,
+    RESULT_CATEGORY,
     RESULT_URL,
 } from '../_shared/notification-messages.ts';
 
@@ -67,8 +69,19 @@ export function groupTargets<Row extends { user_id: string; match_id: string; to
     return [...groups.values()];
 }
 
+/**
+ * Contexte propre à une notification, connu seulement après le claim.
+ * `sendId` est l'id de la ligne notification_sends : porté par `data.id`, c'est
+ * ce qui permet à l'action « Marquer comme lu » de savoir quoi marquer.
+ * `badge` est le nombre de non-lues qu'aura le user une fois celle-ci reçue.
+ */
+export type MessageContext = { sendId: string; badge: number };
+
 /** Un message par token du groupe (tickets alignés 1:1, cf. _shared/expo-push). */
-export function reminderMessages(group: TargetGroup<ReminderTargetRow>): ExpoPushMessage[] {
+export function reminderMessages(
+    group: TargetGroup<ReminderTargetRow>,
+    context: MessageContext,
+): ExpoPushMessage[] {
     const content = buildReminderMessage(group.row.locale, {
         home: { name: group.row.home_team, code: group.row.home_code },
         away: { name: group.row.away_team, code: group.row.away_code },
@@ -76,13 +89,18 @@ export function reminderMessages(group: TargetGroup<ReminderTargetRow>): ExpoPus
     return group.tokens.map((to) => ({
         to,
         ...content,
-        data: { url: REMINDER_URL },
+        data: { url: REMINDER_URL, id: context.sendId },
+        categoryId: REMINDER_CATEGORY,
+        badge: context.badge,
         channelId: 'default',
         sound: 'default' as const,
     }));
 }
 
-export function resultMessages(group: TargetGroup<ResultTargetRow>): ExpoPushMessage[] {
+export function resultMessages(
+    group: TargetGroup<ResultTargetRow>,
+    context: MessageContext,
+): ExpoPushMessage[] {
     const content = buildResultMessage(group.row.locale, {
         home: { name: group.row.home_team, code: group.row.home_code },
         away: { name: group.row.away_team, code: group.row.away_code },
@@ -93,7 +111,9 @@ export function resultMessages(group: TargetGroup<ResultTargetRow>): ExpoPushMes
     return group.tokens.map((to) => ({
         to,
         ...content,
-        data: { url: RESULT_URL },
+        data: { url: RESULT_URL, id: context.sendId },
+        categoryId: RESULT_CATEGORY,
+        badge: context.badge,
         channelId: 'default',
         sound: 'default' as const,
     }));

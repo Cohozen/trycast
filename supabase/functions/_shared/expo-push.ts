@@ -19,6 +19,14 @@ export type ExpoPushMessage = {
     data?: Record<string, unknown>;
     channelId?: string;
     sound?: 'default';
+    /**
+     * Catégorie d'actions enregistrée côté app (boutons de la barre de
+     * notification). L'app doit l'avoir déclarée AVANT l'arrivée du push, sinon
+     * la notification s'affiche simplement sans bouton.
+     */
+    categoryId?: string;
+    /** Badge d'icône d'app. iOS uniquement — Android l'ignore. */
+    badge?: number;
 };
 
 export type ExpoPushTicket =

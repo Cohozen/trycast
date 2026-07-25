@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 
+import { NotificationsBell } from '@/components/notifications-bell';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -171,8 +172,10 @@ export default function ResultsScreen() {
 
     return (
         <View className="flex-1 bg-bg">
-            <View className="flex-none px-5 pb-1" style={{ paddingTop: screenInsets.top }}>
-                <View className="gap-1">
+            <View
+                className="flex-none flex-row items-start gap-3 px-5 pb-1"
+                style={{ paddingTop: screenInsets.top }}>
+                <View className="min-w-0 flex-1 gap-1">
                     <Text className="font-display text-3xl leading-7.5 tracking-[0.3px] text-text">
                         {t('matches:results.title')}
                     </Text>
@@ -182,6 +185,7 @@ export default function ResultsScreen() {
                         </Text>
                     ) : null}
                 </View>
+                <NotificationsBell />
             </View>
 
             {results.length === 0 ? (

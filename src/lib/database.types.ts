@@ -313,33 +313,45 @@ export type Database = {
             };
             notification_sends: {
                 Row: {
+                    body: string | null;
                     created_at: string;
                     id: string;
                     match_id: string;
+                    read_at: string | null;
                     receipt_checked_at: string | null;
                     status: string;
                     ticket_ids: Json | null;
+                    title: string | null;
                     type: string;
+                    url: string | null;
                     user_id: string;
                 };
                 Insert: {
+                    body?: string | null;
                     created_at?: string;
                     id?: string;
                     match_id: string;
+                    read_at?: string | null;
                     receipt_checked_at?: string | null;
                     status?: string;
                     ticket_ids?: Json | null;
+                    title?: string | null;
                     type: string;
+                    url?: string | null;
                     user_id: string;
                 };
                 Update: {
+                    body?: string | null;
                     created_at?: string;
                     id?: string;
                     match_id?: string;
+                    read_at?: string | null;
                     receipt_checked_at?: string | null;
                     status?: string;
                     ticket_ids?: Json | null;
+                    title?: string | null;
                     type?: string;
+                    url?: string | null;
                     user_id?: string;
                 };
                 Relationships: [
@@ -859,6 +871,13 @@ export type Database = {
                     match_id: string;
                     points_awarded: number;
                     token: string;
+                    user_id: string;
+                }[];
+            };
+            notify_unread_counts: {
+                Args: { p_user_ids: string[] };
+                Returns: {
+                    unread: number;
                     user_id: string;
                 }[];
             };

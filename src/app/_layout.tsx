@@ -16,12 +16,15 @@ import { Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { AnimatedSplashOverlay } from '@/components/animated-splash-overlay';
 import { SessionProvider, useSession } from '@/features/auth/session-context';
+import { setupNotificationCategories } from '@/features/notifications/notification-categories';
 import { useNotificationObserver } from '@/features/notifications/use-notification-observer';
+import { useNotificationBadgeSync } from '@/features/notifications/use-notifications';
 import { useRegisterPushToken } from '@/features/notifications/use-register-push-token';
 import { applyStoredLanguagePreference } from '@/features/profile/language-preference';
 import { applyStoredThemePreference } from '@/features/profile/theme-preference';
@@ -42,10 +45,20 @@ initDiagnostics();
 
 function RootNavigator() {
     const { session, isLoading } = useSession();
+    const { i18n } = useTranslation();
     useSyncLocale(session?.user.id);
     useRegisterPushToken(session?.user.id);
-    useNotificationObserver();
+    useNotificationObserver(session?.user.id);
+    useNotificationBadgeSync(session?.user.id);
     const profile = useProfile(session?.user.id);
+
+    // Les libellés des boutons de la barre de notification sont figés au
+    // moment de l'enregistrement de la catégorie : à refaire quand la langue
+    // change, sinon un utilisateur passé à l'anglais garde des boutons en
+    // français jusqu'à la réinstallation.
+    useEffect(() => {
+        void setupNotificationCategories();
+    }, [i18n.language]);
     const [fontsLoaded] = useFonts({
         Anton_400Regular,
         Inter_400Regular,
