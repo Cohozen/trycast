@@ -76,10 +76,17 @@ export default function SettingsScreen() {
     // beta, c'est la seule façon de savoir quel JS tourne chez un testeur qui
     // rapporte un bug : le numéro de build ne bouge pas d'une OTA à l'autre.
     // `updateId` est nul tant que le bundle embarqué au build sert — d'où le
-    // libellé « intégrée ». Rien à afficher dans un dev client, qui charge
-    // depuis Metro : `Updates.isEnabled` y est faux et la rangée disparaît.
-    const updateLabel = Updates.isEnabled
-        ? `${Updates.channel ?? '—'} · ${Updates.updateId?.slice(0, 8) ?? t('profile:settings.updateEmbedded')}`
+    // libellé « intégrée ».
+    //
+    // La rangée est conditionnée au CANAL, pas à `Updates.isEnabled` : celui-ci
+    // vaut vrai dès qu'expo-updates est configuré, y compris dans un build local
+    // qui n'appartient à aucun canal — la rangée n'y afficherait qu'un séparateur
+    // orphelin. Un canal n'existe que sur un build distribué par EAS, c'est-à-dire
+    // exactement là où la ligne sert. `channel` est une chaîne VIDE (et non nulle)
+    // hors canal : tester la vérité, pas la nullité.
+    const updateChannel = Updates.channel || null;
+    const updateLabel = updateChannel
+        ? `${updateChannel} · ${Updates.updateId?.slice(0, 8) ?? t('profile:settings.updateEmbedded')}`
         : null;
 
     useEffect(() => {

@@ -46,7 +46,9 @@ Le ref `bmdzadvugtkclnqjpndr` vivait en dur à 7 endroits, dont les **4 migratio
 
 **Politique `fingerprint` et non `appVersion`** : elle recalcule la version d'exécution dès que le natif bouge, ce qui rend une mise à jour incompatible extrêmement improbable. Sur une app qui gagne régulièrement des libs natives, `appVersion` aurait envoyé du JS incompatible à tous les testeurs le jour où on oublie de bumper `1.0.0`. Vérifié dans l'`Expo.plist` généré : `EXUpdatesRuntimeVersion = file:fingerprint`, `EXUpdatesLaunchWaitMs = 0` (l'app démarre du cache, la mise à jour s'applique au lancement suivant — pas d'attente perçue).
 
-La rangée des Réglages ne s'affiche que si `Updates.isEnabled` : **invisible dans un dev client**, qui charge depuis Metro. La seule preuve valable de l'OTA passe donc par un build `preview` (cf. plan, section Vérification).
+**Piège relevé au simulateur** : `Updates.isEnabled` vaut **vrai** dès qu'expo-updates est configuré, y compris dans un build local qui n'appartient à aucun canal — la rangée s'y affichait avec un séparateur orphelin (« · intégrée au build »), `Updates.channel` renvoyant une **chaîne vide** et non `null`, ce qui neutralisait le repli `??`. La rangée est donc conditionnée au **canal**, pas à `isEnabled` : un canal n'existe que sur un build distribué par EAS, c'est-à-dire exactement là où la ligne sert. Vérifié au simulateur : rangée masquée en local, version toujours affichée.
+
+La seule preuve valable de l'OTA passe par un build `preview` (cf. plan, section Vérification).
 
 ### Lot 6 — Push : ✅ validé sur l'Android réel (2026-07-23)
 Checklist déroulée de bout en bout sur le téléphone de Corentin : rappel H-1 et notification de résultats reçus, taps vers les bons onglets, points calculés par le vrai pipeline, préférence « Résultats » coupée = aucun envoi, pas de rappel à qui a déjà pronostiqué. Outillage rejouable : `scripts/seed-test-notifications.sql` + `scripts/trigger-notify.sql`. **Reste (non bloquant)** : types « Activité de ligue » et « Invitations » en v1.1+ (schéma prefs extensible) ; iOS/APNs quand le compte Apple Developer existera.
