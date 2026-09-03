@@ -1,6 +1,7 @@
 import { nativeApplicationVersion, nativeBuildVersion } from 'expo-application';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
+import * as Updates from 'expo-updates';
 import { BookOpen, ChevronRight, Globe, KeyRound, Mail, ShieldCheck } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -70,6 +71,16 @@ export default function SettingsScreen() {
     // voient les stores. Repli sur app.json hors build natif.
     const appVersion = nativeApplicationVersion ?? Constants.expoConfig?.version ?? '?';
     const versionLabel = nativeBuildVersion ? `${appVersion} (${nativeBuildVersion})` : appVersion;
+
+    // Canal et identifiant de la mise à jour à distance réellement chargée. En
+    // beta, c'est la seule façon de savoir quel JS tourne chez un testeur qui
+    // rapporte un bug : le numéro de build ne bouge pas d'une OTA à l'autre.
+    // `updateId` est nul tant que le bundle embarqué au build sert — d'où le
+    // libellé « intégrée ». Rien à afficher dans un dev client, qui charge
+    // depuis Metro : `Updates.isEnabled` y est faux et la rangée disparaît.
+    const updateLabel = Updates.isEnabled
+        ? `${Updates.channel ?? '—'} · ${Updates.updateId?.slice(0, 8) ?? t('profile:settings.updateEmbedded')}`
+        : null;
 
     useEffect(() => {
         loadThemePreference().then(setTheme);
@@ -277,6 +288,16 @@ export default function SettingsScreen() {
                         {versionLabel}
                     </Text>
                 </Card>
+                {updateLabel ? (
+                    <Card className="flex-row items-center gap-3 px-4 py-3.5">
+                        <Text className="flex-1 font-body-semibold text-[15px] text-text">
+                            {t('profile:settings.update')}
+                        </Text>
+                        <Text className="font-body-medium text-[14px] text-text-muted">
+                            {updateLabel}
+                        </Text>
+                    </Card>
+                ) : null}
                 <View className="mt-1">
                     <Button
                         fullWidth

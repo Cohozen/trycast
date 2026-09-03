@@ -7,6 +7,12 @@
         "icon": "./assets/images/icon.png",
         "scheme": "trycast",
         "userInterfaceStyle": "automatic",
+        "runtimeVersion": {
+            "policy": "fingerprint"
+        },
+        "updates": {
+            "url": "https://u.expo.dev/7dfc088c-9942-4873-97ba-4c2a048d3170"
+        },
         "ios": {
             "bundleIdentifier": "com.cohozen.trycast",
             "supportsTablet": false

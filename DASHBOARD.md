@@ -1,7 +1,9 @@
 # TryCast — Dashboard
 
 > Suivi d'avancement et décisions. Mis à jour à la fin de chaque session.
-> Dernière mise à jour : **2026-07-25 (bis)** (**page Notifications** : historique lu/non lu alimenté par `notification_sends` étendu, cloche à pastille sur les 4 onglets, badge d'icône, et deux boutons d'action dans la barre système — « Marquer comme lu » silencieux + une action qui ouvre l'app. Migration poussée, EF `notify` déployée, `e2e-notifications.sh` 15/15, validé au simulateur par Corentin. Aucun rebuild. **Reste à confirmer sur l'Android réel** : affichage des boutons et comportement de « Marquer comme lu » app tuée).
+> Dernière mise à jour : **2026-07-27** (**Lot 9 — mise en beta Play** : plan acté, Supabase passé en **Pro** dans la nouvelle orga TryCast, phase 1 livrée — plus aucun ref de projet écrit en dur — et phase 2 (OTA `expo-updates`) en cours. **Rebuild du dev client Android requis**).
+>
+> Précédemment : **2026-07-25 (bis)** (**page Notifications** : historique lu/non lu alimenté par `notification_sends` étendu, cloche à pastille sur les 4 onglets, badge d'icône, et deux boutons d'action dans la barre système — « Marquer comme lu » silencieux + une action qui ouvre l'app. Migration poussée, EF `notify` déployée, `e2e-notifications.sh` 15/15, validé au simulateur par Corentin. Aucun rebuild. **Reste à confirmer sur l'Android réel** : affichage des boutons et comportement de « Marquer comme lu » app tuée).
 >
 > Précédemment : **2026-07-25** (**réactivité des basculeurs segmentés via `useDeferredValue`** : le tap sur un SegmentedControl montait toute la liste dans le même rendu synchrone → tap « collant » ; la pastille reste urgente, le contenu lourd est déféré, sur profil (Pronos), classement et écran match. Vérifié : typecheck/lint/format + 333 tests ; validé sur device par Corentin. **Lazy mount des bottom tabs = déjà natif** (expo-router/ui, rien à faire). Aucun rebuild).
 
@@ -22,8 +24,29 @@
 
 ## Ce qu'il reste à faire
 
-### ⚠️ Action Corentin en attente (2026-07-23 quater)
-**Rebuild du dev client Android** — `eas build -p android --profile development` — requis avant de tester le fix clavier sur le téléphone : `react-native-keyboard-controller` est un module natif absent du build actuel. Le fix des volets (`BottomSheet`), lui, ne demande aucun rebuild (Reanimated/gesture-handler déjà présents) et est déjà validé au simulateur iOS.
+### ⚠️ Action Corentin en attente (2026-07-27)
+**Rebuild du dev client Android** — `eas build -p android --profile development` — désormais requis pour **deux** modules natifs absents du build actuel : `react-native-keyboard-controller` (fix clavier) et `expo-updates` (OTA, Lot 9). Un seul build couvre les deux. Le fix des volets (`BottomSheet`) ne demande aucun rebuild (Reanimated/gesture-handler déjà présents) et est déjà validé au simulateur iOS.
+
+## Lot 9 — Mise en beta fermée sur Google Play (en cours, 2026-07-27)
+
+Plan complet : `~/.claude/plans/ok-on-va-partir-melodic-abelson.md`. Cible : test interne Play sur une base de prod propre, puis test fermé calé sur la reprise de la compétition en **novembre**.
+
+**Décisions actées** : le projet Supabase actuel devient la **production** (il porte déjà Resend + DNS vérifiés, les templates en ligne, le rate limit à 30/h, le client Google, les crons, la waitlist réelle) et un **nouveau projet** porte le développement. Données de prod : tout raser sauf le compte de Corentin, la waitlist, les compétitions, les matchs et le barème. **OTA dès maintenant.** iOS toujours différé. Version : reste `1.0.0`, la beta se joue en builds successifs (`autoIncrement` EAS).
+
+**Supabase Pro fait le 2026-07-27** : nouvelle organisation **TryCast** (`zrdzxldbiiojmgkvaeof`, plan `pro`), projet transféré dedans. Le **ref n'a pas changé** (`bmdzadvugtkclnqjpndr`) → Vercel, Resend, les DNS, le callback OAuth Google, les crons et FCM continuent de fonctionner sans rien reconfigurer. Le projet de dev sera créé dans la même orga Pro (le plan gratuit plafonne à 2 projets **par compte**, `clg` est plein avec Necroloto + Hubert-Mange-MPG).
+
+### Phase 1 — plus aucun ref de projet écrit en dur ✅ (2026-07-27, `5b2aa74`)
+Le ref `bmdzadvugtkclnqjpndr` vivait en dur à 7 endroits, dont les **4 migrations de planification pg_cron**. Rejouer les migrations sur un projet neuf y aurait planté 4 crons frappant la **production** toutes les 5 à 10 minutes.
+- Migration `20260727000100_cron_project_url.sql` : les 4 jobs lisent la base des Edge Functions dans **Vault** (`edge_functions_base_url`), comme ils lisaient déjà leur secret. `cron.schedule` étant idempotent sur le nom du job, la re-planification écrase les définitions précédentes. **Défaut sûr** : sans le secret, l'URL est NULL et le tick échoue sans rien appeler — jamais vers un autre projet.
+- `scripts/project-ref.mjs` : source unique du ref, déduite d'`EXPO_PUBLIC_SUPABASE_URL` du `.env` — donc toujours le projet de dev. Consommée par le nouveau `scripts/typegen.mjs` (qui n'écrit `database.types.ts` qu'après un run réussi, là où la redirection shell le vidait d'abord) et par `push-email-config.mjs`, qui **affiche le nom du projet visé avant d'écrire** et exige `--project=<ref>` pour viser la prod.
+- `trigger-notify.sql` : URL lue dans Vault, donc toujours le projet où on exécute le script.
+
+### Phase 2 — mises à jour à distance (OTA) 🔶 en cours
+`expo-updates` (~57.0.21) installé, `updates.url` + `runtimeVersion` dans `app.json`, canaux `preview`/`production` dans `eas.json`, rangée « Mise à jour » (canal + 8 premiers caractères de l'`updateId`) dans Réglages → À propos.
+
+**Politique `fingerprint` et non `appVersion`** : elle recalcule la version d'exécution dès que le natif bouge, ce qui rend une mise à jour incompatible extrêmement improbable. Sur une app qui gagne régulièrement des libs natives, `appVersion` aurait envoyé du JS incompatible à tous les testeurs le jour où on oublie de bumper `1.0.0`. Vérifié dans l'`Expo.plist` généré : `EXUpdatesRuntimeVersion = file:fingerprint`, `EXUpdatesLaunchWaitMs = 0` (l'app démarre du cache, la mise à jour s'applique au lancement suivant — pas d'attente perçue).
+
+La rangée des Réglages ne s'affiche que si `Updates.isEnabled` : **invisible dans un dev client**, qui charge depuis Metro. La seule preuve valable de l'OTA passe donc par un build `preview` (cf. plan, section Vérification).
 
 ### Lot 6 — Push : ✅ validé sur l'Android réel (2026-07-23)
 Checklist déroulée de bout en bout sur le téléphone de Corentin : rappel H-1 et notification de résultats reçus, taps vers les bons onglets, points calculés par le vrai pipeline, préférence « Résultats » coupée = aucun envoi, pas de rappel à qui a déjà pronostiqué. Outillage rejouable : `scripts/seed-test-notifications.sql` + `scripts/trigger-notify.sql`. **Reste (non bloquant)** : types « Activité de ligue » et « Invitations » en v1.1+ (schéma prefs extensible) ; iOS/APNs quand le compte Apple Developer existera.

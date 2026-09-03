@@ -155,6 +155,8 @@
             "openSettings": "Open system settings"
         },
         "version": "Version",
+        "update": "Update",
+        "updateEmbedded": "bundled in build",
         "logout": "Log out",
         "delete": {
             "rowTitle": "Delete my account",

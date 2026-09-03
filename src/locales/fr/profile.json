@@ -155,6 +155,8 @@
             "openSettings": "Ouvrir les réglages système"
         },
         "version": "Version",
+        "update": "Mise à jour",
+        "updateEmbedded": "intégrée au build",
         "logout": "Se déconnecter",
         "delete": {
             "rowTitle": "Supprimer mon compte",
