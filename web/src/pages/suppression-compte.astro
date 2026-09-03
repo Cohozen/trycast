@@ -1,0 +1,76 @@
+---
+// Page exigée par Google Play : un utilisateur qui a désinstallé l'app doit
+// pouvoir demander la suppression de son compte depuis le web, sans réinstaller.
+// Son URL est déclarée dans la fiche du store (champ « suppression des données »)
+// — son absence est un motif de rejet. Contenu volontairement aligné sur le §6
+// de la politique de confidentialité.
+import ContentLayout from '../layouts/content-layout.astro';
+---
+
+<ContentLayout
+    title="Supprimer mon compte — TryCast"
+    description="Comment supprimer définitivement ton compte TryCast et les données associées, depuis l'application ou par e-mail."
+    heading="Supprimer mon compte"
+    updatedAt="27 juillet 2026">
+    <p>
+        Ton compte t'appartient. Tu peux le supprimer quand tu veux, définitivement, sans avoir à
+        te justifier ni à demander quoi que ce soit à qui que ce soit.
+    </p>
+
+    <h2>Depuis l'application (immédiat)</h2>
+    <p>
+        C'est la voie la plus rapide : la suppression est effective tout de suite, sans validation
+        de notre part.
+    </p>
+    <ol>
+        <li>Ouvre TryCast et connecte-toi.</li>
+        <li>Onglet <em>Profil</em>, puis l'icône <em>Réglages</em> en haut de l'écran.</li>
+        <li>Tout en bas, section <em>Zone de danger</em> : <em>Supprimer mon compte</em>.</li>
+        <li>Confirme. Le compte et les données associées sont effacés immédiatement.</li>
+    </ol>
+    <p>
+        Si tu veux garder une copie de tes pronostics avant de partir, passe d'abord
+        par <em>Réglages → Confidentialité → Exporter mes données</em>.
+    </p>
+
+    <h2>Par e-mail (si tu as désinstallé l'application)</h2>
+    <p>
+        Écris à <a href="mailto:contact@trycast.fr">contact@trycast.fr</a> depuis <strong>ton
+        adresse e-mail de compte</strong>, avec « suppression de compte » en objet. C'est cette
+        correspondance d'adresse qui nous permet de vérifier que la demande vient bien de toi —
+        nous ne demandons jamais de mot de passe.
+    </p>
+    <p>
+        La demande est traitée sous un mois au plus, et en pratique bien plus vite.
+    </p>
+
+    <h2>Ce qui est supprimé</h2>
+    <p>
+        Tout ce qui te rattache au service disparaît définitivement, sans corbeille ni délai de
+        rétractation :
+    </p>
+    <ul>
+        <li>ton compte et tes identifiants de connexion ;</li>
+        <li>ton profil : pseudo, adresse e-mail, photo de profil ;</li>
+        <li>tes pronostics, tes points et tes classements ;</li>
+        <li>tes adhésions aux ligues — et les ligues dont tu es le créateur, avec elles ;</li>
+        <li>tes préférences de notification et les jetons de ton téléphone.</li>
+    </ul>
+    <p>
+        Si tu as créé une ligue, préviens ses membres avant : sa suppression est irréversible et
+        emporte le classement de tout le monde. Tu peux aussi en transférer la propriété à un autre
+        membre depuis le détail de la ligue, puis supprimer ton compte — la ligue survivra.
+    </p>
+
+    <h2>Ce qui peut subsister</h2>
+    <p>
+        Rien qui permette de te réidentifier. Les mesures d'usage éventuellement collectées sont
+        anonymes dès l'origine et ne sont rattachées à aucun compte : elles ne peuvent donc être ni
+        retrouvées ni supprimées individuellement. Si ton adresse figurait dans la liste d'attente
+        de la beta, elle en est retirée sur simple demande à la même adresse.
+    </p>
+    <p>
+        Détail complet des traitements et de leurs durées de conservation dans
+        la <a href="/confidentialite">politique de confidentialité</a>.
+    </p>
+</ContentLayout>
