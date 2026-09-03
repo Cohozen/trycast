@@ -81,6 +81,21 @@ async function projectLabel() {
 
 async function getConfig() {
     const res = await fetch(API, { headers: { Authorization: `Bearer ${token}` } });
+    if (res.status === 401) {
+        // Le message brut de l'API (« JWT could not be decoded ») laisse croire à
+        // un problème de projet, alors que c'est le jeton personnel qui est en
+        // cause. Cas le plus fréquent : le `sbp_...` de la doc collé littéralement.
+        console.error(
+            `✗ 401 : SUPABASE_ACCESS_TOKEN refusé (longueur lue : ${token.length}).\n` +
+                "  Il s'agit d'un JETON PERSONNEL — https://supabase.com/dashboard/account/tokens —\n" +
+                "  et non d'une clé d'API de projet. Un jeton valide fait 44 caractères (sbp_ + 40).",
+        );
+        process.exit(1);
+    }
+    if (res.status === 404) {
+        console.error(`✗ 404 : projet ${PROJECT_REF} introuvable, ou hors de portée de ce jeton.`);
+        process.exit(1);
+    }
     if (!res.ok) throw new Error(`GET ${res.status} ${await res.text()}`);
     return res.json();
 }
