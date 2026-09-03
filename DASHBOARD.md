@@ -1,7 +1,7 @@
 # TryCast — Dashboard
 
 > Suivi d'avancement et décisions. Mis à jour à la fin de chaque session.
-> Dernière mise à jour : **2026-09-03** (**Lot 9 — mise en beta Play** : phases 1 (plus aucun ref de projet en dur), 2 (OTA `expo-updates`), 3 (**scission dev/prod Supabase**, 7 E2E verts sur 9) et 5 (page web de suppression de compte) livrées. Restent les phases 4 (config EAS prod), 6 (fiche Play) et 7 (beta). **⚠️ La waitlist est vide** — le recrutement des 12 testeurs n'a aucune matière).
+> Dernière mise à jour : **2026-09-03** (**Lot 9 — mise en beta Play** : phases 1 (plus aucun ref de projet en dur), 2 (OTA `expo-updates`), 3 (**scission dev/prod Supabase**, **9 E2E verts sur 9**) et 5 (page web de suppression de compte) livrées ; phase 4 (variables EAS, environnements Sentry) livrée sauf le `SENTRY_AUTH_TOKEN`. Restent les phases 6 (fiche Play) et 7 (beta). **⚠️ La waitlist est vide** — le recrutement des 12 testeurs n'a aucune matière).
 >
 > Précédemment : **2026-07-25 (bis)** (**page Notifications** : historique lu/non lu alimenté par `notification_sends` étendu, cloche à pastille sur les 4 onglets, badge d'icône, et deux boutons d'action dans la barre système — « Marquer comme lu » silencieux + une action qui ouvre l'app. Migration poussée, EF `notify` déployée, `e2e-notifications.sh` 15/15, validé au simulateur par Corentin. Aucun rebuild. **Reste à confirmer sur l'Android réel** : affichage des boutons et comportement de « Marquer comme lu » app tuée).
 >
@@ -60,7 +60,14 @@ La seule preuve valable de l'OTA passe par un build `preview` (cf. plan, section
 - Les 4 crons du nouveau projet lisent l'URL dans Vault et **aucun ne porte l'URL de prod en dur** — la phase 1 fait son travail.
 - `npm run typegen` depuis le nouveau projet redonne `database.types.ts` **au bit près** : les deux schémas sont identiques.
 
-**E2E : 7 verts sur 9** (`auth`, `avatars`, `predictions`, `leagues`, `scoring`, `notifications`, `privacy`). Restent `e2e-email` et `e2e-password-reset`, qui envoient de vrais e-mails.
+**E2E : 9 verts sur 9.** Les 7 scripts d'API, plus `e2e-email` (3 inscriptions en moins d'une minute : le plafond de 2 e-mails/h est bien levé, Resend est branché sur le dev) et `e2e-password-reset` validé de bout en bout avec un vrai code reçu — mauvais code refusé, **ancien mot de passe révoqué** (la seule assertion qui prouve le reset), code à usage unique, renvoi rapproché en 429. Le code reçu faisait 6 chiffres, ce qui confirme au passage que `mailer_otp_length` est bien à 6.
+
+**Piège corrigé dans `e2e-email.sh`** : un `.env` dont `EXPO_PUBLIC_WEB_URL` finit par « / » produisait `https://www.trycast.fr//app/confirme`, **absente de l'allow-list des Redirect URLs**. GoTrue rejette en silence une URL non listée et retombe sur `site_url` : le lien de confirmation n'atterrissait pas où le script l'annonçait. L'app était immunisée (`src/lib/urls.ts` strippe le slash), le script bash non.
+
+**Comptes de test à nettoyer sur le dev** (créés par ces deux scripts) :
+```sql
+delete from auth.users where email like '%+tc150820-%' or email = 'contact+tc-reset@trycast.fr';
+```
 
 **Limites d'outillage relevées** : le MCP Supabase est en **lecture seule** et n'a pas le rôle `postgres` — ni `vault.create_secret` ni les `insert` ne passent par lui, les écritures SQL passent par le SQL editor. Le jeton du CLI vit dans le trousseau macOS.
 
@@ -75,6 +82,22 @@ La seule preuve valable de l'OTA passe par un build `preview` (cf. plan, section
 ### Supabase branching : écarté, avec le cas où le rouvrir (2026-09-03)
 Question posée : pourquoi pas une branche Supabase par branche git plutôt qu'un projet séparé ? Écarté pour ce projet — le branching est taillé pour les **pull requests** (workflow solo sur `main` ici), une branche naît **sans données** alors que le dev a besoin d'état durable (comptes e2e des 9 scripts, matchs seedés), chaque branche a une **URL neuve** qu'il faut déclarer à la main dans Google Cloud pour l'OAuth, l'étape « Configure » du déploiement de branche **réapplique `config.toml`** — le mécanisme explicitement écarté parce qu'il débranche le SMTP Resend — et le coût n'est pas un argument (~10 $/mois si elle tourne en continu, **les crédits compute ne s'appliquant pas au compute de branching** alors qu'ils s'appliquent à un projet). Enfin, une branche est administrativement **fille de la prod**, soit le couplage que ce lot supprime.
 **À rouvrir** : pour tester une migration risquée sur un schéma propre (branche éphémère, quelques centimes) — bon réflexe avant la première migration qui touchera des données de beta réelles ; et le jour où le travail passe en PR.
+
+### Phase 4 — configuration EAS pour la production 🔶 (2026-09-03)
+
+`production` et `preview` étaient **vides** : un build de release aurait perdu le bouton « Continuer avec Google » **en silence** (comportement voulu de `providers.ts` — pas d'identifiants, pas de fournisseur — mais qui rend la panne invisible). Les deux environnements sont désormais complets et vérifiés :
+
+- `preview` → projet **dev** (`axxutfngespcdiqtrdao`), `production` → projet **prod** (`bmdzadvugtkclnqjpndr`). C'est la variable à ne jamais croiser.
+- Communes aux deux : les 2 identifiants Google, la clé Aptabase, le DSN Sentry, `EXPO_PUBLIC_WEB_URL` (**sans slash final**, cf. le piège ci-dessus) et `google-services.json` en variable-fichier.
+- `development` reste avec le seul `GOOGLE_SERVICES_JSON` : son bundle vient de Metro, qui lit le `.env` local.
+
+**Sentry — environnements séparés.** Dev, beta et prod partagent un seul projet Sentry ; sans étiquette, les plantages des testeurs se noieraient dans le bruit du développement. `Sentry.init` reçoit désormais `environment: Updates.channel || 'development'`. Ne vaut que pour les builds faits après ce commit.
+
+**Aptabase — vérifié dans le code du SDK** (`isDebug: __DEV__` envoyé avec chaque événement) : le dev client est déjà séparable via le basculeur Debug/Release du dashboard, mais `preview` et `production` se mélangent (tous deux en release). Impact jugé négligeable : pendant la beta les testeurs sont sur le canal **production**, `preview` ne sert qu'à Corentin. À rouvrir seulement si les volumes le justifient (seconde app Aptabase, clé posée dans le seul environnement `preview`).
+
+**`organization`/`project` Sentry** déclarés dans le plugin d'`app.json` (`cohozen`/`trycast`) — l'avertissement « Missing config for organization, project » a disparu de `expo config`.
+
+**Reste** : `SENTRY_AUTH_TOKEN` en secret EAS — un **jeton d'organisation** (Settings de l'org → Auth Tokens), pas un jeton personnel : portées CI fixées d'avance, et un jeton personnel cesse de fonctionner si son créateur quitte l'organisation. Sans lui le build passe, mais les source maps ne montent pas et les plantages arrivent en JS minifié. Le bloc `submit.production.android` attend le compte de service Google Play, qui n'existe qu'une fois l'app créée dans la Play Console (phase 6).
 
 ### Lot 6 — Push : ✅ validé sur l'Android réel (2026-07-23)
 Checklist déroulée de bout en bout sur le téléphone de Corentin : rappel H-1 et notification de résultats reçus, taps vers les bons onglets, points calculés par le vrai pipeline, préférence « Résultats » coupée = aucun envoi, pas de rappel à qui a déjà pronostiqué. Outillage rejouable : `scripts/seed-test-notifications.sql` + `scripts/trigger-notify.sql`. **Reste (non bloquant)** : types « Activité de ligue » et « Invitations » en v1.1+ (schéma prefs extensible) ; iOS/APNs quand le compte Apple Developer existera.
