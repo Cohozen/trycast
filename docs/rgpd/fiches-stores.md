@@ -17,6 +17,91 @@ l'app ; **aucune publicité, aucun suivi publicitaire**.
 
 ---
 
+## Google Play — formulaire « Sécurité des données », écran par écran
+
+> Ajouté le 3 septembre 2026 en remplissant le formulaire pour de vrai : la section
+> suivante listait les *types* de données sans répondre aux questions telles que la
+> console les pose. Les deux se complètent — celle-ci pour cliquer, celle-là pour
+> comprendre.
+
+### Écran 2 — Collecte des données et sécurité
+
+| Question | Réponse |
+|---|---|
+| L'appli collecte-t-elle ou partage-t-elle un des types requis ? | **Oui** |
+| Les données collectées sont-elles **toutes chiffrées lors du transfert** ? | **Oui** — HTTPS/TLS de bout en bout : Supabase (REST, Auth, Storage, Edge Functions), Expo Push puis FCM, Sentry, Aptabase. Aucun appel en clair dans le code |
+| Méthodes de création de compte | ☑ **Nom d'utilisateur et mot de passe** · ☑ **OAuth** |
+| Fournissez-vous un moyen de demander la suppression des données ? | **Oui** — `https://www.trycast.fr/suppression-compte` |
+
+⚠️ **Ne pas cocher** « Nom d'utilisateur, mot de passe et autres méthodes
+d'authentification » : cette ligne vise les comptes à second facteur. L'app n'en propose
+aucun — vérifié, il n'existe aucune UI d'enrôlement MFA/TOTP dans `src/`, même si le
+projet Supabase a le TOTP activé côté plateforme.
+
+L'e-mail compte comme « nom d'utilisateur » : l'aide de la question le dit
+explicitement (« Les noms d'utilisateur incluent les ID utilisateur, les adresses e-mail
+et les numéros de téléphone »).
+
+### Écran 3 — Types de données à cocher
+
+| Catégorie | Type |
+|---|---|
+| Informations personnelles | Adresse e-mail · Nom d'utilisateur · Nom |
+| Identifiants | Identifiants utilisateur · Identifiant d'appareil |
+| Photos et vidéos | Photos |
+| Contenu utilisateur | Autre contenu généré par l'utilisateur |
+| Activité dans l'application | Interactions dans l'application · Autres actions |
+| Diagnostics de l'application | Journaux de plantage · Autres données de diagnostic |
+
+⚠️ **Comparer avec « Voir les types de données requis »** en haut de l'écran : Google
+pré-signale ce qu'il a détecté dans le bundle. S'il annonce un type absent de cette liste
+(une position approximative venue d'une dépendance, par exemple), ne pas l'ignorer — il
+faut soit le déclarer, soit comprendre d'où il vient.
+
+### Écran 4 — Utilisation et traitement, type par type
+
+Pour chaque type cochée, la console demande quatre choses. Aucune donnée n'est
+**partagée** (les prestataires techniques qui traitent pour notre compte — hébergeur,
+passerelle de push, mesure — ne comptent pas comme un partage au sens du formulaire) et
+aucune n'est **traitée de façon éphémère** (tout est stocké).
+
+| Type | Collectée | Obligatoire ? | Finalités |
+|---|---|---|---|
+| Adresse e-mail | Oui | **Obligatoire** | Fonctionnalité de l'appli · Gestion du compte |
+| Nom d'utilisateur | Oui | **Obligatoire** | Fonctionnalité de l'appli · Gestion du compte |
+| Nom | Oui | Facultative | Fonctionnalité de l'appli |
+| Identifiants utilisateur | Oui | **Obligatoire** | Fonctionnalité de l'appli · Gestion du compte |
+| Identifiant d'appareil | Oui | Facultative | Fonctionnalité de l'appli |
+| Photos | Oui | Facultative | Fonctionnalité de l'appli |
+| Autre contenu généré (pronostics) | Oui | **Obligatoire** | Fonctionnalité de l'appli |
+| Autres actions (points, classements) | Oui | **Obligatoire** | Fonctionnalité de l'appli |
+| Interactions dans l'application | Oui | Facultative | **Analyse** |
+| Journaux de plantage | Oui | Facultative | **Analyse** |
+| Autres données de diagnostic | Oui | Facultative | **Analyse** |
+
+**Comment lire « obligatoire »** : Google demande si l'utilisateur *peut refuser* la
+collecte tout en utilisant l'app. E-mail, pseudo, identifiant et pronostics sont
+indispensables au service, donc obligatoires. Le nom (transmis par Google), la photo de
+profil, le jeton de push et les trois lignes de télémétrie se refusent sans empêcher de
+jouer — donc facultatifs. Les trois dernières se coupent dans Réglages → Confidentialité.
+
+**Le nom transmis par Google** n'est jamais affiché par l'app, mais Supabase Auth le
+conserve tel que Google l'envoie : il quitte donc l'appareil, et Google demande de
+déclarer ce qui est **collecté**, pas ce qui est **utilisé**.
+
+⚠️ **Jamais la finalité « Publicité ou marketing »**, sur aucune ligne. L'app n'a ni
+publicité ni traceur publicitaire, et cette déclaration est ce qui le rend opposable.
+
+### Point relevé au passage : le bucket des avatars est public
+
+`storage.buckets.avatars` a `public = true` : une URL d'avatar est lisible par quiconque
+la possède, sans authentification. C'est le fonctionnement voulu (les avatars s'affichent
+dans les classements) et ce n'est **pas** un « partage » au sens du formulaire. Mais c'est
+à savoir : ces images ne sont pas privées, et la politique de confidentialité gagnerait à
+le dire plutôt que de le laisser deviner.
+
+---
+
 ## Google Play — formulaire « Sécurité des données »
 
 **Questions générales**
