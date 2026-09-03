@@ -77,6 +77,28 @@ EMAIL=une.vraie@adresse.fr CODE=418207 bash scripts/e2e-password-reset.sh  # dé
 
 `e2e-leagues.sh` et `e2e-scoring.sql` ne sont pas idempotents : **rejouer leur seed avant chaque exécution**.
 
+### ⚠️ Les seeds ne se cumulent pas
+
+**Ne jamais jouer les cinq seeds en une seule passe.** Ils se marchent dessus : `seed-test-scoring.sql`
+fait un `update public.predictions` qui remet à zéro les `points_awarded` que `seed-test-leagues.sql`
+vient de poser sur le match −102. Résultat, `e2e-leagues.sh` échoue sur l'assertion « round points pour
+l'owner » — un rouge qui ressemble à une régression et n'en est pas (vécu le 2026-09-03, au montage du
+nouveau projet de dev).
+
+Chaque seed non idempotent se joue **juste avant son propre script**, pas en préparation globale.
+
+Et **`e2e-auth.sh` passe en dernier** : il supprime `e2e.user2` pour tester `delete-account`, ce qui fait
+échouer tous les scripts suivants sur un `KeyError: 'access_token'` au login. Pour le recréer sans repasser
+par le SQL editor (GoTrue refuse les adresses `.local` à l'inscription publique, mais pas à l'admin) :
+
+```bash
+KEY=$(supabase projects api-keys --project-ref <ref-dev> -o json \
+  | python3 -c "import json,sys; print(next(k['api_key'] for k in json.load(sys.stdin) if k['name']=='service_role'))")
+curl -s -X POST "$EXPO_PUBLIC_SUPABASE_URL/auth/v1/admin/users" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \
+  -d '{"email":"e2e.user2@trycast.local","password":"motdepasse123","email_confirm":true,"user_metadata":{"username":"TestUser2"}}'
+```
+
 ### Côté serveur
 
 `e2e-scoring.sql` vérifie le comportement de la RPC `apply_match_scores` elle-même (points, idempotence, passes 1 et 2, ré-agrégation des classements) — à exécuter dans le SQL editor ou via le MCP Supabase, après avoir rejoué `seed-test-scoring.sql`.

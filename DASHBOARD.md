@@ -1,7 +1,7 @@
 # TryCast — Dashboard
 
 > Suivi d'avancement et décisions. Mis à jour à la fin de chaque session.
-> Dernière mise à jour : **2026-07-27** (**Lot 9 — mise en beta Play** : plan acté, Supabase passé en **Pro** dans la nouvelle orga TryCast, phase 1 livrée — plus aucun ref de projet écrit en dur — et phase 2 (OTA `expo-updates`) en cours. **Rebuild du dev client Android requis**).
+> Dernière mise à jour : **2026-09-03** (**Lot 9 — mise en beta Play** : phases 1 (plus aucun ref de projet en dur), 2 (OTA `expo-updates`), 3 (**scission dev/prod Supabase**, 7 E2E verts sur 9) et 5 (page web de suppression de compte) livrées. Restent les phases 4 (config EAS prod), 6 (fiche Play) et 7 (beta). **⚠️ La waitlist est vide** — le recrutement des 12 testeurs n'a aucune matière).
 >
 > Précédemment : **2026-07-25 (bis)** (**page Notifications** : historique lu/non lu alimenté par `notification_sends` étendu, cloche à pastille sur les 4 onglets, badge d'icône, et deux boutons d'action dans la barre système — « Marquer comme lu » silencieux + une action qui ouvre l'app. Migration poussée, EF `notify` déployée, `e2e-notifications.sh` 15/15, validé au simulateur par Corentin. Aucun rebuild. **Reste à confirmer sur l'Android réel** : affichage des boutons et comportement de « Marquer comme lu » app tuée).
 >
@@ -49,6 +49,32 @@ Le ref `bmdzadvugtkclnqjpndr` vivait en dur à 7 endroits, dont les **4 migratio
 **Piège relevé au simulateur** : `Updates.isEnabled` vaut **vrai** dès qu'expo-updates est configuré, y compris dans un build local qui n'appartient à aucun canal — la rangée s'y affichait avec un séparateur orphelin (« · intégrée au build »), `Updates.channel` renvoyant une **chaîne vide** et non `null`, ce qui neutralisait le repli `??`. La rangée est donc conditionnée au **canal**, pas à `isEnabled` : un canal n'existe que sur un build distribué par EAS, c'est-à-dire exactement là où la ligne sert. Vérifié au simulateur : rangée masquée en local, version toujours affichée.
 
 La seule preuve valable de l'OTA passe par un build `preview` (cf. plan, section Vérification).
+
+### Phase 3 — scission dev / prod Supabase ✅ (2026-09-03)
+
+**Prod** : l'ancien `trycast-dev` est devenu **`trycast-prod`** (`bmdzadvugtkclnqjpndr`), transféré dans la nouvelle organisation **TryCast** en plan **Pro**. Le ref étant inchangé, Vercel, Resend, les DNS, le callback OAuth Google, les crons et FCM n'ont eu besoin d'aucune reconfiguration. Nettoyage joué par Corentin : 3 comptes de test supprimés (2 e2e + le compte Google `cocotest`), compte `cohozen` conservé, waitlist/compétitions/équipes/matchs/barème intacts. Le script désigne les comptes **nommément** (et non « tous sauf cohozen ») avec un garde-fou qui refuse d'écrire si la base a changé : rejoué par mégarde en novembre, il ne peut pas effacer de vrais testeurs.
+
+**Dev** : nouveau projet **`trycast-dev`** (`axxutfngespcdiqtrdao`, eu-west-3, même orga Pro). Monté de bout en bout : 4 secrets Edge Functions propres au dev (différents de la prod — un appel égaré de l'un vers l'autre est rejeté en 401 au lieu de réussir), 6 Edge Functions déployées avec les bons `verify_jwt`, 44 migrations appliquées, 5 secrets Vault, seeds, `.env` local basculé.
+
+**Deux preuves qui comptent** :
+- Les 4 crons du nouveau projet lisent l'URL dans Vault et **aucun ne porte l'URL de prod en dur** — la phase 1 fait son travail.
+- `npm run typegen` depuis le nouveau projet redonne `database.types.ts` **au bit près** : les deux schémas sont identiques.
+
+**E2E : 7 verts sur 9** (`auth`, `avatars`, `predictions`, `leagues`, `scoring`, `notifications`, `privacy`). Restent `e2e-email` et `e2e-password-reset`, qui envoient de vrais e-mails.
+
+**Limites d'outillage relevées** : le MCP Supabase est en **lecture seule** et n'a pas le rôle `postgres` — ni `vault.create_secret` ni les `insert` ne passent par lui, les écritures SQL passent par le SQL editor. Le jeton du CLI vit dans le trousseau macOS.
+
+**Pièges documentés dans `scripts/README.md`** :
+- **Les cinq seeds ne se cumulent pas** : `seed-test-scoring.sql` remet à zéro les `points_awarded` posés par `seed-test-leagues.sql`. Les jouer en une passe fait échouer `e2e-leagues` sur un rouge qui ressemble à une régression et n'en est pas.
+- **`e2e-auth.sh` en dernier** : il supprime `e2e.user2`, les scripts suivants échouent au login. Recréation possible par l'API admin (GoTrue refuse les adresses `.local` à l'inscription publique, pas à l'admin) — plus besoin de repasser par le SQL editor.
+- `push-email-config.mjs` : un 401 « JWT could not be decoded » désigne le **jeton personnel**, pas le projet. Le script affiche désormais la longueur lue et la distinction jeton personnel / clé d'API de projet.
+
+### ⚠️ Constat à traiter : la waitlist est vide
+`waitlist_signups` ne contient **aucune inscription**. La phase 7 (recruter 12 testeurs qui restent inscrits 14 jours) n'a donc aucune matière. Le site est en ligne depuis le 2026-07-20 : s'il doit servir au recrutement, il faut lui envoyer du trafic bien avant novembre, pas la veille.
+
+### Supabase branching : écarté, avec le cas où le rouvrir (2026-09-03)
+Question posée : pourquoi pas une branche Supabase par branche git plutôt qu'un projet séparé ? Écarté pour ce projet — le branching est taillé pour les **pull requests** (workflow solo sur `main` ici), une branche naît **sans données** alors que le dev a besoin d'état durable (comptes e2e des 9 scripts, matchs seedés), chaque branche a une **URL neuve** qu'il faut déclarer à la main dans Google Cloud pour l'OAuth, l'étape « Configure » du déploiement de branche **réapplique `config.toml`** — le mécanisme explicitement écarté parce qu'il débranche le SMTP Resend — et le coût n'est pas un argument (~10 $/mois si elle tourne en continu, **les crédits compute ne s'appliquant pas au compute de branching** alors qu'ils s'appliquent à un projet). Enfin, une branche est administrativement **fille de la prod**, soit le couplage que ce lot supprime.
+**À rouvrir** : pour tester une migration risquée sur un schéma propre (branche éphémère, quelques centimes) — bon réflexe avant la première migration qui touchera des données de beta réelles ; et le jour où le travail passe en PR.
 
 ### Lot 6 — Push : ✅ validé sur l'Android réel (2026-07-23)
 Checklist déroulée de bout en bout sur le téléphone de Corentin : rappel H-1 et notification de résultats reçus, taps vers les bons onglets, points calculés par le vrai pipeline, préférence « Résultats » coupée = aucun envoi, pas de rappel à qui a déjà pronostiqué. Outillage rejouable : `scripts/seed-test-notifications.sql` + `scripts/trigger-notify.sql`. **Reste (non bloquant)** : types « Activité de ligue » et « Invitations » en v1.1+ (schéma prefs extensible) ; iOS/APNs quand le compte Apple Developer existera.
