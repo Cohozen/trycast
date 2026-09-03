@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react-native';
+import * as Updates from 'expo-updates';
 
 import { isTelemetryEnabled } from '@/features/privacy/telemetry-state';
 
@@ -28,6 +29,12 @@ export function initDiagnostics(): void {
 
     Sentry.init({
         dsn: DSN,
+        // Dev, beta et production partagent un seul projet Sentry : sans cette
+        // étiquette, les plantages des testeurs se noieraient dans le bruit du
+        // développement. `Updates.channel` vaut le canal EAS du build
+        // (« preview », « production ») et une chaîne vide en local — d'où le
+        // repli explicite plutôt qu'un environnement vide côté Sentry.
+        environment: Updates.channel || 'development',
         sendDefaultPii: false,
         // Plantages et erreurs uniquement : aucune trace de performance.
         tracesSampleRate: 0,
