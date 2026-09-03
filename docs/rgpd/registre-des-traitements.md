@@ -20,7 +20,7 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 |---|---|
 | **Finalité** | Créer et gérer un compte, authentifier l'utilisateur, lui permettre de se faire reconnaître par ses amis |
 | **Base légale** | Exécution du contrat (CGU) — art. 6.1.b |
-| **Personnes concernées** | Utilisateurs de l'application (≥ 15 ans) |
+| **Personnes concernées** | Utilisateurs de l'application (≥ 16 ans) |
 | **Catégories de données** | Adresse e-mail, mot de passe (haché, jamais en clair — **absent** des comptes créés via un fournisseur d'identité), pseudo, photo de profil (facultative), langue, dates de création et de dernière connexion. Pour un compte créé via **Sign in with Google** : identifiant de compte Google, et les métadonnées transmises par Google (nom complet, URL de la photo de profil Google) conservées telles quelles par Supabase Auth |
 | **Où** | `auth.users` (Supabase Auth — dont `raw_user_meta_data` pour les métadonnées du fournisseur), `public.profiles`, bucket Storage `avatars` |
 | **Destinataires** | Supabase (hébergement), Resend (e-mails de compte), **Google** pour les comptes utilisant Sign in with Google (Google connaît alors la connexion à TryCast). Le pseudo et la photo sont visibles des autres membres des ligues rejointes ; l'e-mail ne l'est jamais |

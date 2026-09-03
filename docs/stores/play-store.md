@@ -178,22 +178,22 @@ Garde ce raisonnement écrit : s'il faut un jour le défendre auprès de Google,
 
 ## Public cible et contenu
 
-⚠️ **Décision à prendre, elle touche un texte légal publié.**
+**Tranché le 3 septembre 2026 : cocher 16-17 et 18+.**
 
-Play demande de cocher des tranches d'âge : moins de 5, 6-8, 9-12, **13-15**, **16-17**, **18+**.
+Play demande de cocher des tranches d'âge : moins de 5, 6-8, 9-12, 13-15, 16-17, 18+.
+Cocher **13-15** ferait entrer TryCast dans le **programme Familles** de Google — obligations
+supplémentaires, revue plus stricte, exigences de conception pour enfants. Ce n'est pas ce que
+le produit est.
 
-Or ta politique de confidentialité annonce **15 ans minimum**. Cocher 13-15 fait entrer
-TryCast dans le **programme Familles** de Google : obligations supplémentaires, revue plus
-stricte, exigences de conception pour enfants. Ce n'est pas ce que tu construis.
+L'âge minimum est donc passé de 15 à **16 ans** dans la politique de confidentialité (§7) et
+les CGU, mises à jour le même jour.
 
-**Recommandation** : cocher **16-17 et 18+**, et faire passer l'âge minimum de 15 à **16 ans**
-dans `web/src/pages/confidentialite.astro` et les CGU. Cohérent, hors programme Familles, et
-16 ans est par ailleurs l'âge du consentement numérique dans plusieurs États de l'UE.
-
-L'alternative — garder 15 et cocher 13-15 — est défendable mais te fait porter les
-obligations Familles pour un public que tu ne visais pas.
-
----
+⚠️ **La justification a dû être réécrite, pas seulement le chiffre.** Le texte disait « 15 ans,
+âge à partir duquel un mineur peut consentir seul au traitement de ses données en France » —
+c'est exact, la France a fixé ce seuil à 15 ans. Écrire « 16 ans » derrière cette phrase
+l'aurait rendue fausse. La politique dit maintenant que les 16 ans sont un **choix de
+l'éditeur, plus strict que la loi française**, aligné sur le seuil par défaut du RGPD et sur la
+tranche déclarée aux stores.
 
 ## Accès à l'application
 
