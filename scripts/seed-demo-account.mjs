@@ -102,15 +102,15 @@ async function nomDuProjet() {
     }
 }
 
-console.log(`Cible : ${await nomDuProjet()} (${ref}) — ${override ? 'nommée explicitement' : 'déduite du .env'}\n`);
+console.log(
+    `Cible : ${await nomDuProjet()} (${ref}) — ${override ? 'nommée explicitement' : 'déduite du .env'}\n`,
+);
 
 // ---------------------------------------------------------------------------
 // 1) Table rase : on supprime les comptes de démo existants, la cascade fait le reste
 // ---------------------------------------------------------------------------
 const existants = await api('/auth/v1/admin/users?per_page=1000');
-const aSupprimer = (existants.users ?? []).filter((u) =>
-    COMPTES.some((c) => c.email === u.email),
-);
+const aSupprimer = (existants.users ?? []).filter((u) => COMPTES.some((c) => c.email === u.email));
 for (const u of aSupprimer) {
     await api(`/auth/v1/admin/users/${u.id}`, { method: 'DELETE' });
 }

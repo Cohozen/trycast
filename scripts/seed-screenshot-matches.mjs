@@ -52,10 +52,14 @@ if (process.argv.some((a) => a.startsWith('--project'))) {
 }
 
 function serviceRoleKey() {
-    const out = execFileSync('supabase', ['projects', 'api-keys', '--project-ref', ref, '-o', 'json'], {
-        encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'ignore'],
-    });
+    const out = execFileSync(
+        'supabase',
+        ['projects', 'api-keys', '--project-ref', ref, '-o', 'json'],
+        {
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'ignore'],
+        },
+    );
     return JSON.parse(out).find((k) => k.name === 'service_role').api_key;
 }
 
@@ -93,9 +97,7 @@ if (!competition) {
     process.exit(1);
 }
 
-const equipes = Object.fromEntries(
-    (await rest('teams?select=id,name')).map((t) => [t.name, t.id]),
-);
+const equipes = Object.fromEntries((await rest('teams?select=id,name')).map((t) => [t.name, t.id]));
 const manquantes = JOURNEE.flatMap(([d, e]) => [d, e]).filter((n) => !equipes[n]);
 if (manquantes.length > 0) {
     console.error(
