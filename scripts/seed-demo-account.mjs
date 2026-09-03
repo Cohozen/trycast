@@ -197,38 +197,59 @@ console.log(`Ligue « ${ligue.name} » créée (code ${ligue.invite_code}), 3 me
 //    s'afficherait à zéro partout, ce qui donne l'impression que rien ne marche.
 //    Valeurs fixes et plausibles — le vrai barème reste celui de la RPC.
 // ---------------------------------------------------------------------------
-const bareme = [
-    [14, 7, 8, true],
-    [21, 18, 5, false],
-    [10, 24, 0, false],
-    [30, 12, 12, true],
-    [17, 17, 3, false],
-    [26, 9, 6, false],
+// Verdict voulu pour chaque (match, joueur). Le pronostic est ensuite DÉRIVÉ du
+// score réel du match, au lieu d'être fixé d'avance : sinon l'app affiche un
+// badge « Score exact » au-dessus d'un pronostic qui ne correspond pas au score
+// — incohérence visible sur une capture comme par le relecteur de Google.
+// Un profil de réussite par joueur, le compte de démonstration devant : la
+// capture du podium le montre en tête, avec l'étoile.
+const VERDICTS = [
+    ['exact', 'bon', 'exact', 'bon', 'bon', 'exact'], // DemoTryCast
+    ['bon', 'bon', 'rate', 'exact', 'bon', 'bon'], // Margot
+    ['bon', 'rate', 'bon', 'bon', 'rate', 'exact'], // Sacha
 ];
+
+/** Pronostic et points cohérents avec le score réellement affiché. */
+function prononcer(verdict, dom, ext) {
+    if (verdict === 'exact') {
+        return { h: dom, a: ext, pts: 18 + Math.min(dom, 20), winner: true, exactPts: 12 };
+    }
+    if (verdict === 'bon') {
+        // Même vainqueur, écart différent : bon 1/N/2 sans score exact.
+        const ecart = dom > ext ? 4 : -4;
+        return { h: dom + ecart, a: ext, pts: 8, winner: true, exactPts: 0 };
+    }
+    // Vainqueur inversé : aucun point, comme le prévoit le barème.
+    return { h: ext, a: dom, pts: 0, winner: false, exactPts: 0 };
+}
 
 let poses = 0;
 const cumul = new Map(crees.map((c) => [c.id, { points: 0, scored: 0, exacts: 0 }]));
 
 for (const [i, m] of matchs.entries()) {
-    const termine = m.status === 'finished';
+    const termine = m.status === 'finished' && m.home_score !== null && m.away_score !== null;
     for (const [j, c] of crees.entries()) {
-        const [dom, ext, pts, exact] = bareme[(i + j) % bareme.length];
-        const prono = {
-            user_id: c.id,
-            match_id: m.id,
-            predicted_home_score: dom,
-            predicted_away_score: ext,
-            predicted_bonus_off_home: exact,
-            predicted_bonus_off_away: false,
-        };
+        const prono = { user_id: c.id, match_id: m.id, predicted_bonus_off_away: false };
+
         if (termine) {
-            prono.points_awarded = pts;
+            const v = prononcer(VERDICTS[j][i % VERDICTS[j].length], m.home_score, m.away_score);
+            prono.predicted_home_score = Math.max(0, v.h);
+            prono.predicted_away_score = Math.max(0, v.a);
+            prono.predicted_bonus_off_home = v.exactPts > 0;
+            prono.points_awarded = v.pts;
             prono.scored_at = new Date().toISOString();
+            prono.points_breakdown = { winnerCorrect: v.winner, exactScorePoints: v.exactPts };
             const t = cumul.get(c.id);
-            t.points += pts;
+            t.points += v.pts;
             t.scored += 1;
-            if (exact) t.exacts += 1;
+            if (v.exactPts > 0) t.exacts += 1;
+        } else {
+            // Match à venir : un pronostic plausible, sans points.
+            prono.predicted_home_score = 20 + ((i + j) % 12);
+            prono.predicted_away_score = 12 + ((i * 2 + j) % 10);
+            prono.predicted_bonus_off_home = (i + j) % 3 === 0;
         }
+
         await rest('predictions', { method: 'POST', body: JSON.stringify(prono) });
         poses += 1;
     }
