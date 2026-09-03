@@ -48,7 +48,11 @@ Le ref `bmdzadvugtkclnqjpndr` vivait en dur à 7 endroits, dont les **4 migratio
 
 **Piège relevé au simulateur** : `Updates.isEnabled` vaut **vrai** dès qu'expo-updates est configuré, y compris dans un build local qui n'appartient à aucun canal — la rangée s'y affichait avec un séparateur orphelin (« · intégrée au build »), `Updates.channel` renvoyant une **chaîne vide** et non `null`, ce qui neutralisait le repli `??`. La rangée est donc conditionnée au **canal**, pas à `isEnabled` : un canal n'existe que sur un build distribué par EAS, c'est-à-dire exactement là où la ligne sert. Vérifié au simulateur : rangée masquée en local, version toujours affichée.
 
-La seule preuve valable de l'OTA passe par un build `preview` (cf. plan, section Vérification).
+**OTA prouvé de bout en bout le 2026-09-03**, sur le build `preview` `7ad9cfba` installé dans l'émulateur Pixel 10 Pro : le libellé « Version » modifié dans les ressources FR est parti par `eas update --channel preview`, et après deux relances l'app affichait la nouvelle chaîne **sans réinstallation**, la rangée Réglages passant de `preview · aba67a2e` (bundle embarqué) à `preview · 01a06810` — exactement l'identifiant rendu par `eas update`. La chaîne d'origine a été republiée dans la foulée pour laisser le canal propre. La version d'exécution de la mise à jour (`2611f008…`) correspondait à l'empreinte du build : la politique `fingerprint` fait son travail.
+
+Deux vérifications que ce build a permis au passage :
+- **FCM correctement embarqué** — l'avertissement `android.googleServicesFile ... won't be uploaded` au lancement du build est un **artefact d'évaluation locale** (la variable-fichier EAS existe bien) : l'`mobilesdk_app_id` extrait de l'APK est identique à celui de `google-services.json`.
+- **Le bouton « Continuer avec Google » est présent** dans le build de release, ce qui prouve que les `EXPO_PUBLIC_GOOGLE_*` de l'environnement `preview` ont bien été inlinées au bundling. C'était le mode de panne silencieuse redouté à la phase 4.
 
 ### Phase 3 — scission dev / prod Supabase ✅ (2026-09-03)
 
