@@ -142,7 +142,14 @@ for (const compte of COMPTES) {
 for (const c of crees) {
     await rest(`profiles?id=eq.${c.id}`, {
         method: 'PATCH',
-        body: JSON.stringify({ username: c.username, username_chosen: true, locale: 'fr' }),
+        // is_demo : classé dans sa ligue (ce que voit le relecteur), absent du
+        // classement général (où il concurrencerait de vrais joueurs).
+        body: JSON.stringify({
+            username: c.username,
+            username_chosen: true,
+            locale: 'fr',
+            is_demo: true,
+        }),
     });
 }
 

@@ -17,6 +17,11 @@ export type MyRank = {
  * head+count sur standings (RLS select-authenticated sur toutes les lignes),
  * avec les tie-breakers exacts de la RPC. `standing` = ma ligne (undefined
  * tant qu'elle charge, null si pas encore scoré).
+ *
+ * La jointure `profiles!inner` reproduit le filtre de `get_global_leaderboard` :
+ * les comptes de démonstration des stores sont classés dans leurs ligues mais
+ * pas au général. Sans elle, le total et le rang affichés ici décaleraient de
+ * ceux du classement — un joueur se verrait 4e sur une liste qui le montre 3e.
  */
 export function useMyRank(
     competitionId: string | undefined,
@@ -35,24 +40,27 @@ export function useMyRank(
         queryFn: async (): Promise<MyRank> => {
             const total = await supabase
                 .from('standings')
-                .select('*', { count: 'exact', head: true })
-                .eq('competition_id', competitionId as string);
+                .select('*, profiles!inner(is_demo)', { count: 'exact', head: true })
+                .eq('competition_id', competitionId as string)
+                .eq('profiles.is_demo', false);
             if (total.error) throw total.error;
 
             if (!standing) return { rank: null, total: total.count ?? 0, gapToAbove: null };
 
             const better = await supabase
                 .from('standings')
-                .select('*', { count: 'exact', head: true })
+                .select('*, profiles!inner(is_demo)', { count: 'exact', head: true })
                 .eq('competition_id', competitionId as string)
+                .eq('profiles.is_demo', false)
                 .or(betterThanFilter(standing));
             if (better.error) throw better.error;
 
             // Le joueur juste au-dessus = le moins bon des meilleurs
             const above = await supabase
                 .from('standings')
-                .select('total_points')
+                .select('total_points, profiles!inner(is_demo)')
                 .eq('competition_id', competitionId as string)
+                .eq('profiles.is_demo', false)
                 .or(betterThanFilter(standing))
                 .order('total_points', { ascending: true })
                 .order('exact_scores', { ascending: true })

@@ -439,6 +439,7 @@ export type Database = {
                     avatar_url: string | null;
                     created_at: string;
                     id: string;
+                    is_demo: boolean;
                     locale: string | null;
                     username: string;
                     username_chosen: boolean;
@@ -447,6 +448,7 @@ export type Database = {
                     avatar_url?: string | null;
                     created_at?: string;
                     id: string;
+                    is_demo?: boolean;
                     locale?: string | null;
                     username: string;
                     username_chosen?: boolean;
@@ -455,6 +457,7 @@ export type Database = {
                     avatar_url?: string | null;
                     created_at?: string;
                     id?: string;
+                    is_demo?: boolean;
                     locale?: string | null;
                     username?: string;
                     username_chosen?: boolean;
@@ -712,6 +715,7 @@ export type Database = {
                     avatar_url: string | null;
                     created_at: string;
                     id: string;
+                    is_demo: boolean;
                     locale: string | null;
                     username: string;
                     username_chosen: boolean;
