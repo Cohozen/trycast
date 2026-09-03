@@ -52,7 +52,13 @@
                     "photosPermission": "TryCast accède à tes photos pour définir ta photo de profil."
                 }
             ],
-            "@sentry/react-native",
+            [
+                "@sentry/react-native",
+                {
+                    "organization": "cohozen",
+                    "project": "trycast"
+                }
+            ],
             [
                 "@react-native-google-signin/google-signin",
                 {
