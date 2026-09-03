@@ -1,8 +1,15 @@
 #!/usr/bin/env node
 /**
- * Pousse UNIQUEMENT la configuration e-mail du projet dev, via l'API Management.
+ * Pousse UNIQUEMENT la configuration e-mail d'un projet, via l'API Management.
  *
  *   SUPABASE_ACCESS_TOKEN='sbp_...' node scripts/push-email-config.mjs [--dry-run]
+ *
+ * La cible par défaut est le projet **de dev** (celui du `.env`). Pousser en
+ * production se fait en la nommant explicitement — c'est le seul script du
+ * dossier qui écrit de la configuration, il ne doit jamais viser la prod par
+ * distraction :
+ *
+ *   node scripts/push-email-config.mjs --project=<ref> --dry-run
  *
  * Pourquoi pas `supabase config push` : cette commande pousse **toute** la
  * configuration du projet, n'a aucun mode dry-run, et échoue de toute façon
@@ -20,8 +27,10 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { OUT_DIR, TEMPLATES } from './build-email-templates.mjs';
+import { devProjectRef } from './project-ref.mjs';
 
-const PROJECT_REF = 'bmdzadvugtkclnqjpndr'; // trycast-dev
+const override = process.argv.find((a) => a.startsWith('--project='))?.slice('--project='.length);
+const PROJECT_REF = override || devProjectRef();
 const API = `https://api.supabase.com/v1/projects/${PROJECT_REF}/config/auth`;
 
 const token = process.env.SUPABASE_ACCESS_TOKEN;
@@ -51,6 +60,25 @@ function payload() {
     return body;
 }
 
+/**
+ * Nom lisible du projet visé. Le ref seul ne dit rien à l'œil — or c'est
+ * exactement ce qu'on veut vérifier avant d'écrire : dev ou prod ?
+ * Best-effort : si l'API ne répond pas, on affiche le ref seul plutôt que
+ * d'échouer sur une ligne d'affichage.
+ */
+async function projectLabel() {
+    try {
+        const res = await fetch('https://api.supabase.com/v1/projects', {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) return PROJECT_REF;
+        const name = (await res.json()).find((p) => p.ref === PROJECT_REF)?.name;
+        return name ? `${name} (${PROJECT_REF})` : PROJECT_REF;
+    } catch {
+        return PROJECT_REF;
+    }
+}
+
 async function getConfig() {
     const res = await fetch(API, { headers: { Authorization: `Bearer ${token}` } });
     if (!res.ok) throw new Error(`GET ${res.status} ${await res.text()}`);
@@ -63,7 +91,9 @@ const short = (v) =>
 const before = await getConfig();
 const body = payload();
 
-console.log(`Projet ${PROJECT_REF} — ${Object.keys(body).length} champs :\n`);
+const cible = override ? 'nommé explicitement' : 'déduit du .env (dev)';
+console.log(`Cible : ${await projectLabel()} — ${cible}`);
+console.log(`${Object.keys(body).length} champs :\n`);
 let changes = 0;
 for (const [k, v] of Object.entries(body)) {
     if (before[k] === v) {

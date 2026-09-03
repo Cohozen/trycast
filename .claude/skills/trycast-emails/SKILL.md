@@ -67,9 +67,12 @@ Le `[auth]` du `config.toml` reste la référence versionnée (et sert à `supab
 ### Comparer le repo au live
 
 ```bash
+REF=$(node -e "import('./scripts/project-ref.mjs').then(m => console.log(m.devProjectRef()))")
 curl -s -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-  https://api.supabase.com/v1/projects/bmdzadvugtkclnqjpndr/config/auth > ~/auth-live.json
+  "https://api.supabase.com/v1/projects/$REF/config/auth" > ~/auth-live.json
 ```
+
+Depuis la scission dev/prod (Lot 9), aucun ref n'est écrit en dur : il se déduit du `.env`, qui pointe toujours sur le projet de développement. Pour interroger la production, passer son ref à la main — délibérément.
 
 ⚠️ La réponse contient **`smtp_pass`** : fichier local uniquement, à supprimer après usage, jamais dans le repo. Correspondances utiles : `uri_allow_list` ↔ `additional_redirect_urls`, `mailer_autoconfirm` ↔ l'inverse d'`enable_confirmations`, `smtp_max_frequency` (secondes) ↔ `email.max_frequency`, `rate_limit_verify` ↔ `sign_in_sign_ups`, `rate_limit_otp` ↔ `token_verifications`.
 

@@ -2,7 +2,9 @@
 
 Scripts d'exploitation : génération et déploiement des e-mails, vérifications E2E contre Supabase, seeds de données de test.
 
-**Tout ce dossier vise le projet `trycast-dev`.** Aucun script n'est prévu pour la production. Les identifiants viennent de `.env` (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_KEY` — clé publishable uniquement, jamais de service role key).
+**Tout ce dossier vise le projet désigné par le `.env`**, c'est-à-dire celui de **développement**. Aucun ref de projet n'est écrit en dur : `project-ref.mjs` le déduit d'`EXPO_PUBLIC_SUPABASE_URL`, et les scripts SQL lisent l'URL des Edge Functions dans le Vault du projet où on les exécute. Les identifiants viennent de `.env` (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_KEY` — clé publishable uniquement, jamais de service role key).
+
+Seule exception : `push-email-config.mjs` accepte `--project=<ref>` pour pousser les e-mails en production. C'est le seul script qui écrit de la configuration, et la production doit se nommer explicitement.
 
 ---
 
@@ -13,7 +15,8 @@ Scripts d'exploitation : génération et déploiement des e-mails, vérification
 | `npm run emails:build` | Régénère `supabase/templates/*.html` |
 | `npm run emails:check` | Échoue si un template a dérivé, ou si les sujets de `config.toml` ne correspondent plus |
 | `npm run emails:push -- --dry-run` | Affiche le diff avec la config en ligne, n'écrit rien |
-| `npm run emails:push` | Pousse sujets, contenus, `mailer_otp_length` et les 2 notifications de sécurité |
+| `npm run emails:push` | Pousse sujets, contenus, `mailer_otp_length` et les 2 notifications de sécurité **sur le projet du `.env`** |
+| `npm run emails:push -- --project=<ref>` | Même chose sur un autre projet — la façon de pousser en **production** |
 
 ### `build-email-templates.mjs`
 

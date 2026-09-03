@@ -58,8 +58,9 @@ L'app tourne dans un dev build (`expo-dev-client`), pas Expo Go. **Toute lib nat
 
 ## Supabase
 
-- Projet dev `trycast-dev`, lié via `supabase link` (l'id du projet se retrouve avec `supabase projects list`)
+- **Deux projets** (Lot 9) : un projet de **développement** — le seul que visent le `.env` local, les scripts et les agents — et la **production**, qui porte les vrais comptes et n'est touchée que par Corentin. **Aucun ref de projet n'est écrit en dur** : les scripts le déduisent de `EXPO_PUBLIC_SUPABASE_URL` du `.env` (`scripts/project-ref.mjs`) et les crons lisent l'URL des Edge Functions dans le Vault du projet où ils tournent (secret `edge_functions_base_url`). Ne jamais réintroduire un ref littéral dans une migration ou un script
 - Schéma : uniquement par migrations dans `supabase/migrations/`, puis `supabase db push` + `npm run typegen`
+- ⚠️ **Sur un projet neuf, les secrets Vault se créent AVANT `supabase db push`** (`edge_functions_base_url`, `sync_fixtures_secret`, `sync_results_secret`, `sync_live_secret`, `notify_secret`) et les Edge Functions se déploient avant, sinon les premiers ticks cron frappent une URL absente
 - Toute règle de sécurité (deadline prono au kickoff, accès données) est imposée par RLS côté serveur, le client n'est qu'une UX
 - Edge Functions dans `supabase/functions/`, déploiement `supabase functions deploy <name>`
 - Vérification E2E auth/RLS : `bash scripts/e2e-auth.sh` (utilisateurs de test : `scripts/seed-test-users.sql`), `bash scripts/e2e-predictions.sh` (matchs de test : `scripts/seed-test-predictions.sql`, à seeder après les users), `bash scripts/e2e-scoring.sh` + `scripts/e2e-scoring.sql` côté serveur (seed : `scripts/seed-test-scoring.sql`, à rejouer avant chaque exécution du .sql) , `bash scripts/e2e-leagues.sh` (seed : `scripts/seed-test-leagues.sql`, à rejouer avant chaque exécution) et `bash scripts/e2e-notifications.sh` (tokens push par RPC, préférences, tables serveur — seuls les users de test sont requis)

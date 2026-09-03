@@ -2,9 +2,11 @@
 -- À exécuter sur le projet DEV uniquement (SQL editor ou MCP execute_sql),
 -- après scripts/seed-test-notifications.sql.
 --
--- Même appel que les jobs cron : pg_net + le secret lu dans Vault, jamais en
--- clair. net.http_post est ASYNCHRONE — il rend un id de requête, la réponse
--- arrive quelques secondes plus tard (voir la relecture en fin de fichier).
+-- Même appel que les jobs cron : pg_net, l'URL de base ET le secret lus dans
+-- Vault, jamais en clair. Le script tape donc toujours le projet dans lequel on
+-- l'exécute — impossible de déclencher la prod depuis l'éditeur SQL du dev.
+-- net.http_post est ASYNCHRONE — il rend un id de requête, la réponse arrive
+-- quelques secondes plus tard (voir la relecture en fin de fichier).
 --
 -- Prérequis côté Expo pour qu'un push parte vraiment sur Android : la clé de
 -- compte de service FCM V1 doit être déposée sur le projet EAS
@@ -14,7 +16,8 @@
 -- 1) sync-results : passe 1 du scoring sur le match -602 (pose points et
 --    scored_at, ré-agrège les classements). À sauter si le match est déjà scoré.
 select net.http_post(
-  url := 'https://bmdzadvugtkclnqjpndr.supabase.co/functions/v1/sync-results',
+  url := (select decrypted_secret from vault.decrypted_secrets
+          where name = 'edge_functions_base_url') || '/functions/v1/sync-results',
   headers := jsonb_build_object(
     'Content-Type', 'application/json',
     'x-sync-secret', (select decrypted_secret from vault.decrypted_secrets
@@ -27,7 +30,8 @@ select net.http_post(
 -- 2) notify : rappel de prono (-601) + résultats (-602).
 --    À lancer une fois que le match -602 porte bien un scored_at.
 select net.http_post(
-  url := 'https://bmdzadvugtkclnqjpndr.supabase.co/functions/v1/notify',
+  url := (select decrypted_secret from vault.decrypted_secrets
+          where name = 'edge_functions_base_url') || '/functions/v1/notify',
   headers := jsonb_build_object(
     'Content-Type', 'application/json',
     'x-sync-secret', (select decrypted_secret from vault.decrypted_secrets
