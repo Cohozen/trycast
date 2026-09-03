@@ -107,14 +107,22 @@ Formats imposés. Ne pas improviser : un mauvais format bloque la publication.
 | Bannière | **1024 × 500** PNG 24 bits ou JPEG | ≤ 15 Mo, **aucune transparence**. Ni capture d'écran, ni texte en petit — elle est recadrée selon les surfaces |
 | Captures téléphone | 2 minimum, **4 à 6 recommandé** | PNG ou JPEG, côté entre 320 et 3840 px, ratio 16:9 ou 9:16, ≤ 8 Mo chacune |
 
-### Captures : ce que je peux faire et ce que je ne peux pas
+### Captures
 
-Cette machine n'a **ni `adb` ni émulateur Android**. Je ne peux donc pas capturer moi-même,
-et je refuse de livrer des captures iOS pour une fiche Play : elles montreraient une
-interface qui n'est pas celle que le testeur verra, ce qui est trompeur et se voit.
+**Émulateur disponible depuis le 2026-09-03** : l'AVD `Pixel_10_Pro` d'Android Studio est
+piloté par `adb`, écran **1280 × 2856**. Boucle vérifiée de bout en bout — démarrage,
+installation de l'APK, Metro, `adb exec-out screencap`. Je peux donc capturer moi-même.
 
-**À toi de capturer** sur ton Android (bouton Power + Volume bas), **à moi de choisir,
-recadrer, ordonner et légender**. Les 5 écrans qui vendent le mieux, dans cet ordre :
+Deux conditions, apprises en essayant :
+
+- **Pas depuis le dev client.** Le menu développeur d'`expo-dev-client` se dessine
+  par-dessus l'app (bouton flottant, panneau au lancement) et se retrouverait sur les
+  captures du store. Il faut un build **`preview` ou `production`**, où il n'existe pas.
+- **Locale de l'émulateur en français.** Il démarre en anglais et l'app suit la langue
+  système : les captures sortiraient en anglais pour une fiche française. Soit régler la
+  langue du système Android, soit forcer Français dans Réglages → Langue.
+
+Les 5 écrans qui vendent le mieux, dans cet ordre :
 
 1. **Matchs** avec un prono en cours de saisie — c'est le geste central de l'app
 2. **Classement d'une ligue** avec plusieurs joueurs — c'est le ressort social
@@ -122,8 +130,9 @@ recadrer, ordonner et légender**. Les 5 écrans qui vendent le mieux, dans cet 
 4. **Résultats** après une journée jouée — la récompense
 5. **Une notification** de rappel sur l'écran verrouillé
 
-Capture en **thème sombre** : c'est là que le design system est le plus flatteur. Vide ton
-écran des notifications parasites et vérifie qu'aucun pseudo réel autre que le tien n'apparaît.
+Capture en **thème sombre** : c'est là que le design system est le plus flatteur. Le compte
+de démonstration créé par `scripts/seed-demo-account.mjs` donne des écrans peuplés — ligue à
+trois membres, classement non vide — sans exposer de pseudo réel.
 
 ---
 
