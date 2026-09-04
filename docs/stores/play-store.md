@@ -195,6 +195,45 @@ l'aurait rendue fausse. La politique dit maintenant que les 16 ans sont un **cho
 l'éditeur, plus strict que la loi française**, aligné sur le seuil par défaut du RGPD et sur la
 tranche déclarée aux stores.
 
+## Connexion Google sur un build distribué par Play
+
+**Vécu le 3 septembre 2026, au premier test interne.** L'app s'installe, s'ouvre, mais
+« Continuer avec Google » échoue en `DEVELOPER_ERROR`. Le code laisse volontairement remonter
+cette erreur sans la maquiller (`google-sign-in.ts`), justement pour qu'elle soit lisible en
+console et dans Sentry.
+
+Elle signifie une seule chose : le couple **nom de package + empreinte SHA-1** de l'app telle
+qu'elle est installée n'est déclaré dans aucun client OAuth Android de Google Cloud.
+
+### Trois empreintes, pas une
+
+La page *Intégrité de l'application → Signature de l'app* affiche plusieurs certificats, et ils
+se ressemblent :
+
+| Certificat | Clé de qui | Signe quoi |
+|---|---|---|
+| Clé de signature de l'application | Google | Ce que les utilisateurs installent |
+| Clé de signature **précédente** | Google | Idem, sur une partie du parc (rotation de clé) |
+| Clé d'**importation** | EAS | Ce que l'on téléverse — **pas** ce qui est installé |
+
+⚠️ **Piège vécu deux fois de suite.** D'abord la clé d'importation a été prise pour la clé de
+signature : le client créé faisait doublon avec celui qui existait déjà, et rien ne changeait.
+Ensuite, la clé de signature **actuelle** ne correspondait pas non plus — c'est la
+**précédente** qui a débloqué la situation, l'appareil ayant reçu une variante signée par elle.
+
+### La règle à suivre
+
+**Déclarer toutes les empreintes, une par client OAuth Android**, package `com.cohozen.trycast`.
+Un client ne vaut que pour un couple package + empreinte ; ils ne se gênent pas.
+
+N'en déclarer qu'une expose à un bug de beta particulièrement pénible : la connexion marche sur
+l'appareil du développeur et échoue chez un testeur qui a reçu l'autre variante — irreproductible
+de son côté.
+
+Après toute modification côté Google Cloud : **forcer l'arrêt de l'app** avant de réessayer. Les
+services Google Play mettent en cache le résultat de la vérification, et on peut retomber sur la
+même erreur alors que la configuration est déjà correcte.
+
 ## Accès à l'application
 
 L'app **exige une connexion** : Google demande un compte de démonstration, sans quoi le
