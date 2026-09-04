@@ -38,21 +38,28 @@
         /* ---- Couleurs sémantiques → utilitaires (bg-surface, text-text-muted…).
          * DS v2 : surfaces neutres chaudes (sable en light, charbon en dark),
          * vert = marque, grenat = étincelle.
-         * Palette primitive de référence :
-         * green-900 #0e3320 · green-800 #14432a · green-700 #1c5638 · green-600 #26694a
-         * grenat-600 #c82e52 · grenat-500 #e63e63 · grenat-400 #f06485
-         * cream #f1ebdd · cream-100 #fbf7ef · cream-200 #e7dfcc
-         * ink-900 #16130e · ink-600 #5f584b · ink-400 #928a7b · mist-300 #a9c0b2 */
-        --color-bg: light-dark(#faf8f4, #17140f);
-        --color-surface: light-dark(#ffffff, #201c16);
-        --color-surface-sunken: light-dark(#f3f0ea, #100e0b);
-        --color-border: light-dark(#e8e3d9, #2f2921);
-        --color-border-strong: light-dark(#d6cfc1, #383127);
-        --color-text: light-dark(#16130e, #f4f0e9);
-        --color-text-muted: light-dark(#5f584b, #b2a999);
-        --color-text-faint: light-dark(#928a7b, #7d7666);
-        --color-brand: light-dark(#14432a, #43a56e);
-        --color-on-brand: light-dark(#faf8f4, #100e0b);
+         * Rampes primitives de référence (cf. docs/design/…/tokens/colors.css) :
+         * marque   green-900 #0e3320 · green-800 #14432a · green-700 #1c5638
+         *          green-600 #26694a · green-500 #328b5c · green-400 #43a56e
+         *          green-300 #5fc48a (marque en dark)
+         * spark    grenat-600 #c82e52 · grenat-500 #e63e63 · grenat-400 #f06485
+         * sable    sand-050 #faf8f4 · 100 #ffffff · 150 #f3f0ea · 200 #e8e3d9 · 300 #d6cfc1
+         * charbon  char-950 #080705 · 900 #100e0b · 850 #211d17 · 800 #2e2921
+         *          char-700 #6b6252 · 600 #453d2f
+         * encre    ink-900 #16130e · ink-600 #5f584b · ink-400 #928a7b
+         * papier   paper-100 #f8f5ef · paper-300 #cdc4b3 · paper-500 #9c9382
+         * legacy   cream #f1ebdd · cream-100 #fbf7ef · cream-200 #e7dfcc · mist-300 #a9c0b2
+         *          (rampe v1, conservée pour la marque et les drapeaux uniquement) */
+        --color-bg: light-dark(#faf8f4, #100e0b);
+        --color-surface: light-dark(#ffffff, #211d17);
+        --color-surface-sunken: light-dark(#f3f0ea, #080705);
+        --color-border: light-dark(#e8e3d9, #453d2f);
+        --color-border-strong: light-dark(#d6cfc1, #6b6252);
+        --color-text: light-dark(#16130e, #f8f5ef);
+        --color-text-muted: light-dark(#5f584b, #cdc4b3);
+        --color-text-faint: light-dark(#928a7b, #9c9382);
+        --color-brand: light-dark(#14432a, #5fc48a);
+        --color-on-brand: light-dark(#faf8f4, #080705);
         --color-accent: #e63e63;
         --color-accent-hover: #f06485;
         --color-accent-press: #c82e52;
@@ -62,28 +69,49 @@
         /* Danger (brique) : distinct du grenat, seule couleur de destruction */
         --color-danger: light-dark(#c4362b, #f0685a);
         --color-danger-press: light-dark(#a82c22, #d8564a);
-        --color-on-danger: light-dark(#fbf7ef, #2a0f0c);
+        --color-on-danger: light-dark(#faf8f4, #2a0f0c);
 
-        /* Statuts (dérivés, neutres IP) */
-        --color-success: #2e8b57;
-        --color-warning: #d8a23a;
-        --color-info: #3c7da6;
+        /* Statuts (dérivés, neutres IP) — branche dark éclaircie pour rester
+         * lisible sur le charbon */
+        --color-success: light-dark(#2e8b57, #4fbf80);
+        --color-warning: light-dark(#d8a23a, #e9b85a);
+        --color-info: light-dark(#3c7da6, #5aa8d4);
         --color-live: #e63e63;
 
-        /* Primitives exposées pour les cas ciblés (ex. retinter la TabBar en dark) */
+        /* Primitives exposées pour les cas ciblés (couleur figée quel que soit le
+         * thème : initiales sur pavé coloré, coutures d'un drapeau…). Préférer
+         * toujours un token sémantique quand il en existe un. */
         --color-green-900: #0e3320;
         --color-green-800: #14432a;
         --color-green-700: #1c5638;
         --color-green-600: #26694a;
+        --color-green-500: #328b5c;
+        --color-green-400: #43a56e;
+        --color-green-300: #5fc48a;
         --color-grenat-600: #c82e52;
         --color-grenat-500: #e63e63;
         --color-grenat-400: #f06485;
-        --color-cream: #f1ebdd;
-        --color-cream-100: #fbf7ef;
-        --color-cream-200: #e7dfcc;
+        --color-sand-050: #faf8f4;
+        --color-sand-100: #ffffff;
+        --color-sand-150: #f3f0ea;
+        --color-sand-200: #e8e3d9;
+        --color-sand-300: #d6cfc1;
+        --color-char-950: #080705;
+        --color-char-900: #100e0b;
+        --color-char-850: #211d17;
+        --color-char-800: #2e2921;
+        --color-char-700: #6b6252;
+        --color-char-600: #453d2f;
+        --color-paper-100: #f8f5ef;
+        --color-paper-300: #cdc4b3;
+        --color-paper-500: #9c9382;
         --color-ink-900: #16130e;
         --color-ink-600: #5f584b;
         --color-ink-400: #928a7b;
+        /* Rampe v1 (legacy) : marque et drapeaux uniquement, jamais une surface */
+        --color-cream: #f1ebdd;
+        --color-cream-100: #fbf7ef;
+        --color-cream-200: #e7dfcc;
         --color-mist-300: #a9c0b2;
 
         /* ---- Typo : Anton (display) + Inter (corps) chargées via expo-font.
