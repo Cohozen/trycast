@@ -10,7 +10,8 @@
     --green-700: #1c5638; /* raised (rare) */
     --green-600: #26694a; /* bordures discrètes */
     --green-500: #328b5c; /* marque médiane */
-    --green-400: #43a56e; /* MARQUE (dark) — vert lisible sur charbon */
+    --green-400: #43a56e; /* marque médiane-claire */
+    --green-300: #5fc48a; /* MARQUE (dark) — vert lisible sur charbon */
 
     --grenat-600: #c82e52; /* accent pressed */
     --grenat-500: #e63e63; /* ACCENT — the spark (CTA, live, selected) */
@@ -23,12 +24,12 @@
     --sand-200: #e8e3d9; /* séparateurs (light) */
     --sand-300: #d6cfc1; /* bordure forte (light) */
 
-    --char-950: #100e0b; /* enfoncé (dark) */
-    --char-900: #17140f; /* fond charbon chaud (dark) */
-    --char-850: #201c16; /* surface (dark) */
-    --char-800: #2a251e; /* raised (dark) */
-    --char-700: #383127; /* bordure forte (dark) */
-    --char-600: #2f2921; /* bordure (dark) */
+    --char-950: #080705; /* enfoncé (dark) */
+    --char-900: #100e0b; /* fond charbon chaud (dark) */
+    --char-850: #211d17; /* surface (dark) — +2 pas au-dessus du fond */
+    --char-800: #2e2921; /* raised (dark) */
+    --char-700: #6b6252; /* bordure forte (dark) — 3.2:1 sur le fond */
+    --char-600: #453d2f; /* bordure (dark) — hairline visible */
 
     /* ---- Primitive palette · texte ---- */
     --ink-900: #16130e; /* texte primaire sur clair (noir chaud) */
@@ -36,9 +37,9 @@
     --ink-400: #928a7b; /* texte discret / placeholders */
 
     /* Texte sur fond sombre */
-    --paper-100: #f4f0e9; /* texte primaire sur charbon */
-    --paper-300: #b2a999; /* texte secondaire sur charbon */
-    --paper-500: #7d7666; /* texte discret sur charbon */
+    --paper-100: #f8f5ef; /* texte primaire sur charbon */
+    --paper-300: #cdc4b3; /* texte secondaire sur charbon (≈9:1) */
+    --paper-500: #9c9382; /* texte discret sur charbon (≈5:1) */
 
     /* ---- Status (mutés pour respecter la règle du spark) ---- */
     --status-live: var(--grenat-500);
@@ -120,7 +121,11 @@
     --text: var(--paper-100);
     --text-muted: var(--paper-300);
     --text-faint: var(--paper-500);
-    --brand: var(--green-400);
+    --status-live: var(--grenat-500);
+    --success-500: #4fbf80;
+    --warning-500: #e9b85a;
+    --info-500: #5aa8d4;
+    --brand: var(--green-300);
     --on-brand: var(--char-950);
     --accent: var(--grenat-500);
     --accent-hover: var(--grenat-400);
@@ -128,10 +133,10 @@
     --on-accent: #ffffff;
     --focus-ring: var(--grenat-400);
 
-    --glass-bar: color-mix(in srgb, var(--surface) 80%, transparent);
-    --glass-hairline: color-mix(in srgb, var(--paper-100) 12%, transparent);
-    --glass-pill: color-mix(in srgb, var(--accent) 13%, transparent);
-    --glass-pill-border: color-mix(in srgb, var(--accent) 30%, transparent);
+    --glass-bar: color-mix(in srgb, var(--surface) 88%, transparent);
+    --glass-hairline: color-mix(in srgb, var(--paper-100) 22%, transparent);
+    --glass-pill: color-mix(in srgb, var(--accent) 22%, transparent);
+    --glass-pill-border: color-mix(in srgb, var(--accent) 45%, transparent);
 
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35);
