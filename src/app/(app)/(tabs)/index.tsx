@@ -220,26 +220,23 @@ export default function MatchesScreen() {
 
     if (hasLeagues) {
         listChildren.push(
-            // Actions de ligue
-            <View className="flex-row gap-2.5" key="league-actions">
-                <View className="flex-1">
-                    <Button
-                        fullWidth
-                        onPress={() => router.push('/league/new')}
-                        title={t('leagues:actions.create')}
-                        variant="secondary"
-                    />
-                </View>
-                <View className="flex-1">
-                    <Button
-                        fullWidth
-                        onPress={() =>
-                            router.push({ pathname: '/league/new', params: { tab: 'join' } })
-                        }
-                        title={t('leagues:actions.join')}
-                        variant="ghost"
-                    />
-                </View>
+            // Actions de ligue — empilées : côte à côte, les libellés complets
+            // ne tiennent pas dans une demi-largeur d'écran
+            <View className="gap-2.5" key="league-actions">
+                <Button
+                    fullWidth
+                    onPress={() => router.push('/league/new')}
+                    title={t('leagues:actions.create')}
+                    variant="secondary"
+                />
+                <Button
+                    fullWidth
+                    onPress={() =>
+                        router.push({ pathname: '/league/new', params: { tab: 'join' } })
+                    }
+                    title={t('leagues:actions.join')}
+                    variant="ghost"
+                />
             </View>,
         );
     } else {

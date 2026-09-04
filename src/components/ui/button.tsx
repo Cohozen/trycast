@@ -113,7 +113,13 @@ export function Button({
             ) : (
                 <>
                     {leadingIcon}
-                    <Text className={cn('font-body-semibold', s.text, v.text)}>{title}</Text>
+                    {/* shrink + une seule ligne : un libellé plus large que la
+                        boîte déborderait sinon de façon asymétrique (Android) */}
+                    <Text
+                        className={cn('shrink text-center font-body-semibold', s.text, v.text)}
+                        numberOfLines={1}>
+                        {title}
+                    </Text>
                 </>
             )}
         </Pressable>
