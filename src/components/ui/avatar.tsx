@@ -16,10 +16,16 @@ type AvatarProps = {
     ring?: boolean;
 };
 
-const sizeClasses: Record<AvatarSize, { box: string; text: string }> = {
-    sm: { box: 'h-8 w-8', text: 'text-[12px]' },
-    md: { box: 'h-10 w-10', text: 'text-[15px]' },
-    lg: { box: 'h-14 w-14', text: 'text-[21px]' },
+/**
+ * `ring` = face + 4px de chaque côté (bordure 2 + padding 2). La boîte de
+ * l'anneau est dimensionnée explicitement : sans largeur ni hauteur propres,
+ * un parent `flex-row` sans `items-center` l'étire (alignItems: stretch) et
+ * Android arrondit alors le rectangle à 50 % de chaque axe → ovale.
+ */
+const sizeClasses: Record<AvatarSize, { box: string; ring: string; text: string }> = {
+    sm: { box: 'h-8 w-8', ring: 'h-10 w-10', text: 'text-[12px]' },
+    md: { box: 'h-10 w-10', ring: 'h-12 w-12', text: 'text-[15px]' },
+    lg: { box: 'h-14 w-14', ring: 'h-16 w-16', text: 'text-[21px]' },
 };
 
 /**
@@ -60,5 +66,13 @@ export function Avatar({ name, uri, size = 'md', ring = false }: AvatarProps) {
     if (!ring) {
         return face;
     }
-    return <View className="rounded-pill border-2 border-accent p-[2px]">{face}</View>;
+    return (
+        <View
+            className={cn(
+                'items-center justify-center rounded-pill border-2 border-accent',
+                s.ring,
+            )}>
+            {face}
+        </View>
+    );
 }
