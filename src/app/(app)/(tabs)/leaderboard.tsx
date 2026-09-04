@@ -83,33 +83,25 @@ export default function LeaderboardScreen() {
     const standing = useMyStanding(competition.data?.id, userId);
     const myRank = useMyRank(competition.data?.id, standing.isPending ? undefined : standing.data);
 
+    // Chargement : `board` n'a rien à montrer, qu'il soit en première requête
+    // ou en train de rejouer après un échec (une query en erreur garde
+    // `status: 'error'` pendant tout son refetch, donc `isPending` reste faux).
     const loading =
         competition.isPending ||
         myLeagues.isPending ||
+        (board.isFetching && board.data === undefined) ||
         (deferredScope === 'global'
             ? globalBoard.isPending
             : !!currentLeagueId && leagueBoard.isPending);
-
-    if (competition.isError || myLeagues.isError || board.isError) {
-        return (
-            <View className="flex-1 items-center justify-center bg-bg p-6">
-                <EmptyState
-                    action={
-                        <Button
-                            onPress={() => {
-                                void competition.refetch();
-                                void myLeagues.refetch();
-                                void board.refetch();
-                            }}
-                            title={t('common:actions.retry')}
-                            variant="secondary"
-                        />
-                    }
-                    title={t('leagues:errors.load')}
-                />
-            </View>
-        );
-    }
+    // `board` suit la portée différée : pendant la bascule, il pointe encore sur
+    // la query de l'autre onglet. Afficher son erreur ferait clignoter
+    // « Impossible de charger le classement » au moment du tap.
+    const settling = deferredScope !== effectiveScope;
+    const failed =
+        !loading &&
+        !settling &&
+        board.data === undefined &&
+        (competition.isError || myLeagues.isError || board.isError);
 
     const entries = markTies(board.data ?? []);
     const hasTies = entries.some((entry) => entry.tie);
@@ -146,7 +138,11 @@ export default function LeaderboardScreen() {
 
                 {leagues.length > 0 ? (
                     <SegmentedControl
-                        onChange={setScope}
+                        // « Charger plus » ne survit pas à un changement de portée
+                        onChange={(next) => {
+                            setScope(next);
+                            setLimit(PAGE_SIZE);
+                        }}
                         options={[
                             { value: 'leagues', label: t('leagues:leaderboard.tabs.leagues') },
                             { value: 'global', label: t('leagues:leaderboard.tabs.global') },
@@ -160,7 +156,10 @@ export default function LeaderboardScreen() {
                         <Select
                             accessibilityLabel={t('leagues:leaderboard.select.overline')}
                             icon={<Users color={accentColor} size={18} strokeWidth={1.9} />}
-                            onChange={setSelectedLeagueId}
+                            onChange={(next) => {
+                                setSelectedLeagueId(next);
+                                setLimit(PAGE_SIZE);
+                            }}
                             options={leagues.map((league) => ({
                                 value: league.id,
                                 label: league.name,
@@ -224,6 +223,23 @@ export default function LeaderboardScreen() {
                         <Skeleton className="h-16" variant="block" />
                         <Skeleton className="h-16" variant="block" />
                     </View>
+                ) : failed ? (
+                    // Dans le flux, pas en plein écran : le sélecteur d'onglet
+                    // reste accessible, l'autre portée peut très bien répondre.
+                    <EmptyState
+                        action={
+                            <Button
+                                onPress={() => {
+                                    void competition.refetch();
+                                    void myLeagues.refetch();
+                                    void board.refetch();
+                                }}
+                                title={t('common:actions.retry')}
+                                variant="secondary"
+                            />
+                        }
+                        title={t('leagues:errors.load')}
+                    />
                 ) : entries.length === 0 ? (
                     <EmptyState
                         action={
