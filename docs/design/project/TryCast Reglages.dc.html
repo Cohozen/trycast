@@ -18,16 +18,16 @@
   <style>
     * { box-sizing: border-box; }
     /* LIGHT theme semantic overrides (matches sibling screens) + dedicated DANGER red.
-       Danger (#C4362B brick) is intentionally distinct from grenat (#E63E63): grenat stays
+       Danger (#C4362B brick) is intentionally distinct from grenat (var(--grenat-500)): grenat stays
        reserved for positive/active accents; brick-red is the ONLY destruction color. */
     [data-theme="light"] {
-      --bg: var(--cream); --surface: var(--cream-100); --surface-sunken: var(--cream-200);
-      --border: var(--cream-200); --border-strong: #D8CEB8;
+      --bg: var(--sand-050); --surface: var(--sand-100); --surface-sunken: var(--sand-150);
+      --border: var(--sand-200); --border-strong: var(--sand-300);
       --text: var(--ink-900); --text-muted: var(--ink-600); --text-faint: var(--ink-400);
-      --brand: var(--green-800); --on-brand: var(--cream);
-      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: var(--cream);
+      --brand: var(--green-800); --on-brand: var(--sand-050);
+      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: #FFFFFF;
       --focus-ring: var(--grenat-500);
-      --danger: #C4362B; --danger-press: #A82C22; --on-danger: #FBF7EF;
+      --danger: #C4362B; --danger-press: #A82C22; --on-danger: var(--sand-050);
       --shadow-sm: 0 1px 2px rgba(22,19,14,0.06); --shadow-md: 0 4px 14px rgba(22,19,14,0.08); --shadow-lg: 0 12px 32px rgba(22,19,14,0.12);
     }
     [data-theme="dark"] { --danger: #F0685A; --danger-press: #D8564A; --on-danger: #2A0F0C; }
@@ -40,7 +40,7 @@
 </helmet>
 <div style="width: max-content; min-height: 100vh; padding: 48px; background: #7C776E; font-family: var(--font-body); display: flex; flex-direction: column; gap: 32px;">
 
-  <div style="display: flex; flex-direction: column; gap: 6px; color: #FBF7EF;">
+  <div style="display: flex; flex-direction: column; gap: 6px; color: var(--sand-050);">
     <span style="font-family: var(--font-display); font-size: 34px; letter-spacing: 0.01em;">TryCast — Écran Réglages</span>
     <span style="font-size: 14px; color: rgba(255,255,255,0.72);">Compte · préférences · légal &amp; RGPD · à propos · zone danger · thèmes clair &amp; sombre · feuilles &amp; modale destructive · états d'erreur</span>
   </div>
@@ -49,7 +49,7 @@
     <sc-for list="{{ frames }}" as="f" hint-placeholder-count="11">
       <div style="display: flex; flex-direction: column; gap: 12px;">
 
-        <div style="display: inline-flex; align-items: center; gap: 8px; color: #FBF7EF; font-size: 13px; font-weight: 600; padding: 0 4px; max-width: 390px;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; color: var(--sand-050); font-size: 13px; font-weight: 600; padding: 0 4px; max-width: 390px;">
           <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ f.dot }}; flex: none;"></span>{{ f.label }}
         </div>
 
@@ -183,7 +183,7 @@
                     <span style="font-size: 12px; color: var(--text-muted); line-height: 1.35;">{{ f.master.sub }}</span>
                   </span>
                   <button type="button" role="switch" aria-checked="{{ f.master.checked }}" onClick="{{ f.master.onClick }}" style="flex: none; position: relative; width: 46px; height: 28px; border-radius: var(--radius-pill); border: none; padding: 0; cursor: {{ f.master.cursor }}; background: {{ f.master.track }}; transition: background var(--dur) var(--ease-out); opacity: {{ f.master.opacity }}; -webkit-tap-highlight-color: transparent;">
-                    <span style="position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #FBF7EF; box-shadow: 0 1px 3px rgba(0,0,0,0.28); transform: {{ f.master.thumb }}; transition: transform var(--dur) var(--ease-out);"></span>
+                    <span style="position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--sand-050); box-shadow: 0 1px 3px rgba(0,0,0,0.28); transform: {{ f.master.thumb }}; transition: transform var(--dur) var(--ease-out);"></span>
                   </button>
                 </div>
 
@@ -208,7 +208,7 @@
                           <span style="font-size: 11.5px; color: var(--text-faint); line-height: 1.3;">{{ n.desc }}</span>
                         </span>
                         <button type="button" role="switch" aria-checked="{{ n.checked }}" onClick="{{ n.onClick }}" style="flex: none; position: relative; width: 46px; height: 28px; border-radius: var(--radius-pill); border: none; padding: 0; cursor: {{ n.cursor }}; background: {{ n.track }}; transition: background var(--dur) var(--ease-out); opacity: {{ n.opacity }}; -webkit-tap-highlight-color: transparent;">
-                          <span style="position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #FBF7EF; box-shadow: 0 1px 3px rgba(0,0,0,0.28); transform: {{ n.thumb }}; transition: transform var(--dur) var(--ease-out);"></span>
+                          <span style="position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--sand-050); box-shadow: 0 1px 3px rgba(0,0,0,0.28); transform: {{ n.thumb }}; transition: transform var(--dur) var(--ease-out);"></span>
                         </button>
                       </div>
                     </sc-for>
@@ -285,7 +285,7 @@
 
           <!-- ============ BOTTOM SHEET ============ -->
           <sc-if value="{{ f.showSheet }}" hint-placeholder-val="{{ false }}">
-            <div style="position: absolute; inset: 0; z-index: 40; background: rgba(11,26,17,0.44); animation: tc-fade var(--dur) var(--ease-out); display: flex; flex-direction: column; justify-content: flex-end;">
+            <div style="position: absolute; inset: 0; z-index: 40; background: color-mix(in srgb, var(--ink-900) 44%, transparent); animation: tc-fade var(--dur) var(--ease-out); display: flex; flex-direction: column; justify-content: flex-end;">
               <div style="background: var(--surface); border-radius: var(--radius-lg) var(--radius-lg) 0 0; box-shadow: var(--shadow-lg); animation: tc-slideup var(--dur) var(--ease-out); max-height: 90%; display: flex; flex-direction: column; overflow: hidden;">
                 <div style="flex: none; display: flex; justify-content: center; padding: 10px 0 2px;"><span style="width: 38px; height: 5px; border-radius: 3px; background: var(--border-strong);"></span></div>
 
@@ -325,7 +325,7 @@
                             <span style="font-size: 11px; color: var(--text-faint); margin-top: 2px;">{{ c.date }}</span>
                           </span>
                           <button type="button" role="switch" aria-checked="{{ c.checked }}" onClick="{{ c.onClick }}" style="flex: none; margin-top: 2px; position: relative; width: 46px; height: 28px; border-radius: var(--radius-pill); border: none; padding: 0; cursor: pointer; background: {{ c.track }}; transition: background var(--dur) var(--ease-out); -webkit-tap-highlight-color: transparent;">
-                            <span style="position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #FBF7EF; box-shadow: 0 1px 3px rgba(0,0,0,0.28); transform: {{ c.thumb }}; transition: transform var(--dur) var(--ease-out);"></span>
+                            <span style="position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--sand-050); box-shadow: 0 1px 3px rgba(0,0,0,0.28); transform: {{ c.thumb }}; transition: transform var(--dur) var(--ease-out);"></span>
                           </button>
                         </div>
                       </sc-for>
@@ -340,7 +340,7 @@
 
           <!-- ============ DELETE MODAL ============ -->
           <sc-if value="{{ f.showModal }}" hint-placeholder-val="{{ false }}">
-            <div style="position: absolute; inset: 0; z-index: 50; background: rgba(11,26,17,0.5); animation: tc-fade var(--dur) var(--ease-out); display: flex; align-items: center; justify-content: center; padding: 16px;">
+            <div style="position: absolute; inset: 0; z-index: 50; background: color-mix(in srgb, var(--ink-900) 50%, transparent); animation: tc-fade var(--dur) var(--ease-out); display: flex; align-items: center; justify-content: center; padding: 16px;">
               <div style="width: 100%; max-height: calc(100% - 24px); background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; animation: tc-pop var(--dur) var(--ease-out); display: flex; flex-direction: column;">
                 <div class="tc-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 22px 20px 16px; display: flex; flex-direction: column; gap: 14px;">
                   <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
@@ -438,13 +438,13 @@ class Component extends DCLogic {
     const check = E('svg', { width: 17, height: 17, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2.6, strokeLinecap: 'round', strokeLinejoin: 'round' }, E('path', { d: 'M20 6L9 17l-5-5' }));
 
     const frameDefs = [
-      { id: 'full_l', theme: 'light', label: 'Réglages complet · clair', dot: '#FBF7EF', themeDef: 'system' },
-      { id: 'full_d', theme: 'dark', label: 'Réglages complet · sombre', dot: '#14432A', themeDef: 'dark' },
-      { id: 'social', theme: 'light', label: 'Compte social-only (Apple) · mot de passe masqué', dot: '#8A8071', social: true },
+      { id: 'full_l', theme: 'light', label: 'Réglages complet · clair', dot: 'var(--sand-050)', themeDef: 'system' },
+      { id: 'full_d', theme: 'dark', label: 'Réglages complet · sombre', dot: 'var(--green-800)', themeDef: 'dark' },
+      { id: 'social', theme: 'light', label: 'Compte social-only (Apple) · mot de passe masqué', dot: 'var(--ink-400)', social: true },
       { id: 'pseudo', theme: 'light', label: 'Pseudo en édition · erreur « déjà pris »', dot: 'var(--grenat-500)', pseudoEdit: true },
       { id: 'pwd', theme: 'light', label: 'Feuille · modifier le mot de passe (erreur)', dot: 'var(--grenat-500)', sheet: 'pwd' },
-      { id: 'rgpd', theme: 'light', label: 'Feuille · consentements RGPD', dot: '#8A8071', sheet: 'rgpd' },
-      { id: 'notif', theme: 'light', label: 'Notifications · permission OS refusée', dot: '#8A8071', osRefused: true },
+      { id: 'rgpd', theme: 'light', label: 'Feuille · consentements RGPD', dot: 'var(--ink-400)', sheet: 'rgpd' },
+      { id: 'notif', theme: 'light', label: 'Notifications · permission OS refusée', dot: 'var(--ink-400)', osRefused: true },
       { id: 'del_r', theme: 'light', label: 'Suppression · repos (confirmer désactivé)', dot: '#C4362B', modal: 'rest' },
       { id: 'del_a', theme: 'light', label: 'Suppression · confirmation active', dot: '#C4362B', modal: 'active' },
       { id: 'del_l', theme: 'light', label: 'Suppression · chargement', dot: '#C4362B', modal: 'loading' },

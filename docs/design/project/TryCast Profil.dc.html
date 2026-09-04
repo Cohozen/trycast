@@ -18,32 +18,31 @@
   <style>
     * { box-sizing: border-box; }
     [data-theme="light"] {
-      --bg: var(--cream); --surface: var(--cream-100); --surface-sunken: var(--cream-200);
-      --border: var(--cream-200); --border-strong: #D8CEB8;
+      --bg: var(--sand-050); --surface: var(--sand-100); --surface-sunken: var(--sand-150);
+      --border: var(--sand-200); --border-strong: var(--sand-300);
       --text: var(--ink-900); --text-muted: var(--ink-600); --text-faint: var(--ink-400);
-      --brand: var(--green-800); --on-brand: var(--cream);
-      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: var(--cream);
+      --brand: var(--green-800); --on-brand: var(--sand-050);
+      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: #FFFFFF;
       --focus-ring: var(--grenat-500);
+      /* Verre du TabBar flottant : hairline + pill derives de la rampe --border
+         (au lieu des mixes #ffffff bruts du DS) pour rester coherents avec les tokens. */
+      --glass-hairline: color-mix(in srgb, var(--border-strong) 85%, transparent);
+      --glass-pill: color-mix(in srgb, var(--surface) 82%, transparent);
+      --glass-pill-border: color-mix(in srgb, var(--border-strong) 90%, transparent);
       --shadow-sm: 0 1px 2px rgba(22,19,14,0.06); --shadow-md: 0 4px 14px rgba(22,19,14,0.08); --shadow-lg: 0 12px 32px rgba(22,19,14,0.12);
+    }
+    [data-theme="dark"] {
+      --glass-hairline: color-mix(in srgb, var(--border-strong) 92%, transparent);
     }
     .tc-scroll::-webkit-scrollbar { width: 0; height: 0; }
     @keyframes tc-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
     @keyframes tc-shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
     .tc-shim { background: linear-gradient(90deg, color-mix(in srgb, var(--text) 7%, transparent) 25%, color-mix(in srgb, var(--text) 15%, transparent) 37%, color-mix(in srgb, var(--text) 7%, transparent) 63%); background-size: 400% 100%; animation: tc-shimmer 1.4s ease infinite; border-radius: var(--radius-xs); }
-    /* Dark mode isn't defined for the DS floating TabBar: it hardcodes white glass. Retint green.
-       Scope to the phone element itself so it doesn't leak into light-theme phones. */
-    .tc-phone[data-theme="dark"] .tc-tabbar-wrap nav {
-      border-color: color-mix(in srgb, var(--green-600) 60%, transparent) !important;
-    }
-    .tc-phone[data-theme="dark"] .tc-tabbar-wrap span[style*="rgb(255, 255, 255) 55%"] {
-      background: color-mix(in srgb, var(--green-700) 72%, transparent) !important;
-      border-color: color-mix(in srgb, var(--green-600) 70%, transparent) !important;
-    }
   </style>
 </helmet>
 <div style="width: max-content; min-height: 100vh; padding: 48px; background: #7C776E; font-family: var(--font-body); display: flex; flex-direction: column; gap: 32px;">
 
-  <div style="display: flex; flex-direction: column; gap: 6px; color: #FBF7EF;">
+  <div style="display: flex; flex-direction: column; gap: 6px; color: var(--sand-050);">
     <span style="font-family: var(--font-display); font-size: 34px; letter-spacing: 0.01em;">TryCast — Écran Profil</span>
     <span style="font-size: 14px; color: rgba(255,255,255,0.72);">Mon profil &amp; profil public · onglets Stats / Pronos / Ligues · sélecteur de compétition · graphiques SVG · thèmes clair &amp; sombre · états limites</span>
   </div>
@@ -52,7 +51,7 @@
     <sc-for list="{{ frames }}" as="f" hint-placeholder-count="11">
       <div style="display: flex; flex-direction: column; gap: 12px;">
 
-        <div style="display: inline-flex; align-items: center; gap: 8px; color: #FBF7EF; font-size: 13px; font-weight: 600; padding: 0 4px;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; color: var(--sand-050); font-size: 13px; font-weight: 600; padding: 0 4px;">
           <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ f.dot }};"></span>{{ f.label }}
         </div>
 
@@ -574,17 +573,17 @@ class Component extends DCLogic {
     }));
 
     const frameDefs = [
-      { id: 'ms_l', kind: 'me', theme: 'light', tab: 'stats', label: 'Mon profil · Stats · clair', dot: '#FBF7EF' },
-      { id: 'ms_d', kind: 'me', theme: 'dark', tab: 'stats', label: 'Mon profil · Stats · sombre', dot: '#14432A' },
+      { id: 'ms_l', kind: 'me', theme: 'light', tab: 'stats', label: 'Mon profil · Stats · clair', dot: 'var(--sand-050)' },
+      { id: 'ms_d', kind: 'me', theme: 'dark', tab: 'stats', label: 'Mon profil · Stats · sombre', dot: 'var(--green-800)' },
       { id: 'ms_open', kind: 'me', theme: 'light', tab: 'stats', open: true, label: 'Stats · sélecteur de compétition', dot: 'var(--grenat-500)' },
       { id: 'pub_l', kind: 'pub', theme: 'light', tab: 'stats', label: 'Profil public · Stats · clair', dot: 'var(--grenat-500)' },
-      { id: 'pub_d', kind: 'pub', theme: 'dark', tab: 'stats', label: 'Profil public · Stats · sombre', dot: '#14432A' },
-      { id: 'mp', kind: 'me', theme: 'light', tab: 'pronos', label: 'Mon profil · Pronos · clair', dot: '#FBF7EF' },
-      { id: 'pubp', kind: 'pub', theme: 'dark', tab: 'pronos', label: 'Profil public · Pronos · sombre', dot: '#14432A' },
-      { id: 'ml', kind: 'me', theme: 'light', tab: 'ligues', label: 'Mon profil · Ligues · clair', dot: '#FBF7EF' },
-      { id: 'ml0', kind: 'me', theme: 'light', tab: 'ligues', ligueEmpty: true, label: 'Ligues · 0 ligue (CTA héros)', dot: '#8A8071' },
-      { id: 'new', kind: 'new', theme: 'light', tab: 'stats', label: 'Stats · nouveau joueur (0 donnée)', dot: '#8A8071' },
-      { id: 'load', kind: 'me', theme: 'light', tab: 'stats', loading: true, label: 'Chargement (skeleton)', dot: '#8A8071' },
+      { id: 'pub_d', kind: 'pub', theme: 'dark', tab: 'stats', label: 'Profil public · Stats · sombre', dot: 'var(--green-800)' },
+      { id: 'mp', kind: 'me', theme: 'light', tab: 'pronos', label: 'Mon profil · Pronos · clair', dot: 'var(--sand-050)' },
+      { id: 'pubp', kind: 'pub', theme: 'dark', tab: 'pronos', label: 'Profil public · Pronos · sombre', dot: 'var(--green-800)' },
+      { id: 'ml', kind: 'me', theme: 'light', tab: 'ligues', label: 'Mon profil · Ligues · clair', dot: 'var(--sand-050)' },
+      { id: 'ml0', kind: 'me', theme: 'light', tab: 'ligues', ligueEmpty: true, label: 'Ligues · 0 ligue (CTA héros)', dot: 'var(--ink-400)' },
+      { id: 'new', kind: 'new', theme: 'light', tab: 'stats', label: 'Stats · nouveau joueur (0 donnée)', dot: 'var(--ink-400)' },
+      { id: 'load', kind: 'me', theme: 'light', tab: 'stats', loading: true, label: 'Chargement (skeleton)', dot: 'var(--ink-400)' },
     ];
 
     const frames = frameDefs.map((fd) => {

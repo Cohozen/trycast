@@ -21,13 +21,13 @@
        Danger (brick) is intentionally distinct from grenat: grenat = spark (active/1st/moi),
        brick-red = the ONLY destruction color (quitter / supprimer / retirer). */
     [data-theme="light"] {
-      --bg: var(--cream); --surface: var(--cream-100); --surface-sunken: var(--cream-200);
-      --border: var(--cream-200); --border-strong: #D8CEB8;
+      --bg: var(--sand-050); --surface: var(--sand-100); --surface-sunken: var(--sand-150);
+      --border: var(--sand-200); --border-strong: var(--sand-300);
       --text: var(--ink-900); --text-muted: var(--ink-600); --text-faint: var(--ink-400);
-      --brand: var(--green-800); --on-brand: var(--cream);
-      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: var(--cream);
+      --brand: var(--green-800); --on-brand: var(--sand-050);
+      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: #FFFFFF;
       --focus-ring: var(--grenat-500);
-      --danger: #C4362B; --danger-press: #A82C22; --on-danger: #FBF7EF;
+      --danger: #C4362B; --danger-press: #A82C22; --on-danger: var(--sand-050);
       --shadow-sm: 0 1px 2px rgba(22,19,14,0.06); --shadow-md: 0 4px 14px rgba(22,19,14,0.08); --shadow-lg: 0 12px 32px rgba(22,19,14,0.12);
     }
     [data-theme="dark"] { --danger: #F0685A; --danger-press: #D8564A; --on-danger: #2A0F0C; }
@@ -42,7 +42,7 @@
 </helmet>
 <div style="width: max-content; min-height: 100vh; padding: 48px; background: #7C776E; font-family: var(--font-body); display: flex; flex-direction: column; gap: 32px;">
 
-  <div style="display: flex; flex-direction: column; gap: 6px; color: #FBF7EF;">
+  <div style="display: flex; flex-direction: column; gap: 6px; color: var(--sand-050);">
     <span style="font-family: var(--font-display); font-size: 34px; letter-spacing: 0.01em;">TryCast — Détail d'une ligue</span>
     <span style="font-size: 14px; color: rgba(255,255,255,0.72);">En-tête ligue · onglets Classement / Résultats / Réglages · vue admin &amp; membre · invitation, gestion des membres, zone danger · modales de confirmation · thèmes clair &amp; sombre · états limites</span>
   </div>
@@ -51,7 +51,7 @@
     <sc-for list="{{ frames }}" as="f" hint-placeholder-count="16">
       <div style="display: flex; flex-direction: column; gap: 12px;">
 
-        <div style="display: inline-flex; align-items: center; gap: 8px; color: #FBF7EF; font-size: 13px; font-weight: 600; padding: 0 4px; max-width: 390px;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; color: var(--sand-050); font-size: 13px; font-weight: 600; padding: 0 4px; max-width: 390px;">
           <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ f.dot }}; flex: none;"></span>{{ f.label }}
         </div>
 
@@ -379,7 +379,7 @@
 
           <!-- ============ MODAL: QUITTER (simple) ============ -->
           <sc-if value="{{ f.modalQuitter }}" hint-placeholder-val="{{ false }}">
-            <div style="position: absolute; inset: 0; z-index: 50; background: rgba(11,26,17,0.5); animation: tc-fade var(--dur) var(--ease-out); display: flex; align-items: center; justify-content: center; padding: 16px;">
+            <div style="position: absolute; inset: 0; z-index: 50; background: color-mix(in srgb, var(--ink-900) 50%, transparent); animation: tc-fade var(--dur) var(--ease-out); display: flex; align-items: center; justify-content: center; padding: 16px;">
               <div style="width: 100%; background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; animation: tc-pop var(--dur) var(--ease-out);">
                 <div style="padding: 24px 20px 8px; display: flex; flex-direction: column; align-items: center; gap: 13px; text-align: center;">
                   <span style="display: inline-flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger);"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5M21 12H9"></path></svg></span>
@@ -396,7 +396,7 @@
 
           <!-- ============ MODAL: SUPPRIMER (forte) ============ -->
           <sc-if value="{{ f.modalSupprimer }}" hint-placeholder-val="{{ false }}">
-            <div style="position: absolute; inset: 0; z-index: 50; background: rgba(11,26,17,0.5); animation: tc-fade var(--dur) var(--ease-out); display: flex; align-items: center; justify-content: center; padding: 16px;">
+            <div style="position: absolute; inset: 0; z-index: 50; background: color-mix(in srgb, var(--ink-900) 50%, transparent); animation: tc-fade var(--dur) var(--ease-out); display: flex; align-items: center; justify-content: center; padding: 16px;">
               <div style="width: 100%; max-height: calc(100% - 24px); background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; animation: tc-pop var(--dur) var(--ease-out); display: flex; flex-direction: column;">
                 <div class="tc-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 22px 20px 16px; display: flex; flex-direction: column; gap: 14px;">
                   <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
@@ -427,7 +427,7 @@
 
           <!-- ============ MODAL: RETIRER UN MEMBRE (simple) ============ -->
           <sc-if value="{{ f.modalRetirer }}" hint-placeholder-val="{{ false }}">
-            <div style="position: absolute; inset: 0; z-index: 50; background: rgba(11,26,17,0.5); animation: tc-fade var(--dur) var(--ease-out); display: flex; align-items: center; justify-content: center; padding: 16px;">
+            <div style="position: absolute; inset: 0; z-index: 50; background: color-mix(in srgb, var(--ink-900) 50%, transparent); animation: tc-fade var(--dur) var(--ease-out); display: flex; align-items: center; justify-content: center; padding: 16px;">
               <div style="width: 100%; background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; animation: tc-pop var(--dur) var(--ease-out);">
                 <div style="padding: 24px 20px 8px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
                   <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ f.removeName }}" size="lg" hint-size="56px,56px"></x-import>
@@ -550,21 +550,21 @@ class Component extends DCLogic {
 
     const frameDefs = [
       { id: 'cl_admin_l', view: 'admin', tab: 'classement', theme: 'light', label: 'Classement · vue admin · clair', dot: 'var(--grenat-500)' },
-      { id: 'cl_member_d', view: 'member', tab: 'classement', theme: 'dark', label: 'Classement · vue membre · sombre', dot: '#14432A' },
-      { id: 'res_admin_l', view: 'admin', tab: 'resultats', theme: 'light', label: 'Résultats · classement de la journée · clair', dot: '#8A8071' },
-      { id: 'res_empty_l', view: 'admin', tab: 'resultats', journee: 'j4', theme: 'light', label: 'Résultats · journée pas encore jouée', dot: '#8A8071' },
-      { id: 'res_member_d', view: 'member', tab: 'resultats', theme: 'dark', label: 'Résultats · vue membre · sombre', dot: '#14432A' },
-      { id: 'set_member_l', view: 'member', tab: 'reglages', theme: 'light', label: 'Réglages · vue membre · clair', dot: '#FBF7EF' },
-      { id: 'set_admin_l', view: 'admin', tab: 'reglages', theme: 'light', label: 'Réglages · vue admin · clair', dot: '#FBF7EF' },
-      { id: 'set_admin_d', view: 'admin', tab: 'reglages', theme: 'dark', label: 'Réglages · vue admin · sombre', dot: '#14432A' },
+      { id: 'cl_member_d', view: 'member', tab: 'classement', theme: 'dark', label: 'Classement · vue membre · sombre', dot: 'var(--green-800)' },
+      { id: 'res_admin_l', view: 'admin', tab: 'resultats', theme: 'light', label: 'Résultats · classement de la journée · clair', dot: 'var(--ink-400)' },
+      { id: 'res_empty_l', view: 'admin', tab: 'resultats', journee: 'j4', theme: 'light', label: 'Résultats · journée pas encore jouée', dot: 'var(--ink-400)' },
+      { id: 'res_member_d', view: 'member', tab: 'resultats', theme: 'dark', label: 'Résultats · vue membre · sombre', dot: 'var(--green-800)' },
+      { id: 'set_member_l', view: 'member', tab: 'reglages', theme: 'light', label: 'Réglages · vue membre · clair', dot: 'var(--sand-050)' },
+      { id: 'set_admin_l', view: 'admin', tab: 'reglages', theme: 'light', label: 'Réglages · vue admin · clair', dot: 'var(--sand-050)' },
+      { id: 'set_admin_d', view: 'admin', tab: 'reglages', theme: 'dark', label: 'Réglages · vue admin · sombre', dot: 'var(--green-800)' },
       { id: 'set_toast_l', view: 'member', tab: 'reglages', theme: 'light', toast: true, label: 'Réglages · code copié (micro-feedback)', dot: '#2E8B57' },
-      { id: 'one_member_l', view: 'admin', tab: 'classement', variant: 'onemember', theme: 'light', label: 'Ligue à 1 membre · invitation mise en avant', dot: '#8A8071' },
+      { id: 'one_member_l', view: 'admin', tab: 'classement', variant: 'onemember', theme: 'light', label: 'Ligue à 1 membre · invitation mise en avant', dot: 'var(--ink-400)' },
       { id: 'modal_quit', view: 'member', tab: 'reglages', modal: 'quitter', theme: 'light', label: 'Modale · quitter la ligue', dot: '#C4362B' },
       { id: 'modal_del', view: 'admin', tab: 'reglages', modal: 'supprimer', theme: 'light', label: 'Modale · supprimer la ligue (admin)', dot: '#C4362B' },
       { id: 'modal_rm', view: 'admin', tab: 'reglages', modal: 'retirer', theme: 'light', label: 'Modale · retirer un membre', dot: '#C4362B' },
-      { id: 'load_cl', view: 'admin', tab: 'classement', variant: 'loading', theme: 'light', label: 'Chargement · onglet Classement', dot: '#8A8071' },
-      { id: 'load_res', view: 'admin', tab: 'resultats', variant: 'loading', theme: 'light', label: 'Chargement · onglet Résultats', dot: '#8A8071' },
-      { id: 'load_set', view: 'admin', tab: 'reglages', variant: 'loading', theme: 'light', label: 'Chargement · onglet Réglages', dot: '#8A8071' },
+      { id: 'load_cl', view: 'admin', tab: 'classement', variant: 'loading', theme: 'light', label: 'Chargement · onglet Classement', dot: 'var(--ink-400)' },
+      { id: 'load_res', view: 'admin', tab: 'resultats', variant: 'loading', theme: 'light', label: 'Chargement · onglet Résultats', dot: 'var(--ink-400)' },
+      { id: 'load_set', view: 'admin', tab: 'reglages', variant: 'loading', theme: 'light', label: 'Chargement · onglet Réglages', dot: 'var(--ink-400)' },
     ];
 
     const frames = frameDefs.map((fd) => {

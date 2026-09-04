@@ -18,11 +18,11 @@
   <style>
     * { box-sizing: border-box; }
     [data-theme="light"] {
-      --bg: var(--cream); --surface: var(--cream-100); --surface-sunken: var(--cream-200);
-      --border: var(--cream-200); --border-strong: #D8CEB8;
+      --bg: var(--sand-050); --surface: var(--sand-100); --surface-sunken: var(--sand-150);
+      --border: var(--sand-200); --border-strong: var(--sand-300);
       --text: var(--ink-900); --text-muted: var(--ink-600); --text-faint: var(--ink-400);
-      --brand: var(--green-800); --on-brand: var(--cream);
-      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: var(--cream);
+      --brand: var(--green-800); --on-brand: var(--sand-050);
+      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: #FFFFFF;
       --focus-ring: var(--grenat-500);
       --shadow-sm: 0 1px 2px rgba(22,19,14,0.06); --shadow-md: 0 4px 14px rgba(22,19,14,0.08); --shadow-lg: 0 12px 32px rgba(22,19,14,0.12);
     }
@@ -35,7 +35,7 @@
 </helmet>
 <div style="width: max-content; min-height: 100vh; padding: 48px; background: #7C776E; font-family: var(--font-body); display: flex; flex-direction: column; gap: 32px;">
 
-  <div style="display: flex; flex-direction: column; gap: 6px; color: #FBF7EF;">
+  <div style="display: flex; flex-direction: column; gap: 6px; color: var(--sand-050);">
     <span style="font-family: var(--font-display); font-size: 34px; letter-spacing: 0.01em;">TryCast — Match détail</span>
     <span style="font-size: 14px; color: rgba(255,255,255,0.72);">France – Irlande · les 3 statuts (à venir · live · terminé) · thèmes clair &amp; sombre · états limites</span>
   </div>
@@ -44,7 +44,7 @@
     <sc-for list="{{ frames }}" as="f" hint-placeholder-count="9">
       <div style="display: flex; flex-direction: column; gap: 12px;">
 
-        <div style="display: inline-flex; align-items: center; gap: 8px; color: #FBF7EF; font-size: 13px; font-weight: 600; padding: 0 4px;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; color: var(--sand-050); font-size: 13px; font-weight: 600; padding: 0 4px;">
           <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ f.dotColor }};"></span>{{ f.label }}
         </div>
 
@@ -631,15 +631,15 @@ class Component extends DCLogic {
     };
 
     const frameDefs = [
-      { id: 'up_l',   theme: 'light', status: 'upcoming', label: 'À venir · clair',        dotColor: '#FBF7EF' },
-      { id: 'up_d',   theme: 'dark',  status: 'upcoming', label: 'À venir · sombre',       dotColor: '#14432A' },
+      { id: 'up_l',   theme: 'light', status: 'upcoming', label: 'À venir · clair',        dotColor: 'var(--sand-050)' },
+      { id: 'up_d',   theme: 'dark',  status: 'upcoming', label: 'À venir · sombre',       dotColor: 'var(--green-800)' },
       { id: 'live_l', theme: 'light', status: 'live',     label: 'Live · clair',           dotColor: 'var(--grenat-500)' },
       { id: 'live_d', theme: 'dark',  status: 'live',     label: 'Live · sombre',          dotColor: 'var(--grenat-500)' },
-      { id: 'fin_l',  theme: 'light', status: 'finished', label: 'Terminé · clair',        dotColor: '#FBF7EF' },
-      { id: 'fin_d',  theme: 'dark',  status: 'finished', label: 'Terminé · sombre',       dotColor: '#14432A' },
-      { id: 'noleag', theme: 'light', status: 'finished', label: 'Terminé · 0 ligue (CTA)', dotColor: '#8A8071', variant: 'no-league' },
-      { id: 'load',   theme: 'light', status: 'finished', label: 'Chargement (skeleton)',  dotColor: '#8A8071', variant: 'loading' },
-      { id: 'noevt',  theme: 'dark',  status: 'live',     label: 'Live · déroulé vide',    dotColor: '#8A8071', variant: 'empty-timeline' },
+      { id: 'fin_l',  theme: 'light', status: 'finished', label: 'Terminé · clair',        dotColor: 'var(--sand-050)' },
+      { id: 'fin_d',  theme: 'dark',  status: 'finished', label: 'Terminé · sombre',       dotColor: 'var(--green-800)' },
+      { id: 'noleag', theme: 'light', status: 'finished', label: 'Terminé · 0 ligue (CTA)', dotColor: 'var(--ink-400)', variant: 'no-league' },
+      { id: 'load',   theme: 'light', status: 'finished', label: 'Chargement (skeleton)',  dotColor: 'var(--ink-400)', variant: 'loading' },
+      { id: 'noevt',  theme: 'dark',  status: 'live',     label: 'Live · déroulé vide',    dotColor: 'var(--ink-400)', variant: 'empty-timeline' },
     ];
 
     const chipFor = (status) => {
