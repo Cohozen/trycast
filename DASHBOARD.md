@@ -1,7 +1,7 @@
 # TryCast — Dashboard
 
 > Suivi d'avancement et décisions. Mis à jour à la fin de chaque session.
-> Dernière mise à jour : **2026-09-03** (**Lot 9 — mise en beta Play** : phases 1 (plus aucun ref de projet en dur), 2 (OTA `expo-updates`), 3 (**scission dev/prod Supabase**, **9 E2E verts sur 9**) et 5 (page web de suppression de compte) livrées ; phase 4 (variables EAS, environnements Sentry) livrée sauf le `SENTRY_AUTH_TOKEN`. Restent les phases 6 (fiche Play) et 7 (beta). **⚠️ La waitlist est vide** — le recrutement des 12 testeurs n'a aucune matière).
+> Dernière mise à jour : **2026-09-03 (bis)** (**Lot 9 — l'app est installée depuis le Play Store**. Test interne ouvert, connexion Google validée sur le build distribué, OTA prouvé. Phases 1 à 6 livrées ; reste la phase 7, la beta fermée. **⚠️ Le build en circulation (version code 2) ne peut pas recevoir de mise à jour à distance** — voir le piège d'empreinte ci-dessous.)
 >
 > Précédemment : **2026-07-25 (bis)** (**page Notifications** : historique lu/non lu alimenté par `notification_sends` étendu, cloche à pastille sur les 4 onglets, badge d'icône, et deux boutons d'action dans la barre système — « Marquer comme lu » silencieux + une action qui ouvre l'app. Migration poussée, EF `notify` déployée, `e2e-notifications.sh` 15/15, validé au simulateur par Corentin. Aucun rebuild. **Reste à confirmer sur l'Android réel** : affichage des boutons et comportement de « Marquer comme lu » app tuée).
 >
@@ -21,6 +21,7 @@
 | 7 | Finitions (confirmation email, changement d'e-mail, RGPD minimal, anglais + sélecteur de langue) | ✅ **Livré, déployé et actif** (EF + config Auth + domaine + **SMTP Resend** + **e-mails FR en ligne** + **reset par code validé**) — OAuth + iOS/APNs **différés** |
 | Web | Site vitrine Astro (`web/` : landing, waitlist beta, pages légales) | ✅ Livré, **en ligne sur trycast.fr** (canonique `www.`), textes légaux validés — reste : boîte mail contact@ |
 | **8** | **Connexion Google** (socle multi-fournisseur, écran de choix du pseudo, RGPD) | ✅ **Livré et validé sur Android réel** (2026-07-23) |
+| **9** | **Mise en beta Play** (découplage dev/prod, OTA, config EAS, fiche et visuels, test interne) | 🔶 **Phases 1 à 6 livrées** — l'app s'installe depuis le Play Store ; reste la phase 7 (beta fermée) |
 
 ## Ce qu'il reste à faire
 
@@ -86,6 +87,30 @@ delete from auth.users where email like '%+tc150820-%' or email = 'contact+tc-re
 ### Supabase branching : écarté, avec le cas où le rouvrir (2026-09-03)
 Question posée : pourquoi pas une branche Supabase par branche git plutôt qu'un projet séparé ? Écarté pour ce projet — le branching est taillé pour les **pull requests** (workflow solo sur `main` ici), une branche naît **sans données** alors que le dev a besoin d'état durable (comptes e2e des 9 scripts, matchs seedés), chaque branche a une **URL neuve** qu'il faut déclarer à la main dans Google Cloud pour l'OAuth, l'étape « Configure » du déploiement de branche **réapplique `config.toml`** — le mécanisme explicitement écarté parce qu'il débranche le SMTP Resend — et le coût n'est pas un argument (~10 $/mois si elle tourne en continu, **les crédits compute ne s'appliquant pas au compute de branching** alors qu'ils s'appliquent à un projet). Enfin, une branche est administrativement **fille de la prod**, soit le couplage que ce lot supprime.
 **À rouvrir** : pour tester une migration risquée sur un schéma propre (branche éphémère, quelques centimes) — bon réflexe avant la première migration qui touchera des données de beta réelles ; et le jour où le travail passe en PR.
+
+### Phases 5 et 6, et premier test interne ✅ (2026-09-03)
+
+**Fiche Play complète** : textes FR (description courte 79/80, longue 3 412/4 000, notes de version 481/500), **icône 512** dérivée de l'icône de l'app, **bannière 1024×500** (fond charbon neutre, grenat en étincelle seulement — le ballon est dessiné en primitives ImageMagick, son moteur SVG écrasant les transformations imbriquées de `favicon.svg`), et **4 captures 1280×2856** prises sur l'émulateur depuis le build `preview`. Tout est dans `docs/stores/assets/`.
+
+**Émulateur Android disponible** depuis cette session (AVD `Pixel_10_Pro`, piloté par `adb`) : boucle vérifiée de bout en bout. Deux conditions pour des captures publiables — **pas depuis le dev client** (le menu développeur se dessine par-dessus l'app) et **locale de l'émulateur en français** (il démarre en anglais et l'app suit le système).
+
+**Compte de démonstration** : `scripts/seed-demo-account.mjs` crée le compte exigé par Play, deux comptes compagnons, une ligue et des pronostics. Deux incohérences corrigées en le regardant tourner, toutes deux visibles par le relecteur : le panneau Précision lit `points_breakdown` que le seed n'écrivait pas (« 80 points » et « 0 % de précision »), et l'app posait un badge « Score exact » sur un pronostic qui ne correspondait pas au score — le pronostic est désormais **dérivé du score réel**. Les comptes portent `profiles.is_demo` et sont **exclus du classement général** (RPC + `useMyRank`, filtré aux deux endroits sous peine de rangs divergents entre l'accueil et la liste).
+
+**Âge minimum porté à 16 ans** (tranche Play 16-17 / 18+, pour rester hors du programme Familles). La justification a été **réécrite et pas seulement le chiffre** : le texte invoquait le seuil français, qui est bien de 15 ans — écrire 16 derrière cette phrase l'aurait rendue fausse.
+
+**Premier test interne, le 3 septembre** : AAB `production` (version code 2) téléversé, app installée depuis le Play Store, **connexion Google fonctionnelle sur le build distribué**. C'est ce qu'aucun build de développement ne pouvait prouver.
+
+⚠️ **Empreintes de signature — deux erreurs de lecture successives.** La page *Signature de l'app* affiche plusieurs certificats : d'abord la **clé d'importation** a été prise pour la clé de signature (le client OAuth créé faisait doublon avec l'existant, rien ne changeait), puis la clé de signature **actuelle** n'était pas la bonne non plus — c'est la **précédente** qui a débloqué, l'appareil ayant reçu une variante signée par elle. **Règle : déclarer toutes les empreintes, une par client OAuth Android.** N'en déclarer qu'une expose à un `DEVELOPER_ERROR` irreproductible, qui frappe certains testeurs et pas le développeur.
+
+### ⚠️ Piège d'empreinte OTA : les scripts npm (2026-09-03)
+
+Les commandes npm ajoutées pour les builds et l'OTA (`build:*`, `ota:*`, `env:*`) ont **déplacé l'empreinte du projet** et coupé le build déjà distribué de toute mise à jour. Isolé sans ambiguïté : avec le `package.json` d'avant, l'empreinte redevient `2611f008`, exactement celle de l'AAB installé.
+
+Le champ `scripts` de `package.json` est une source de l'empreinte par défaut, un script `android`/`ios` pouvant trahir un projet en workflow natif. Ce n'est pas le cas ici : `fingerprint.config.js` l'exclut désormais, vérifié — ajouter un script npm ne déplace plus rien.
+
+**Ce mode de panne est MUET** : rien n'échoue, aucun message, le correctif n'arrive simplement jamais chez les testeurs. Réflexe avant toute publication — `npx expo-updates fingerprint:generate --platform android` comparé à la ligne *Fingerprint* de `npm run build:list`.
+
+**Conséquence à assumer** : le build en circulation (version code 2) restera hors d'atteinte des mises à jour, son empreinte ayant été figée avant cette correction. Sans gravité — il n'est installé que sur le téléphone de Corentin, et une nouvelle release était déjà prévue pour les correctifs. **Le prochain build en sera immunisé.**
 
 ### Phase 4 — configuration EAS pour la production 🔶 (2026-09-03)
 

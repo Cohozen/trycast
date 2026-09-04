@@ -48,6 +48,10 @@ Le build Android embarque l'identité Firebase (FCM) de l'app : le fichier `goog
 | `npm run lint`                    | ESLint (config Expo, règles stylistiques désactivées)                          |
 | `npm run format` / `format:check` | Biome (formatage : 4 espaces, 100 colonnes)                                    |
 | `npm run typegen`                 | Régénère `src/lib/database.types.ts` depuis le schéma Supabase                 |
+| `npm run build:dev` / `build:preview` / `build:prod` | Builds EAS Android (dev client / release sur le dev / AAB pour la Play Console) |
+| `npm run ota:preview` / `ota:prod` | Mise à jour à distance sur le canal correspondant (garde-fous : voir `scripts/README.md`) |
+| `npm run env:preview` / `env:prod` | Variables EAS de l'environnement, à vérifier avant un build |
+| `node scripts/seed-demo-account.mjs` | Compte de démonstration exigé par les stores |
 | `bash scripts/e2e-auth.sh`        | Vérification E2E auth + RLS contre le projet Supabase (voir en-tête du script) |
 | `bash scripts/e2e-predictions.sh` | Vérification E2E RLS des pronostics (deadline kickoff, colonnes de points)     |
 | `bash scripts/e2e-scoring.sh`     | Vérification E2E du scoring côté client (barème lisible, RPC verrouillée)      |
@@ -216,7 +220,41 @@ Mise en route sur un nouveau projet (ordre important, secrets jamais dans le rep
 
 ## Builds (EAS)
 
-Projet EAS initialisé. Builds et soumission aux stores : à venir dans les lots suivants (`eas build`, `eas submit`).
+Trois profils dans `eas.json`, chacun lié à un environnement EAS et à un projet Supabase :
+
+| Profil | Produit | Base visée | Canal OTA |
+| --- | --- | --- | --- |
+| `development` | APK avec `expo-dev-client` | celle du `.env` local (le bundle vient de Metro) | aucun |
+| `preview` | APK de release, distribution interne | projet de **développement** | `preview` |
+| `production` | **AAB** pour la Play Console | projet de **production** | `production` |
+
+⚠️ Un build `preview` ou `production` **inline les `EXPO_PUBLIC_*` au bundling sur les serveurs
+EAS** : ils viennent de l'environnement EAS, pas du `.env` local. Une variable absente ne fait
+pas échouer le build — elle disparaît en silence. Le bouton « Continuer avec Google » s'évapore
+ainsi sans le moindre message. Vérifier avec `npm run env:prod` avant de lancer.
+
+### Mises à jour à distance (OTA)
+
+`expo-updates` en politique **`fingerprint`** : la version d'exécution est recalculée dès que
+quelque chose touche au natif, ce qui rend une mise à jour incompatible extrêmement improbable.
+Un correctif purement JavaScript part par `npm run ota:prod` et arrive au **deuxième**
+lancement de l'app (`EXUpdatesLaunchWaitMs = 0` : démarrage depuis le cache, application au
+lancement suivant — aucune attente perçue). Pas de relecture Google, pas de téléversement.
+
+⚠️ **Une mise à jour n'est délivrée qu'aux builds portant exactement la même empreinte**, et le
+non-appariement est **muet** : rien n'échoue, le correctif n'arrive simplement jamais. Comparer
+avant de publier, l'empreinte du build étant visible sur `npm run build:list` :
+
+```bash
+npx expo-updates fingerprint:generate --platform android
+```
+
+Ce qui la déplace : dépendance native, `app.json`, `eas.json`, plugins de configuration, assets
+déclarés dans la config, montée de SDK — et `fingerprint.config.js` lui-même. Le champ `scripts`
+de `package.json` en est **exclu** (`fingerprint.config.js`) : sans cette exclusion, ajouter une
+commande npm coupe les builds déjà distribués de toute mise à jour.
+
+iOS reste différé (pas de compte Apple Developer) : les scripts de build ne visent qu'Android.
 
 ### Numéro de version
 

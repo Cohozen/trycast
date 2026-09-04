@@ -18,6 +18,45 @@ L'app tourne dans un **dev build** (`expo-dev-client`) sur le téléphone Androi
 
 Symptôme d'un build en retard : `ERROR [Error: Cannot find native module 'ExpoXxx']` au lancement sur le device — souvent accompagné d'un faux WARN « Route … is missing the required default export » (l'import natif qui jette empêche l'évaluation du module de la route ; il disparaît avec le rebuild).
 
+## Rebuild ou mise à jour à distance ? (Lot 9)
+
+Depuis qu'`expo-updates` est en place, un correctif **JavaScript** n'a plus besoin de build :
+
+```bash
+npm run ota:preview -- --message "…"   # canal preview  → build preview
+npm run ota:prod    -- --message "…"   # canal production → testeurs Play
+```
+
+Le build reste obligatoire pour tout ce qui touche au natif — la liste ci-dessus vaut mot pour
+mot, plus `eas.json`, les assets déclarés dans la config et `fingerprint.config.js`.
+
+### ⚠️ Le non-appariement d'empreinte est MUET
+
+La politique est `fingerprint` : une mise à jour n'est délivrée qu'aux builds portant
+**exactement** la même version d'exécution. Si elle diffère, **rien n'échoue et rien ne
+s'affiche** — le correctif n'arrive jamais, et on ne le découvre qu'en s'étonnant que rien ne
+bouge. C'est le mode de panne le plus coûteux du dispositif.
+
+Avant toute publication, comparer à l'empreinte du build installé (`npm run build:list`, ligne
+*Fingerprint*) :
+
+```bash
+npx expo-updates fingerprint:generate --platform android
+```
+
+**Vécu le 2026-09-03** : ajouter des commandes npm à `package.json` a suffi à déplacer
+l'empreinte et à couper le build déjà distribué de toute mise à jour. Le champ `scripts` est
+une source de l'empreinte par défaut — un script `android`/`ios` pouvant trahir un projet en
+workflow natif. D'où l'exclusion posée dans `fingerprint.config.js`, vérifiée : ajouter un
+script npm ne déplace plus rien. **Modifier ce fichier déplace l'empreinte** : ne le faire
+qu'en même temps qu'une release.
+
+### Les `EXPO_PUBLIC_*` d'un build de release
+
+Un build `preview`/`production` **inline les variables au bundling sur les serveurs EAS**,
+depuis l'environnement EAS et non le `.env` local. Une variable absente ne fait **pas** échouer
+le build : elle disparaît en silence. `npm run env:prod` avant de lancer.
+
 ## Comment rebuilder
 
 ### Android (device perso de Corentin) — voie validée : EAS

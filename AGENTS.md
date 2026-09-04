@@ -51,6 +51,16 @@ Avant de considérer un lot terminé : `npm run typecheck && npm run lint && npm
 
 L'app tourne dans un dev build (`expo-dev-client`), pas Expo Go. **Toute lib native ajoutée/retirée, tout changement `app.json`/`app.config.ts`, toute montée de SDK ⇒ prévenir explicitement Corentin qu'un rebuild du dev client est nécessaire** (commande, quotas EAS et pièges : skill `trycast-dev-builds`).
 
+## Builds, environnements et OTA (Lot 9)
+
+- Trois profils EAS, chacun lié à un environnement EAS **et** à un projet Supabase : `development` (APK dev client, bundle servi par Metro donc `.env` local), `preview` (release sur le projet **dev**, canal OTA `preview`), `production` (**AAB** pour la Play Console, projet **prod**, canal `production`). Commandes : `npm run build:dev|build:preview|build:prod`, `npm run env:preview|env:prod`
+- ⚠️ Un build `preview`/`production` **inline les `EXPO_PUBLIC_*` au bundling côté serveur EAS**, pas depuis le `.env`. Une variable absente ne fait **pas** échouer le build : elle disparaît en silence (le bouton « Continuer avec Google » s'évapore sans message). Vérifier avec `npm run env:prod` avant de lancer
+- **OTA en politique `fingerprint`.** Un correctif JS part par `npm run ota:prod -- --message "…"` (garde-fous dans `scripts/ota.mjs` : arbre propre, typecheck + tests, message d'au moins 10 caractères). Un changement **natif** impose un build
+- ⚠️ **Une mise à jour n'est délivrée qu'aux builds de même empreinte, et le non-appariement est MUET** : rien n'échoue, le correctif n'arrive jamais. Comparer avant publication — `npx expo-updates fingerprint:generate --platform android` contre la ligne *Fingerprint* de `npm run build:list`
+- Le champ `scripts` de `package.json` est **exclu** de l'empreinte (`fingerprint.config.js`) : sans cela, ajouter une commande npm coupe les builds déjà distribués de toute mise à jour (vécu le 2026-09-03). Modifier ce fichier déplace l'empreinte — à ne toucher qu'avec une release
+- **Comptes de démonstration des stores** : `scripts/seed-demo-account.mjs` (mot de passe en argument, jamais dans le dépôt ; `--project` exigé pour viser la prod). Ils portent `profiles.is_demo`, ce qui les **exclut du classement général** tout en les classant dans leur ligue — la colonne n'a aucun `grant`, personne ne peut se marquer soi-même
+- **Play** : dossier complet dans `docs/stores/play-store.md`, visuels dans `docs/stores/assets/`. ⚠️ Déclarer **toutes** les empreintes de signature (clé de signature actuelle, précédente, et clé d'importation), une par client OAuth Android : n'en déclarer qu'une donne un `DEVELOPER_ERROR` irreproductible chez certains testeurs seulement
+
 ## Git
 
 - Commits petits et fréquents : un commit = un changement cohérent (config ≠ reformatage ≠ feature), messages `type: description`
