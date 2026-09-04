@@ -37,6 +37,46 @@ npm run emails:push -- --dry-run
 
 ---
 
+## Builds et mises à jour à distance
+
+| Commande | Effet |
+|---|---|
+| `npm run build:dev` | Dev client Android (APK, à installer soi-même) |
+| `npm run build:preview` | Build de release sur le projet **dev** — sert aux captures et à valider l'OTA |
+| `npm run build:prod` | **AAB** pour la Play Console, sur le projet **prod** |
+| `npm run build:list` | Les 5 derniers builds Android |
+| `npm run ota:preview -- --message "…"` | Mise à jour à distance sur le canal `preview` |
+| `npm run ota:prod -- --message "…"` | Mise à jour à distance sur le canal `production` |
+| `npm run ota:list` | Les 5 dernières mises à jour publiées |
+| `npm run env:preview` / `env:prod` | Variables EAS de l'environnement, à vérifier avant un build |
+
+Android uniquement : iOS est différé faute de compte Apple Developer. Ces scripts
+gagneront leur variante le jour venu.
+
+### Quand une mise à jour suffit, et quand il faut rebuilder
+
+Un correctif **JavaScript** (texte, style, logique, écran) part par `ota:*` et arrive chez les
+testeurs à leur deuxième lancement — pas de relecture Google, pas de téléversement.
+
+Un changement **natif** (lib native ajoutée ou retirée, `app.json`, montée de SDK) impose un
+nouveau build. La politique `fingerprint` le dit sans ambiguïté : l'empreinte change, et une
+mise à jour publiée depuis ce code serait refusée par les appareils.
+
+### `ota.mjs` : pourquoi un script et pas une ligne
+
+`eas update` est la seule commande du projet qui change **instantanément** ce que les
+utilisateurs exécutent, sans aucun des filets que le passage par le store fournit. Le script
+rétablit trois garanties :
+
+- **Arbre de travail propre.** Publier du code non commité rend impossible de savoir plus tard
+  ce que les gens faisaient tourner. EAS le signale d'un astérisque après le hash du commit —
+  facile à ne pas voir. `--allow-dirty` lève la contrainte, délibérément.
+- **Typecheck et tests au vert** avant l'envoi. `--skip-checks` pour un correctif d'urgence.
+- **Un message d'au moins 10 caractères.** Il devient l'étiquette de la mise à jour dans le
+  tableau de bord : « fix » ne dira rien dans trois semaines.
+
+---
+
 ## Vérifications E2E
 
 Scripts bash rejouables qui tapent l'API Supabase avec de vrais JWT pour vérifier que **les règles de sécurité tiennent côté serveur** (RLS, RPC verrouillées), pas seulement dans l'UI.
