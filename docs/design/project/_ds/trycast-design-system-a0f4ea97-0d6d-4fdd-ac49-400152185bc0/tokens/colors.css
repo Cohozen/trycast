@@ -15,7 +15,8 @@
   --green-700: #1C5638; /* raised (rare) */
   --green-600: #26694A; /* bordures discrètes */
   --green-500: #328B5C; /* marque médiane */
-  --green-400: #43A56E; /* MARQUE (dark) — vert lisible sur charbon */
+  --green-400: #43A56E; /* marque médiane-claire */
+  --green-300: #5FC48A; /* MARQUE (dark) — vert lisible sur charbon */
 
   --grenat-600: #C82E52; /* accent pressed */
   --grenat-500: #E63E63; /* ACCENT — the spark (CTA, live, selected) */
@@ -28,12 +29,12 @@
   --sand-200: #E8E3D9; /* séparateurs (light) */
   --sand-300: #D6CFC1; /* bordure forte (light) */
 
-  --char-950: #100E0B; /* enfoncé (dark) */
-  --char-900: #17140F; /* fond charbon chaud (dark) */
-  --char-850: #201C16; /* surface (dark) */
-  --char-800: #2A251E; /* raised (dark) */
-  --char-700: #383127; /* bordure forte (dark) */
-  --char-600: #2F2921; /* bordure (dark) */
+  --char-950: #080705; /* enfoncé (dark) */
+  --char-900: #100E0B; /* fond charbon chaud (dark) */
+  --char-850: #211D17; /* surface (dark) — +2 pas au-dessus du fond */
+  --char-800: #2E2921; /* raised (dark) */
+  --char-700: #6B6252; /* bordure forte (dark) — 3.2:1 sur le fond */
+  --char-600: #453D2F; /* bordure (dark) — hairline visible */
 
   /* ---- Primitive palette · texte ---- */
   --ink-900: #16130E; /* texte primaire sur clair (noir chaud) */
@@ -41,9 +42,9 @@
   --ink-400: #928A7B; /* texte discret / placeholders */
 
   /* Texte sur fond sombre */
-  --paper-100: #F4F0E9; /* texte primaire sur charbon */
-  --paper-300: #B2A999; /* texte secondaire sur charbon */
-  --paper-500: #7D7666; /* texte discret sur charbon */
+  --paper-100: #F8F5EF; /* texte primaire sur charbon */
+  --paper-300: #CDC4B3; /* texte secondaire sur charbon (≈9:1) */
+  --paper-500: #9C9382; /* texte discret sur charbon (≈5:1) */
 
   /* Ancien nom conservé pour compat */
   --cream:      #F1EBDD;
@@ -91,7 +92,11 @@
   --text:          var(--paper-100);
   --text-muted:    var(--paper-300);
   --text-faint:    var(--paper-500);
-  --brand:         var(--green-400);
+  --status-live:   var(--grenat-500);
+  --success-500:   #4FBF80;
+  --warning-500:   #E9B85A;
+  --info-500:      #5AA8D4;
+  --brand:         var(--green-300);
   --on-brand:      var(--char-950);
   --accent:        var(--grenat-500);
   --accent-hover:  var(--grenat-400);
@@ -100,8 +105,8 @@
   --focus-ring:    var(--grenat-400);
 
   /* ---- Glass (TabBar floating, overlays) — dark ---- */
-  --glass-bar:         color-mix(in srgb, var(--surface) 80%, transparent);
-  --glass-hairline:    color-mix(in srgb, var(--paper-100) 12%, transparent);
-  --glass-pill:        color-mix(in srgb, var(--accent) 13%, transparent);
-  --glass-pill-border: color-mix(in srgb, var(--accent) 30%, transparent);
+  --glass-bar:         color-mix(in srgb, var(--surface) 88%, transparent);
+  --glass-hairline:    color-mix(in srgb, var(--paper-100) 22%, transparent);
+  --glass-pill:        color-mix(in srgb, var(--accent) 22%, transparent);
+  --glass-pill-border: color-mix(in srgb, var(--accent) 45%, transparent);
 }
