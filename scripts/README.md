@@ -62,6 +62,29 @@ Un changement **natif** (lib native ajoutée ou retirée, `app.json`, montée de
 nouveau build. La politique `fingerprint` le dit sans ambiguïté : l'empreinte change, et une
 mise à jour publiée depuis ce code serait refusée par les appareils.
 
+### ⚠️ Ce qui déplace la version d'exécution
+
+Une mise à jour n'est délivrée qu'aux builds portant la **même empreinte**. Si elle diffère,
+rien ne casse et rien ne s'affiche : la mise à jour n'arrive simplement jamais. On ne le
+découvre qu'en constatant que le correctif n'est pas là.
+
+**Vécu le 3 septembre 2026** : ajouter des commandes npm à `package.json` a suffi à changer
+l'empreinte et à couper le build déjà distribué de toute mise à jour. Le champ `scripts` est
+une source de l'empreinte par défaut — un script `android`/`ios` peut trahir un projet en
+workflow natif. Ce n'est pas le cas ici, d'où l'exclusion posée dans `fingerprint.config.js`.
+
+Vérifier avant de publier, en comparant à l'empreinte du build installé (visible sur
+`npm run build:list`, ligne *Fingerprint*) :
+
+```bash
+npx expo-updates fingerprint:generate --platform android
+```
+
+Ce qui déplace légitimement l'empreinte, et impose donc un nouveau build : une dépendance
+native ajoutée ou retirée, `app.json`, `eas.json`, les plugins de configuration, les assets
+déclarés dans la config, une montée de SDK. Et `fingerprint.config.js` lui-même — à ne
+modifier qu'en même temps qu'une release.
+
 ### `ota.mjs` : pourquoi un script et pas une ligne
 
 `eas update` est la seule commande du projet qui change **instantanément** ce que les
