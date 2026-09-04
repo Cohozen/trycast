@@ -41,7 +41,6 @@ export function LeaguePreviewSheet({
 
     return (
         <BottomSheet
-            backdropColor="#0B1A11"
             backdropOpacity={0.5}
             bottomInset={24}
             contentClassName="gap-4 px-5"

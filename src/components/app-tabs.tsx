@@ -32,11 +32,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 
 /**
- * Barre d'onglets flottante du design system (4 onglets). L'onglet actif
- * porte l'étincelle grenat sur une pastille claire — teintée accent (grenat)
- * en dark sur la barre charbon (verre blanc en light, hairline claire +
- * pastille grenat en dark, cf. tokens --glass-* du DS v2). Pas de flou :
- * surface quasi opaque, plus robuste en RN.
+ * Barre d'onglets flottante du design system (4 onglets). L'onglet actif porte
+ * l'étincelle grenat sur une pastille grenat translucide, dans les deux thèmes.
+ * Le liseré de la barre (--glass-hairline du DS) est dérivé de la rampe
+ * `border-strong` par thème : chaude et sourde en light, chaude et claire sur le
+ * charbon en dark — surtout pas un blanc froid, qui trahissait le verre v1. Pas
+ * de flou (--glass-bar suppose un backdrop-filter absent en RN) : surface quasi
+ * opaque, plus robuste.
  *
  * La pastille active est un élément UNIQUE qui coulisse (Reanimated, ressort
  * amorti) de l'onglet quitté vers l'onglet cible ; l'icône et le label de
@@ -176,7 +178,7 @@ function FloatingTabList(props: TabListProps) {
             <View
                 className="items-center px-4"
                 style={{ paddingBottom: Math.max(insets.bottom, 16) }}>
-                <View className="w-full max-w-125 flex-row gap-1 rounded-[34px] border border-text-faint/50 bg-surface/95 p-2 tc-shadow-lg dark:border-white/12">
+                <View className="w-full max-w-125 flex-row gap-1 rounded-[34px] border border-border-strong/85 bg-surface/95 p-2 tc-shadow-lg dark:border-border-strong/92">
                     <SlidingPill />
                     {props.children}
                 </View>

@@ -17,7 +17,7 @@ type LeagueColorPickerProps = {
  */
 export function LeagueColorPicker({ value, onChange }: LeagueColorPickerProps) {
     const { t } = useTranslation(['leagues']);
-    const checkColor = useThemeColor('cream-100');
+    const checkColor = useThemeColor('sand-050');
 
     return (
         <View className="flex-row flex-wrap gap-2">

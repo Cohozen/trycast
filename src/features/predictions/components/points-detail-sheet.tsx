@@ -179,7 +179,6 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
 
     return (
         <BottomSheet
-            backdropColor="#16130E"
             backdropOpacity={0.4}
             className="border-t border-border"
             contentClassName="px-5"

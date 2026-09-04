@@ -14,6 +14,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { View } from '@/tw';
+import { palette } from '@/tw/palette';
 import { cn } from '@/tw/variants';
 
 type BottomSheetProps = {
@@ -25,7 +26,7 @@ type BottomSheetProps = {
     className?: string;
     /** Classes du conteneur de contenu (padding horizontal, gap…). */
     contentClassName?: string;
-    /** Teinte du fond assombri (défaut charbon neutre). */
+    /** Teinte du fond assombri (défaut : l'encre du DS, `ink-900`). */
     backdropColor?: string;
     /** Opacité maximale du fond assombri. */
     backdropOpacity?: number;
@@ -54,7 +55,7 @@ export function BottomSheet({
     children,
     className,
     contentClassName,
-    backdropColor = '#16130E',
+    backdropColor = palette['ink-900'].light,
     backdropOpacity = 0.4,
     bottomInset = 32,
 }: BottomSheetProps) {

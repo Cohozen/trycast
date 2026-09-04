@@ -14,6 +14,7 @@ import Svg, {
 
 import { FLAG_DEFS, type FlagShape } from '@/features/matches/team-flags';
 import type { TeamRow } from '@/features/matches/types';
+import { palette } from '@/tw/palette';
 
 type TeamFlagSize = 'sm' | 'md' | 'lg';
 
@@ -30,7 +31,7 @@ const CY = 50;
 const RX = 33;
 const RY = 19;
 const ROTATE = 'rotate(-22 58 50)';
-const CREAM = '#F1EBDD';
+const CREAM = palette.cream.light;
 const SEAM_TICKS = [-14, -7, 0, 7, 14];
 
 function shapeElement(shape: FlagShape, index: number) {
@@ -65,7 +66,7 @@ export function TeamFlag({ team, size = 'md' }: TeamFlagProps) {
     const clipId = `team-flag-${useId().replace(/:/g, '')}`;
     const dim = DIMS[size];
     const flag = team?.code ? FLAG_DEFS[team.code] : undefined;
-    const color = team?.color ?? '#8A8071';
+    const color = team?.color ?? palette['ink-400'].light;
     const trail = flag?.primary ?? color;
     const code = team?.code ?? '';
 

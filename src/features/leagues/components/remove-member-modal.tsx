@@ -33,7 +33,7 @@ export function RemoveMemberModal({
 
     return (
         <Modal animationType="fade" onRequestClose={onCancel} transparent visible={visible}>
-            <View className="flex-1 items-center justify-center bg-[#0B1A11]/50 p-4">
+            <View className="flex-1 items-center justify-center bg-ink-900/50 p-4">
                 <View className="w-full max-w-[420px] overflow-hidden rounded-lg bg-surface tc-shadow-lg">
                     <View className="items-center gap-3 px-5 pb-2 pt-6">
                         <Avatar name={member.username} size="lg" uri={member.avatarUrl} />

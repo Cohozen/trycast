@@ -20,8 +20,8 @@ const sizeClasses: Record<LeagueIconSize, { box: string; text: string }> = {
 /**
  * Pavé d'identité d'une ligue : initiales Anton sur fond de la couleur choisie
  * à la création. La couleur vient de la base (donnée, pas token) → posée en
- * style ; le texte crème reste lisible sur toute la palette, dans les deux
- * thèmes.
+ * style ; le texte sable reste lisible sur toute la palette, dans les deux
+ * thèmes (primitive figée, pas un token sémantique qui basculerait en dark).
  */
 export function LeagueIcon({ name, color, size = 'md' }: LeagueIconProps) {
     const s = sizeClasses[size];
@@ -29,7 +29,7 @@ export function LeagueIcon({ name, color, size = 'md' }: LeagueIconProps) {
         <View
             className={cn('items-center justify-center rounded-md tc-shadow-sm', s.box)}
             style={{ backgroundColor: leagueColorOf(color) }}>
-            <Text className={cn('font-display tracking-[0.5px] text-cream-100', s.text)}>
+            <Text className={cn('font-display tracking-[0.5px] text-sand-050', s.text)}>
                 {initialsOf(name)}
             </Text>
         </View>

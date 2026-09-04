@@ -79,7 +79,7 @@ export function EmailEditorModal({
     return (
         <Modal animationType="fade" onRequestClose={close} transparent visible={visible}>
             <KeyboardAvoidingView behavior="padding" style={StyleSheet.absoluteFill}>
-                <View className="flex-1 items-center justify-center bg-[#0B1A11]/50 p-4">
+                <View className="flex-1 items-center justify-center bg-ink-900/50 p-4">
                     <View className="w-full max-w-[420px] overflow-hidden rounded-lg bg-surface tc-shadow-lg">
                         <View className="gap-3.5 px-5 pb-4 pt-6">
                             <View className="items-center gap-3">
