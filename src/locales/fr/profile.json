@@ -26,7 +26,8 @@
             "overline": "Classement général",
             "of": "sur {{count}} joueurs",
             "noneTitle": "Pas encore classé",
-            "noneHint": "Le rang s'affiche après ton premier prono scoré."
+            "noneHint": "Le rang s'affiche après ton premier prono scoré.",
+            "noneHintOther": "Le rang s'affiche après son premier prono scoré."
         },
         "precision": {
             "title": "Précision",
@@ -44,6 +45,9 @@
         "trend": {
             "title": "Points par journée",
             "empty": "Ta progression s'affichera après ta première journée de pronos.",
+            "emptyOther": "La progression s'affichera après sa première journée de pronos.",
+            "noPredictions": "Aucun prono sur cette compétition.",
+            "noPredictionsOther": "Aucun prono de ce joueur sur cette compétition.",
             "roundLabel": "J{{round}}",
             "roundUnknown": "J ?",
             "lastRound_one": "{{count}} pt",
@@ -52,7 +56,8 @@
     },
     "predictions": {
         "emptyTitle": "Aucun prono terminé",
-        "emptyMessage": "Tes pronos apparaîtront ici une fois les matchs joués et scorés."
+        "emptyMessage": "Tes pronos apparaîtront ici une fois les matchs joués et scorés.",
+        "emptyMessageOther": "Aucun prono terminé sur cette compétition."
     },
     "username": {
         "label": "Pseudo",

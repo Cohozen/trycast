@@ -26,7 +26,8 @@
             "overline": "Overall leaderboard",
             "of": "of {{count}} players",
             "noneTitle": "Not ranked yet",
-            "noneHint": "Your rank appears after your first scored prediction."
+            "noneHint": "Your rank appears after your first scored prediction.",
+            "noneHintOther": "Their rank appears after their first scored prediction."
         },
         "precision": {
             "title": "Accuracy",
@@ -44,6 +45,9 @@
         "trend": {
             "title": "Points per round",
             "empty": "Your progress will show after your first round of predictions.",
+            "emptyOther": "Their progress will show after their first round of predictions.",
+            "noPredictions": "No predictions in this competition.",
+            "noPredictionsOther": "This player has no predictions in this competition.",
             "roundLabel": "R{{round}}",
             "roundUnknown": "R?",
             "lastRound_one": "{{count}} pt",
@@ -52,7 +56,8 @@
     },
     "predictions": {
         "emptyTitle": "No completed predictions",
-        "emptyMessage": "Your predictions will appear here once matches are played and scored."
+        "emptyMessage": "Your predictions will appear here once matches are played and scored.",
+        "emptyMessageOther": "No completed predictions in this competition."
     },
     "username": {
         "label": "Username",

@@ -192,7 +192,7 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                 {/* Identité (+ accès réglages sur mon profil) */}
                 <View className="flex-row gap-3.5">
                     {profilePending ? (
-                        <Skeleton className="h-[56px] flex-1" variant="block" />
+                        <Skeleton className="h-16 flex-1" variant="block" />
                     ) : (
                         <>
                             <Avatar
@@ -286,6 +286,7 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                     </View>
                 ) : deferredTab === 'stats' ? (
                     <ProfileStatsPanel
+                        owner={isSelf ? 'self' : 'other'}
                         points={standing.data?.total_points ?? null}
                         rank={myRank.data?.rank ?? null}
                         stats={stats}
@@ -295,7 +296,11 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                 ) : deferredTab === 'predictions' ? (
                     finishedMatches.length === 0 ? (
                         <EmptyState
-                            message={t('profile:predictions.emptyMessage')}
+                            message={t(
+                                isSelf
+                                    ? 'profile:predictions.emptyMessage'
+                                    : 'profile:predictions.emptyMessageOther',
+                            )}
                             title={t('profile:predictions.emptyTitle')}
                         />
                     ) : (
@@ -349,30 +354,28 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                                 </Card>
                             </Pressable>
                         ))}
-                        <View className="mt-1 flex-row gap-2.5">
-                            <View className="flex-1">
-                                <Button
-                                    fullWidth
-                                    onPress={() => router.push('/league/new')}
-                                    size="sm"
-                                    title={t('leagues:actions.create')}
-                                    variant="secondary"
-                                />
-                            </View>
-                            <View className="flex-1">
-                                <Button
-                                    fullWidth
-                                    onPress={() =>
-                                        router.push({
-                                            pathname: '/league/new',
-                                            params: { tab: 'join' },
-                                        })
-                                    }
-                                    size="sm"
-                                    title={t('leagues:actions.join')}
-                                    variant="secondary"
-                                />
-                            </View>
+                        {/* Empilés : côte à côte, les libellés complets ne
+                            tiennent pas dans une demi-largeur d'écran */}
+                        <View className="mt-1 gap-2.5">
+                            <Button
+                                fullWidth
+                                onPress={() => router.push('/league/new')}
+                                size="sm"
+                                title={t('leagues:actions.create')}
+                                variant="secondary"
+                            />
+                            <Button
+                                fullWidth
+                                onPress={() =>
+                                    router.push({
+                                        pathname: '/league/new',
+                                        params: { tab: 'join' },
+                                    })
+                                }
+                                size="sm"
+                                title={t('leagues:actions.join')}
+                                variant="secondary"
+                            />
                         </View>
                     </View>
                 )}

@@ -18,6 +18,11 @@ type ProfileStatsPanelProps = {
     totalPlayers: number | null;
     /** Série « Points par journée » (vide tant qu'aucune journée entamée). */
     trend: readonly RoundPoints[];
+    /**
+     * Profil affiché : le mien (tutoiement) ou celui d'un autre joueur
+     * (3e personne). Même convention que `ResultCard`.
+     */
+    owner?: 'self' | 'other';
 };
 
 function StatCard({
@@ -56,9 +61,14 @@ export function ProfileStatsPanel({
     rank,
     totalPlayers,
     trend,
+    owner = 'self',
 }: ProfileStatsPanelProps) {
     const { t } = useTranslation(['profile']);
     const brandColor = useThemeColor('brand');
+    const isSelf = owner === 'self';
+    // Sans aucun prono, la courbe est une ligne plate au ras du cadre : elle
+    // n'apprend rien et laisse croire à un bug. On la remplace par un message.
+    const showTrend = trend.length > 0 && stats.played > 0;
 
     return (
         <View className="gap-4">
@@ -106,7 +116,11 @@ export function ProfileStatsPanel({
                             {t('profile:stats.rank.noneTitle')}
                         </Text>
                         <Text className="font-body text-[12px] text-text-muted">
-                            {t('profile:stats.rank.noneHint')}
+                            {t(
+                                isSelf
+                                    ? 'profile:stats.rank.noneHint'
+                                    : 'profile:stats.rank.noneHintOther',
+                            )}
                         </Text>
                     </View>
                 </View>
@@ -136,7 +150,7 @@ export function ProfileStatsPanel({
                     <Text className="font-body-bold text-[12px] uppercase tracking-[0.96px] text-text">
                         {t('profile:stats.trend.title')}
                     </Text>
-                    {trend.length > 0 ? (
+                    {showTrend ? (
                         <Badge tone="brand">
                             {t('profile:stats.trend.lastRound', {
                                 count: trend[trend.length - 1].points,
@@ -144,13 +158,21 @@ export function ProfileStatsPanel({
                         </Badge>
                     ) : null}
                 </View>
-                {trend.length > 0 ? (
+                {showTrend ? (
                     <PointsTrendChart trend={trend} />
                 ) : (
                     <View className="items-center gap-3 px-2 pb-1.5 pt-3.5">
                         <View className="h-0 w-full border-b-2 border-dashed border-border-strong" />
                         <Text className="text-center font-body text-[12.5px] leading-[18px] text-text-muted">
-                            {t('profile:stats.trend.empty')}
+                            {t(
+                                trend.length > 0
+                                    ? isSelf
+                                        ? 'profile:stats.trend.noPredictions'
+                                        : 'profile:stats.trend.noPredictionsOther'
+                                    : isSelf
+                                      ? 'profile:stats.trend.empty'
+                                      : 'profile:stats.trend.emptyOther',
+                            )}
                         </Text>
                     </View>
                 )}
