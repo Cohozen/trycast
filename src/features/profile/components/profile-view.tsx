@@ -309,7 +309,7 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                 ) : leagues.length === 0 ? (
                     <EmptyState
                         action={
-                            <View className="w-full min-w-60 gap-2.5">
+                            <View className="w-full max-w-75 gap-2.5">
                                 <Button
                                     fullWidth
                                     onPress={() => router.push('/league/new')}
@@ -354,15 +354,14 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                                 </Card>
                             </Pressable>
                         ))}
-                        {/* Empilés : côte à côte, les libellés complets ne
-                            tiennent pas dans une demi-largeur d'écran */}
+                        {/* Mêmes boutons que l'état « aucune ligue » et que le
+                            Classement — seuls le titre et le message du héros
+                            sont réservés au cas sans ligue */}
                         <View className="mt-1 gap-2.5">
                             <Button
                                 fullWidth
                                 onPress={() => router.push('/league/new')}
-                                size="sm"
                                 title={t('leagues:actions.create')}
-                                variant="secondary"
                             />
                             <Button
                                 fullWidth
@@ -372,7 +371,6 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                                         params: { tab: 'join' },
                                     })
                                 }
-                                size="sm"
                                 title={t('leagues:actions.join')}
                                 variant="secondary"
                             />

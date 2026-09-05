@@ -244,7 +244,10 @@ export default function MatchesScreen() {
             // Aucune ligue : les CTA deviennent le héros
             <View className="items-center gap-3.5 px-5 pb-1 pt-6" key="league-hero">
                 <BrandMark size={72} />
-                <Text className="text-center font-display text-h2 text-text">
+                {/* leading-[26px] : le ratio 1.09 du token h2 (24px) est trop
+                    serré pour les ascendantes d'Anton, qui se font rogner en
+                    natif — même parade que text-h1 / leading-[38px] */}
+                <Text className="text-center font-display text-h2 leading-[26px] text-text">
                     {t('leagues:hero.title')}
                 </Text>
                 <Text className="max-w-70 text-center font-body text-[14px] leading-5.25 text-text-muted">

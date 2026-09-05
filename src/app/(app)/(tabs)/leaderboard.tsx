@@ -244,7 +244,7 @@ export default function LeaderboardScreen() {
                     <EmptyState
                         action={
                             leagues.length === 0 ? (
-                                <View className="w-full min-w-[240px] gap-2.5">
+                                <View className="w-full max-w-75 gap-2.5">
                                     <Button
                                         fullWidth
                                         onPress={() => router.push('/league/new')}

@@ -18,13 +18,21 @@ export function EmptyState({ title, message, icon, action }: EmptyStateProps) {
                     {icon}
                 </View>
             ) : null}
-            <Text className="text-center font-display text-h2 leading-1 text-text">{title}</Text>
+            {/* leading-[26px] et pas `leading-1`, qui vaut calc(--spacing * 1)
+                soit ~3.5px en natif : les ascendantes d'Anton s'y font rogner */}
+            <Text className="text-center font-display text-h2 leading-[26px] text-text">
+                {title}
+            </Text>
             {message ? (
                 <Text className="max-w-[280px] text-center font-body text-[14px] leading-[21px] text-text-muted">
                     {message}
                 </Text>
             ) : null}
-            {action ? <View className="mt-2">{action}</View> : null}
+            {/* w-full : sans largeur définie ici, le parent `items-center` laisse
+                l'action se dimensionner sur son contenu et un enfant `w-full`
+                se résout alors sur son propre texte — deux boutons empilés
+                sortent de largeurs différentes, libellés désalignés. */}
+            {action ? <View className="mt-2 w-full items-center">{action}</View> : null}
         </View>
     );
 }
