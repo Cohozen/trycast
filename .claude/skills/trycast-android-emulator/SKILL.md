@@ -185,6 +185,19 @@ les accents. Après chaque interaction, vérifier (screenshot ou dump) — ne ja
   Le JSX, lui, se recharge parfaitement (vérifié de bout en bout). Piège trompeur : on croit le dev
   client cassé alors qu'il fonctionne. Pour voir un changement de traduction, recharger l'app
   (menu développeur → `Reload`, ou `adb shell am force-stop com.cohozen.trycast` puis relance).
+- ⚠️ **Ne jamais démarrer l'AVD avec `-no-snapshot-save`** (erreur commise et corrigée le
+  2026-09-05). Le drapeau ne « repart pas d'un état propre » : il **jette la session entière** et
+  rebascule sur le dernier instantané. Effet vécu — le dev client installé le matin avait disparu
+  au redémarrage, l'émulateur avait retrouvé son build release du 3 septembre (`firstInstallTime`
+  inchangé, aucun flag `DEBUGGABLE`), et le `npm run android` suivant échouait en
+  `INSTALL_FAILED_UPDATE_INCOMPATIBLE` **après cinq minutes de Gradle**. Le Quick Boot par défaut
+  sauvegarde à l'extinction, ce qui est exactement ce qu'on veut. Pour un vrai démarrage à froid,
+  c'est `-no-snapshot-load`, et ça se demande explicitement.
+- **Le conflit de signature est détecté avant Gradle** par `scripts/android-preflight.sh`, branché
+  dans `npm run android` : il nomme l'appareil fautif et affiche la commande de désinstallation,
+  sans jamais la jouer (gratuit sur un émulateur, coûteux sur le téléphone de Corentin, où c'est le
+  build du Play Store qui partirait). Discriminant utilisé : un build de debug porte le drapeau
+  `DEBUGGABLE` dans `dumpsys package`, un build de release non.
 - **Prudence données** : les champs de score des matchs auto-savent dans la base **dev**. Ne pas y
   taper de valeurs de test sans les remettre en l'état. Le champ « Code d'invitation »
   (`trycast://league/join`) est inoffensif tant qu'on ne soumet pas.
@@ -192,5 +205,5 @@ les accents. Après chaque interaction, vérifier (screenshot ou dump) — ne ja
 ## Nettoyage fin de session
 
 Rien d'obligatoire. Éventuellement tuer la tâche Metro, et `adb emu kill` pour éteindre l'émulateur.
-Le script démarre l'AVD en `-no-snapshot-save` : l'arrêt est instantané et le prochain démarrage
-repart d'un état connu.
+Le Quick Boot sauvegarde l'état à l'extinction : le dev client installé est toujours là au prochain
+démarrage.

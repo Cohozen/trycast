@@ -74,6 +74,20 @@ qu'il s'agit d'un problème de timing. Le script boucle donc sur `sys.boot_compl
 main qu'appareil prêt. Il ne fait rien si un appareil est déjà connecté — un téléphone branché en
 USB a la priorité.
 
+⚠️ **Pas de `-no-snapshot-save`** : le drapeau paraît propre mais il **jette la session** et
+rebascule sur le dernier instantané — le dev client installé disparaît au redémarrage et l'émulateur
+retrouve son vieux build release (vécu le 2026-09-05). Le Quick Boot par défaut sauvegarde à
+l'extinction, c'est ce qu'on veut.
+
+### `android-preflight.sh` : échouer vite
+
+Branché dans `npm run android`, avant Gradle. Un dev client (signé `android/app/debug.keystore`) et
+un build EAS ne peuvent pas coexister sous le même nom de paquet : l'installation échoue en
+`INSTALL_FAILED_UPDATE_INCOMPATIBLE`, **après cinq minutes de compilation**, avec un message qui ne
+nomme ni l'appareil ni le geste correctif. Le preflight le détecte d'abord, nomme l'appareil et
+affiche la commande — **sans la jouer** : désinstaller est gratuit sur un émulateur et coûteux sur
+le téléphone de Corentin, ce choix lui revient.
+
 Détails d'usage (observer, piloter, deep links, pièges) : skill `trycast-android-emulator`.
 
 ---

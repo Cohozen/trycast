@@ -82,7 +82,7 @@
     },
     "scripts": {
         "start": "expo start",
-        "android": ". ./scripts/android-env.sh && SENTRY_DISABLE_AUTO_UPLOAD=true expo run:android",
+        "android": ". ./scripts/android-env.sh && sh ./scripts/android-preflight.sh && SENTRY_DISABLE_AUTO_UPLOAD=true expo run:android",
         "android:doctor": "sh ./scripts/android-doctor.sh",
         "android:emulator": "sh ./scripts/android-emulator.sh",
         "ios": "SENTRY_DISABLE_AUTO_UPLOAD=true expo run:ios",
