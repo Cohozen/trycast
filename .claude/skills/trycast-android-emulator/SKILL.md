@@ -33,9 +33,17 @@ npm run android            # compile, installe le dev client, lance Metro
 ```
 
 `npm run android` reste au premier plan (Metro) : le lancer en **tâche de fond** (`run_in_background`)
-et suivre son fichier de sortie. Premier build : **15-25 min** (Gradle, AGP, NDK à télécharger),
-ensuite 1-3 min. Attendre la ligne **`Android Bundled`** dans la sortie Metro — c'est *la* preuve que
-le dev client parle bien à Metro.
+et suivre son fichier de sortie. Attendre la ligne **`Android Bundled`** dans la sortie Metro —
+c'est *la* preuve que le dev client parle bien à Metro.
+
+Durées mesurées le 2026-09-05, machine M-series : **5 min 30 de Gradle** au premier build (663 tâches,
+arm64 seul), plus le téléchargement initial de Gradle 9.3.1 et des composants SDK manquants
+(AGP a installé seul `build-tools 35` et la plateforme `android-36`, sans `cmdline-tools`) — une
+vingtaine de minutes bout en bout. Ensuite 1-3 min.
+
+**Au premier lancement**, le dev client affiche son panneau d'accueil par-dessus l'app. Son bouton
+`Continue` ouvre le **menu développeur complet** au lieu de fermer le panneau : sortir avec
+`adb shell input keyevent 4` (retour Android).
 
 Pour les commandes `adb` isolées, sourcer l'environnement à chaque appel — `adb` n'est pas dans le
 `PATH` par défaut :
@@ -99,7 +107,18 @@ for n in ET.parse('<scratchpad>/ui.xml').iter('node'):
 
 `text` porte le contenu, `content-desc` l'`accessibilityLabel` React Native. Le code ne pose
 **aucun `testID`** aujourd'hui, donc `resource-id` est vide sur les vues de l'app : on sélectionne
-par texte ou par libellé d'accessibilité.
+par texte ou par libellé d'accessibilité. Le FAB du menu développeur apparaît sous
+`ImageView: 'Tools'` (~1154, 282 px) — c'est lui, pas un élément de l'app.
+
+Sortie réelle sur l'écran de connexion, pour donner l'échelle :
+
+```
+TextView:  'TryCast'                     center=(639,528)
+Button:    'Continuer avec Google'       center=(640,1039)  clickable
+EditText:  'toi@exemple.fr'              center=(640,1395)  clickable
+EditText:  'Ton mot de passe'            center=(601,1652)  clickable
+Button:    'Se connecter'                center=(640,1929)  clickable
+```
 
 ### 3. Logs runtime
 
@@ -160,6 +179,12 @@ les accents. Après chaque interaction, vérifier (screenshot ou dump) — ne ja
 - **Un nouveau config plugin n'est pas réappliqué sur un `android/` préexistant** (même piège qu'iOS,
   cf. `trycast-dev-builds`) : après tout ajout de dépendance native ou de plugin,
   `prebuild --clean` **avant** de rebuilder.
+- **Le Fast Refresh ne recharge PAS les fichiers de locale** (vécu 2026-09-05). Modifier une chaîne
+  dans `src/locales/fr/*.json` ne change rien à l'écran : i18next initialise son magasin de
+  ressources une fois pour toutes au démarrage, et remplacer le module JSON ne le réinitialise pas.
+  Le JSX, lui, se recharge parfaitement (vérifié de bout en bout). Piège trompeur : on croit le dev
+  client cassé alors qu'il fonctionne. Pour voir un changement de traduction, recharger l'app
+  (menu développeur → `Reload`, ou `adb shell am force-stop com.cohozen.trycast` puis relance).
 - **Prudence données** : les champs de score des matchs auto-savent dans la base **dev**. Ne pas y
   taper de valeurs de test sans les remettre en l'état. Le champ « Code d'invitation »
   (`trycast://league/join`) est inoffensif tant qu'on ne soumet pas.
