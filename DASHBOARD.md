@@ -1,7 +1,9 @@
 # TryCast — Dashboard
 
 > Suivi d'avancement et décisions. Mis à jour à la fin de chaque session.
-> Dernière mise à jour : **2026-09-05** (**premiers retours de la prod Android** : six correctifs d'affichage (anneau d'avatar ovale, libellés de boutons désalignés, sélecteur de compétitions, tutoiement sur le profil d'autrui, courbe plate sans prono, clignotement d'erreur au changement d'onglet du classement), puis un second tour de retours de Corentin. 6 commits, pas de push. **Éligible OTA** — aucune dépendance native, `app.json` intouché. **Passe visuelle iOS partielle, Android non vérifié** : l'app installée sur l'émulateur est un build release, pas un dev client.)
+> Dernière mise à jour : **2026-09-05 (bis)** (**la chaîne Android locale fonctionne**. `npm run android` échouait faute de JDK et de `ANDROID_HOME` : `scripts/android-env.sh` devient la source unique de l'environnement, avec `android:doctor` et `android:emulator` (qui attend `sys.boot_completed`). **Dev client compilé et installé sur l'émulateur Pixel 10 Pro**, `Android Bundled` obtenu, Fast Refresh vérifié de bout en bout — la vérification visuelle Android est enfin possible. Skill `trycast-android-emulator`. 3 commits, pas de push. **Aucun changement de code applicatif** : outillage et documentation uniquement.)
+>
+> Précédemment : **2026-09-05** (**premiers retours de la prod Android** : six correctifs d'affichage (anneau d'avatar ovale, libellés de boutons désalignés, sélecteur de compétitions, tutoiement sur le profil d'autrui, courbe plate sans prono, clignotement d'erreur au changement d'onglet du classement), puis un second tour de retours de Corentin. 6 commits, pas de push. **Éligible OTA** — aucune dépendance native, `app.json` intouché. **Passe visuelle iOS partielle, Android non vérifié** : l'app installée sur l'émulateur est un build release, pas un dev client.)
 >
 > Précédemment : **2026-09-03 (bis)** (**Lot 9 — l'app est installée depuis le Play Store**. Test interne ouvert, connexion Google validée sur le build distribué, OTA prouvé. Phases 1 à 6 livrées ; reste la phase 7, la beta fermée. **⚠️ Le build en circulation (version code 2) ne peut pas recevoir de mise à jour à distance** — voir le piège d'empreinte ci-dessous.)
 >
@@ -25,8 +27,23 @@
 
 ## Ce qu'il reste à faire
 
-### ⚠️ Action Corentin en attente (2026-07-27)
-**Rebuild du dev client Android** — `eas build -p android --profile development` — désormais requis pour **deux** modules natifs absents du build actuel : `react-native-keyboard-controller` (fix clavier) et `expo-updates` (OTA, Lot 9). Un seul build couvre les deux. **Conséquence mesurée le 2026-09-05** : l'app installée sur l'émulateur Pixel 10 Pro est un build **release** (preview/prod), pas un dev client — elle tourne sur son JS embarqué et **ne se connecte pas à Metro** (0 « Android Bundled » dans la sortie, alors que l'app s'ouvre normalement). Tant que ce build n'existe pas, **aucun correctif ne peut être vérifié sur Android** : on n'y observe que le code déjà publié. Le symptôme est trompeur — l'app se lance, s'utilise, et donne l'illusion d'un correctif qui ne prend pas. Le fix des volets (`BottomSheet`) ne demande aucun rebuild (Reanimated/gesture-handler déjà présents) et est déjà validé au simulateur iOS.
+### ✅ Levé le 2026-09-05 (bis) — vérification Android
+
+Le blocage « rebuild du dev client Android » est **résolu sur l'émulateur** : le dev client construit
+en local (`npm run android`) embarque bien `react-native-keyboard-controller` (24 tâches Gradle) et
+`expo-updates`. `Android Bundled` obtenu, Fast Refresh vérifié — on observe désormais son propre code
+et non le JS déjà publié.
+
+⚠️ **Sur le téléphone Android réel, rien n'a changé** : il porte toujours un build release. Deux
+voies quand il faudra y vérifier quelque chose — installer le même APK de debug
+(`android/app/build/outputs/apk/debug/app-debug.apk`, à condition que le téléphone atteigne Metro sur
+le réseau local), ou `eas build -p android --profile development` pour un dev client distribuable.
+
+**Rappel du piège**, désormais documenté dans le skill : un build release ne se connecte jamais à
+Metro. L'app s'ouvre, s'utilise, et donne l'illusion parfaite d'un correctif qui ne prend pas. Le
+seul signe est l'absence de `Android Bundled` dans la sortie. Vérifier ce point **avant** toute passe
+visuelle Android.
+
 
 ## Lot 9 — Mise en beta fermée sur Google Play (en cours, 2026-07-27)
 
