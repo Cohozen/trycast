@@ -68,6 +68,46 @@ différentes. Conséquences :
   développeur** (engrenage flottant) doit être visible, et une édition de code doit se propager
   toute seule par Fast Refresh.
 
+### Le corollaire : un dev client peut AUSSI tourner sur un bundle embarqué
+
+Piège vécu le 2026-09-05, distinct du précédent et plus sournois — le paquet installé était bien
+le dev client (`flags=[ DEBUGGABLE … ]`, engrenage flottant présent), mais il avait été **lancé
+avec le mauvais lien** :
+
+```bash
+adb shell am start -a android.intent.action.VIEW -d "trycast://" com.cohozen.trycast   # ❌ ouvre l'app sur son JS embarqué
+```
+
+Ce lien ouvre l'app sans jamais lui dire **où** est Metro : elle sert son bundle embarqué, tout
+fonctionne, et les modifications de code n'arrivent jamais. Le lien correct passe l'URL de Metro
+au dev client :
+
+```bash
+adb reverse tcp:8081 tcp:8081
+adb shell am force-stop com.cohozen.trycast
+adb shell am start -a android.intent.action.VIEW \
+  -d "trycast://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081" com.cohozen.trycast
+```
+
+**Le seul critère fiable reste `Android Bundled` dans la sortie Metro** — ni le flag DEBUGGABLE,
+ni l'engrenage flottant, ni le fait que l'app s'affiche correctement ne prouvent quoi que ce soit.
+Vérifier **avant** de mesurer :
+
+```bash
+grep -c "Android Bundled" <fichier-de-sortie-metro>   # 0 = l'app n'est PAS sur ton code
+```
+
+### Toute comparaison avant/après exige un témoin positif
+
+Corollaire méthodologique du piège ci-dessus. Une mesure du type « 0 pixel de différence entre
+avant et après » a **deux** explications : le rendu est vraiment identique, ou bien **rien n'a été
+rechargé**. Les deux sont indiscernables sur le résultat.
+
+Avant de conclure quoi que ce soit d'un avant/après sur Android, faire tourner un **témoin
+positif** : appliquer un changement statique volontairement énorme (déplacer une géométrie de
+plusieurs unités, changer une taille) et vérifier que la capture bouge. Si le témoin ne bouge pas,
+toutes les mesures de la passe sont nulles et non avenues — pas seulement douteuses.
+
 ## Les 4 canaux d'observation
 
 ### 1. Screenshot
