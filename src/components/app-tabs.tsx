@@ -7,8 +7,6 @@ import {
     TabTrigger,
     TabTriggerSlotProps,
 } from 'expo-router/ui';
-import type { LucideIcon } from 'lucide-react-native';
-import { BarChart3, CheckCircle, List, User } from 'lucide-react-native';
 import {
     createContext,
     useCallback,
@@ -21,6 +19,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { Keyboard, Platform, StyleSheet, type LayoutRectangle } from 'react-native';
 import Animated, {
+    Easing,
     useAnimatedStyle,
     useReducedMotion,
     useSharedValue,
@@ -29,6 +28,12 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { LeaderboardTabIcon } from '@/components/tab-icons/leaderboard-tab-icon';
+import { MatchesTabIcon } from '@/components/tab-icons/matches-tab-icon';
+import { TAB_ICON_MOTION_DURATION } from '@/components/tab-icons/motion';
+import { ProfileTabIcon } from '@/components/tab-icons/profile-tab-icon';
+import { ResultsTabIcon } from '@/components/tab-icons/results-tab-icon';
+import type { TabIconComponent } from '@/components/tab-icons/types';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 
 /**
@@ -45,6 +50,11 @@ import { Pressable, Text, useThemeColor, View } from '@/tw';
  * l'onglet actif fondent vers le grenat par cross-fade d'opacité (deux couches
  * empilées — robuste natif + web, où useThemeColor renvoie une var() CSS non
  * interpolable). Respecte « réduire les animations » (bascule instantanée).
+ *
+ * Les icônes ne viennent pas de lucide-react-native mais de `tab-icons/` : ce
+ * sont les mêmes dessins, redessinés trait par trait pour que quelques-uns
+ * puissent bouger brièvement quand l'onglet devient actif (chorégraphies et
+ * courbes dans `tab-icons/motion.ts`).
  */
 
 /** Ordre des routes des onglets → index de la pastille (source de vérité de l'onglet actif). */
@@ -113,16 +123,20 @@ export default function AppTabs() {
                 <TabList asChild>
                     <FloatingTabList>
                         <TabTrigger asChild href="/" name="index">
-                            <TabButton icon={List} label={t('tabs.matches')} index={0} />
+                            <TabButton icon={MatchesTabIcon} label={t('tabs.matches')} index={0} />
                         </TabTrigger>
                         <TabTrigger asChild href="/results" name="results">
-                            <TabButton icon={CheckCircle} label={t('tabs.results')} index={1} />
+                            <TabButton icon={ResultsTabIcon} label={t('tabs.results')} index={1} />
                         </TabTrigger>
                         <TabTrigger asChild href="/leaderboard" name="leaderboard">
-                            <TabButton icon={BarChart3} label={t('tabs.leaderboard')} index={2} />
+                            <TabButton
+                                icon={LeaderboardTabIcon}
+                                label={t('tabs.leaderboard')}
+                                index={2}
+                            />
                         </TabTrigger>
                         <TabTrigger asChild href="/profile" name="profile">
-                            <TabButton icon={User} label={t('tabs.profile')} index={3} />
+                            <TabButton icon={ProfileTabIcon} label={t('tabs.profile')} index={3} />
                         </TabTrigger>
                     </FloatingTabList>
                 </TabList>
@@ -227,7 +241,11 @@ function SlidingPill() {
     );
 }
 
-type TabButtonProps = TabTriggerSlotProps & { icon: LucideIcon; label: string; index: number };
+type TabButtonProps = TabTriggerSlotProps & {
+    icon: TabIconComponent;
+    label: string;
+    index: number;
+};
 
 export function TabButton({ icon: Icon, label, isFocused, index, ...props }: TabButtonProps) {
     const { onMeasure } = useTabBar();
@@ -243,6 +261,28 @@ export function TabButton({ icon: Icon, label, isFocused, index, ...props }: Tab
     }, [isFocused, reduce, progress]);
     const activeLayer = useAnimatedStyle(() => ({ opacity: progress.value }));
 
+    // Frise de l'animation d'activation de l'icône : repos à 1, remise à 0 puis
+    // ramenée à 1 LINÉAIREMENT (les easings vivent dans tab-icons/motion.ts).
+    // La MÊME valeur alimente les deux couches empilées : c'est ce qui les garde
+    // en phase, sinon les traits gris dépasseraient derrière les traits grenat.
+    const timeline = useSharedValue(1);
+
+    // Uniquement au passage inactif → actif. La ref initialisée sur isFocused
+    // couvre deux cas d'un coup : pas d'animation au montage (l'onglet initial
+    // ne s'anime pas au lancement, comme la pastille se pose sans glisser), et
+    // pas de rejeu au retour d'un écran poussé — isFocused y reste vrai.
+    const wasFocused = useRef(isFocused);
+    useEffect(() => {
+        if (isFocused && !wasFocused.current && !reduce) {
+            timeline.value = 0; // affectation brute = annulation de l'animation en cours
+            timeline.value = withTiming(1, {
+                duration: TAB_ICON_MOTION_DURATION,
+                easing: Easing.linear,
+            });
+        }
+        wasFocused.current = isFocused;
+    }, [isFocused, reduce, timeline]);
+
     return (
         <Pressable
             {...props}
@@ -250,14 +290,14 @@ export function TabButton({ icon: Icon, label, isFocused, index, ...props }: Tab
             onLayout={(e) => onMeasure(index, e.nativeEvent.layout)}>
             <View className="flex-1 items-center justify-center gap-1 px-2 py-3">
                 {/* Couche de base : état inactif (grisé) */}
-                <Icon color={faint} size={24} strokeWidth={1.9} />
+                <Icon color={faint} size={24} strokeWidth={1.9} timeline={timeline} />
                 <Text className="font-body-bold text-[10px] tracking-[0.3px] text-text-faint">
                     {label}
                 </Text>
                 {/* Couche active (grenat), fondue par-dessus selon la progression */}
                 <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, activeLayer]}>
                     <View className="flex-1 items-center justify-center gap-1 px-2 py-3">
-                        <Icon color={accent} size={24} strokeWidth={2.4} />
+                        <Icon color={accent} size={24} strokeWidth={2.4} timeline={timeline} />
                         <Text className="font-body-bold text-[10px] tracking-[0.3px] text-accent">
                             {label}
                         </Text>
