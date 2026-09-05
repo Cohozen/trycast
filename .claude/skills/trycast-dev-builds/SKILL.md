@@ -68,7 +68,15 @@ eas build -p android --profile development
 - Profil `development` d'`eas.json` déjà configuré (`developmentClient: true`, `GOOGLE_SERVICES_JSON` en env EAS, clé FCM aux credentials).
 - Fin de build : Corentin installe l'APK via le lien/QR EAS, puis `npm start` et il rouvre l'app.
 - **Quota free : 30 builds/mois** — au rythme réel (~1–2 rebuilds/mois) c'est large ; ne pas lancer de build EAS « pour voir ».
-- Alternative sans quota : `npm run android` (`expo run:android`, build local + install USB) — **pas disponible aujourd'hui** : pas de SDK Android ni de JDK sur le Mac (vérifié 2026-07-14, ~1 Go d'Android Studio à installer). À envisager au Lot 7.
+- **Alternative sans quota, opérationnelle depuis le 2026-09-05** : `npm run android` (build local, 5 min 30 de Gradle). Elle couvre l'**émulateur** ; pour le device perso, l'APK produit (`android/app/build/outputs/apk/debug/app-debug.apk`) s'installe aussi par `adb install`, à condition que le téléphone atteigne Metro sur le réseau local. Prérequis et pilotage : skill `trycast-android-emulator`.
+
+### Android (émulateur) — build local
+
+```bash
+npx expo prebuild --clean -p android && npm run android
+```
+
+Même règle du `--clean` qu'en iOS. Vérifier après coup que `android/app/google-services.json` est bien revenu (réinjecté par `app.config.ts`). Prérequis machine : un **JDK 17** (`brew install openjdk@17`). Démarrer l'émulateur d'abord avec `npm run android:emulator`, qui attend que le système soit réellement prêt.
 
 ### iOS (simulateur) — build local
 
@@ -76,7 +84,7 @@ eas build -p android --profile development
 npx expo prebuild --clean -p ios && npm run ios
 ```
 
-⚠️ Le `--clean` est **obligatoire** : un `expo run:ios` sur un `ios/` préexistant ne ré-applique pas les config plugins (vécu : `NSPhotoLibraryUsageDescription` manquant → crash TCC au picker photo). Même logique côté Android local le jour venu.
+⚠️ Le `--clean` est **obligatoire** : un `expo run:ios` sur un `ios/` préexistant ne ré-applique pas les config plugins (vécu : `NSPhotoLibraryUsageDescription` manquant → crash TCC au picker photo).
 
 ⚠️ **`pod install` refuse les pods Swift dont les dépendances ne définissent pas de module** (vécu 2026-07-23, ajout de `@react-native-google-signin/google-signin`). Message : *« The Swift pod `AppCheckCore` depends upon `GoogleUtilities` and `RecaptchaInterop`, which do not define modules »* — le prebuild s'arrête net à l'étape CocoaPods. Correctif **dans `app.json`**, jamais dans le `Podfile` (généré, effacé par `--clean`) : plugin `expo-build-properties` avec les pods fautifs en `modular_headers`.
 
@@ -118,9 +126,11 @@ Un build **`preview`/`production`** bundle **sur les serveurs EAS** : les `EXPO_
 
 `com.cohozen.trycast` installé sur l'émulateur Pixel 10 Pro était un build **release** (preview/production), pas un dev client. Il se lance normalement, s'utilise normalement — mais il tourne sur **son JS embarqué** et ne se connecte jamais à Metro. **Aucun correctif local n'y est visible** : on n'y observe que le code déjà publié, ce qui se prend très facilement pour « mon correctif ne prend pas ».
 
-**Le signe qui ne trompe pas** : la sortie Metro ne contient **aucun** « Android Bundled » alors que l'app est ouverte (`grep -c "Android Bundled" <log>` = 0). Deuxième signe : un dev client affiche le **launcher** « Development Servers » au lancement ; un build release va droit à l'app.
+**Le signe qui ne trompe pas** : la sortie Metro ne contient **aucun** « Android Bundled » alors que l'app est ouverte (`grep -c "Android Bundled" <log>` = 0).
 
-Corollaire : tant qu'un dev client Android n'est pas installé, **toute vérification visuelle Android est impossible** — le dire plutôt que d'interpréter ce qu'on voit à l'écran.
+⚠️ Le « deuxième signe » qu'on lisait ici — *un dev client affiche le launcher « Development Servers » au lancement* — est **peu fiable** : lancé par `npm run android`, le dev client reçoit directement l'URL de Metro en deep link et va droit à l'app, sans passer par le launcher (constaté le 2026-09-05 (bis)). Signes réellement fiables : le **FAB du menu développeur** (engrenage flottant, `content-desc='Tools'` dans `uiautomator dump`) et le **Fast Refresh** qui propage une édition de JSX.
+
+**Résolu le 2026-09-05 (bis)** : `npm run android` construit et installe le dev client en local, et la vérification visuelle Android est opérationnelle (skill `trycast-android-emulator`). Le corollaire reste valable pour le **téléphone réel**, qui porte toujours un build release : tant qu'un dev client n'y est pas installé, ne pas interpréter ce qu'on y voit à l'écran — le dire.
 
 ## Piège : « mais je passe par Expo Go »
 

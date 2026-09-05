@@ -17,7 +17,7 @@ Pronostic unique par match (score exact + bonus offensifs), points pondérés pa
 
 - Node.js ≥ 20 et npm
 - **iOS** : Xcode + CocoaPods (`brew install cocoapods`) + un simulateur iOS (macOS uniquement)
-- **Android** : Android Studio + un émulateur (image ARM64 sur Apple Silicon)
+- **Android** : Android Studio + un émulateur (image ARM64 sur Apple Silicon) + un **JDK 17** (`brew install openjdk@17`) — React Native 0.86 déclare une toolchain 17, et le JDK livré avec Android Studio est trop récent. `npm run android:doctor` vérifie tout ça et donne la commande manquante le cas échéant
 - CLI optionnelles : `supabase` (migrations, typegen) et `eas-cli` (builds cloud) — `npm install -g supabase eas-cli`
 
 ## Démarrage
@@ -25,10 +25,18 @@ Pronostic unique par match (score exact + bonus offensifs), points pondérés pa
 ```bash
 npm install
 cp .env.example .env   # puis renseigner l'URL et la clé publishable Supabase
-npm run ios            # ou npm run android
+npm run ios            # simulateur iOS
+
+npm run android:doctor    # Android : vérifier JDK, SDK, AVD
+npm run android:emulator  # démarrer l'émulateur et ATTENDRE qu'il soit prêt
+npm run android           # compiler, installer, lancer Metro
 ```
 
-Le projet embarque `expo-dev-client` : l'app tourne dans un **development build local** (pas dans Expo Go). `npm run ios` (`expo run:ios`) et `npm run android` (`expo run:android`) compilent le client de dev natif, l'installent sur le simulateur/émulateur et démarrent Metro. La **première** compilation prend quelques minutes (prebuild + CocoaPods/Gradle) ; ensuite `npm start` (`expo start`) suffit pour relancer Metro et rouvrir l'app déjà installée (`w` ouvre le web, `j` les React Native DevTools). Les dossiers natifs `/ios` et `/android` sont régénérés à la volée par le prebuild et **non versionnés**.
+Le projet embarque `expo-dev-client` : l'app tourne dans un **development build local** (pas dans Expo Go). `npm run ios` (`expo run:ios`) et `npm run android` (`expo run:android`) compilent le client de dev natif, l'installent sur le simulateur/émulateur et démarrent Metro. La **première** compilation prend quelques minutes (prebuild + CocoaPods/Gradle — 5 min 30 de Gradle côté Android, mesuré sur Apple Silicon) ; ensuite `npm start` (`expo start`) suffit pour relancer Metro et rouvrir l'app déjà installée (`w` ouvre le web, `j` les React Native DevTools). Les dossiers natifs `/ios` et `/android` sont régénérés à la volée par le prebuild et **non versionnés**.
+
+Côté Android, tout l'environnement (JDK, `ANDROID_HOME`, `PATH`, `local.properties`, AVD visé) vient de `scripts/android-env.sh`, sourcé par les scripts npm — **rien à exporter dans son `~/.zshrc`** : npm exécute ses scripts via `sh`, qui ne lit pas le profil du shell. `TRYCAST_AVD=<nom>` vise un autre émulateur.
+
+⚠️ **Un build release et un dev client ne cohabitent pas** : signatures différentes, l'installation échoue en `INSTALL_FAILED_UPDATE_INCOMPATIBLE` — désinstaller d'abord (`adb uninstall com.cohozen.trycast`). Et surtout, **un build release ne se connecte jamais à Metro** : il s'ouvre et s'utilise normalement, mais tourne sur son JS embarqué, ce qui donne l'illusion parfaite d'un correctif qui ne prend pas. Le seul signe est l'absence de `Android Bundled` dans la sortie.
 
 Les **notifications push** nécessitent ce dev build (elles sont retirées d'Expo Go depuis le SDK 53) et un **appareil physique** : sur simulateur/émulateur, l'app détecte l'absence de contexte push et saute simplement l'enregistrement du token. Pour un dev build installable sur téléphone (distribution interne), passer par EAS :
 
@@ -44,6 +52,8 @@ Le build Android embarque l'identité Firebase (FCM) de l'app : le fichier `goog
 | Commande                          | Rôle                                                                           |
 | --------------------------------- | ------------------------------------------------------------------------------ |
 | `npm run test`                    | Tests unitaires Vitest                                                         |
+| `npm run android:doctor`          | Diagnostic de la chaîne Android : JDK, SDK, AVD, appareils connectés            |
+| `npm run android:emulator`        | Démarre l'émulateur et attend qu'il soit réellement prêt                        |
 | `npm run typecheck`               | `tsc --noEmit`                                                                 |
 | `npm run lint`                    | ESLint (config Expo, règles stylistiques désactivées)                          |
 | `npm run format` / `format:check` | Biome (formatage : 4 espaces, 100 colonnes)                                    |
