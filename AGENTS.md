@@ -51,6 +51,16 @@ Avant de considérer un lot terminé : `npm run typecheck && npm run lint && npm
 
 L'app tourne dans un dev build (`expo-dev-client`), pas Expo Go. **Toute lib native ajoutée/retirée, tout changement `app.json`/`app.config.ts`, toute montée de SDK ⇒ prévenir explicitement Corentin qu'un rebuild du dev client est nécessaire** (commande, quotas EAS et pièges : skill `trycast-dev-builds`).
 
+## Vérification visuelle sur émulateur
+
+Deux plateformes, deux skills : **iOS** (`trycast-ios-simulator`) et **Android**
+(`trycast-android-emulator`). Dans les deux cas c'est un **dev build local** qui tourne, jamais Expo Go.
+
+- Android : `npm run android:doctor` (diagnostic), `npm run android:emulator` (démarre l'AVD et attend qu'il soit prêt), `npm run android` (compile, installe, lance Metro). Prérequis machine : un **JDK 17** (`brew install openjdk@17`) — RN 0.86 déclare une toolchain 17, le JBR d'Android Studio est en Java 25. Tout l'environnement (JDK, `ANDROID_HOME`, `PATH`, `local.properties`, AVD) vient de `scripts/android-env.sh`, **jamais** du `~/.zshrc` : npm exécute ses scripts via `sh`, qui ne le source pas
+- ⚠️ **Un build release et un dev client ne peuvent pas cohabiter** : signatures différentes, l'installation échoue en `INSTALL_FAILED_UPDATE_INCOMPATIBLE`. Désinstaller d'abord (`adb uninstall com.cohozen.trycast`) — et vérifier **avant** toute passe visuelle Android que ce qui tourne est bien le dev client, sinon on observe le JS déjà publié en croyant tester son correctif (piège vécu le 2026-09-05)
+- `android/` et `ios/` sont **générés et gitignorés** : rien ne s'y édite à la main, `npx expo prebuild --clean -p <platform>` les régénère
+
+
 ## Builds, environnements et OTA (Lot 9)
 
 - Trois profils EAS, chacun lié à un environnement EAS **et** à un projet Supabase : `development` (APK dev client, bundle servi par Metro donc `.env` local), `preview` (release sur le projet **dev**, canal OTA `preview`), `production` (**AAB** pour la Play Console, projet **prod**, canal `production`). Commandes : `npm run build:dev|build:preview|build:prod`, `npm run env:preview|env:prod`

@@ -37,6 +37,47 @@ npm run emails:push -- --dry-run
 
 ---
 
+## Émulateur Android et build local
+
+| Commande | Effet |
+|---|---|
+| `npm run android:doctor` | Diagnostic : JDK, SDK, AVD, appareils connectés. Ne construit rien |
+| `npm run android:emulator` | Démarre l'AVD et **attend qu'il soit réellement prêt** |
+| `npm run android` | Compile le dev client, l'installe et lance Metro |
+
+**Prérequis machine** — un JDK 17 (`brew install openjdk@17`). React Native 0.86 déclare une
+toolchain 17 ; le JBR livré avec Android Studio est en Java 25, hors du couloir supporté.
+`npm run android:doctor` le dit et donne la commande si rien n'est trouvé.
+
+### `android-env.sh`
+
+**Source unique de l'environnement Android**, à sourcer et non à exécuter. npm lance ses scripts via
+`sh`, qui ne source pas `~/.zshrc` : sans ce fichier, `npm run android` ne voit ni Java ni le SDK,
+même dans un shell interactif où tout est configuré. Il résout le JDK 17, exporte `JAVA_HOME`,
+`ANDROID_HOME`/`ANDROID_SDK_ROOT`, complète le `PATH` (`platform-tools`, `emulator`), écrit
+`android/local.properties` et fixe l'AVD visé.
+
+Deux surcharges utiles : `TRYCAST_AVD=<nom>` pour viser un autre émulateur, `ANDROID_HOME=<chemin>`
+pour un SDK ailleurs.
+
+Il force aussi `ORG_GRADLE_PROJECT_reactNativeArchitectures=arm64-v8a`. `android/gradle.properties`
+en déclare quatre parce que les builds EAS visent tous les téléphones ; en local, la machine comme
+l'émulateur sont en arm64, et compiler les trois autres quadruple le temps de build pour rien.
+Gradle lit `ORG_GRADLE_PROJECT_<propriété>` comme propriété de projet, donc sans toucher au fichier
+généré.
+
+### `android-emulator.sh` : pourquoi attendre
+
+`emulator` rend la main dès que la fenêtre s'ouvre, bien avant que le système ait démarré. Enchaîner
+`expo run:android` à ce moment-là échoue à l'installation de l'APK, avec une erreur qui ne dit pas
+qu'il s'agit d'un problème de timing. Le script boucle donc sur `sys.boot_completed` et ne rend la
+main qu'appareil prêt. Il ne fait rien si un appareil est déjà connecté — un téléphone branché en
+USB a la priorité.
+
+Détails d'usage (observer, piloter, deep links, pièges) : skill `trycast-android-emulator`.
+
+---
+
 ## Builds et mises à jour à distance
 
 | Commande | Effet |
