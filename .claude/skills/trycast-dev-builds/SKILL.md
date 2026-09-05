@@ -114,6 +114,14 @@ Un build **`preview`/`production`** bundle **sur les serveurs EAS** : les `EXPO_
 
 **Toujours vérifier `pwd` avant une commande de build**, ou préfixer par un `cd` absolu. Le répertoire de travail de l'outil Bash persiste d'un appel à l'autre — c'est le même piège que zoxide sur `cd web`, par une autre porte.
 
+## Piège : l'app de l'émulateur Android n'est pas forcément un dev client (vécu 2026-09-05)
+
+`com.cohozen.trycast` installé sur l'émulateur Pixel 10 Pro était un build **release** (preview/production), pas un dev client. Il se lance normalement, s'utilise normalement — mais il tourne sur **son JS embarqué** et ne se connecte jamais à Metro. **Aucun correctif local n'y est visible** : on n'y observe que le code déjà publié, ce qui se prend très facilement pour « mon correctif ne prend pas ».
+
+**Le signe qui ne trompe pas** : la sortie Metro ne contient **aucun** « Android Bundled » alors que l'app est ouverte (`grep -c "Android Bundled" <log>` = 0). Deuxième signe : un dev client affiche le **launcher** « Development Servers » au lancement ; un build release va droit à l'app.
+
+Corollaire : tant qu'un dev client Android n'est pas installé, **toute vérification visuelle Android est impossible** — le dire plutôt que d'interpréter ce qu'on voit à l'écran.
+
 ## Piège : « mais je passe par Expo Go »
 
 Non. Depuis que le projet a `expo-dev-client`, le QR de `npx expo start` est un deep link `…expo-development-client/…` qui **ouvre le dev build installé, pas Expo Go** — même scanné depuis l'app Expo Go. Un vieil APK reste donc le runtime quoi qu'on scanne. (La touche `s` dans Metro force Expo Go, mais ce n'est plus un chemin supporté pour TryCast : push FCM et config native absents d'Expo Go.)
