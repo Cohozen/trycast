@@ -1,11 +1,18 @@
 ---
 name: trycast-dev-builds
-description: Savoir quand le dev client (Android device + simulateur iOS) doit être rebuildé et comment — déclencheurs natifs (nouvelle lib native, app.json/app.config.ts, montée de SDK), build EAS profil development, alternative locale, pièges (QR qui ouvre le dev client et pas Expo Go, prebuild --clean obligatoire). À consulter dès qu'on installe/retire une dépendance, qu'on touche app.json/app.config.ts, ou qu'un device affiche « Cannot find native module ».
+description: Savoir quand le dev client (émulateur Android + simulateur iOS) doit être rebuildé et comment — déclencheurs natifs (nouvelle lib native, app.json/app.config.ts, montée de SDK), build EAS profil development, alternative locale, pièges (QR qui ouvre le dev client et pas Expo Go, prebuild --clean obligatoire). À consulter dès qu'on installe/retire une dépendance, qu'on touche app.json/app.config.ts, ou qu'un device affiche « Cannot find native module ».
 ---
 
 # Dev builds TryCast — quand et comment rebuilder
 
-L'app tourne dans un **dev build** (`expo-dev-client`) sur le téléphone Android de Corentin et le simulateur iOS. Le dev build est une coquille native : le JS est servi par Metro (`npm start`), donc **le quotidien (écrans, hooks, styles, i18n, SQL) ne demande jamais de build**. Seul le natif embarqué dans l'APK/l'app compte.
+L'app tourne dans un **dev build** (`expo-dev-client`) sur l'**émulateur Android** et le **simulateur iOS**. Le dev build est une coquille native : le JS est servi par Metro (`npm start`), donc **le quotidien (écrans, hooks, styles, i18n, SQL) ne demande jamais de build**. Seul le natif embarqué dans l'APK/l'app compte.
+
+⚠️ **Le téléphone de Corentin n'est pas une cible de développement** (acté le 2026-09-06, une fois
+la chaîne Android locale opérationnelle) : il porte la version du **test interne Play**, et rien
+d'autre. Ne pas proposer d'y installer un dev client — les signatures diffèrent, l'installation
+supposerait de désinstaller le build du store. Ce qui ne s'observe que sur un appareil physique
+(les **notifications push**, absentes du simulateur comme de l'émulateur) se vérifie donc sur ce
+build distribué, au besoin après un `npm run ota:prod`.
 
 ## Quand un rebuild est nécessaire — LE PRÉVENIR
 
@@ -112,7 +119,7 @@ eas build -p android --profile development
 - Profil `development` d'`eas.json` déjà configuré (`developmentClient: true`, `GOOGLE_SERVICES_JSON` en env EAS, clé FCM aux credentials).
 - Fin de build : Corentin installe l'APK via le lien/QR EAS, puis `npm start` et il rouvre l'app.
 - **Quota free : 30 builds/mois** — au rythme réel (~1–2 rebuilds/mois) c'est large ; ne pas lancer de build EAS « pour voir ».
-- **Alternative sans quota, opérationnelle depuis le 2026-09-05** : `npm run android` (build local, 5 min 30 de Gradle). Elle couvre l'**émulateur** ; pour le device perso, l'APK produit (`android/app/build/outputs/apk/debug/app-debug.apk`) s'installe aussi par `adb install`, à condition que le téléphone atteigne Metro sur le réseau local. Prérequis et pilotage : skill `trycast-android-emulator`.
+- **Alternative sans quota, opérationnelle depuis le 2026-09-05** : `npm run android` (build local, 5 min 30 de Gradle). Elle couvre l'**émulateur**, seule cible de développement Android depuis le 2026-09-06 (le téléphone reste sur le build du test interne, cf. plus haut). Prérequis et pilotage : skill `trycast-android-emulator`.
 
 ### Android (émulateur) — build local
 
@@ -174,7 +181,7 @@ Un build **`preview`/`production`** bundle **sur les serveurs EAS** : les `EXPO_
 
 ⚠️ Le « deuxième signe » qu'on lisait ici — *un dev client affiche le launcher « Development Servers » au lancement* — est **peu fiable** : lancé par `npm run android`, le dev client reçoit directement l'URL de Metro en deep link et va droit à l'app, sans passer par le launcher (constaté le 2026-09-05 (bis)). Signes réellement fiables : le **FAB du menu développeur** (engrenage flottant, `content-desc='Tools'` dans `uiautomator dump`) et le **Fast Refresh** qui propage une édition de JSX.
 
-**Résolu le 2026-09-05 (bis)** : `npm run android` construit et installe le dev client en local, et la vérification visuelle Android est opérationnelle (skill `trycast-android-emulator`). Le corollaire reste valable pour le **téléphone réel**, qui porte toujours un build release : tant qu'un dev client n'y est pas installé, ne pas interpréter ce qu'on y voit à l'écran — le dire.
+**Résolu le 2026-09-05 (bis)** : `npm run android` construit et installe le dev client en local, et la vérification visuelle Android est opérationnelle (skill `trycast-android-emulator`). Le corollaire vaut désormais **définitivement** pour le téléphone réel : il porte le build du test interne Play **par choix**, et n'accueillera pas de dev client. Ce qu'on y voit est le JS publié, jamais un correctif local — ne pas l'interpréter autrement, et le dire.
 
 ## Piège : « mais je passe par Expo Go »
 

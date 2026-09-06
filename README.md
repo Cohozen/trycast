@@ -38,7 +38,7 @@ Côté Android, tout l'environnement (JDK, `ANDROID_HOME`, `PATH`, `local.proper
 
 ⚠️ **Un build release et un dev client ne cohabitent pas** : signatures différentes, l'installation échoue en `INSTALL_FAILED_UPDATE_INCOMPATIBLE` — désinstaller d'abord (`adb uninstall com.cohozen.trycast`). Et surtout, **un build release ne se connecte jamais à Metro** : il s'ouvre et s'utilise normalement, mais tourne sur son JS embarqué, ce qui donne l'illusion parfaite d'un correctif qui ne prend pas. Le seul signe est l'absence de `Android Bundled` dans la sortie.
 
-Les **notifications push** nécessitent ce dev build (elles sont retirées d'Expo Go depuis le SDK 53) et un **appareil physique** : sur simulateur/émulateur, l'app détecte l'absence de contexte push et saute simplement l'enregistrement du token. Pour un dev build installable sur téléphone (distribution interne), passer par EAS :
+Les **notifications push** nécessitent ce dev build (elles sont retirées d'Expo Go depuis le SDK 53) et un **appareil physique** : sur simulateur/émulateur, l'app détecte l'absence de contexte push et saute simplement l'enregistrement du token. Pour un dev build installable sur téléphone (distribution interne), passer par EAS — en sachant qu'un appareil portant déjà l'app du store devra la désinstaller d'abord (signatures différentes) :
 
 ```bash
 npx eas-cli build --profile development --platform android   # APK à installer (QR code)
