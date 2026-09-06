@@ -1,4 +1,3 @@
-import * as Notifications from 'expo-notifications';
 import { ExternalLink, TriangleAlert } from 'lucide-react-native';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,20 +8,13 @@ import { Switch } from '@/components/ui/switch';
 import { trackEvent } from '@/lib/analytics';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 import { deriveNotificationsUi, type PushPermission } from '../derive-notifications-ui';
+import { readPushPermission } from '../read-permission';
 import { ensurePushPermission, registerPushToken } from '../register-push-token';
 import { DEFAULT_NOTIFICATION_PREFS } from '../types';
 import {
     useNotificationPreferences,
     useUpdateNotificationPreferences,
 } from '../use-notification-preferences';
-
-async function readPermission(): Promise<PushPermission> {
-    // Pas de push web : jamais de bannière, les préférences restent éditables
-    if (Platform.OS === 'web') return 'granted';
-    const current = await Notifications.getPermissionsAsync();
-    if (current.granted) return 'granted';
-    return current.canAskAgain ? 'undetermined' : 'denied';
-}
 
 /**
  * Section Notifications de l'écran Réglages (maquette TryCast Reglages) :
@@ -40,7 +32,7 @@ export function NotificationSettings({ userId }: { userId: string }) {
     const updatePrefs = useUpdateNotificationPreferences(userId);
 
     const refreshPermission = useCallback(() => {
-        readPermission().then(setPermission);
+        readPushPermission().then(setPermission);
     }, []);
 
     // Lue au montage puis re-lue à chaque retour au premier plan : reflète un

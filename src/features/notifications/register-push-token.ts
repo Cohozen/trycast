@@ -12,7 +12,12 @@ import { isPushSupported } from './push-support';
  * connecté). Après un refus, seul l'écran Réglages permet de re-tenter. */
 const PERMISSION_ASKED_KEY = 'notifications.permission-asked';
 
-function pushSupported(): boolean {
+/**
+ * Le push est-il disponible ici ? Faux hors build natif sur appareil réel
+ * (émulateur, simulateur, web) — exporté pour que le guide d'accueil n'offre
+ * pas un bouton qui ne pourrait rien faire.
+ */
+export function isPushSupportedHere(): boolean {
     return isPushSupported({
         isDevice: Device.isDevice,
         executionEnvironment: Constants.executionEnvironment ?? 'bare',
@@ -37,7 +42,7 @@ async function ensureAndroidChannel(): Promise<void> {
 export async function ensurePushPermission(options?: {
     force?: boolean;
 }): Promise<Notifications.NotificationPermissionsStatus | null> {
-    if (!pushSupported()) return null;
+    if (!isPushSupportedHere()) return null;
     await ensureAndroidChannel();
     const current = await Notifications.getPermissionsAsync();
     if (current.granted) return current;
@@ -52,7 +57,7 @@ export async function ensurePushPermission(options?: {
 
 /** Token Expo Push de l'appareil courant, null hors build natif sur device. */
 async function currentPushToken(): Promise<string | null> {
-    if (!pushSupported()) return null;
+    if (!isPushSupportedHere()) return null;
     const projectId: string | undefined =
         Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
     if (!projectId) return null;
