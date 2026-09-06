@@ -51,6 +51,50 @@ workflow natif. D'où l'exclusion posée dans `fingerprint.config.js`, vérifié
 script npm ne déplace plus rien. **Modifier ce fichier déplace l'empreinte** : ne le faire
 qu'en même temps qu'une release.
 
+### ⚠️ Un build Android local pollue l'empreinte (`node_modules` réécrit)
+
+**Vécu le 2026-09-06** : `npm run build:prod` s'arrête au bout de 48 s sur
+
+```
+Runtime version mismatch:
+- Runtime version calculated on local machine: 51df254f…
+- Runtime version calculated on EAS: 6d6e1903…
+```
+
+avec un diff d'empreinte portant sur un seul dossier,
+`node_modules/@react-native-masked-view/masked-view` (raison `rncoreAutolinkingAndroid`).
+
+Cause : le `android/build.gradle` **de cette bibliothèque** réécrit son propre
+`AndroidManifest.xml` **dans `node_modules`**, à la configuration du projet, pour en retirer
+l'attribut `package=` (interdit depuis AGP 7) :
+
+```groovy
+def manifestOutFile = file("${projectDir}/src/main/AndroidManifest.xml")
+…
+manifestOutFile.write(manifestContent)   // écriture en dur dans node_modules
+```
+
+Un seul `npm run android` suffit donc à faire diverger la machine d'une installation fraîche,
+**définitivement** : EAS calcule l'empreinte **avant** Gradle (paquet publié intact), la machine
+locale **après** (fichier réécrit). Le dossier étant haché pour les deux plateformes
+(`rncoreAutolinkingAndroid` **et** `rncoreAutolinkingIos`), l'empreinte iOS est touchée aussi.
+
+Le build n'était pas en cause : c'est l'empreinte **locale** qui mentait. Le vrai danger est
+l'OTA — une publication dans cet état part avec une empreinte que plus aucun build ne porte,
+donc dans le vide et sans le moindre message.
+
+**Traité à la racine** : `fingerprint.config.js` ignore ce manifeste (`ignorePaths`), vérifié —
+l'empreinte est la même que le fichier soit intact ou réécrit par Gradle. Si le symptôme
+réapparaît pour **une autre** bibliothèque (même famille de `build.gradle` bavard), le réflexe
+est de comparer le paquet local au paquet publié plutôt que de soupçonner EAS :
+
+```bash
+npm pack @scope/paquet@<version>   # dans un dossier temporaire, puis
+tar xzf *.tgz && diff -r package <projet>/node_modules/@scope/paquet
+```
+
+et de remettre l'arbre d'aplomb avec `npm ci` avant tout build EAS ou publication OTA.
+
 ### Les `EXPO_PUBLIC_*` d'un build de release
 
 Un build `preview`/`production` **inline les variables au bundling sur les serveurs EAS**,
