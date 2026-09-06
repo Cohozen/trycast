@@ -63,10 +63,12 @@ l'exiger, c'est le besoin qu'il faut revoir.
    le registre **et** la politique publique avant de livrer.
 4. `npm run typecheck && npm run test`.
 
-Les 9 événements actuels : `account_created`, `signed_in`, `prediction_saved` (`first`
+Les 10 événements actuels : `account_created`, `signed_in`, `prediction_saved` (`first`
 déduit de `created_at === updated_at`, le trigger `predictions_set_updated_at` ne touchant
 `updated_at` qu'à l'UPDATE), `league_created`, `league_joined`, `leaderboard_viewed`
-(`scope`), `notifications_enabled`, `data_exported`, `account_deleted`.
+(`scope`), `notifications_enabled`, `data_exported`, `account_deleted`,
+`welcome_guide_closed` (`completed` : suivi jusqu'au bout ou sorti par un de ses boutons,
+vs. passé ou glissé).
 
 `account_deleted` part **avant** le `signOut` : après, `Stack.Protected` bascule sur
 `(auth)` et démonte l'arbre, ce qui coupe l'envoi en vol.

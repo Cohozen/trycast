@@ -7,7 +7,7 @@
 **Responsable du traitement** : l'éditeur de TryCast, joignable à `contact@trycast.fr`.
 **Délégué à la protection des données** : aucun (non requis — pas de suivi à grande échelle,
 pas de données sensibles).
-**Dernière mise à jour** : 23 juillet 2026 (Sign in with Google dans le traitement §1).
+**Dernière mise à jour** : 6 septembre 2026 (dixième événement de mesure, « guide d'accueil fermé », dans le traitement §7).
 
 Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](procedure-droits.md),
 [fiches-stores.md](fiches-stores.md). Version publique : `web/src/pages/confidentialite.astro`.
@@ -111,7 +111,7 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 | **Finalité** | Savoir quelles fonctionnalités sont utilisées, pour décider quoi améliorer |
 | **Base légale** | Intérêt légitime — art. 6.1.f. Mesure d'audience anonyme, sans identifiant ni traceur : impact nul sur la vie privée, et désactivable à tout moment dans l'application |
 | **Personnes concernées** | Utilisateurs de l'application n'ayant pas coupé la mesure |
-| **Catégories de données** | 9 événements de parcours nommés (compte créé, pronostic enregistré, ligue créée ou rejointe, classement consulté, notifications activées, export demandé, compte supprimé), la version de l'app et le système d'exploitation. **Aucun identifiant utilisateur, aucun identifiant d'appareil** |
+| **Catégories de données** | 10 événements de parcours nommés (compte créé, pronostic enregistré, ligue créée ou rejointe, classement consulté, notifications activées, export demandé, compte supprimé, guide d'accueil fermé), la version de l'app et le système d'exploitation. **Aucun identifiant utilisateur, aucun identifiant d'appareil** |
 | **Où** | Aptabase, région UE. Rien n'est stocké dans notre base |
 | **Destinataires** | Aptabase |
 | **Transferts hors UE** | Aucun |
