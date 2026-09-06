@@ -49,7 +49,12 @@ export type AnalyticsEvent =
     /** Un export de données personnelles a été demandé (RGPD). */
     | { name: 'data_exported' }
     /** Un compte a été supprimé. */
-    | { name: 'account_deleted' };
+    | { name: 'account_deleted' }
+    /**
+     * Le guide d'accueil a été fermé. `completed` distingue « suivi jusqu'au
+     * bout » (ou sorti par un de ses boutons) de « passé / glissé ».
+     */
+    | { name: 'welcome_guide_closed'; props: { completed: boolean } };
 
 export type AnalyticsEventName = AnalyticsEvent['name'];
 

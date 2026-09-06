@@ -1,0 +1,33 @@
+{
+    "steps": {
+        "intro": {
+            "title": "Welcome to TryCast",
+            "body": "You predict the competition's matches, and so do your mates. In the end, only one of you tops the table."
+        },
+        "predictions": {
+            "title": "A prediction is a score",
+            "body": "Call the exact score you expect. Nothing to submit: your entry saves itself, and locks at kick-off.",
+            "bonus": "Tick the attacking bonus if you think a team will score at least four tries. Get it right and it pays; get it wrong and it costs 10 points."
+        },
+        "leagues": {
+            "title": "Leagues are where it's at",
+            "body": "Create yours and share its 8-character code, or join your mates'. You can also play without a league: your points still count overall."
+        },
+        "notifications": {
+            "title": "Never miss a kick-off",
+            "body": "We remind you before each match, and let you know as soon as your points are in."
+        }
+    },
+    "actions": {
+        "rules": "See the full scoring",
+        "leagues": "Create or join a league",
+        "enable-notifications": "Turn on notifications",
+        "open-os-settings": "Open system settings"
+    },
+    "nav": {
+        "next": "Next",
+        "done": "Let's go",
+        "skip": "Skip",
+        "progress": "Step {{current}} of {{total}}"
+    }
+}

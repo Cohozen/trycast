@@ -2,7 +2,15 @@ import { nativeApplicationVersion, nativeBuildVersion } from 'expo-application';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import * as Updates from 'expo-updates';
-import { BookOpen, ChevronRight, Globe, KeyRound, Mail, ShieldCheck } from 'lucide-react-native';
+import {
+    BookOpen,
+    ChevronRight,
+    Globe,
+    KeyRound,
+    Mail,
+    ShieldCheck,
+    Sparkles,
+} from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -36,6 +44,7 @@ import {
     type ThemePreference,
 } from '@/features/profile/theme-preference';
 import { useDeleteAccount, useProfile } from '@/features/profile/use-profile';
+import { useWelcomeGuide } from '@/features/welcome/components/welcome-guide-provider';
 import { supabase } from '@/lib/supabase';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 
@@ -47,6 +56,7 @@ import { Pressable, Text, useThemeColor, View } from '@/tw';
 export default function SettingsScreen() {
     const { t } = useTranslation(['profile', 'scoring', 'common']);
     const router = useRouter();
+    const { replay } = useWelcomeGuide();
     const { session } = useSession();
     const { data: profile } = useProfile(session?.user.id);
     const deleteAccount = useDeleteAccount();
@@ -275,6 +285,24 @@ export default function SettingsScreen() {
             {/* À propos */}
             <View className="gap-2.5">
                 <SectionLabel>{t('profile:settings.sections.about')}</SectionLabel>
+                {/* Le guide se rejoue sur l'écran d'où l'on vient, pas
+                    par-dessus les Réglages */}
+                <Pressable
+                    accessibilityRole="button"
+                    onPress={() => {
+                        router.back();
+                        replay();
+                    }}>
+                    <Card className="flex-row items-center gap-3 px-4 py-3.5">
+                        <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">
+                            <Sparkles color={brandColor} size={17} strokeWidth={1.9} />
+                        </View>
+                        <Text className="flex-1 font-body-semibold text-[15px] text-text">
+                            {t('profile:settings.replayGuide')}
+                        </Text>
+                        <ChevronRight color={textFaintColor} size={18} strokeWidth={1.9} />
+                    </Card>
+                </Pressable>
                 <Pressable accessibilityRole="button" onPress={() => router.push('/rules')}>
                     <Card className="flex-row items-center gap-3 px-4 py-3.5">
                         <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">

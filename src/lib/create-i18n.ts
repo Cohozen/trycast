@@ -10,6 +10,7 @@ import notificationsEn from '@/locales/en/notifications.json';
 import predictionsEn from '@/locales/en/predictions.json';
 import profileEn from '@/locales/en/profile.json';
 import scoringEn from '@/locales/en/scoring.json';
+import welcomeEn from '@/locales/en/welcome.json';
 import auth from '@/locales/fr/auth.json';
 import celebration from '@/locales/fr/celebration.json';
 import common from '@/locales/fr/common.json';
@@ -19,6 +20,7 @@ import notifications from '@/locales/fr/notifications.json';
 import predictions from '@/locales/fr/predictions.json';
 import profile from '@/locales/fr/profile.json';
 import scoring from '@/locales/fr/scoring.json';
+import welcome from '@/locales/fr/welcome.json';
 
 /**
  * Ressources i18n : FR = langue source, un namespace par domaine métier
@@ -38,6 +40,7 @@ export const resources = {
         scoring,
         celebration,
         notifications,
+        welcome,
     },
     en: {
         common: commonEn,
@@ -49,6 +52,7 @@ export const resources = {
         scoring: scoringEn,
         celebration: celebrationEn,
         notifications: notificationsEn,
+        welcome: welcomeEn,
     },
 } as const;
 

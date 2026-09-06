@@ -159,6 +159,7 @@
             "blockedBanner": "Les notifications sont bloquées dans les réglages {{os}}. Active-les pour recevoir tes rappels.",
             "openSettings": "Ouvrir les réglages système"
         },
+        "replayGuide": "Revoir le guide de démarrage",
         "version": "Version",
         "update": "Mise à jour",
         "updateEmbedded": "intégrée au build",

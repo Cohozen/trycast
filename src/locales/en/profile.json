@@ -159,6 +159,7 @@
             "blockedBanner": "Notifications are blocked in your {{os}} settings. Turn them on to get your reminders.",
             "openSettings": "Open system settings"
         },
+        "replayGuide": "Replay the getting-started guide",
         "version": "Version",
         "update": "Update",
         "updateEmbedded": "bundled in build",

@@ -1,0 +1,33 @@
+{
+    "steps": {
+        "intro": {
+            "title": "Bienvenue sur TryCast",
+            "body": "Tu pronostiques les matchs de la compétition, tes potes aussi. À la fin, il n'y en a qu'un en haut du classement."
+        },
+        "predictions": {
+            "title": "Un prono, c'est un score",
+            "body": "Tu annonces le score exact que tu imagines. Rien à valider : ta saisie s'enregistre toute seule, et se verrouille au coup d'envoi.",
+            "bonus": "Coche le bonus offensif si tu penses qu'une équipe marquera au moins quatre essais. Réussi, ça rapporte ; raté, ça coûte 10 points."
+        },
+        "leagues": {
+            "title": "Le sel du jeu, c'est la ligue",
+            "body": "Crée la tienne et partage son code à 8 caractères, ou rejoins celle de tes potes. Tu peux aussi jouer sans ligue : tes points comptent au général."
+        },
+        "notifications": {
+            "title": "Ne rate pas un coup d'envoi",
+            "body": "On te rappelle tes pronos avant chaque match, et on te prévient dès que tes points sont calculés."
+        }
+    },
+    "actions": {
+        "rules": "Voir le barème complet",
+        "leagues": "Créer ou rejoindre une ligue",
+        "enable-notifications": "Activer les notifications",
+        "open-os-settings": "Ouvrir les réglages système"
+    },
+    "nav": {
+        "next": "Suivant",
+        "done": "C'est parti",
+        "skip": "Passer",
+        "progress": "Étape {{current}} sur {{total}}"
+    }
+}
