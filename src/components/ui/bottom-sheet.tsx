@@ -130,6 +130,10 @@ export function BottomSheet({
     // pas ces callbacks comme des worklets (contrairement à useAnimatedReaction),
     // d'où les suppressions ciblées ci-dessous.
     const pan = Gesture.Pan()
+        // Ne s'active qu'après 10 px vers le bas : un contenu qui défile
+        // horizontalement (le guide d'accueil) garde ses glissés latéraux, et
+        // un simple tapotement ne fait plus frémir le volet.
+        .activeOffsetY(10)
         .onUpdate((event) => {
             // eslint-disable-next-line react-hooks/immutability -- worklet de geste
             dragY.value = Math.max(0, event.translationY);
