@@ -17,9 +17,25 @@
  * correctifs n'arrivent simplement jamais. Un piège coûteux, puisqu'on ne le
  * découvre qu'en constatant que rien ne se passe.
  *
+ * `ignorePaths` traite un autre cas, vécu le 6 septembre 2026 : le
+ * `android/build.gradle` de `@react-native-masked-view/masked-view` **réécrit
+ * son propre `AndroidManifest.xml` dans `node_modules`** au moment où Gradle
+ * configure le projet (il retire l'attribut `package=`, devenu interdit depuis
+ * AGP 7). Un simple `npm run android` suffit donc à faire diverger la machine
+ * de développement d'une installation fraîche : EAS calcule l'empreinte AVANT
+ * Gradle, sur le paquet publié, la machine locale APRÈS, sur le fichier
+ * modifié. Le build de production s'est arrêté sur `Runtime version mismatch`,
+ * et une publication OTA lancée dans cet état serait partie avec une empreinte
+ * fantôme — donc dans le vide, silencieusement. Ignorer ce fichier rend
+ * l'empreinte identique des deux côtés (vérifié : même valeur que le manifeste
+ * soit intact ou réécrit par Gradle).
+ *
  * ⚠️ Modifier ce fichier change l'empreinte : les builds antérieurs cessent de
  * recevoir les mises à jour. À ne toucher qu'en même temps qu'une release.
  */
 module.exports = {
     sourceSkips: ['PackageJsonScriptsAll'],
+    ignorePaths: [
+        'node_modules/@react-native-masked-view/masked-view/android/src/main/AndroidManifest.xml',
+    ],
 };
