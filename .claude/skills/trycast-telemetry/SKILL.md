@@ -1,6 +1,6 @@
 ---
 name: trycast-telemetry
-description: Mesure d'usage (Aptabase, région EU) et rapports de plantage (Sentry, région EU) de TryCast — catalogue d'événements typé, garde-fou par préférence locale et non par la table consents, ajout d'un événement, pièges de build sentry-cli, obligations RGPD associées. À consulter dès qu'on ajoute ou modifie un événement de mesure, qu'on touche à src/lib/analytics*.ts ou diagnostics.ts, aux interrupteurs de Réglages → Confidentialité, ou qu'un build échoue en erreur 65.
+description: Mesure d'usage (Aptabase, région EU) et rapports de plantage (Sentry, région EU) de TryCast — catalogue d'événements typé, garde-fou par préférence locale et non par la table consents, ajout d'un événement, pièges de build sentry-cli, vues Debug/Release du tableau de bord Aptabase, obligations RGPD associées. À consulter dès qu'on ajoute ou modifie un événement de mesure, qu'on touche à src/lib/analytics*.ts ou diagnostics.ts, aux interrupteurs de Réglages → Confidentialité, ou qu'un build échoue en erreur 65.
 ---
 
 # Télémétrie TryCast — Aptabase & Sentry
@@ -117,6 +117,36 @@ tableaux de bord Aptabase et Sentry, pas depuis le poste de dev.
 Piège d'automatisation constaté : un écran d'onglet déjà monté ne rejoue pas son
 `useEffect`. Pour re-déclencher `leaderboard_viewed`, changer la portée (Ligues ↔ Général)
 plutôt que renaviguer vers l'onglet.
+
+## ⚠️ Lire le tableau de bord Aptabase : deux vues séparées, Debug et Release
+
+Le SDK marque chaque événement d'un `isDebug: __DEV__`, et le tableau de bord **sépare
+complètement les deux jeux de données**. On bascule par l'icône **Bug / Fusée** en haut à
+droite, à côté du sélecteur de dates ; le mode Debug porte un ruban orange.
+
+- dev client (émulateur Android, simulateur iOS) ⇒ **Debug**
+- build `preview` / `production`, donc le test interne Play ⇒ **Release**
+
+D'où le faux négatif vécu le 2026-09-08 : « Aptabase ne marche pas sur le build du test
+interne » alors que la vue ouverte était celle des émulateurs. Avant de soupçonner la
+configuration, **vérifier la vue**.
+
+Deux compléments qui font partie du même diagnostic :
+
+- **Aucun événement n'est émis au démarrage** — pas de `session_start`, pas de `app_open`.
+  Une session n'apparaît que si un `trackEvent` part. Sur un appareil déjà connecté et qui
+  a déjà vu le guide, ouvrir l'app puis la fermer ne produit **rien** : c'est normal, pas
+  une panne. Les seuls événements atteignables en usage ordinaire sont `leaderboard_viewed`
+  et `prediction_saved`.
+- **La cadence d'envoi diffère** : `flushInterval` vaut 2 s en `__DEV__` mais **60 s** en
+  release (ou au passage en arrière-plan). Tuer l'app juste après une action peut perdre le
+  lot. Laisser l'app ouverte une minute, puis la mettre en arrière-plan sans la balayer.
+
+Pour vérifier qu'un build distribué embarque bien la clé, sans toucher au téléphone :
+récupérer le manifeste de l'update servie à son runtime (`u.expo.dev/<projectId>` avec les
+en-têtes `expo-runtime-version` / `expo-platform` / `expo-channel-name`), télécharger le
+`launchAsset` avec l'`authorization` que donne la partie `extensions` du multipart, puis
+`strings` sur le bundle Hermes. La clé `A-EU-…` y est en clair si elle a été inlinée.
 
 ## Obligations RGPD attachées
 
