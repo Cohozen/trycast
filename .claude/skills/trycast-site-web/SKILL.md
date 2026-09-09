@@ -82,9 +82,10 @@ serait aussi un passage en SSR, donc un adapter Vercel.
 du projet Vercel. Sans elles, **rien n'est écrit** et le build passe quand même — un fichier
 d'attente serait pire, la vérification échouant alors sans que rien ne le signale.
 
-`ANDROID_CERT_FINGERPRINTS` : des **SHA-256** séparées par des virgules, 32 octets hexadécimaux
-séparés par des deux-points (95 caractères chacune), sur une seule ligne. Le script met en
-majuscules et coupe les espaces, on peut donc coller depuis la Play Console. Une valeur mal
+`ANDROID_CERT_FINGERPRINTS` : des **SHA-256**, 32 octets hexadécimaux séparés par des deux-points
+(95 caractères chacune). Le séparateur entre empreintes est indifférent — virgule, espace ou
+retour à la ligne — précisément pour qu'une copie brute de la Play Console, qui les affiche sur
+des lignes distinctes, fonctionne sans reformatage. Une valeur mal
 formée **arrête le build** : c'est délibéré, le cas courant étant une **SHA-1** (40 caractères)
 prise pour une SHA-256 — les deux se suivent dans la Play Console, et c'est la SHA-1 que réclament
 les clients OAuth. Les empreintes à réunir sont celles des trois certificats de *Intégrité de

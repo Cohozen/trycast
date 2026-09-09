@@ -13,7 +13,8 @@
 //
 //   APPLE_TEAM_ID              identifiant d'équipe Apple Developer (10 car.).
 //                              Indisponible tant qu'aucun abonnement n'est pris.
-//   ANDROID_CERT_FINGERPRINTS  empreintes SHA-256 séparées par des virgules.
+//   ANDROID_CERT_FINGERPRINTS  empreintes SHA-256, séparées par des virgules,
+//                              des espaces ou des retours à la ligne.
 //                              Il en faut **plusieurs** : celle de la clé Play
 //                              App Signing, celle de la clé d'importation, et
 //                              celle du build de test — n'en déclarer qu'une
@@ -34,8 +35,12 @@ const PATH_PREFIX = '/rejoindre';
 const outDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'public', '.well-known');
 
 const teamId = process.env.APPLE_TEAM_ID?.trim();
+// Séparateur : virgule, espace ou retour à la ligne, indifféremment. La Play
+// Console affiche les empreintes sur des lignes distinctes ; les copier d'un
+// bloc donne des retours à la ligne, pas des virgules, et exiger un
+// reformatage à la main serait une occasion d'erreur pour rien.
 const fingerprints = (process.env.ANDROID_CERT_FINGERPRINTS ?? '')
-    .split(',')
+    .split(/[\s,]+/)
     .map((value) => value.trim().toUpperCase())
     .filter(Boolean);
 
