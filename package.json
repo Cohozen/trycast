@@ -104,7 +104,8 @@
         "emails:build": "node ./scripts/build-email-templates.mjs",
         "emails:check": "node ./scripts/build-email-templates.mjs --check",
         "emails:push": "node ./scripts/push-email-config.mjs",
-        "typegen": "node ./scripts/typegen.mjs"
+        "typegen": "node ./scripts/typegen.mjs",
+        "deps:check": "node ./scripts/deps-check.mjs"
     },
     "private": true
 }
