@@ -1,0 +1,89 @@
+# Veille des dépendances : un rapport hebdomadaire, aucune mise à jour.
+#
+# Le job joue `npm run deps:check` et range le résultat dans UNE issue, toujours
+# la même. Le corps est réécrit à chaque passage (il reflète l'état courant),
+# mais un commentaire — donc une notification — n'est ajouté que si la liste des
+# majeures en retard a changé. Sans cette règle, l'issue produirait 52 alertes
+# par an disant exactement la même chose, et cesserait d'être lue.
+#
+# Rien n'est mis à jour ici, et rien n'échoue sur de la dérive de versions : le
+# job ne devient rouge que si la collecte elle-même a raté (registre injoignable),
+# auquel cas aucune issue n'est publiée — un rapport annonçant « 0 paquet en
+# retard » faute d'avoir pu lire quoi que ce soit vaut moins que pas de rapport.
+
+name: Dépendances
+
+on:
+  schedule:
+    # Lundi 6 h UTC. ⚠️ GitHub désactive les `schedule` d'un dépôt public après
+    # 60 jours sans activité : `workflow_dispatch` est la porte de secours.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: deps-watch
+  cancel-in-progress: false
+
+jobs:
+  rapport:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TITRE: Veille des dépendances
+      LABEL: dependencies
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # Le site a son propre lock (pas de workspaces npm) : sans cette install,
+      # la section « Site vitrine » du rapport serait annoncée non analysée.
+      - run: npm ci
+        working-directory: web
+      - name: Rapport
+        run: npm run deps:check -- --markdown > rapport.md
+
+      - name: Publier ou mettre à jour l'issue
+        run: |
+          set -euo pipefail
+
+          # Idempotent : le label n'existe pas au premier passage, et sa création
+          # échoue à tous les suivants — ce n'est pas une erreur.
+          gh label create "$LABEL" --color 0E8A16 \
+            --description "Rapport hebdomadaire de veille des dépendances" 2>/dev/null || true
+
+          numero=$(gh issue list --label "$LABEL" --state open --limit 1 \
+            --json number --jq '.[0].number // empty')
+
+          # La signature est une ligne de commentaire HTML posée en fin de
+          # rapport par deps-check.mjs : elle seule décide s'il faut notifier.
+          signature=$(grep -o '<!-- majeures:.*-->' rapport.md || echo '')
+
+          if [ -z "$numero" ]; then
+            gh issue create --title "$TITRE" --label "$LABEL" --body-file rapport.md
+            exit 0
+          fi
+
+          precedente=$(gh issue view "$numero" --json body --jq .body \
+            | grep -o '<!-- majeures:.*-->' || echo '')
+
+          gh issue edit "$numero" --body-file rapport.md
+
+          if [ "$signature" != "$precedente" ]; then
+            {
+              echo "La liste des majeures en retard a changé."
+              echo
+              echo "- avant : \`${precedente:-inconnue}\`"
+              echo "- maintenant : \`${signature}\`"
+              echo
+              echo "Le corps de l'issue ci-dessus a été mis à jour. Les décisions se consignent dans \`docs/dependances.md\`."
+            } | gh issue comment "$numero" --body-file -
+          else
+            echo "Majeures inchangées : issue mise à jour sans notification."
+          fi
