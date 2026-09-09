@@ -31,10 +31,17 @@ export function normalizeInviteCode(raw: string): string | null {
  * code nu (espaces/tirets tolérés) ou noyé dans un lien/message — on cherche
  * alors une séquence isolée de 8 caractères de l'alphabet du serveur. null si
  * rien ne ressemble à un code.
+ *
+ * On dédoublonne avant de conclure : le message de partage cite le code *et*
+ * le lien qui le porte, donc la même séquence y figure deux fois sans qu'il y
+ * ait la moindre ambiguïté. Seuls deux codes *différents* font renoncer — on
+ * ne devine pas lequel l'utilisateur visait.
  */
 export function extractInviteCode(raw: string): string | null {
     const direct = normalizeInviteCode(raw);
     if (direct) return direct;
     const matches = raw.toUpperCase().match(/(?<![A-Z0-9])[A-HJ-KM-NP-Z2-9]{8}(?![A-Z0-9])/g);
-    return matches?.length === 1 ? matches[0] : null;
+    if (!matches) return null;
+    const unique = new Set(matches);
+    return unique.size === 1 ? matches[0] : null;
 }

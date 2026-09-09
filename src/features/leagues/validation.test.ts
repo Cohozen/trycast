@@ -52,6 +52,12 @@ describe('extractInviteCode', () => {
         ['Rejoins ma ligue avec le code E2ETEST2 !', 'E2ETEST2'],
         ['https://trycast.app/join/E2ETEST2', 'E2ETEST2'],
         ['https://trycast.app/join?code=e2etest2', 'E2ETEST2'],
+        // Le message de partage cite le code et le lien : deux occurrences du
+        // même code ne sont pas une ambiguïté.
+        [
+            'Rejoins ma ligue sur TryCast\nhttps://www.trycast.fr/rejoindre/E2ETEST2\n(code E2ETEST2)',
+            'E2ETEST2',
+        ],
     ])('extrait %j', (input, expected) => {
         expect(extractInviteCode(input)).toBe(expected);
     });
@@ -61,7 +67,7 @@ describe('extractInviteCode', () => {
         ['aucun code ici'],
         ['ABCDEFG0'], // hors alphabet
         ['ABCDEFGHJKMN'], // séquence trop longue, pas un code isolé
-        ['E2ETEST2 ou XW3KP7QM'], // deux candidats : ambigu, on ne devine pas
+        ['E2ETEST2 ou XW3KP7QM'], // deux codes distincts : ambigu, on ne devine pas
     ])('ne devine rien pour %j', (input) => {
         expect(extractInviteCode(input)).toBeNull();
     });
