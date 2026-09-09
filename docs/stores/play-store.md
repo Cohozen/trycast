@@ -245,7 +245,14 @@ Le même tableau de certificats alimente `assetlinks.json`, qui autorise l'app �
   seul tableau `sha256_cert_fingerprints`.
 
 Le piège, lui, est identique : n'en déclarer qu'une fait échouer la vérification chez une partie
-seulement des testeurs. Les valeurs se renseignent dans la variable d'environnement
+seulement des testeurs — et il s'est reproduit dès le premier déploiement du fichier
+(2026-09-09 : une empreinte en ligne au lieu de trois). Le fichier étant par ailleurs valide, rien
+ne le signale ; **compter les empreintes servies** fait donc partie du contrôle de déploiement :
+
+```bash
+curl -s https://www.trycast.fr/.well-known/assetlinks.json | python3 -c "
+import json,sys; print(len(json.load(sys.stdin)[0]['target']['sha256_cert_fingerprints']), 'empreinte(s)')"
+``` Les valeurs se renseignent dans la variable d'environnement
 `ANDROID_CERT_FINGERPRINTS` du projet Vercel (séparées par des virgules) ; sans elle le fichier
 n'est pas généré du tout, et les liens restent de simples pages web. Vérification après
 déploiement : `adb shell pm get-app-links com.cohozen.trycast` doit afficher `verified`.

@@ -96,6 +96,31 @@ celle du build de test si l'on veut vérifier avant la prod. Pour un build local
 déclare les liens. Android vérifie `autoVerify` au moment de l'installation ; si le fichier
 manque alors, la vérification échoue et n'est retentée que plus tard, sans rien signaler.
 
+### Contrôler le déploiement (recette du 2026-09-09)
+
+Tout se vérifie depuis un terminal, sans attendre le build de l'app :
+
+```bash
+# Le fichier, son Content-Type, et surtout le NOMBRE d'empreintes
+curl -s https://www.trycast.fr/.well-known/assetlinks.json | python3 -c "
+import json,sys
+fps = json.load(sys.stdin)[0]['target']['sha256_cert_fingerprints']
+print(len(fps), 'empreinte(s)'); [print(' ', f) for f in fps]"
+
+# Le rewrite : la page doit répondre 200 avec un code dans le chemin
+curl -s -o /dev/null -w '%{http_code}\n' https://www.trycast.fr/rejoindre/GRP8XTQ5
+
+# Les balises d'aperçu sur l'URL réelle, og:image en absolu
+curl -sL https://www.trycast.fr/rejoindre/GRP8XTQ5 | grep -oE '<meta property="og:image"[^>]*>'
+```
+
+⚠️ **Le nombre d'empreintes est le point à regarder, pas la validité du JSON.** Un fichier
+parfaitement valide avec **une seule** empreinte se déploie sans broncher et casse chez une partie
+seulement des testeurs — ceux qui ont reçu une variante signée par la clé *précédente*. C'est le cas
+constaté au premier déploiement (2026-09-09) : une empreinte en ligne là où il en faut trois.
+L'apex doit par ailleurs répondre **308 vers `www`**, ce qui confirme que seul `www` avait à être
+déclaré côté natif.
+
 ⚠️ **L'AASA n'a pas d'extension** : Vercel le servirait en `application/octet-stream` et Apple
 l'ignorerait en silence. Le `Content-Type: application/json` est forcé par le bloc `headers` de
 `vercel.json` — à vérifier après déploiement :
