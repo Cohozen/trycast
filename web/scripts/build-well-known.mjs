@@ -51,9 +51,9 @@ if (malformed.length > 0) {
     console.error(
         `ANDROID_CERT_FINGERPRINTS : ${malformed.length} empreinte(s) invalide(s).\n` +
             'Attendu : des SHA-256 séparées par des virgules, 32 octets en hexadécimal\n' +
-            "séparés par des deux-points (95 caractères). Relever la SHA-256 — et non la\n" +
+            'séparés par des deux-points (95 caractères). Relever la SHA-256 — et non la\n' +
             "SHA-1 — de chaque certificat dans la Play Console, Intégrité de l'application\n" +
-            '→ Signature de l\'application.\n' +
+            "→ Signature de l'application.\n" +
             malformed.map((value) => `  ✗ ${value} (${value.length} caractères)`).join('\n'),
     );
     process.exit(1);
