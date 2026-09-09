@@ -63,6 +63,45 @@ curl -s -o /dev/null -w '%{http_code}' -X POST "$PUBLIC_SUPABASE_URL/rest/v1/rpc
 
 Vérifier l'insert côté serveur (MCP `execute_sql` sur `waitlist_signups`), puis **purger les données de test** (`truncate public.waitlist_signups; truncate public.waitlist_attempts;`). Le select PostgREST direct sur ces tables doit répondre 401/permission denied.
 
+## Liens d'invitation : `/rejoindre/<CODE>`
+
+Le site est **statique** : pas de `getStaticPaths` possible sur un code arbitraire. Une page
+unique `src/pages/rejoindre.astro` est servie pour `/rejoindre/:code` par un `rewrite` de
+`vercel.json`, et le code est lu **côté client** depuis le chemin (repli sur `?c=` — c'est ce
+repli qui permet de tester en `npm run dev`, où le rewrite Vercel n'existe pas).
+
+L'aperçu est **générique**, et doit le rester : afficher le nom de la ligue imposerait d'ouvrir
+`preview_league` aux requêtes anonymes (elle est `grant execute … to authenticated`) et donc
+d'exposer le nom de n'importe quelle ligue à qui détient un code, robots d'aperçu compris. Ce
+serait aussi un passage en SSR, donc un adapter Vercel.
+
+### `.well-known/` — généré, jamais versionné
+
+`scripts/build-well-known.mjs` (lancé en `prebuild`) écrit `assetlinks.json` et
+`apple-app-site-association` à partir de `ANDROID_CERT_FINGERPRINTS` et `APPLE_TEAM_ID`, variables
+du projet Vercel. Sans elles, **rien n'est écrit** et le build passe quand même — un fichier
+d'attente serait pire, la vérification échouant alors sans que rien ne le signale.
+
+⚠️ **L'AASA n'a pas d'extension** : Vercel le servirait en `application/octet-stream` et Apple
+l'ignorerait en silence. Le `Content-Type: application/json` est forcé par le bloc `headers` de
+`vercel.json` — à vérifier après déploiement :
+
+```bash
+curl -sI https://www.trycast.fr/.well-known/apple-app-site-association | grep -i content-type
+```
+
+### Vignettes OpenGraph
+
+`base-layout.astro` émet le bloc social complet (`og:image` absolue via `Astro.site`, `twitter:*`,
+`canonical`). Deux réglages non évidents : une `og:image` **relative** est ignorée sans message par
+les robots, d'où le `site:` d'`astro.config.mjs` ; et sur une page `noindex` (atterrissages
+d'e-mail, invitations) `canonical` et `og:url` sont **omis**, parce qu'ils ramèneraient au chemin
+nu — un robot qui s'en sert pour bâtir sa carte perdrait le code au passage.
+
+Les PNG 1200×630 sont versionnés et reproductibles par `scripts/build-og-images.sh` (ImageMagick +
+les polices du DS prises dans les `node_modules` de l'app). ImageMagick n'ayant pas de délégué SVG
+fiable ici, le ballon du logo y est retracé en primitives plutôt que converti.
+
 ## Déploiement
 
 Vercel, projet créé par Corentin (2026-07-15), **branché sur le repo GitHub avec Root Directory `web`** : chaque push sur `main` rebuilde le site — c'est **la** voie de déploiement. Le `installCommand` de `web/vercel.json` (stub tsconfig, voir piège ci-dessus) est indispensable. Les `PUBLIC_*` sont bakées au build (env vars Vercel côté dashboard, ou `.env` non versionné en local). Le connecteur Vercel de Claude **ne voit pas ce projet** (`list_projects` vide — autre scope) : ne pas tenter `deploy_to_vercel` (risque de créer un projet parallèle), passer par un commit + push (accord de Corentin requis pour le push).

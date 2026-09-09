@@ -41,6 +41,35 @@ Avant de considérer un lot terminé : `npm run typecheck && npm run lint && npm
 - Formulaire waitlist : RPC `join_waitlist` (migration `20260715000100_waitlist.sql`) appelée en fetch direct PostgREST, env `web/.env` (`PUBLIC_SUPABASE_URL`/`PUBLIC_SUPABASE_KEY`, modèle `web/.env.example`) ; anti-spam côté SQL (rate limit IP 3/h + plafond global 100/h + refus silencieux) + honeypot côté client — pas d'accès direct aux tables `waitlist_*`
 - Hébergement : **Vercel** (Root Directory `web`, build sur push GitHub) — le `installCommand` de `web/vercel.json` pose un stub `expo/tsconfig.base.json` requis par la découverte tsconfig de rolldown (piège détaillé dans le skill `trycast-site-web`) ; le connecteur Vercel de Claude ne voit pas le projet (scope), passer par git push
 
+## Liens d'invitation de ligue
+
+- Forme unique : `https://www.trycast.fr/rejoindre/<CODE>`, construite par `buildInviteUrl()` de
+  `src/lib/urls.ts` — **seul endroit** qui connaît cette URL côté app. Elle est répliquée à trois
+  autres : le `rewrite` de `web/vercel.json` (le site est statique, donc pas de `getStaticPaths`
+  sur un code arbitraire : une page unique `web/src/pages/rejoindre.astro` sert `/rejoindre/:code`
+  et lit le code côté client), le `pathPrefix` des `intentFilters` d'`app.json`, et
+  `INVITE_PATH_SEGMENT` de `src/features/leagues/invite-link.ts`. En changer une impose les quatre
+- **L'hôte est `www.trycast.fr`**, domaine primaire ; l'apex y redirige et n'est **pas** déclaré
+  côté natif : ni Apple ni Google ne suivent une redirection pour lire `.well-known/`, et les liens
+  d'e-mail doivent par ailleurs coïncider avec `additional_redirect_urls` de `supabase/config.toml`
+- ⚠️ **`pathPrefix: '/rejoindre'` est impératif** dans l'intent filter Android : déclarer le domaine
+  entier ferait intercepter par l'app la landing et les pages légales, que le site doit continuer
+  d'ouvrir dans le navigateur
+- `src/app/+native-intent.tsx` réécrit le lien entrant en `/league/new?tab=join&code=…` **et retient
+  le code au passage** (`pending-invite-store`, péremption 24 h) : sans session, les
+  `<Stack.Protected>` renvoient sur `(auth)` et l'intention serait perdue. `usePendingInvite` le
+  rejoue après l'inscription — **après que le guide d'accueil est résolu**, même piège que la
+  permission notifications — et l'écran d'adhésion le purge quand le lien a abouti du premier coup
+- **`.well-known/` est généré, pas versionné** (`web/scripts/build-well-known.mjs`, lancé en
+  `prebuild`) à partir de `APPLE_TEAM_ID` et `ANDROID_CERT_FINGERPRINTS`, variables du projet
+  Vercel : sans elles rien n'est écrit, comme les clés Aptabase/Sentry/Google. Une empreinte
+  d'attente serait pire que l'absence de fichier — la vérification échouerait **en silence**.
+  Déclarer **toutes** les empreintes SHA-256 (Play App Signing, clé d'importation, build de test),
+  même piège que les clients OAuth Android. Le `Content-Type: application/json` de l'AASA est forcé
+  par `web/vercel.json` : le fichier n'a pas d'extension, et Apple rejette tout le reste sans rien dire
+- **iOS reste inerte** tant qu'aucun abonnement Apple Developer ne fournit de Team ID : le code est
+  complet, il ne manquera qu'une valeur à renseigner
+
 ## Versions
 
 - **`app.json` → `expo.version` est la seule source de vérité** de la version « marketing » (celle affichée dans Réglages et sur les stores). Semver `MAJOR.MINOR.PATCH`, bumpée **à la main, au moment de préparer une release store** — jamais à chaque lot livré : MINOR = nouvelles fonctionnalités, PATCH = correctifs. Valeur actuelle : `1.0.0` (rien n'est encore publié ; la beta TestFlight / Play interne se fait en 1.0.0, build 1, 2, 3…)

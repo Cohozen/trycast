@@ -234,6 +234,22 @@ Après toute modification côté Google Cloud : **forcer l'arrêt de l'app** ava
 services Google Play mettent en cache le résultat de la vérification, et on peut retomber sur la
 même erreur alors que la configuration est déjà correcte.
 
+### Les mêmes empreintes servent aux liens d'invitation
+
+Le même tableau de certificats alimente `assetlinks.json`, qui autorise l'app à ouvrir les liens
+`https://www.trycast.fr/rejoindre/…`. Deux différences à ne pas confondre :
+
+- OAuth veut des **SHA-1**, les liens d'application des **SHA-256** — la page *Signature de
+  l'app* affiche les deux pour chaque certificat ;
+- OAuth veut **un client par empreinte**, alors qu'`assetlinks.json` les accepte toutes dans un
+  seul tableau `sha256_cert_fingerprints`.
+
+Le piège, lui, est identique : n'en déclarer qu'une fait échouer la vérification chez une partie
+seulement des testeurs. Les valeurs se renseignent dans la variable d'environnement
+`ANDROID_CERT_FINGERPRINTS` du projet Vercel (séparées par des virgules) ; sans elle le fichier
+n'est pas généré du tout, et les liens restent de simples pages web. Vérification après
+déploiement : `adb shell pm get-app-links com.cohozen.trycast` doit afficher `verified`.
+
 ## Accès à l'application
 
 L'app **exige une connexion** : Google demande un compte de démonstration, sans quoi le
