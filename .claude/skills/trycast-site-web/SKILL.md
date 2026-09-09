@@ -82,6 +82,20 @@ serait aussi un passage en SSR, donc un adapter Vercel.
 du projet Vercel. Sans elles, **rien n'est écrit** et le build passe quand même — un fichier
 d'attente serait pire, la vérification échouant alors sans que rien ne le signale.
 
+`ANDROID_CERT_FINGERPRINTS` : des **SHA-256** séparées par des virgules, 32 octets hexadécimaux
+séparés par des deux-points (95 caractères chacune), sur une seule ligne. Le script met en
+majuscules et coupe les espaces, on peut donc coller depuis la Play Console. Une valeur mal
+formée **arrête le build** : c'est délibéré, le cas courant étant une **SHA-1** (40 caractères)
+prise pour une SHA-256 — les deux se suivent dans la Play Console, et c'est la SHA-1 que réclament
+les clients OAuth. Les empreintes à réunir sont celles des trois certificats de *Intégrité de
+l'application → Signature de l'application* (signature actuelle, précédente, importation), plus
+celle du build de test si l'on veut vérifier avant la prod. Pour un build local de debug :
+`keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android | grep SHA256`.
+
+⚠️ **Ordre des opérations** : le fichier doit être **en ligne avant** l'installation du build qui
+déclare les liens. Android vérifie `autoVerify` au moment de l'installation ; si le fichier
+manque alors, la vérification échoue et n'est retentée que plus tard, sans rien signaler.
+
 ⚠️ **L'AASA n'a pas d'extension** : Vercel le servirait en `application/octet-stream` et Apple
 l'ignorerait en silence. Le `Content-Type: application/json` est forcé par le bloc `headers` de
 `vercel.json` — à vérifier après déploiement :

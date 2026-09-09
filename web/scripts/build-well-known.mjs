@@ -39,6 +39,26 @@ const fingerprints = (process.env.ANDROID_CERT_FINGERPRINTS ?? '')
     .map((value) => value.trim().toUpperCase())
     .filter(Boolean);
 
+// Une empreinte mal formée ne casse rien au build et ne se voit nulle part :
+// le fichier est servi, Google le lit, la vérification échoue, et les liens
+// s'ouvrent dans le navigateur sans le moindre message. On préfère arrêter le
+// build. Le cas le plus probable est une SHA-1 (40 caractères) copiée à la
+// place d'une SHA-256 — ce sont voisines dans la Play Console, et c'est la
+// SHA-1 que réclament les clients OAuth.
+const SHA256 = /^[0-9A-F]{2}(:[0-9A-F]{2}){31}$/;
+const malformed = fingerprints.filter((value) => !SHA256.test(value));
+if (malformed.length > 0) {
+    console.error(
+        `ANDROID_CERT_FINGERPRINTS : ${malformed.length} empreinte(s) invalide(s).\n` +
+            'Attendu : des SHA-256 séparées par des virgules, 32 octets en hexadécimal\n' +
+            "séparés par des deux-points (95 caractères). Relever la SHA-256 — et non la\n" +
+            "SHA-1 — de chaque certificat dans la Play Console, Intégrité de l'application\n" +
+            '→ Signature de l\'application.\n' +
+            malformed.map((value) => `  ✗ ${value} (${value.length} caractères)`).join('\n'),
+    );
+    process.exit(1);
+}
+
 // Repartir d'un dossier vide : une valeur retirée de l'environnement doit
 // retirer le fichier, pas laisser traîner la version précédente.
 await rm(outDir, { recursive: true, force: true });
