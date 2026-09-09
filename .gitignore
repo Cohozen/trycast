@@ -50,3 +50,7 @@ google-services.json
 
 # claude local settings
 .claude/settings.local.json
+
+# Site web : .well-known généré au build depuis les variables d’environnement
+# (empreintes de signature, Team ID Apple) — jamais versionné.
+web/public/.well-known/

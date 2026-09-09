@@ -3,6 +3,12 @@ import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
+    // Domaine primaire (l'apex y redirige). Sert à Astro.site, donc aux URLs
+    // absolues d'og:image et og:url : les robots d'aperçu refusent une image
+    // relative. C'est aussi l'hôte que déclarent les liens d'application, et
+    // le seul sur lequel .well-known/ est vérifié — ni Apple ni Google ne
+    // suivent une redirection pour aller le lire.
+    site: 'https://www.trycast.fr',
     vite: {
         resolve: {
             // Pas d'alias TS dans ce projet. Sans ça, la découverte tsconfig du resolver

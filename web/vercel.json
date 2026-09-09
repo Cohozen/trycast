@@ -1,4 +1,21 @@
 {
     "$schema": "https://openapi.vercel.sh/vercel.json",
-    "installCommand": "npm ci && (mkdir -p ../node_modules/expo && echo '{}' > ../node_modules/expo/tsconfig.base.json || true)"
+    "installCommand": "npm ci && (mkdir -p ../node_modules/expo && echo '{}' > ../node_modules/expo/tsconfig.base.json || true)",
+    "rewrites": [
+        {
+            "source": "/rejoindre/:code",
+            "destination": "/rejoindre"
+        }
+    ],
+    "headers": [
+        {
+            "source": "/.well-known/apple-app-site-association",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                }
+            ]
+        }
+    ]
 }

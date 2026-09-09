@@ -12,9 +12,18 @@ import SiteNav from '../components/site-nav.astro';
 interface Props {
     title: string;
     description: string;
+    /** Vignette d'aperçu, relative au site. Défaut : la vignette générique. */
+    image?: string;
+    /** Pages sans intérêt pour la recherche (atterrissages d'e-mail, invitations). */
+    noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, image = '/og-default.png', noindex = false } = Astro.props;
+
+// Absolues et non relatives : les robots d'aperçu (WhatsApp, iMessage,
+// Discord, Slack) ignorent une og:image relative, sans le signaler.
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const imageUrl = new URL(image, Astro.site);
 ---
 
 <!doctype html>
@@ -26,10 +35,32 @@ const { title, description } = Astro.props;
         <title>{title}</title>
         <meta name="description" content={description} />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        {
+            /* Une page d'atterrissage porte un identifiant dans son chemin
+            (/rejoindre/<code>) que cette page statique ne connaît pas au build :
+            annoncer une canonique ou une og:url la ramènerait au chemin nu, et
+            un robot qui s'en sert pour la carte perdrait le code en route. */
+            !noindex && (
+                <>
+                    <link rel="canonical" href={canonical.href} />
+                    <meta property="og:url" content={canonical.href} />
+                </>
+            )
+        }
+        {noindex && <meta name="robots" content="noindex" />}
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:type" content="website" />
         <meta property="og:locale" content="fr_FR" />
+        <meta property="og:site_name" content="TryCast" />
+        <meta property="og:image" content={imageUrl.href} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="TryCast — pronostics rugby entre amis" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={imageUrl.href} />
         <script is:inline>
             // Thème suivant la préférence système, avant le premier paint (tokens sur [data-theme]).
             (() => {

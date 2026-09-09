@@ -1,0 +1,180 @@
+---
+// Atterrissage d'un lien d'invitation à une ligue : www.trycast.fr/rejoindre/<CODE>.
+//
+// Le site est statique : pas de getStaticPaths possible sur un code arbitraire,
+// donc un rewrite Vercel (web/vercel.json) sert cette page unique pour
+// /rejoindre/:code, et le code est lu côté client depuis l'URL.
+//
+// Trois publics, dans cet ordre : celui dont l'app est installée n'arrive même
+// pas ici (le lien ouvre l'app directement) ; celui qui vient d'un ordinateur
+// ou d'un navigateur qui n'a pas honoré le lien repart par « Ouvrir TryCast » ;
+// celui qui n'a pas encore l'app — le plus nombreux pour une invitation —
+// repart avec le code sous les yeux, à saisir après installation.
+//
+// L'aperçu partagé reste **générique** : afficher ici le nom de la ligue
+// exigerait d'ouvrir preview_league aux requêtes anonymes, donc d'exposer le
+// nom de n'importe quelle ligue à qui détient un code, robots compris.
+import BaseLayout from '../layouts/base-layout.astro';
+---
+
+<BaseLayout
+    title="Rejoindre une ligue — TryCast"
+    description="Tu es invité à rejoindre une ligue de pronostics rugby sur TryCast."
+    image="/og-invite.png"
+    noindex>
+    <section>
+        <div class="card">
+            <p class="overline">Invitation</p>
+            <h1>Rejoins la ligue</h1>
+            <p class="lede">
+                Ouvre TryCast, va dans <strong>Ligues → Rejoindre</strong> et entre ce code.
+            </p>
+
+            <p class="code" id="code" data-empty="Code introuvable">…</p>
+
+            <a class="primary" id="open" href="trycast://league/new?tab=join">Ouvrir TryCast</a>
+            <p class="hint">Pas encore l'app ? Installe TryCast, puis entre le code ci-dessus.</p>
+            <a class="secondary" href="/">Découvrir TryCast</a>
+        </div>
+    </section>
+</BaseLayout>
+
+<script is:inline>
+    // Le code vient du chemin (/rejoindre/ABCD2345) que le rewrite a conservé,
+    // avec repli sur ?c= si le rewrite venait à manquer. Même alphabet que le
+    // serveur (ni 0/O ni 1/I/L) : une valeur qui n'y répond pas n'est pas
+    // affichée, plutôt que d'inviter à recopier un code impossible.
+    (() => {
+        const fromPath = window.location.pathname.split('/').filter(Boolean).pop() ?? '';
+        const raw = /^[a-hj-km-np-z2-9]{8}$/i.test(fromPath)
+            ? fromPath
+            : (new URLSearchParams(window.location.search).get('c') ?? '');
+        const code = /^[a-hj-km-np-z2-9]{8}$/i.test(raw) ? raw.toUpperCase() : null;
+
+        const node = document.getElementById('code');
+        const open = document.getElementById('open');
+        if (code) {
+            node.textContent = code;
+            open.href = `trycast://league/new?tab=join&code=${code}`;
+        } else {
+            node.textContent = node.dataset.empty;
+            node.classList.add('missing');
+        }
+    })();
+</script>
+
+<style>
+    section {
+        display: flex;
+        justify-content: center;
+        padding: 96px 24px 120px;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 440px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 40px 32px;
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .overline {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: var(--text-faint);
+    }
+
+    h1 {
+        margin-top: 8px;
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-size: clamp(30px, 6vw, 40px);
+        line-height: 1;
+        letter-spacing: 0.01em;
+        text-wrap: balance;
+    }
+
+    .lede {
+        margin: 12px 0 0;
+        font-size: 16px;
+        line-height: 1.55;
+        color: var(--text-muted);
+        text-wrap: pretty;
+    }
+
+    .lede strong {
+        color: var(--text);
+        font-weight: 600;
+    }
+
+    .code {
+        width: 100%;
+        margin: 22px 0 0;
+        padding: 18px 12px;
+        border-radius: var(--radius-md);
+        background: var(--surface-sunken);
+        border: 1px solid var(--border);
+        font-family: var(--font-display);
+        font-size: clamp(30px, 8vw, 40px);
+        line-height: 1.05;
+        /* Le pas de chasse compense le décalage optique du dernier caractère. */
+        letter-spacing: 0.15em;
+        text-indent: 0.15em;
+        color: var(--text);
+    }
+
+    .code.missing {
+        font-family: inherit;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0;
+        text-indent: 0;
+        color: var(--text-faint);
+    }
+
+    .primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 52px;
+        width: 100%;
+        margin-top: 22px;
+        border-radius: var(--radius-pill);
+        background: var(--accent);
+        color: var(--on-accent);
+        font-size: 16px;
+        font-weight: 700;
+        box-shadow: var(--glow-accent);
+    }
+
+    .primary:hover {
+        background: var(--accent-press);
+        color: var(--on-accent);
+    }
+
+    .hint {
+        margin: 14px 0 0;
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--text-faint);
+    }
+
+    .secondary {
+        margin-top: 16px;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-muted);
+    }
+
+    .secondary:hover {
+        color: var(--text);
+    }
+</style>
