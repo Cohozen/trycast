@@ -59,7 +59,16 @@ Avant de considérer un lot terminé : `npm run typecheck && npm run lint && npm
   le code au passage** (`pending-invite-store`, péremption 24 h) : sans session, les
   `<Stack.Protected>` renvoient sur `(auth)` et l'intention serait perdue. `usePendingInvite` le
   rejoue après l'inscription — **après que le guide d'accueil est résolu**, même piège que la
-  permission notifications — et l'écran d'adhésion le purge quand le lien a abouti du premier coup
+  permission notifications
+- ⚠️ **Expo Router traite le lien APRÈS le montage de `(app)`**, pas avant : l'ordre mesuré est
+  « nettoyage → `redirectSystemPath` → écriture » (traces du 2026-09-09). Tout nettoyage de
+  l'invitation en attente qui s'en remet à cet ordre est donc illusoire — le code réécrit après
+  coup survit et se rejoue à la navigation suivante, renvoyant sur « Rejoindre » un utilisateur
+  qui vient d'ouvrir sa ligue. D'où `markInviteHonored` : **une invitation déjà présentée ne se
+  rejoue pas**, quel que soit l'ordre. Ne pas remplacer cette mémoire par un `await` ou un délai
+- ⚠️ **Ne pas passer `url` à `Share.share`** : iOS met alors le lien nu en avant et certaines cibles
+  le substituent au message, faisant disparaître le nom de la ligue. L'URL vit **dans** le message ;
+  ce sont les messageries qui la détectent pour bâtir l'aperçu, pas le système
 - **`.well-known/` est généré, pas versionné** (`web/scripts/build-well-known.mjs`, lancé en
   `prebuild`) à partir de `APPLE_TEAM_ID` et `ANDROID_CERT_FINGERPRINTS`, variables du projet
   Vercel : sans elles rien n'est écrit, comme les clés Aptabase/Sentry/Google. Une empreinte
