@@ -17,6 +17,8 @@ Read the exact versioned docs at https://docs.expo.dev/versions/v57.0.0/ before 
 
 Avant de considérer un lot terminé : `npm run typecheck && npm run lint && npm run format:check && npm run test`. La CI GitHub Actions exécute la même chose.
 
+**Veille des dépendances** — `npm run deps:check` (hors lot obligatoire) range ce qui est en retard par famille et ne modifie rien ; un workflow hebdomadaire verse le même rapport dans une issue unique. ⚠️ `latest` est un piège pour tout ce que le **SDK pilote** (async-storage, Sentry, react-native, react…) : ces versions montent en bloc avec le SDK, jamais par un `npm i` isolé, et **toute montée d'un paquet natif déplace l'empreinte** — donc coupe les builds distribués de l'OTA, à caler sur une release. Une majeure qu'on ne prend pas se justifie dans `docs/dependances.md` ; recette et pièges dans `scripts/README.md`.
+
 ## Conventions
 
 - Alias d'import `@/` → `src/`

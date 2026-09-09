@@ -272,3 +272,52 @@ Les essais ne sont pas fournis par l'API : c'est la seule donnée de match saisi
 Les deux sont réservés à `service_role` : invisibles depuis l'app, vérifié par `e2e-scoring.sh`.
 
 Une fois les essais saisis, **il n'y a rien à déclencher** : la passe 2 du bonus offensif est ramassée par le cron `sync-results-10min`, les points arrivent en ≤ 10 min. Seul cas à traiter à part, signalé par la colonne `etat` de la vue : un match passé en `needs_review` est sorti du pipeline et doit être débloqué avant toute saisie.
+
+---
+
+## Veille des dépendances
+
+| Commande | Effet |
+|---|---|
+| `npm run deps:check` | Rapport lisible : ce qui est en retard, rangé par famille. Ne modifie rien |
+| `npm run deps:check -- --markdown` | Le même en Markdown — c'est ce que publie le workflow hebdomadaire |
+| `npm run deps:check -- --json` | La structure brute |
+
+### Pourquoi ce script existe
+
+`npm outdated` affiche aujourd'hui **50 paquets**, ce qui ne veut rien dire : la moitié est pilotée
+par le SDK Expo — suivre leur `latest` casserait le projet — et l'un d'eux est un faux positif
+permanent. Un retard n'est exploitable qu'une fois rangé dans la famille qui lui correspond, parce
+que chacune appelle une décision différente, et que trois d'entre elles n'en appellent aucune :
+
+| Famille | Ce qu'on en fait |
+|---|---|
+| À réaligner sur le SDK | `npx expo install --fix` — Expo réclame ces versions, elles sont testées ensemble |
+| Majeures | Rien tout de suite : la décision et sa raison vont dans [`docs/dependances.md`](../docs/dependances.md) |
+| Rattrapage dans la plage | `npm update` — déjà autorisé par `package.json`, seul le lock bouge |
+| Mineures hors plage | À prendre quand ça arrange |
+| Écartés | Ni retard ni décision : `latest` y serait une régression (préversion NativeWind, paquets du SDK) |
+
+Les sources croisées sont `npm outdated`, `npx expo install --check` — **l'autorité vivante**, elle
+sait ce que le manifeste embarqué dans `node_modules` ignore encore —, `bundledNativeModules.json`
+pour délimiter le périmètre du SDK, et `npm audit` pour la synthèse de sécurité.
+
+⚠️ Un paquet marqué **⚑ natif** (dossier `android`/`ios`, `expo-module.config.json`, podspec) impose
+un rebuild du dev client **et déplace l'empreinte** : les builds déjà distribués cesseraient de
+recevoir les mises à jour à distance, sans le moindre message. Ces montées se groupent avec une
+release, jamais au fil de l'eau.
+
+### Codes de sortie
+
+`0` quoi qu'il arrive, **sauf** si la collecte a échoué (registre injoignable) : dans ce cas `1`, et
+le rapport le dit en tête. Un rapport annonçant « 0 paquet en retard » parce qu'il n'a rien pu lire
+serait pire que pas de rapport — c'est la seule chose qui fait échouer le job hebdomadaire.
+
+### Le rappel hebdomadaire
+
+`.github/workflows/deps.yml` joue ce rapport le lundi matin et le verse dans **une issue unique**
+(label `dependencies`). Le corps est réécrit à chaque passage ; un commentaire — donc une
+notification — n'arrive que si la liste des majeures a changé, d'après la signature
+`<!-- majeures: … -->` que le script pose en fin de rapport. Sans cette règle, l'issue produirait 52
+alertes identiques par an et cesserait d'être lue. ⚠️ GitHub désactive les `schedule` d'un dépôt
+public après 60 jours sans activité : `gh workflow run deps.yml` reste la porte de secours.
