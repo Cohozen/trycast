@@ -58,6 +58,7 @@ Le build Android embarque l'identité Firebase (FCM) de l'app : le fichier `goog
 | `npm run lint`                    | ESLint (config Expo, règles stylistiques désactivées)                          |
 | `npm run format` / `format:check` | Biome (formatage : 4 espaces, 100 colonnes)                                    |
 | `npm run typegen`                 | Régénère `src/lib/database.types.ts` depuis le schéma Supabase                 |
+| `npm run deps:check`              | Ce qui est en retard, rangé par famille — ne modifie rien (voir `docs/dependances.md`) |
 | `npm run build:dev` / `build:preview` / `build:prod` | Builds EAS Android (dev client / release sur le dev / AAB pour la Play Console) |
 | `npm run ota:preview` / `ota:prod` | Mise à jour à distance sur le canal correspondant (garde-fous : voir `scripts/README.md`) |
 | `npm run env:preview` / `env:prod` | Variables EAS de l'environnement, à vérifier avant un build |
