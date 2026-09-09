@@ -95,7 +95,14 @@ npm run dev                 # http://localhost:4321
 npm run check && npm run build
 ```
 
-CI dédiée (`.github/workflows/web.yml`, déclenchée sur `web/**` uniquement). Hébergement cible : Vercel (projet `trycast-web`).
+Le site sert aussi les **liens d'invitation de ligue** (`/rejoindre/<CODE>`) et les fichiers
+`.well-known/` qui autorisent l'app à les ouvrir directement. Ces fichiers sont **générés au build**
+depuis `ANDROID_CERT_FINGERPRINTS` et `APPLE_TEAM_ID` (variables du projet Vercel, cf.
+`web/.env.example`) : sans elles, rien n'est écrit et les liens restent de simples pages web.
+
+CI dédiée (`.github/workflows/web.yml`, déclenchée sur `web/**` uniquement). ⚠️ Elle formate `web/`
+avec une version **épinglée** de biome (`@biomejs/biome@2.5.2`), distincte de celle du dépôt : la
+rejouer telle quelle avant de conclure. Hébergement : Vercel (projet `trycast-web`).
 
 ## Backend Supabase
 
