@@ -27,6 +27,16 @@ import { WelcomeGuideSheet } from './welcome-guide-sheet';
 type WelcomeGuideContextValue = {
     /** Rejoue le guide (rangée « Revoir le guide » des Réglages). */
     replay: () => void;
+    /**
+     * Le sort du guide de premier lancement est tranché : soit il avait déjà
+     * été vu, soit il vient d'être fermé. Faux tant que la question n'est pas
+     * réglée, y compris pendant que la sheet est ouverte.
+     *
+     * C'est le feu vert de tout ce qui ne doit pas surgir par-dessus la sheet
+     * de bienvenue — la demande de permission notifications passe par le flag
+     * en stockage, l'invitation de ligue en attente par ce booléen.
+     */
+    resolved: boolean;
 };
 
 const WelcomeGuideContext = createContext<WelcomeGuideContextValue | null>(null);
@@ -46,6 +56,7 @@ export function WelcomeGuideProvider({ children }: { children: ReactNode }) {
     const navigationReady = !!useRootNavigationState()?.key;
     const [steps, setSteps] = useState<WelcomeStep[]>([]);
     const [visible, setVisible] = useState(false);
+    const [resolved, setResolved] = useState(false);
     // L'évaluation du premier lancement n'a lieu qu'une fois par montage.
     const evaluated = useRef(false);
 
@@ -62,7 +73,10 @@ export function WelcomeGuideProvider({ children }: { children: ReactNode }) {
         if (!navigationReady || evaluated.current) return;
         evaluated.current = true;
         void (async () => {
-            if (await loadWelcomeGuideSeen()) return;
+            if (await loadWelcomeGuideSeen()) {
+                setResolved(true);
+                return;
+            }
             await resolveSteps();
             setVisible(true);
         })();
@@ -70,6 +84,7 @@ export function WelcomeGuideProvider({ children }: { children: ReactNode }) {
 
     const close = useCallback((completed: boolean) => {
         setVisible(false);
+        setResolved(true);
         trackEvent({ name: 'welcome_guide_closed', props: { completed } });
         void (async () => {
             await markWelcomeGuideSeen();
@@ -115,7 +130,7 @@ export function WelcomeGuideProvider({ children }: { children: ReactNode }) {
         [close, resolveSteps, router],
     );
 
-    const value = useMemo(() => ({ replay }), [replay]);
+    const value = useMemo(() => ({ replay, resolved }), [replay, resolved]);
 
     return (
         <WelcomeGuideContext.Provider value={value}>

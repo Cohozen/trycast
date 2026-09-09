@@ -40,8 +40,18 @@ export type AnalyticsEvent =
     | { name: 'prediction_saved'; props: { first: boolean } }
     /** Une ligue a été créée. */
     | { name: 'league_created' }
-    /** Une ligue a été rejointe via un code d'invitation. */
-    | { name: 'league_joined' }
+    /**
+     * Une ligue a été rejointe. `via` distingue le code saisi ou collé à la
+     * main d'une arrivée par lien d'invitation, pour mesurer ce que le partage
+     * par lien apporte réellement.
+     */
+    | { name: 'league_joined'; props: { via: 'code' | 'link' } }
+    /**
+     * Une invitation vient d'être partagée. `from` situe le point de départ —
+     * l'écran de succès juste après la création, ou les réglages d'une ligue
+     * existante. Jamais le code lui-même : ce serait un identifiant.
+     */
+    | { name: 'league_invite_shared'; props: { from: 'creation' | 'settings' } }
     /** Un classement a été consulté. Même vocabulaire que l'écran Classement. */
     | { name: 'leaderboard_viewed'; props: { scope: 'leagues' | 'global' } }
     /** Les notifications push viennent d'être activées. */

@@ -1,12 +1,9 @@
-import * as Clipboard from 'expo-clipboard';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
     ArrowLeftRight,
     ChevronRight,
     Clock,
-    Copy,
     Info,
-    Share2,
     TriangleAlert,
     UserPlus,
     Users,
@@ -14,7 +11,6 @@ import {
 } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Share } from 'react-native';
 
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -23,9 +19,9 @@ import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useToast } from '@/components/ui/toast-provider';
 import { useSession } from '@/features/auth/session-context';
 import { DeleteLeagueModal } from '@/features/leagues/components/delete-league-modal';
+import { InviteShareActions } from '@/features/leagues/components/invite-share-actions';
 import { LeaderboardRow } from '@/features/leagues/components/leaderboard-row';
 import { LeagueIcon } from '@/features/leagues/components/league-icon';
 import { LeaveLeagueModal } from '@/features/leagues/components/leave-league-modal';
@@ -47,7 +43,6 @@ import { useTransferOwnership } from '@/features/leagues/use-transfer-ownership'
 import type { MatchWithTeams } from '@/features/matches/types';
 import { useMatches } from '@/features/matches/use-matches';
 import { useOpenPlayerProfile } from '@/features/profile/use-open-player-profile';
-import { hapticLight } from '@/lib/haptics';
 import { i18n } from '@/lib/i18n';
 import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
@@ -466,31 +461,14 @@ function SettingsTab({
     const kickMember = useKickMember(league.id);
     const transferOwnership = useTransferOwnership(league.id);
 
-    const toast = useToast();
     const [leaveOpen, setLeaveOpen] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [transferOpen, setTransferOpen] = useState(false);
     const [removeTarget, setRemoveTarget] = useState<LeaderboardEntry | null>(null);
 
-    const onBrandColor = useThemeColor('on-brand');
-    const textColor = useThemeColor('text');
     const faintColor = useThemeColor('text-faint');
     const brandColor = useThemeColor('brand');
     const warningColor = useThemeColor('warning');
-
-    const copyCode = async () => {
-        await Clipboard.setStringAsync(league.invite_code);
-        hapticLight();
-        toast.show(t('leagues:detail.codeCopied', { code: league.invite_code }), 'success');
-    };
-    const shareCode = () => {
-        Share.share({
-            message: t('leagues:detail.shareMessage', {
-                name: league.name,
-                code: league.invite_code,
-            }),
-        });
-    };
 
     return (
         <View className="gap-6 pt-1">
@@ -507,28 +485,11 @@ function SettingsTab({
                     <Text className="text-center font-body text-[12px] leading-[17px] text-text-muted">
                         {t('leagues:detail.settings.codeHint')}
                     </Text>
-                    <View className="w-full flex-row gap-2.5">
-                        <View className="flex-1">
-                            <Button
-                                fullWidth
-                                leadingIcon={
-                                    <Copy color={onBrandColor} size={16} strokeWidth={2} />
-                                }
-                                onPress={copyCode}
-                                title={t('common:actions.copy')}
-                                variant="brand"
-                            />
-                        </View>
-                        <View className="flex-1">
-                            <Button
-                                fullWidth
-                                leadingIcon={<Share2 color={textColor} size={16} strokeWidth={2} />}
-                                onPress={shareCode}
-                                title={t('common:actions.share')}
-                                variant="secondary"
-                            />
-                        </View>
-                    </View>
+                    <InviteShareActions
+                        code={league.invite_code}
+                        from="settings"
+                        name={league.name}
+                    />
                 </Card>
             </View>
 

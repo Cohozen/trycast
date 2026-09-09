@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { ToastProvider } from '@/components/ui/toast-provider';
 import { CelebrationHost } from '@/features/celebration/components/celebration-host';
+import { PendingInviteHost } from '@/features/leagues/components/pending-invite-host';
 import { useStandingsRealtime } from '@/features/leagues/use-standings-realtime';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
 import { WelcomeGuideProvider } from '@/features/welcome/components/welcome-guide-provider';
@@ -93,6 +94,7 @@ export default function AppLayout() {
                     />
                 </Stack>
                 <CelebrationHost />
+                <PendingInviteHost />
             </WelcomeGuideProvider>
         </ToastProvider>
     );

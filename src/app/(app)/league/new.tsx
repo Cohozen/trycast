@@ -1,28 +1,31 @@
 import * as Clipboard from 'expo-clipboard';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { Check, ClipboardPaste, Copy, Info, Link2, Lock, Share2 } from 'lucide-react-native';
-import { useState } from 'react';
+import { Check, ClipboardPaste, Info, Link2, Lock } from 'lucide-react-native';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Share } from 'react-native';
 
 import { Button } from '@/components/ui/button';
 import { Screen } from '@/components/ui/screen';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { TextField } from '@/components/ui/text-field';
 import { Toast } from '@/components/ui/toast';
-import { useToast } from '@/components/ui/toast-provider';
 import { DEFAULT_LEAGUE_COLOR, type LeagueColor } from '@/features/leagues/colors';
 import { InviteCodeInput } from '@/features/leagues/components/invite-code-input';
+import { InviteShareActions } from '@/features/leagues/components/invite-share-actions';
 import { LeagueColorPicker } from '@/features/leagues/components/league-color-picker';
 import { LeagueIcon } from '@/features/leagues/components/league-icon';
 import { LeaguePreviewSheet } from '@/features/leagues/components/league-preview-sheet';
+import { takePendingInvite } from '@/features/leagues/pending-invite-store';
 import { toLeagueMessageKey } from '@/features/leagues/errors';
 import type { LeagueRow } from '@/features/leagues/types';
 import { useCreateLeague } from '@/features/leagues/use-create-league';
 import { useJoinLeague } from '@/features/leagues/use-join-league';
 import { useLeaguePreview } from '@/features/leagues/use-league-preview';
-import { extractInviteCode, validateLeagueName } from '@/features/leagues/validation';
-import { hapticLight } from '@/lib/haptics';
+import {
+    extractInviteCode,
+    normalizeInviteCode,
+    validateLeagueName,
+} from '@/features/leagues/validation';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 
 type NewLeagueTab = 'create' | 'join';
@@ -35,8 +38,21 @@ type NewLeagueTab = 'create' | 'join';
  */
 export default function NewLeagueScreen() {
     const { t } = useTranslation(['leagues', 'common']);
-    const params = useLocalSearchParams<{ tab?: string }>();
-    const [tab, setTab] = useState<NewLeagueTab>(params.tab === 'join' ? 'join' : 'create');
+    const params = useLocalSearchParams<{ tab?: string; code?: string }>();
+    // Un code fourni par l'URL (lien d'invitation) impose l'onglet « rejoindre »
+    // quel que soit `tab` : c'est la seule raison d'être de ce lien.
+    const initialCode = normalizeInviteCode(params.code ?? '');
+    const [tab, setTab] = useState<NewLeagueTab>(
+        initialCode || params.tab === 'join' ? 'join' : 'create',
+    );
+
+    // Le lien a abouti : l'invitation retenue pour survivre à un passage par
+    // l'écran de connexion n'a plus de raison d'être, et la laisser traîner la
+    // ferait rejouer au prochain lancement. `usePendingInvite` s'abstient tant
+    // qu'on est sur cet écran, les deux ne se marchent donc pas dessus.
+    useEffect(() => {
+        if (initialCode) void takePendingInvite();
+    }, [initialCode]);
 
     // Le titre du header natif suit l'onglet (surcharge l'option statique du
     // layout) ; il remplace l'ancien grand titre in-screen, devenu redondant.
@@ -53,7 +69,7 @@ export default function NewLeagueScreen() {
                 ]}
                 value={tab}
             />
-            {tab === 'create' ? <CreateSection /> : <JoinSection />}
+            {tab === 'create' ? <CreateSection /> : <JoinSection initialCode={initialCode} />}
         </Screen>
     );
 }
@@ -143,24 +159,7 @@ function CreateSection() {
 function CreateSuccess({ league }: { league: LeagueRow }) {
     const { t } = useTranslation(['leagues', 'common']);
     const router = useRouter();
-    const toast = useToast();
     const successColor = useThemeColor('success');
-    const onBrandColor = useThemeColor('on-brand');
-    const textColor = useThemeColor('text');
-
-    const copyCode = async () => {
-        await Clipboard.setStringAsync(league.invite_code);
-        hapticLight();
-        toast.show(t('leagues:detail.codeCopied', { code: league.invite_code }), 'success');
-    };
-    const shareCode = () => {
-        Share.share({
-            message: t('leagues:detail.shareMessage', {
-                name: league.name,
-                code: league.invite_code,
-            }),
-        });
-    };
 
     return (
         <View className="gap-6 pt-2">
@@ -183,26 +182,7 @@ function CreateSuccess({ league }: { league: LeagueRow }) {
                 <Text className="pl-[6px] font-display text-[40px] leading-[42px] tracking-[6px] text-text">
                     {league.invite_code}
                 </Text>
-                <View className="w-full flex-row gap-2.5">
-                    <View className="flex-1">
-                        <Button
-                            fullWidth
-                            leadingIcon={<Copy color={onBrandColor} size={16} strokeWidth={2} />}
-                            onPress={copyCode}
-                            title={t('common:actions.copy')}
-                            variant="brand"
-                        />
-                    </View>
-                    <View className="flex-1">
-                        <Button
-                            fullWidth
-                            leadingIcon={<Share2 color={textColor} size={16} strokeWidth={2} />}
-                            onPress={shareCode}
-                            title={t('common:actions.share')}
-                            variant="secondary"
-                        />
-                    </View>
-                </View>
+                <InviteShareActions code={league.invite_code} from="creation" name={league.name} />
             </View>
 
             <View className="gap-2.5">
@@ -221,11 +201,18 @@ function CreateSuccess({ league }: { league: LeagueRow }) {
     );
 }
 
-function JoinSection() {
+/**
+ * `initialCode` vient d'un lien d'invitation (`/rejoindre/<code>` réécrit par
+ * `+native-intent`). Il n'est qu'une valeur de départ : dès que l'utilisateur
+ * touche au champ, la saisie reprend la main — d'où le `via` porté par un état
+ * plutôt que déduit de cette prop au moment du join.
+ */
+function JoinSection({ initialCode }: { initialCode: string | null }) {
     const { t } = useTranslation(['leagues', 'common']);
     const router = useRouter();
     const joinLeague = useJoinLeague();
-    const [value, setValue] = useState('');
+    const [value, setValue] = useState(initialCode ?? '');
+    const [via, setVia] = useState<'code' | 'link'>(initialCode ? 'link' : 'code');
     const [linkDetected, setLinkDetected] = useState(false);
     const [pasteError, setPasteError] = useState<string | null>(null);
     // La sheet se rouvre à chaque nouveau code complet ; « Annuler » la
@@ -242,6 +229,7 @@ function JoinSection() {
 
     const onChange = (next: string) => {
         setValue(next);
+        setVia('code');
         setLinkDetected(false);
         setPasteError(null);
         setDismissed(false);
@@ -327,9 +315,10 @@ function JoinSection() {
                 onCancel={() => setDismissed(true)}
                 onJoin={() => {
                     if (!code) return;
-                    joinLeague.mutate(code, {
-                        onSuccess: (league) => openLeague(league.id),
-                    });
+                    joinLeague.mutate(
+                        { code, via },
+                        { onSuccess: (league) => openLeague(league.id) },
+                    );
                 }}
                 onOpen={() => preview.data && openLeague(preview.data.league_id)}
                 preview={preview.data ?? null}
