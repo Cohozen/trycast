@@ -15,7 +15,7 @@ import { InviteShareActions } from '@/features/leagues/components/invite-share-a
 import { LeagueColorPicker } from '@/features/leagues/components/league-color-picker';
 import { LeagueIcon } from '@/features/leagues/components/league-icon';
 import { LeaguePreviewSheet } from '@/features/leagues/components/league-preview-sheet';
-import { takePendingInvite } from '@/features/leagues/pending-invite-store';
+import { markInviteHonored, takePendingInvite } from '@/features/leagues/pending-invite-store';
 import { toLeagueMessageKey } from '@/features/leagues/errors';
 import type { LeagueRow } from '@/features/leagues/types';
 import { useCreateLeague } from '@/features/leagues/use-create-league';
@@ -46,12 +46,13 @@ export default function NewLeagueScreen() {
         initialCode || params.tab === 'join' ? 'join' : 'create',
     );
 
-    // Le lien a abouti : l'invitation retenue pour survivre à un passage par
-    // l'écran de connexion n'a plus de raison d'être, et la laisser traîner la
-    // ferait rejouer au prochain lancement. `usePendingInvite` s'abstient tant
-    // qu'on est sur cet écran, les deux ne se marchent donc pas dessus.
+    // Le lien a abouti : le code est sous les yeux de l'utilisateur, plus rien
+    // ne justifie de le rejouer. On vide aussi le stockage au passage — sans
+    // compter dessus, l'écriture de `+native-intent` pouvant arriver après.
     useEffect(() => {
-        if (initialCode) void takePendingInvite();
+        if (!initialCode) return;
+        markInviteHonored(initialCode);
+        void takePendingInvite();
     }, [initialCode]);
 
     // Le titre du header natif suit l'onglet (surcharge l'option statique du

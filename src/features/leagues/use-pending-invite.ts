@@ -17,10 +17,11 @@ import { takePendingInvite } from './pending-invite-store';
  *   ne pas naviguer pendant le splash ;
  * - `resolved` — ne pas ouvrir l'aperçu d'une ligue par-dessus la sheet de
  *   bienvenue, exactement le piège déjà connu pour la permission notifications ;
- * - `pathname` — quand le lien a abouti tout seul (session déjà ouverte,
- *   `+native-intent` a redirigé), l'écran d'adhésion est *déjà* à l'écran et
- *   purge le stockage lui-même. Cette garde rend l'ordre des deux effets
- *   indifférent, là où s'en remettre à leur ordonnancement serait fragile.
+ * - `pathname` — quand le lien a abouti tout seul (session déjà ouverte), la
+ *   destination est *déjà* à l'écran : il n'y a rien à rejouer, et
+ *   l'invitation retenue est effacée sur place. La laisser traîner la ferait
+ *   rejouer à la première navigation suivante, renvoyant sur « Rejoindre » un
+ *   utilisateur qui vient d'ouvrir sa ligue.
  */
 export function usePendingInvite() {
     const router = useRouter();
@@ -32,7 +33,10 @@ export function usePendingInvite() {
 
     useEffect(() => {
         if (!navigationReady || !resolved || consumed.current) return;
-        if (pathname.startsWith('/league/new')) return;
+        if (pathname.startsWith('/league/new')) {
+            void takePendingInvite();
+            return;
+        }
         consumed.current = true;
         void (async () => {
             const code = await takePendingInvite();

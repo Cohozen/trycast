@@ -14,11 +14,23 @@ import { savePendingInvite } from '@/features/leagues/pending-invite-store';
  * la rejoue après l'inscription, l'écran d'adhésion la purge quand le lien a
  * abouti du premier coup.
  */
-export function redirectSystemPath({ path }: { path: string; initial: boolean }): string {
+export async function redirectSystemPath({
+    path,
+}: {
+    path: string;
+    initial: boolean;
+}): Promise<string> {
     try {
         const code = inviteCodeFromPath(path);
         if (!code) return path;
-        void savePendingInvite(code);
+        // Attendue, et non lancée en tâche de fond. L'écran d'adhésion est la
+        // destination de la redirection qui suit, et `usePendingInvite` efface
+        // l'invitation dès qu'il l'y voit arriver : une écriture encore en vol
+        // à cet instant survivrait à cet effacement, pour être rejouée à la
+        // navigation suivante — l'utilisateur ouvre sa ligue et se retrouve
+        // renvoyé sur « Rejoindre ». Course observée au simulateur le
+        // 2026-09-09, avant que ce `await` ne la referme.
+        await savePendingInvite(code);
         return `/league/new?tab=join&code=${code}`;
     } catch {
         // Un lien illisible ne doit jamais empêcher l'app de démarrer : on

@@ -62,15 +62,49 @@ export async function savePendingInvite(code: string): Promise<void> {
 }
 
 /**
- * Lit **et efface** l'invitation en attente : une invitation ne se rejoue
- * jamais deux fois, même si la navigation qui suit échoue.
+ * Codes déjà présentés à l'utilisateur depuis le démarrage de l'app.
+ *
+ * `redirectSystemPath` retient le code **avant** de rediriger, sans pouvoir
+ * savoir si sa redirection aboutira — c'est le rôle même de cette mémoire.
+ * Quand elle aboutit, l'écriture devient inutile, et il se trouve qu'elle
+ * arrive parfois *après* le nettoyage : Expo Router traite le lien une fois
+ * l'app montée, pas avant (observé au simulateur le 2026-09-09, traces
+ * `purge` → `intent` → `save` dans cet ordre). S'en remettre à l'ordre de ces
+ * étapes serait donc illusoire ; on note plutôt ce qui a déjà été montré, et
+ * une invitation honorée ne se rejoue pas, quel que soit l'ordre.
+ *
+ * Volontairement en mémoire : la question ne se pose que dans une exécution.
+ */
+const honored = new Set<string>();
+
+/** L'écran d'adhésion a affiché ce code : il n'y a plus rien à rejouer. */
+export function markInviteHonored(code: string): void {
+    honored.add(code);
+}
+
+/** Vrai si ce code a déjà été présenté depuis le démarrage. */
+export function isInviteHonored(code: string): boolean {
+    return honored.has(code);
+}
+
+/** Remet la mémoire à zéro — réservé aux tests. */
+export function resetHonoredInvites(): void {
+    honored.clear();
+}
+
+/**
+ * Lit **et efface** l'invitation en attente. Rend `null` pour un code déjà
+ * honoré, tout en l'effaçant quand même : le stockage doit se vider même
+ * lorsqu'il n'y a rien à rejouer, sans quoi l'invitation ressurgirait au
+ * lancement suivant.
  */
 export async function takePendingInvite(): Promise<string | null> {
     try {
         const stored = await AsyncStorage.getItem(STORAGE_KEY);
         if (stored === null) return null;
         await AsyncStorage.removeItem(STORAGE_KEY);
-        return parsePendingInvite(stored, Date.now());
+        const code = parsePendingInvite(stored, Date.now());
+        return code && !isInviteHonored(code) ? code : null;
     } catch {
         return null;
     }

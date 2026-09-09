@@ -1,8 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import {
+    isInviteHonored,
+    markInviteHonored,
     parsePendingInvite,
     PENDING_INVITE_TTL_MS,
+    resetHonoredInvites,
     serializePendingInvite,
 } from './pending-invite-store';
 
@@ -46,5 +49,19 @@ describe('parsePendingInvite', () => {
         ['un chemin déguisé en code', '{"code":"../../settings","at":1800000000000}'],
     ])('rend null pour %s', (_label, stored) => {
         expect(parsePendingInvite(stored, NOW)).toBeNull();
+    });
+});
+
+describe('invitations honorées', () => {
+    beforeEach(resetHonoredInvites);
+
+    it("n'en retient aucune au démarrage", () => {
+        expect(isInviteHonored('E2ETEST2')).toBe(false);
+    });
+
+    it('retient celle que l’écran d’adhésion a affichée', () => {
+        markInviteHonored('E2ETEST2');
+        expect(isInviteHonored('E2ETEST2')).toBe(true);
+        expect(isInviteHonored('XW3KP7QM')).toBe(false);
     });
 });

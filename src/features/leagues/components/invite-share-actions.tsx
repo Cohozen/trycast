@@ -1,7 +1,7 @@
 import * as Clipboard from 'expo-clipboard';
 import { Copy, Share2 } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Platform, Share } from 'react-native';
+import { Share } from 'react-native';
 
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast-provider';
@@ -41,14 +41,18 @@ export function InviteShareActions({ code, name, from }: InviteShareActionsProps
     };
 
     const shareInvite = () => {
-        const url = buildInviteUrl(code);
-        // L'URL reste *dans* le message sur les deux plateformes : `url` n'est
-        // honoré que par iOS, où certaines cibles de partage le substituent au
-        // message au lieu de l'y ajouter. Le passer en plus n'y sert qu'à
-        // alimenter les cibles qui n'acceptent qu'un lien.
+        // Un seul élément partagé, le message, l'URL à l'intérieur. Passer `url`
+        // en plus (iOS l'accepte, Android l'ignore) fait mettre le lien nu en
+        // avant par la feuille de partage, et certaines cibles le substituent
+        // au message : on y perdrait le nom de la ligue, qui est tout l'intérêt
+        // de l'invitation. L'aperçu ne s'en trouve pas dégradé — ce sont les
+        // messageries qui détectent l'URL dans le texte, pas le système.
         void Share.share({
-            message: t('leagues:detail.shareMessage', { name, code, url }),
-            ...(Platform.OS === 'ios' ? { url } : {}),
+            message: t('leagues:detail.shareMessage', {
+                name,
+                code,
+                url: buildInviteUrl(code),
+            }),
         });
         trackEvent({ name: 'league_invite_shared', props: { from } });
     };
