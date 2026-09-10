@@ -17,6 +17,18 @@
  * correctifs n'arrivent simplement jamais. Un piège coûteux, puisqu'on ne le
  * découvre qu'en constatant que rien ne se passe.
  *
+ * ⚠️ **`ExpoConfigVersions` n'est délibérément PAS dans cette liste** (décision
+ * actée le 10 septembre 2026 — ne pas la reproposer). Sans ce drapeau,
+ * `expo.version` fait partie de l'empreinte (`@expo/fingerprint` ne la retire
+ * de la source `expoConfig` que sous ce skip), donc **tout bump de version
+ * impose un nouveau build**. C'est voulu : l'écran Réglages affiche
+ * `nativeApplicationVersion`, gravée dans le binaire, qu'une mise à jour à
+ * distance ne peut pas changer. Découpler les deux permettrait de bumper sans
+ * builder, et l'app afficherait alors une version fausse. Le couplage est donc
+ * un garde-fou, pas une gêne — le corollaire étant qu'un correctif JS se publie
+ * **sans bump** (`npm run ota:prod`). `npm run release` annonce le verdict avant
+ * d'écrire quoi que ce soit.
+ *
  * `ignorePaths` traite un autre cas, vécu le 6 septembre 2026 : le
  * `android/build.gradle` de `@react-native-masked-view/masked-view` **réécrit
  * son propre `AndroidManifest.xml` dans `node_modules`** au moment où Gradle
@@ -30,8 +42,12 @@
  * l'empreinte identique des deux côtés (vérifié : même valeur que le manifeste
  * soit intact ou réécrit par Gradle).
  *
- * ⚠️ Modifier ce fichier change l'empreinte : les builds antérieurs cessent de
- * recevoir les mises à jour. À ne toucher qu'en même temps qu'une release.
+ * ⚠️ Changer la CONFIGURATION ci-dessous change l'empreinte : les builds
+ * antérieurs cessent de recevoir les mises à jour. À ne toucher qu'en même
+ * temps qu'une release. En revanche, ce commentaire n'en fait pas partie — le
+ * fichier lui-même n'est pas haché, seul son effet l'est (vérifié le
+ * 10 septembre 2026 : empreinte identique avant et après cette réécriture).
+ * Documenter ici est donc sans risque, et c'est le bon endroit pour le faire.
  */
 module.exports = {
     sourceSkips: ['PackageJsonScriptsAll'],

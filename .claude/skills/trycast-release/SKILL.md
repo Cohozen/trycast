@@ -49,6 +49,12 @@ livrée en OTA » — bumper, c'est builder. Ce n'est pas un défaut : la versio
 Réglages vient de `nativeApplicationVersion`, gravée dans le binaire, qu'une mise à jour à
 distance ne peut pas changer. Bumper sans builder produirait une version fausse.
 
+**Décision actée le 2026-09-10 : `ExpoConfigVersions` n'entrera pas dans les `sourceSkips`** — le
+couplage est un garde-fou, il rend l'état incohérent impossible. Ne pas la reproposer ; le
+raisonnement est inscrit dans `fingerprint.config.js`, là où on serait tenté de la défaire.
+(Au passage, vérifié le même jour : **les commentaires de ce fichier ne sont pas hachés**, seule
+sa configuration effective l'est — le documenter ne coupe aucun build de ses mises à jour.)
+
 Le corollaire est ce qui compte au quotidien : **un correctif JS se publie sans bump**.
 
 ```
