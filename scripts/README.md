@@ -100,6 +100,7 @@ Détails d'usage (observer, piloter, deep links, pièges) : skill `trycast-andro
 | `npm run build:preview` | Build de release sur le projet **dev** — sert aux captures et à valider l'OTA |
 | `npm run build:prod` | **AAB** pour la Play Console, sur le projet **prod** |
 | `npm run build:list` | Les 5 derniers builds Android |
+| `npm run release -- --minor --notes "…"` | Prépare une release : bump, journal, vérifications, commit et tag `vX.Y.Z` |
 | `npm run ota:preview -- --message "…"` | Mise à jour à distance sur le canal `preview` |
 | `npm run ota:prod -- --message "…"` | Mise à jour à distance sur le canal `production` |
 | `npm run ota:list` | Les 5 dernières mises à jour publiées |
@@ -139,6 +140,37 @@ Ce qui déplace légitimement l'empreinte, et impose donc un nouveau build : une
 native ajoutée ou retirée, `app.json`, `eas.json`, les plugins de configuration, les assets
 déclarés dans la config, une montée de SDK. Et `fingerprint.config.js` lui-même — à ne
 modifier qu'en même temps qu'une release.
+
+### `release.mjs` : ce qu'il rend indissociable
+
+Une release, c'est six gestes qui doivent tomber ensemble : bumper `app.json` **et**
+`package.json` (leur divergence casse `src/lib/app-version.test.ts`, qui ne faisait jusqu'ici
+que la constater), écrire le journal, passer les quatre vérifications de la CI, commiter,
+taguer. En faire cinq sur six produit un état qu'on ne découvre qu'au build suivant.
+
+```bash
+npm run release -- --minor --notes "…" --dry-run   # lit tout, n'écrit rien
+npm run release -- --patch --notes "…"             # bump, journal, commit, tag
+```
+
+Sa vraie raison d'être est l'**étape d'empreinte**. La question risquée d'une release n'est pas
+MINOR-ou-PATCH, c'est « l'empreinte a-t-elle bougé ? » — jusqu'ici vérifiée de tête contre
+`npm run build:list`, alors que le non-appariement est muet. Le script compare l'empreinte locale
+à celle du dernier build de production et annonce laquelle des deux sorties s'applique. Elle est
+réseau et suppose une session EAS : elle **avertit, elle ne bloque jamais**.
+
+⚠️ **`expo.version` fait partie de l'empreinte** tant que `fingerprint.config.js` n'exclut pas
+`ExpoConfigVersions` (vérifié le 2026-09-10 dans `@expo/fingerprint/build/sourcer/Expo.js`, et la
+source `expoConfig` hachée contenait bien la version). **Tout bump impose donc un build**, et un
+correctif JS se publie sans bump. Ce n'est pas gênant : la version affichée dans Réglages vient
+du binaire, qu'une mise à jour à distance ne peut de toute façon pas changer.
+
+Le script **ne pousse rien, ne build rien, ne publie rien** : il affiche les commandes. Échappatoires :
+`--skip-checks`, `--skip-fingerprint`, `--dry-run`. Pas de `--allow-dirty`, contrairement à
+`ota.mjs` — un commit de release ne doit contenir que le bump et le journal.
+
+Retour arrière tant que rien n'est poussé : `git tag -d vX.Y.Z && git reset --hard HEAD~1`.
+Le reste (mise à jour republiée, GitHub Release supprimée) est dans le skill `trycast-release`.
 
 ### `ota.mjs` : pourquoi un script et pas une ligne
 

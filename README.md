@@ -280,7 +280,7 @@ Deux compteurs bien distincts :
 
 | | Où | Qui le bump |
 | --- | --- | --- |
-| Version « marketing » (`1.0.0`) | `app.json` → `expo.version` (dupliquée dans `package.json`) | **à la main**, au moment de préparer une release store |
+| Version « marketing » (`1.0.0`) | `app.json` → `expo.version` (dupliquée dans `package.json`) | `npm run release`, au moment de préparer une release store |
 | Numéro de build (`versionCode` / `buildNumber`) | nulle part dans le repo | **EAS**, seul (`appVersionSource: "remote"` + `autoIncrement` sur le profil production) |
 
 La version marketing suit le semver : MINOR pour de nouvelles fonctionnalités,
@@ -288,6 +288,18 @@ PATCH pour des correctifs — pas de bump à chaque lot livré. Elle vaut `1.0.0
 tant que rien n'est publié ; la beta TestFlight / Play interne se joue en 1.0.0
 avec des builds 1, 2, 3… `src/lib/app-version.test.ts` casse la CI si `app.json`
 et `package.json` divergent, donc les deux se bumpent dans le même commit.
+
+```bash
+npm run release -- --minor --notes "Ce que cette version apporte" --dry-run
+```
+
+Le script bumpe les deux fichiers, rejoue les vérifications de la CI, écrit
+l'entrée de [`CHANGELOG.md`](CHANGELOG.md), commite et pose le tag `vX.Y.Z` —
+qui déclenche la GitHub Release. Il ne pousse rien et ne build rien. Il annonce
+surtout si l'empreinte a bougé, donc si la version peut partir en mise à jour à
+distance ou impose un build. ⚠️ **`expo.version` fait partie de l'empreinte** :
+tout bump impose aujourd'hui un build, un correctif JS se publie donc sans bump.
+Détails et retour arrière : `scripts/README.md` et le skill `trycast-release`.
 
 L'écran Réglages affiche `nativeApplicationVersion (nativeBuildVersion)`
 d'`expo-application`, c'est-à-dire le binaire réellement installé — pas la

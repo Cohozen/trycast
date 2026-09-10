@@ -83,10 +83,13 @@ Avant de considérer un lot terminé : `npm run typecheck && npm run lint && npm
 
 ## Versions
 
-- **`app.json` → `expo.version` est la seule source de vérité** de la version « marketing » (celle affichée dans Réglages et sur les stores). Semver `MAJOR.MINOR.PATCH`, bumpée **à la main, au moment de préparer une release store** — jamais à chaque lot livré : MINOR = nouvelles fonctionnalités, PATCH = correctifs. Valeur actuelle : `1.0.0` (rien n'est encore publié ; la beta TestFlight / Play interne se fait en 1.0.0, build 1, 2, 3…)
+- **Une release se prépare par `npm run release -- --minor|--patch --notes "…"`** (`scripts/release.mjs`, skill `trycast-release`), jamais à la main : le script bumpe les deux fichiers d'un geste, rejoue les vérifications de la CI, écrit `CHANGELOG.md`, commite et pose le tag annoté `vX.Y.Z` — qui déclenche `.github/workflows/release.yml` et la GitHub Release. Il ne pousse rien et ne build rien. Passer d'abord en `--dry-run` : c'est là que s'écrivent les notes, à partir des commits depuis le dernier tag
+- ⚠️ **`expo.version` fait partie de l'empreinte** tant que `fingerprint.config.js` n'exclut pas `ExpoConfigVersions` (vérifié le 2026-09-10 dans `@expo/fingerprint`) : **tout bump impose donc un build**, et un correctif JS se publie **sans bump**, par `npm run ota:prod`. Le script annonce le verdict avant d'écrire quoi que ce soit
+- **`app.json` → `expo.version` est la seule source de vérité** de la version « marketing » (celle affichée dans Réglages et sur les stores). Semver `MAJOR.MINOR.PATCH` — MINOR = ce qu'on annonce dans les notes de version, PATCH = ce qu'on corrige en silence ; jamais de bump à chaque lot livré. Valeur actuelle : `1.0.0` (rien n'est encore publié ; la beta TestFlight / Play interne se fait en 1.0.0, build 1, 2, 3…)
 - Le **numéro de build** (`versionCode` Android / `buildNumber` iOS) n'est **jamais** écrit dans le repo : EAS le gère seul (`appVersionSource: "remote"` + `autoIncrement` sur le profil production dans `eas.json`)
 - `package.json` → `version` duplique `app.json` par convention npm : `src/lib/app-version.test.ts` casse la CI si les deux divergent — **bumper les deux ensemble**
-- Réglages affiche `nativeApplicationVersion (nativeBuildVersion)` d'`expo-application` (le binaire réellement installé), pas la version du bundle JS
+- Réglages affiche `nativeApplicationVersion (nativeBuildVersion)` d'`expo-application` (le binaire réellement installé), pas la version du bundle JS — et, dessous, le canal et l'identifiant court de la mise à jour à distance chargée : c'est la seule façon de savoir quel JS tourne chez un testeur, le numéro de build ne bougeant pas d'une OTA à l'autre
+- `CHANGELOG.md` est le journal des versions distribuées, écrit par le script à partir des `--notes`. La 1.0.0 y figure sans tag (le commit du binaire en circulation n'est pas identifiable avec certitude) : la traçabilité par tag commence à la version suivante
 
 ## Dev builds
 
