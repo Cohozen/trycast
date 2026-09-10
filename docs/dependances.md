@@ -20,7 +20,7 @@ ce que le SDK réclame (`npx expo install --fix`), les rattrapages dans la plage
 | `eslint` | 9.39.4 | 10.10.0 | ⏸️ différé, sans risque | prochain lot d'outillage — à faire avec Vitest 5 |
 | `vitest` | 4.1.9 | 5.0.0 | ⏸️ différé, sans risque | idem |
 | `@aptabase/react-native` ⚑ | 0.5.0 | 0.6.0 | ⏸️ sans objet | quand une release native passe de toute façon |
-| Famille SDK (async-storage 3, Sentry 8, gesture-handler 3…) | — | — | ❌ **ne pas suivre** | montée du SDK Expo (58) |
+| Famille SDK (async-storage 3, Sentry 8, gesture-handler 3…) | — | — | ❌ **ne pas suivre** | sortie d’un SDK 58 — **pas encore annoncé** (canary seulement) |
 
 ---
 
@@ -100,16 +100,21 @@ déplacer l'empreinte pour ça seul.
 ce sont elles qu'Expo teste ensemble. Les installer une par une, c'est sortir du couloir supporté et
 découvrir la casse au premier build natif.
 
-Ces montées arrivent **en bloc, avec le SDK 58** — jamais par `npm i`. Le rapport les range dans
-« Écartés » pour cette raison, en rappelant à chaque fois ce que le SDK attend.
+⚠️ **Le SDK 58 n'existe pas** (vérifié le 2026-09-10) : le SDK 57 est sorti le 30 juin 2026 et reste
+le dernier publié — `latest` **et** `next` pointent tous deux sur `expo@57.0.21`, et la seule trace
+d'un 58 est une canary quotidienne (`58.0.0-canary-2026…`), qui n'est pas une cible. « Attendre le
+SDK 58 » n'est donc pas une veille à tenir : il n'y a rien à surveiller avant l'annonce, et le
+rapport continuera d'écarter ces paquets d'ici là.
 
-Le passage au SDK suivant est un lot en soi : `npx expo install --fix`, rebuild du dev client,
-passes visuelles iOS **et** Android, nouvelle empreinte, et donc une release.
+Quand il sortira, ce sera un lot en soi : `npx expo install --fix`, rebuild du dev client, passes
+visuelles iOS **et** Android, nouvelle empreinte, et donc une release.
 
 ## Ce qui ne se décide pas
 
 - **À réaligner sur le SDK** (`npx expo install --fix`) — Expo réclame ces versions, elles sont
-  testées ensemble. Aujourd'hui 26 paquets, presque tous natifs : à caler sur une release.
+  testées ensemble. Aujourd'hui **26 paquets**, presque tous natifs — dont `expo` 57.0.2 → 57.0.21
+  et `expo-router` 57.0.3 → 57.0.20, soit une vingtaine de correctifs publiés depuis le SDK 57.0.2 :
+  c'est le plus gros écart du projet, et il se rattrape en une commande suivie d'une release.
 - **Rattrapage dans la plage** (`npm update`) — déjà autorisé par `package.json`, seul le lock bouge.
 - **`npm audit`** — la synthèse figure au rapport. Sur une app React Native, l'essentiel des alertes
   vit dans des dépendances de build inaccessibles à l'exécution : à lire, pas à corriger
