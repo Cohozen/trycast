@@ -508,7 +508,7 @@ function verifierEcriture(cible) {
     return format.status === 0 ? null : 'biome format signale une dérive sur les fichiers écrits';
 }
 
-function apercuDiff(chemin, libelle, avant, apres, cible, actuelle) {
+function apercuDiff({ libelle, avant, apres }, cible, actuelle) {
     if (avant === null) {
         console.log(`  ${libelle}  (absent — serait créé, ${apres.split('\n').length} lignes)`);
         return;
@@ -517,10 +517,17 @@ function apercuDiff(chemin, libelle, avant, apres, cible, actuelle) {
         console.log(`  ${libelle}  inchangé`);
         return;
     }
+    // Le journal n'a pas de ligne "version" : son ajout se décrit en nombre de
+    // lignes, pas en diff de version — sans quoi l'aperçu annoncerait un
+    // remplacement qui n'a pas lieu.
     const index = avant.indexOf(`"version": "${actuelle}"`);
-    const ligne = index === -1 ? '?' : avant.slice(0, index).split('\n').length;
+    if (index === -1) {
+        const ajoutees = apres.split('\n').length - avant.split('\n').length;
+        console.log(`  ${libelle}  section ${cible} ajoutée en tête (+${ajoutees} lignes)`);
+        return;
+    }
     console.log(
-        `  ${libelle}  ligne ${ligne}\n` +
+        `  ${libelle}  ligne ${avant.slice(0, index).split('\n').length}\n` +
             `      - "version": "${actuelle}"\n` +
             `      + "version": "${cible}"`,
     );
@@ -672,7 +679,7 @@ function main() {
 
     if (dryRun) {
         console.log("--dry-run : rien n'a été écrit.\n");
-        for (const p of plan) apercuDiff(p.chemin, p.libelle, p.avant, p.apres, cible, actuelle);
+        for (const p of plan) apercuDiff(p, cible, actuelle);
         console.log(`\n  Section ${cible} :\n`);
         console.log(
             sectionChangelog(cible, notes, date)
