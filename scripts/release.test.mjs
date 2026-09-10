@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import {
     changelogAvecSection,
     comparerVersions,
+    extraireSection,
     grouperCommits,
     incrementer,
     lireNotes,
@@ -140,6 +141,38 @@ describe('changelogAvecSection', () => {
         const resultat = changelogAvecSection('# Journal\n\nPréambule.\n', section);
         expect(resultat).toContain('Préambule.');
         expect(resultat.trimEnd()).toMatch(/- Une nouveauté$/);
+    });
+});
+
+describe('extraireSection', () => {
+    const journal =
+        '# Journal\n\nPréambule.\n\n' +
+        '## 1.1.0 — 2026-09-10\n\n- Une nouveauté\n- Une autre\n\n' +
+        '## 1.0.0 — 2026-09-03\n\n- Première version\n';
+
+    it('rend le corps de la section demandée, titre exclu', () => {
+        expect(extraireSection(journal, '1.1.0')).toBe('- Une nouveauté\n- Une autre');
+        expect(extraireSection(journal, '1.0.0')).toBe('- Première version');
+    });
+
+    it('rend null pour une version absente, sans confondre 1.1.0 et 1.1.0x', () => {
+        expect(extraireSection(journal, '2.0.0')).toBeNull();
+        expect(extraireSection(journal, '1.1')).toBeNull();
+    });
+
+    it("retrouve la section que le script vient d'écrire", () => {
+        // L'aller-retour est ce dont dépend le corps de la GitHub Release.
+        const ecrit = changelogAvecSection(
+            journal,
+            sectionChangelog('1.2.0', ['Du neuf'], '2026-09-11'),
+        );
+        expect(extraireSection(ecrit, '1.2.0')).toBe('- Du neuf');
+        expect(extraireSection(ecrit, '1.1.0')).toBe('- Une nouveauté\n- Une autre');
+    });
+
+    it('lit le CHANGELOG.md réel du dépôt', () => {
+        const reel = readFileSync(join(RACINE, 'CHANGELOG.md'), 'utf8');
+        expect(extraireSection(reel, '1.0.0')).toContain('Première version distribuée');
     });
 });
 

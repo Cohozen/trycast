@@ -1,0 +1,60 @@
+name: Release
+
+# Un tag `vX.Y.Z` est le seul déclencheur. `ci.yml` ne réagit qu'aux push sur
+# main et aux pull requests : jusqu'ici, pousser un tag ne vérifiait rien et ne
+# laissait aucune trace hors du dépôt.
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # requis par `gh release create`
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # le tag annoté et l'historique, pas seulement le commit
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      # Les quatre vérifications de ci.yml, rejouées sur le commit taggé
+      # lui-même. Doublon partiel assumé : il garantit que c'est bien CET état
+      # qui est vert, indépendamment de ce qui a pu être poussé sur main depuis.
+      - run: npm run lint -- --max-warnings 0
+        env:
+          CI: '1'
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm test
+
+      # Le seul garde-fou possible contre un tag posé à la main : `npm run
+      # release` rend les deux cohérents par construction, un `git tag` isolé
+      # non. Un tag qui ment sur la version rendrait le journal inexploitable.
+      - name: Le tag doit correspondre à app.json
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          declaree=$(node -p "require('./app.json').expo.version")
+          if [ "$version" != "$declaree" ]; then
+            echo "::error::Le tag $GITHUB_REF_NAME annonce $version, app.json déclare $declaree."
+            exit 1
+          fi
+
+      # L'extraction vit dans scripts/release.mjs, qui est propriétaire du
+      # format du journal et testé : un awk dans ce YAML ne se découvrirait
+      # cassé que le jour d'une release.
+      - name: Notes de version
+        run: node scripts/release.mjs --section="${GITHUB_REF_NAME#v}" > "$RUNNER_TEMP/notes.md"
+
+      - name: Publier la GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "TryCast ${GITHUB_REF_NAME#v}" \
+            --notes-file "$RUNNER_TEMP/notes.md" \
+            --verify-tag

@@ -222,6 +222,23 @@ export function changelogAvecSection(actuel, section) {
     return `${tete.trimEnd()}\n\n${section.trim()}\n\n${reste.trimStart()}`;
 }
 
+/**
+ * Corps d'une section du journal, titre exclu — ce que la GitHub Release
+ * affiche sous son propre titre. `null` si la version n'y figure pas.
+ *
+ * Le workflow de release s'en sert plutôt que d'un `awk` dans le YAML : le
+ * format du journal appartient à ce fichier, et une extraction non testée dans
+ * un script de CI ne se découvre cassée que le jour d'une release.
+ */
+export function extraireSection(contenu, version) {
+    const echappe = version.replace(/\./g, '\\.');
+    const debut = contenu.match(new RegExp(`^## ${echappe}(\\s|$).*$`, 'm'));
+    if (!debut) return null;
+    const apres = contenu.slice(debut.index + debut[0].length);
+    const suivante = apres.search(/^## /m);
+    return (suivante === -1 ? apres : apres.slice(0, suivante)).trim();
+}
+
 /** Range des sujets de commit par préfixe conventionnel. */
 export function grouperCommits(sujets) {
     const groupes = new Map();
@@ -568,6 +585,24 @@ function epilogue(actuelle, cible, notes, verdict, commit) {
 // --- enchaînement ---------------------------------------------------------
 
 function main() {
+    // Lecture seule, utilisée par .github/workflows/release.yml pour le corps
+    // de la GitHub Release. Court-circuite tout le reste.
+    const section = process.argv
+        .find((a) => a.startsWith('--section='))
+        ?.slice('--section='.length);
+    if (section) {
+        let journal;
+        try {
+            journal = readFileSync(CHANGELOG, 'utf8');
+        } catch {
+            echouer('✗ CHANGELOG.md est absent.');
+        }
+        const corps = extraireSection(journal, section);
+        if (!corps) echouer(`✗ Aucune section ${section} dans CHANGELOG.md.`);
+        console.log(corps);
+        process.exit(0);
+    }
+
     const dryRun = process.argv.includes('--dry-run');
     const sansVerifs = process.argv.includes('--skip-checks');
     const sansEmpreinte = process.argv.includes('--skip-fingerprint');
