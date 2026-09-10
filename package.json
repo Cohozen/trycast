@@ -96,6 +96,7 @@
         "build:preview": "eas build --platform android --profile preview",
         "build:prod": "eas build --platform android --profile production",
         "build:list": "eas build:list --platform android --limit 5",
+        "release": "node ./scripts/release.mjs",
         "ota:preview": "node ./scripts/ota.mjs --channel=preview",
         "ota:prod": "node ./scripts/ota.mjs --channel=production",
         "ota:list": "eas update:list --limit 5",
