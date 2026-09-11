@@ -1,6 +1,10 @@
 ---
+import { getDictionary, localePath, toLocale } from '../i18n';
 import BallLogo from './ball-logo.astro';
 
+const locale = toLocale(Astro.currentLocale);
+const t = getDictionary(locale);
+const home = localePath('home', locale);
 const year = new Date().getFullYear();
 ---
 
@@ -11,36 +15,33 @@ const year = new Date().getFullYear();
                 <BallLogo size={36} />
                 <span class="wordmark"><span class="try">Try</span><span class="cast">Cast</span></span>
             </div>
-            <div class="tagline">Tente ton essai.</div>
-            <p class="pitch">
-                Le jeu de pronos rugby, gratuit et 100% entre amis. Non affilié aux compétitions,
-                clubs ou fédérations cités.
-            </p>
+            <div class="tagline">{t.footer.tagline}</div>
+            <p class="pitch">{t.footer.pitch}</p>
         </div>
         <div class="columns">
             <div class="column">
-                <span class="heading">Produit</span>
-                <a href="/#concept">Le concept</a>
-                <a href="/#competitions">Compétitions</a>
-                <a href="/#faq">FAQ</a>
-                <a href="/#waitlist">Liste d'attente</a>
+                <span class="heading">{t.footer.product}</span>
+                <a href={`${home}#concept`}>{t.nav.concept}</a>
+                <a href={`${home}#competitions`}>{t.nav.competitions}</a>
+                <a href={`${home}#faq`}>{t.nav.faq}</a>
+                <a href={`${home}#waitlist`}>{t.nav.waitlist}</a>
             </div>
             <div class="column">
-                <span class="heading">Légal</span>
-                <a href="/cgu">CGU</a>
-                <a href="/confidentialite">Confidentialité</a>
-                <a href="/mentions-legales">Mentions légales</a>
-                <a href="/suppression-compte">Supprimer mon compte</a>
+                <span class="heading">{t.footer.legal}</span>
+                <a href="/cgu">{t.footer.terms}</a>
+                <a href="/confidentialite">{t.footer.privacy}</a>
+                <a href="/mentions-legales">{t.footer.legalNotice}</a>
+                <a href="/suppression-compte">{t.footer.deleteAccount}</a>
             </div>
             <div class="column">
-                <span class="heading">Contact</span>
+                <span class="heading">{t.footer.contact}</span>
                 <a href="mailto:contact@trycast.fr">contact@trycast.fr</a>
             </div>
         </div>
     </div>
     <div class="bottom">
-        <span>© {year} TryCast. Fait entre potes, pour de vrai.</span>
-        <span>Aucun pari d'argent · aucune mise · jeu social gratuit.</span>
+        <span>© {year} {t.footer.madeBy}</span>
+        <span>{t.footer.noMoney}</span>
     </div>
 </footer>
 

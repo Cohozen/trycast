@@ -9,6 +9,14 @@ export default defineConfig({
     // le seul sur lequel .well-known/ est vérifié — ni Apple ni Google ne
     // suivent une redirection pour aller le lire.
     site: 'https://www.trycast.fr',
+    // Français à la racine, anglais sous /en/ : les URL françaises ne bougent pas, et ce
+    // sont elles que connaissent l'app, les e-mails et les liens d'invitation. Chemins
+    // et dictionnaires : src/i18n/.
+    i18n: {
+        locales: ['fr', 'en'],
+        defaultLocale: 'fr',
+        routing: { prefixDefaultLocale: false },
+    },
     vite: {
         resolve: {
             // Pas d'alias TS dans ce projet. Sans ça, la découverte tsconfig du resolver

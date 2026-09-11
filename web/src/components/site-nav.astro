@@ -1,20 +1,33 @@
 ---
+import { getDictionary, localePath, type RouteName, toLocale } from '../i18n';
 import BallLogo from './ball-logo.astro';
+import LanguageSwitcher from './language-switcher.astro';
+
+interface Props {
+    /** Page traduite : affiche le sélecteur de langue vers son équivalent. */
+    route?: RouteName;
+}
+
+const { route } = Astro.props;
+const locale = toLocale(Astro.currentLocale);
+const t = getDictionary(locale);
+const home = localePath('home', locale);
 ---
 
 <header>
     <nav>
-        <a href="/#top" class="brand">
+        <a href={`${home}#top`} class="brand">
             <BallLogo size={34} />
             <span class="wordmark">TryCast</span>
         </a>
         <div class="spacer"></div>
         <div class="links">
-            <a href="/#concept">Le concept</a>
-            <a href="/#competitions">Compétitions</a>
-            <a href="/#faq">FAQ</a>
+            <a href={`${home}#concept`}>{t.nav.concept}</a>
+            <a href={`${home}#competitions`}>{t.nav.competitions}</a>
+            <a href={`${home}#faq`}>{t.nav.faq}</a>
         </div>
-        <a href="/#waitlist" class="cta">Liste d'attente</a>
+        {route && <LanguageSwitcher route={route} />}
+        <a href={`${home}#waitlist`} class="cta">{t.nav.waitlist}</a>
     </nav>
 </header>
 
