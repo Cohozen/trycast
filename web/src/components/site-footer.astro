@@ -1,8 +1,13 @@
 ---
-import { getDictionary, localePath, toLocale } from '../i18n';
+import { getDictionary, type Locale, localePath, toLocale } from '../i18n';
 import BallLogo from './ball-logo.astro';
 
-const locale = toLocale(Astro.currentLocale);
+interface Props {
+    /** Langue du rendu, quand elle ne vient pas de l'URL (pages autoLocale). */
+    locale?: Locale;
+}
+
+const locale = Astro.props.locale ?? toLocale(Astro.currentLocale);
 const t = getDictionary(locale);
 const home = localePath('home', locale);
 const year = new Date().getFullYear();

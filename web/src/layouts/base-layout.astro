@@ -8,7 +8,15 @@ import '../styles/tokens.css';
 import '../styles/global.css';
 import SiteFooter from '../components/site-footer.astro';
 import SiteNav from '../components/site-nav.astro';
-import { getDictionary, intlLocales, locales, type RouteName, routes, toLocale } from '../i18n';
+import {
+    getDictionary,
+    intlLocales,
+    type Locale,
+    locales,
+    type RouteName,
+    routes,
+    toLocale,
+} from '../i18n';
 
 interface Props {
     title: string;
@@ -22,9 +30,24 @@ interface Props {
      * de langue et les balises hreflang vers ses équivalents.
      */
     route?: RouteName;
+    /**
+     * Atterrissage à URL unique, imposée par l'app ou les e-mails (/rejoindre/<code>,
+     * /app/confirme…) : pas de /en/ possible, donc la page rend les deux langues dans des
+     * blocs [data-locale] et le script du <head> choisit selon le navigateur (ou ?lang=),
+     * avant le premier paint. Valeur : le <title> de chaque langue. Les balises d'aperçu
+     * restent dans la langue du build — les robots n'exécutent pas de JS.
+     */
+    autoLocale?: Record<Locale, string>;
 }
 
-const { title, description, image = '/og-default.png', noindex = false, route } = Astro.props;
+const {
+    title,
+    description,
+    image = '/og-default.png',
+    noindex = false,
+    route,
+    autoLocale,
+} = Astro.props;
 
 const locale = toLocale(Astro.currentLocale);
 const t = getDictionary(locale);
@@ -96,10 +119,47 @@ const alternates =
                 prefersDark.addEventListener('change', apply);
             })();
         </script>
+        {
+            autoLocale && (
+                <script is:inline define:vars={{ titles: autoLocale }}>
+                    // Même règle que l'app : anglais si le système l'est, français sinon
+                    // (une langue non gérée retombe sur le français, comme i18next côté app).
+                    // ?lang= force le choix : sélecteur de langue et recette.
+                    (() => {
+                        const forced = new URLSearchParams(window.location.search).get('lang');
+                        const browser = (navigator.language || '').toLowerCase();
+                        const lang =
+                            forced === 'en' || forced === 'fr' ? forced : browser.startsWith('en') ? 'en' : 'fr';
+                        document.documentElement.lang = lang;
+                        document.title = titles[lang];
+                    })();
+                </script>
+            )
+        }
     </head>
     <body>
-        <SiteNav route={route} />
+        {
+            autoLocale ? (
+                locales.map((l) => (
+                    <div data-locale={l} lang={l}>
+                        <SiteNav locale={l} autoLocale />
+                    </div>
+                ))
+            ) : (
+                <SiteNav route={route} />
+            )
+        }
         <slot />
-        <SiteFooter />
+        {
+            autoLocale ? (
+                locales.map((l) => (
+                    <div data-locale={l} lang={l}>
+                        <SiteFooter locale={l} />
+                    </div>
+                ))
+            ) : (
+                <SiteFooter />
+            )
+        }
     </body>
 </html>

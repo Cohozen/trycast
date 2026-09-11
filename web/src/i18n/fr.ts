@@ -210,6 +210,40 @@ export const fr = {
         errorNetwork: "Oups — ça n'a pas voulu passer. Réessaie dans un instant.",
         reassurance: 'Gratuit, sans engagement. On ne partage jamais ton e-mail.',
     },
+    invite: {
+        title: 'Rejoindre une ligue — TryCast',
+        description: 'Tu es invité à rejoindre une ligue de pronostics rugby sur TryCast.',
+        overline: 'Invitation',
+        heading: 'Rejoins la ligue',
+        // Libellés des écrans de l'app (src/locales/fr/leagues.json).
+        lede: {
+            before: 'Ouvre TryCast, va dans ',
+            strong: 'Ligues → Rejoindre',
+            after: ' et entre ce code.',
+        },
+        codeMissing: 'Code introuvable',
+        open: 'Ouvrir TryCast',
+        hint: "Pas encore l'app ? Installe TryCast, puis entre le code ci-dessus.",
+        discover: 'Découvrir TryCast',
+    },
+    appReturn: {
+        open: 'Ouvrir TryCast',
+        home: "Retour à l'accueil",
+        confirmed: {
+            title: 'Adresse confirmée — TryCast',
+            description:
+                "Ton adresse e-mail est confirmée. Retourne dans l'app TryCast pour te connecter.",
+            heading: 'Adresse confirmée',
+            body: "Ton adresse e-mail est validée. Retourne dans l'app TryCast et connecte-toi pour commencer à pronostiquer.",
+        },
+        emailChanged: {
+            title: 'E-mail mis à jour — TryCast',
+            description:
+                "Ton changement d'adresse e-mail est confirmé. Retourne dans l'app TryCast.",
+            heading: 'E-mail mis à jour',
+            body: "Ton changement d'adresse e-mail est confirmé. Tu peux retourner dans l'app TryCast, ta nouvelle adresse est active.",
+        },
+    },
     legal: {
         updatedAt: 'Dernière mise à jour :',
         // Encart des traductions : n'apparaît que hors du français, qui fait foi.

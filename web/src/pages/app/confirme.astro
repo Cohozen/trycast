@@ -1,13 +1,22 @@
 ---
+// URL unique (EMAIL_CONFIRM_URL de l'app, allow-list Supabase) : les deux langues sont
+// rendues, le layout choisit selon le navigateur (autoLocale).
 import AppReturnCard from '../../components/app-return-card.astro';
+import { getDictionary, type Locale, locales } from '../../i18n';
 import BaseLayout from '../../layouts/base-layout.astro';
+
+const page = (l: Locale) => getDictionary(l).appReturn.confirmed;
 ---
 
 <BaseLayout
-    title="Adresse confirmée — TryCast"
-    description="Ton adresse e-mail est confirmée. Retourne dans l'app TryCast pour te connecter.">
-    <AppReturnCard
-        heading="Adresse confirmée"
-        body="Ton adresse e-mail est validée. Retourne dans l'app TryCast et connecte-toi pour commencer à pronostiquer."
-    />
+    title={page('fr').title}
+    description={page('fr').description}
+    autoLocale={{ fr: page('fr').title, en: page('en').title }}>
+    {
+        locales.map((l) => (
+            <div data-locale={l} lang={l}>
+                <AppReturnCard locale={l} heading={page(l).heading} body={page(l).body} />
+            </div>
+        ))
+    }
 </BaseLayout>

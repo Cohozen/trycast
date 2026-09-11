@@ -2,19 +2,33 @@
 // Lien vers la même page dans l'autre langue, lu dans la table des routes. Pas de
 // redirection automatique selon le navigateur (décision du 2026-09-11) : le visiteur
 // choisit, et les moteurs trouvent l'équivalent par les balises hreflang du layout.
-import { getDictionary, localePath, otherLocale, type RouteName, toLocale } from '../i18n';
+//
+// Sans route, la page est un atterrissage à URL unique (autoLocale du layout) : le
+// lien garde le chemin — qui porte parfois un code d'invitation — et force la langue
+// par ?lang=, que lit le script du <head>.
+import {
+    getDictionary,
+    type Locale,
+    localePath,
+    otherLocale,
+    type RouteName,
+    toLocale,
+} from '../i18n';
 
 interface Props {
-    route: RouteName;
+    route?: RouteName;
+    /** Langue du rendu, quand elle ne vient pas de l'URL (pages autoLocale). */
+    locale?: Locale;
 }
 
 const { route } = Astro.props;
-const locale = toLocale(Astro.currentLocale);
+const locale = Astro.props.locale ?? toLocale(Astro.currentLocale);
 const target = otherLocale(locale);
 const t = getDictionary(locale);
+const href = route ? localePath(route, target) : `?lang=${target}`;
 ---
 
-<a href={localePath(route, target)} hreflang={target} lang={target} title={t.switcher.title} aria-label={t.switcher.title}>
+<a href={href} hreflang={target} lang={target} title={t.switcher.title} aria-label={t.switcher.title}>
     {t.switcher.label}
 </a>
 

@@ -14,36 +14,49 @@
 // L'aperçu partagé reste **générique** : afficher ici le nom de la ligue
 // exigerait d'ouvrir preview_league aux requêtes anonymes, donc d'exposer le
 // nom de n'importe quelle ligue à qui détient un code, robots compris.
+//
+// L'URL est unique (c'est celle que construit l'app, et l'invité n'a pas forcément
+// la langue de celui qui invite) : les deux langues sont rendues, le layout choisit
+// selon le navigateur (autoLocale). L'aperçu partagé, lui, reste en français.
+import { getDictionary, type Locale, localePath, locales } from '../i18n';
 import BaseLayout from '../layouts/base-layout.astro';
+
+const page = (l: Locale) => getDictionary(l).invite;
 ---
 
 <BaseLayout
-    title="Rejoindre une ligue — TryCast"
-    description="Tu es invité à rejoindre une ligue de pronostics rugby sur TryCast."
+    title={page('fr').title}
+    description={page('fr').description}
     image="/og-invite.png"
-    noindex>
-    <section>
-        <div class="card">
-            <p class="overline">Invitation</p>
-            <h1>Rejoins la ligue</h1>
-            <p class="lede">
-                Ouvre TryCast, va dans <strong>Ligues → Rejoindre</strong> et entre ce code.
-            </p>
+    noindex
+    autoLocale={{ fr: page('fr').title, en: page('en').title }}>
+    {
+        locales.map((l) => (
+            <div data-locale={l} lang={l}>
+                <section>
+                    <div class="card">
+                        <p class="overline">{page(l).overline}</p>
+                        <h1>{page(l).heading}</h1>
+                        <p class="lede">{page(l).lede.before}<strong>{page(l).lede.strong}</strong>{page(l).lede.after}</p>
 
-            <p class="code" id="code" data-empty="Code introuvable">…</p>
+                        <p class="code" data-empty={page(l).codeMissing}>…</p>
 
-            <a class="primary" id="open" href="trycast://league/new?tab=join">Ouvrir TryCast</a>
-            <p class="hint">Pas encore l'app ? Installe TryCast, puis entre le code ci-dessus.</p>
-            <a class="secondary" href="/">Découvrir TryCast</a>
-        </div>
-    </section>
+                        <a class="primary open-app" href="trycast://league/new?tab=join">{page(l).open}</a>
+                        <p class="hint">{page(l).hint}</p>
+                        <a class="secondary" href={localePath('home', l)}>{page(l).discover}</a>
+                    </div>
+                </section>
+            </div>
+        ))
+    }
 </BaseLayout>
 
 <script is:inline>
     // Le code vient du chemin (/rejoindre/ABCD2345) que le rewrite a conservé,
     // avec repli sur ?c= si le rewrite venait à manquer. Même alphabet que le
     // serveur (ni 0/O ni 1/I/L) : une valeur qui n'y répond pas n'est pas
-    // affichée, plutôt que d'inviter à recopier un code impossible.
+    // affichée, plutôt que d'inviter à recopier un code impossible. La carte
+    // existe une fois par langue : on les renseigne toutes.
     (() => {
         const fromPath = window.location.pathname.split('/').filter(Boolean).pop() ?? '';
         const raw = /^[a-hj-km-np-z2-9]{8}$/i.test(fromPath)
@@ -51,14 +64,18 @@ import BaseLayout from '../layouts/base-layout.astro';
             : (new URLSearchParams(window.location.search).get('c') ?? '');
         const code = /^[a-hj-km-np-z2-9]{8}$/i.test(raw) ? raw.toUpperCase() : null;
 
-        const node = document.getElementById('code');
-        const open = document.getElementById('open');
+        for (const node of document.querySelectorAll('.code')) {
+            if (code) {
+                node.textContent = code;
+            } else {
+                node.textContent = node.dataset.empty;
+                node.classList.add('missing');
+            }
+        }
         if (code) {
-            node.textContent = code;
-            open.href = `trycast://league/new?tab=join&code=${code}`;
-        } else {
-            node.textContent = node.dataset.empty;
-            node.classList.add('missing');
+            for (const open of document.querySelectorAll('.open-app')) {
+                open.href = `trycast://league/new?tab=join&code=${code}`;
+            }
         }
     })();
 </script>

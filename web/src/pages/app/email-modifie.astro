@@ -1,13 +1,22 @@
 ---
+// URL unique (EMAIL_CHANGE_URL de l'app, allow-list Supabase) : les deux langues sont
+// rendues, le layout choisit selon le navigateur (autoLocale).
 import AppReturnCard from '../../components/app-return-card.astro';
+import { getDictionary, type Locale, locales } from '../../i18n';
 import BaseLayout from '../../layouts/base-layout.astro';
+
+const page = (l: Locale) => getDictionary(l).appReturn.emailChanged;
 ---
 
 <BaseLayout
-    title="E-mail mis à jour — TryCast"
-    description="Ton changement d'adresse e-mail est confirmé. Retourne dans l'app TryCast.">
-    <AppReturnCard
-        heading="E-mail mis à jour"
-        body="Ton changement d'adresse e-mail est confirmé. Tu peux retourner dans l'app TryCast, ta nouvelle adresse est active."
-    />
+    title={page('fr').title}
+    description={page('fr').description}
+    autoLocale={{ fr: page('fr').title, en: page('en').title }}>
+    {
+        locales.map((l) => (
+            <div data-locale={l} lang={l}>
+                <AppReturnCard locale={l} heading={page(l).heading} body={page(l).body} />
+            </div>
+        ))
+    }
 </BaseLayout>

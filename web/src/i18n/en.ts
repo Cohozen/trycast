@@ -205,6 +205,37 @@ export const en: Dictionary = {
         errorNetwork: 'Oops — that didn’t go through. Try again in a moment.',
         reassurance: 'Free, no strings attached. We never share your email.',
     },
+    invite: {
+        title: 'Join a league — TryCast',
+        description: 'You’re invited to join a rugby predictions league on TryCast.',
+        overline: 'Invitation',
+        heading: 'Join the league',
+        lede: {
+            before: 'Open TryCast, go to ',
+            strong: 'Leagues → Join',
+            after: ' and enter this code.',
+        },
+        codeMissing: 'Code not found',
+        open: 'Open TryCast',
+        hint: 'Don’t have the app yet? Install TryCast, then enter the code above.',
+        discover: 'Discover TryCast',
+    },
+    appReturn: {
+        open: 'Open TryCast',
+        home: 'Back to home',
+        confirmed: {
+            title: 'Email confirmed — TryCast',
+            description: 'Your email address is confirmed. Head back to the TryCast app to log in.',
+            heading: 'Email confirmed',
+            body: 'Your email address is verified. Head back to the TryCast app and log in to start predicting.',
+        },
+        emailChanged: {
+            title: 'Email updated — TryCast',
+            description: 'Your email address change is confirmed. Head back to the TryCast app.',
+            heading: 'Email updated',
+            body: 'Your email address change is confirmed. You can head back to the TryCast app — your new address is active.',
+        },
+    },
     legal: {
         updatedAt: 'Last updated:',
         translationNotice: {

@@ -1,15 +1,19 @@
 ---
-import { getDictionary, localePath, type RouteName, toLocale } from '../i18n';
+import { getDictionary, type Locale, localePath, type RouteName, toLocale } from '../i18n';
 import BallLogo from './ball-logo.astro';
 import LanguageSwitcher from './language-switcher.astro';
 
 interface Props {
     /** Page traduite : affiche le sélecteur de langue vers son équivalent. */
     route?: RouteName;
+    /** Langue du rendu, quand elle ne vient pas de l'URL (pages autoLocale). */
+    locale?: Locale;
+    /** Atterrissage à URL unique : sélecteur par ?lang= plutôt que par route. */
+    autoLocale?: boolean;
 }
 
-const { route } = Astro.props;
-const locale = toLocale(Astro.currentLocale);
+const { route, autoLocale = false } = Astro.props;
+const locale = Astro.props.locale ?? toLocale(Astro.currentLocale);
 const t = getDictionary(locale);
 const home = localePath('home', locale);
 ---
@@ -26,7 +30,7 @@ const home = localePath('home', locale);
             <a href={`${home}#competitions`}>{t.nav.competitions}</a>
             <a href={`${home}#faq`}>{t.nav.faq}</a>
         </div>
-        {route && <LanguageSwitcher route={route} />}
+        {(route || autoLocale) && <LanguageSwitcher route={route} locale={locale} />}
         <a href={`${home}#waitlist`} class="cta">{t.nav.waitlist}</a>
     </nav>
 </header>
