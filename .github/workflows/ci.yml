@@ -1,11 +1,14 @@
 name: CI
 
+# Le site (web/**) a sa propre CI, sauf sa table de routes : src/lib/urls.test.ts
+# vérifie que l'app ouvre bien les chemins qu'elle déclare. Motifs lus dans
+# l'ordre, le dernier qui correspond l'emporte.
 on:
   push:
     branches: [main]
-    paths-ignore: ['web/**']
+    paths: ['**', '!web/**', 'web/src/i18n/index.ts']
   pull_request:
-    paths-ignore: ['web/**']
+    paths: ['**', '!web/**', 'web/src/i18n/index.ts']
 
 jobs:
   checks:
