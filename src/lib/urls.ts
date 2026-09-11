@@ -25,15 +25,31 @@ export const EMAIL_CHANGE_URL = `${WEB_BASE_URL}/app/email-modifie`;
 // confidentialité soit atteignable depuis l'app elle-même, pas seulement depuis
 // la fiche du store : elles sont ouvertes dans le navigateur intégré
 // (`legal-links.tsx` pour les Réglages, `legal-notice.tsx` à l'inscription).
+//
+// Le site les sert en français à la racine et en anglais sous /en/, avec des
+// slugs traduits. Ces chemins répliquent la table `routes` de
+// web/src/i18n/index.ts, que l'app ne peut pas importer (web/ est un paquet à
+// part) : urls.test.ts casse si les deux divergent.
+const LEGAL_PATHS = {
+    /** Conditions générales d'utilisation. */
+    terms: { fr: '/cgu', en: '/en/terms' },
+    /** Politique de confidentialité (RGPD). */
+    privacy: { fr: '/confidentialite', en: '/en/privacy' },
+    /** Mentions légales (éditeur, hébergeur). */
+    legalNotice: { fr: '/mentions-legales', en: '/en/legal-notice' },
+} as const;
 
-/** Conditions générales d'utilisation. */
-export const TERMS_URL = `${WEB_BASE_URL}/cgu`;
+export type LegalPage = keyof typeof LEGAL_PATHS;
 
-/** Politique de confidentialité (RGPD). */
-export const PRIVACY_URL = `${WEB_BASE_URL}/confidentialite`;
-
-/** Mentions légales (éditeur, hébergeur). */
-export const LEGAL_NOTICE_URL = `${WEB_BASE_URL}/mentions-legales`;
+/**
+ * Page légale dans la langue de l'app : l'anglais si l'app est en anglais, le
+ * français sinon — celui-ci fait foi, et c'est aussi la langue de repli de
+ * l'app. Passer `i18n.resolvedLanguage`, la langue réellement affichée.
+ */
+export function legalUrl(page: LegalPage, language: string | undefined): string {
+    const locale = language?.split('-')[0] === 'en' ? 'en' : 'fr';
+    return `${WEB_BASE_URL}${LEGAL_PATHS[page][locale]}`;
+}
 
 /**
  * Lien d'invitation à une ligue, partagé depuis l'app (`InviteShareActions`).
