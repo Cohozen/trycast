@@ -1,6 +1,6 @@
 ---
 name: trycast-site-web
-description: Travailler sur le site vitrine Astro de TryCast (web/) — structure, tokens DS en CSS vanilla, commandes de vérification, preview navigateur et son piège de capture, formulaire waitlist (RPC join_waitlist, anti-spam SQL, tests E2E curl), déploiement Vercel. À consulter dès qu'on touche à web/, à la landing, aux pages légales ou à la waitlist.
+description: Travailler sur le site vitrine Astro de TryCast (web/) — structure, bilingue FR/EN (dictionnaires typés, table des routes, pages légales jumelles, atterrissages autoLocale), tokens DS en CSS vanilla, commandes de vérification, preview navigateur et son piège de capture, formulaire waitlist (RPC join_waitlist, anti-spam SQL, tests E2E curl), déploiement Vercel. À consulter dès qu'on touche à web/, à la landing, à un texte du site, aux pages légales ou à la waitlist.
 ---
 
 # Site vitrine TryCast (`web/`)
@@ -9,11 +9,25 @@ Site **Astro statique** (pas d'adapter SSR) dans un sous-dossier autonome : son 
 
 ## Structure
 
-- `web/src/pages/` — `index.astro` (landing), `cgu.astro`, `confidentialite.astro`, `mentions-legales.astro`
-- `web/src/layouts/` — `base-layout.astro` (SEO, polices, thème, nav+footer), `content-layout.astro` (pages légales ; validées le 2026-07-20, éditeur anonyme LCEN 6-III-2, contact `contact@trycast.fr` — à revoir au passage commercial/App Store)
-- `web/src/components/` — un composant par fichier, kebab-case, sections de la landing + `ball-logo`/`team-flag`/`section-heading`
+- `web/src/pages/` — `index.astro` (landing FR), `cgu.astro`, `confidentialite.astro`, `mentions-legales.astro`, `suppression-compte.astro`, `rejoindre.astro`, `app/*` ; `en/` porte l'anglais (`index`, `terms`, `privacy`, `legal-notice`, `delete-account`)
+- `web/src/i18n/` — dictionnaires `fr.ts` (source) / `en.ts`, table `routes` et `legalUpdatedAt` dans `index.ts` (voir « Bilingue FR/EN »)
+- `web/src/layouts/` — `base-layout.astro` (SEO, hreflang, polices, thème, nav+footer, `autoLocale`), `content-layout.astro` (pages légales ; validées le 2026-07-20, éditeur anonyme LCEN 6-III-2, contact `contact@trycast.fr` — à revoir au passage commercial/App Store)
+- `web/src/components/` — un composant par fichier, kebab-case, sections de la landing (composées par `landing-page.astro`, rendu par `/` et `/en/`) + `ball-logo`/`team-flag`/`section-heading`/`language-switcher`
 - `web/src/styles/tokens.css` — **copie** des tokens DS (custom properties, dark via `[data-theme='dark']`) ; source de vérité design : `docs/design/project/_ds/…/tokens/`. ⚠️ **Cette copie ne se met pas à jour toute seule et aucun test ne la surveille** : une mise à jour des tokens du DS se répercute à **trois** endroits (`src/global.css`, `src/tw/palette.ts` — verrouillés ensemble par `palette.test.ts` — et ce fichier, qui reste orphelin). Vécu le 2026-09-04 : la rampe dark du site avait une version de retard sur l'app. Le site n'a pas besoin des primitives legacy `cream-*`/`mist-300`, il ne les utilise pas. Piège : pas de `*/` dans un commentaire CSS (chemins avec glob → lightningcss casse en minify)
 - Polices **self-hostées** via `@fontsource/anton` + `@fontsource/inter` (RGPD : pas de CDN Google Fonts). Thème posé par un script inline dans `<head>` selon `prefers-color-scheme`
+
+## Bilingue FR/EN (2026-09-11)
+
+Français à la racine, anglais sous `/en/` (`i18n` d'`astro.config.mjs`, `prefixDefaultLocale: false`) : **aucune URL française n'a bougé**, et ce sont elles que connaissent l'app (`src/lib/urls.ts`), l'allow-list Supabase, les liens d'invitation et `.well-known/`. Pas de dépendance : des dictionnaires TS.
+
+- **Aucune chaîne en dur.** Un texte va dans `fr.ts` **et** `en.ts` ; `en` est typé `Dictionary = typeof fr`, donc une clé oubliée casse `astro check` (`ts(2741)`, prouvé). Un composant lit `getDictionary(toLocale(Astro.currentLocale))`. Listes en **objets à clés** : les données non traduites (icônes SVG) restent dans le composant et s'y rattachent par clé
+- **Texte enrichi** : découper en `before` / `strong` / `after` plutôt que `set:html`, et écrire `{t.before}<b>{t.strong}</b>{t.after}` **sur une ligne** (piège `compressHTML` ci-dessous)
+- **Nouvelle page traduite** = une entrée dans `routes` (slug par langue), puis `route="…"` passé au layout : c'est ce qui active le sélecteur et les `hreflang` (forme à barre finale, comme la canonique). Pas de redirection selon le navigateur, décision actée
+- **Pages légales** : un fichier par langue (la prose n'a rien à faire dans un dictionnaire). **Le français fait foi** ; l'anglais porte un encart qui y renvoie. Date commune dans `legalUpdatedAt`, formatée par `Intl` (`en-GB`). Modifier une page légale = modifier sa jumelle dans le même commit ; `scripts/check-legal-parity.mjs` (lancé par `npm run check`) compare le nombre de `<h2>` et de `<li>` — il attrape une section ou une donnée ajoutée d'un seul côté, pas une phrase changée
+- **Atterrissages à URL unique** (`/rejoindre/<code>`, `/app/confirme`, `/app/email-modifie`) : pas de `/en/` possible (URL construite par l'app, allow-list Supabase). Le layout reçoit `autoLocale={{ fr: titre, en: titre }}`, la page rend chaque langue dans un `<div data-locale>` (`display: contents`, la nav sticky tient) et le script du `<head>` pose `html[lang]` avant le premier paint : `en` si `navigator.language` l'est, `fr` sinon — même règle que l'app. `?lang=en|fr` force (sélecteur, recette). Sans JS : français. L'aperçu social reste en français
+- Voix anglaise : tutoiement familier, vocabulaire rugby britannique, **libellés d'écrans repris de `src/locales/en/`** (Settings → Privacy → Export my data, Leagues → Join, Log in…) — une page qui guide dans l'app doit citer ses vrais boutons
+- Vignette OG anglaise : `og-default-en.png`, même script `scripts/build-og-images.sh` (il réécrit aussi les PNG FR : identiques au pixel, seules les métadonnées changent — `git checkout` les deux autres)
+- Recette : `/en/`, puis sélecteur aller-retour ; `/rejoindre?c=GRP8XTQ5&lang=en` et `&lang=fr` ; le navigateur du panneau est en `fr`. Le `scroll-behavior: smooth` du site rend `window.scrollTo` asynchrone : passer `{ behavior: 'instant' }` pour mesurer après défilement, et pas de `requestAnimationFrame` quand le panneau est masqué (il ne se déclenche pas)
 
 ## Piège : `compressHTML` colle les mots aux balises inline
 
@@ -29,12 +43,13 @@ Correctifs en place (2026-07-15) :
 - `web/astro.config.mjs` : `resolve.tsconfigPaths: false` (aucun alias TS — coupe l'escalade côté resolver)
 - Scripts client en **`.js` dans `web/src/scripts/`** (jamais de `<script>` TS inline : un `.js` matche le tsconfig de `web/` via `allowJs` et l'escalade s'arrête)
 - Le **transform natif** (`builtin:vite-transform`) escalade quoi qu'il arrive (aucune option ne l'arrête — `oxc.tsconfig`/`rollupOptions.tsconfig` inopérants et absents des types) → on rend le tsconfig racine **parseable** avec un stub `node_modules/expo/tsconfig.base.json` = `{}` : step dédié dans `.github/workflows/web.yml` + `installCommand` de `web/vercel.json`
-- Reproduire en local : `mv node_modules/expo/tsconfig.base.json{,.bak}` puis `cd web && npm run build` (remettre le fichier après)
+- Reproduire le **bug** en local : `mv node_modules/expo/tsconfig.base.json{,.bak}` puis `cd web && npm run build` (remettre le fichier après) — ça échoue quoi qu'on ait changé, c'est normal
+- Reproduire les **conditions de la CI** (ce qui prouve qu'un changement passera) : même `mv`, puis `echo '{}' > node_modules/expo/tsconfig.base.json` (le stub), `npm run check && npm run build`, puis remettre l'original
 
 ## Vérification
 
 ```bash
-cd web && npm run check && npm run build   # astro check + build
+cd web && npm run check && npm run build   # astro check + parité des pages légales + build
 ```
 
 CI dédiée `.github/workflows/web.yml` (paths `web/**`) ; `ci.yml` (app) ignore `web/**`.
@@ -113,6 +128,11 @@ curl -s -o /dev/null -w '%{http_code}\n' https://www.trycast.fr/rejoindre/GRP8XT
 
 # Les balises d'aperçu sur l'URL réelle, og:image en absolu
 curl -sL https://www.trycast.fr/rejoindre/GRP8XTQ5 | grep -oE '<meta property="og:image"[^>]*>'
+
+# Le site anglais (2026-09-11) : pages en 200, hreflang croisés, URL françaises intactes
+for p in /en/ /en/terms /en/privacy /en/legal-notice /en/delete-account /cgu /confidentialite; do
+  curl -s -o /dev/null -w "$p %{http_code}\n" "https://www.trycast.fr$p"; done
+curl -s https://www.trycast.fr/ | grep -oE '<link rel="alternate" hreflang="[^"]*"[^>]*>'
 ```
 
 ⚠️ **Le nombre d'empreintes est le point à regarder, pas la validité du JSON.** Un fichier
