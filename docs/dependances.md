@@ -19,7 +19,7 @@ ce que le SDK réclame (`npx expo install --fix`), les rattrapages dans la plage
 | `typescript` (app + `web/`) | 6.0.3 | 7.0.2 | ❌ **bloqué** | TypeScript 7.1 publié **et** adopté par typescript-eslint et le tooling Astro |
 | `eslint` | 9.39.5 | 10.10.0 | ❌ **bloqué** (essayé le 2026-09-11) | `eslint-plugin-react` publié avec le support d'ESLint 10, et repris par `eslint-config-expo` |
 | `vitest` | 4.1.11 | 5.0.0 | ⏸️ différé, par choix | prochain lot d'outillage — n'attend plus ESLint |
-| `@aptabase/react-native` ⚑ | 0.5.0 | 0.6.0 | ⏸️ sans objet | quand une release native passe de toute façon |
+| `@aptabase/react-native` ⚑ | 0.5.1 | 0.6.0 | ⏸️ sans objet | quand une release native passe de toute façon |
 | Famille SDK (async-storage 3, Sentry 8, gesture-handler 3…) | — | — | ❌ **ne pas suivre** | SDK 58 **stable** — en préversion depuis le 2026-09-10 |
 
 ---
@@ -127,16 +127,25 @@ le soir même où ce fichier le disait inexistant). `latest` reste `expo@57.0.21
 n'est pas une cible pour une app distribuée, mais elle annonce une version stable dans les semaines
 qui viennent. Le rapport continuera d'écarter ces paquets tant que le SDK 57 est installé.
 
-Quand il sortira, ce sera un lot en soi : `npx expo install --fix`, rebuild du dev client, passes
-visuelles iOS **et** Android, nouvelle empreinte, et donc une release.
+**Décision de Corentin (2026-09-11) : on ne touche pas au SDK 58 avant sa sortie réelle** (`latest`),
+et pas avant que la beta fermée soit lancée. Ce sera alors un lot en soi : `npx expo install --fix`,
+rebuild du dev client, passes visuelles iOS **et** Android, nouvelle empreinte, et donc une release.
 
 ## Ce qui ne se décide pas
 
 - **À réaligner sur le SDK** (`npx expo install --fix`) — Expo réclame ces versions, elles sont
-  testées ensemble. Aujourd'hui **25 paquets**, presque tous natifs — dont `expo` 57.0.2 → 57.0.21
-  et `expo-router` 57.0.3 → 57.0.20, soit une vingtaine de correctifs publiés depuis le SDK 57.0.2 :
-  c'est le plus gros écart du projet, et il se rattrape en une commande suivie d'une release.
+  testées ensemble. Rattrapé le 2026-09-11 (25 paquets, `expo` 57.0.2 → 57.0.21) : c'est un lot
+  natif, donc une nouvelle empreinte et un build. La CLI propose alors d'ajouter les plugins
+  `expo-image`, `expo-status-bar` et `expo-web-browser` à la config, et échoue faute de pouvoir
+  modifier `app.config.ts`. Les trois sont sans effet avec leur configuration par défaut (vérifié
+  dans leur source) : l'erreur se lit, elle ne se corrige pas.
 - **Rattrapage dans la plage** (`npm update`) — déjà autorisé par `package.json`, seul le lock bouge.
+  ⚠️ **Toujours nommer les paquets** : un `npm update` sans argument monte aussi les natifs de la
+  plage (`google-signin`…), donc déplace l'empreinte. `@types/react` refuse de monter au-delà de
+  19.2.17 sans message : ce ne sont que des types, laissé en l'état.
 - **`npm audit`** — la synthèse figure au rapport. Sur une app React Native, l'essentiel des alertes
   vit dans des dépendances de build inaccessibles à l'exécution : à lire, pas à corriger
-  mécaniquement.
+  mécaniquement. ⚠️ `npm audit fix` sans `--force` **n'est pas anodin** tant que le SDK n'est pas
+  réaligné : il monte alors des paquets natifs (`expo-constants`, `expo-font`…). Une fois le SDK à
+  jour, il ne touche plus que l'outillage de build. Les alertes restantes proposent de « corriger »
+  en redescendant à `expo@46` ou `expo-router@5` : faux positifs.
