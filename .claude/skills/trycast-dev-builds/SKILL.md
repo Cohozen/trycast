@@ -138,6 +138,41 @@ npx expo prebuild --clean -p ios && npm run ios
 
 ⚠️ Le `--clean` est **obligatoire** : un `expo run:ios` sur un `ios/` préexistant ne ré-applique pas les config plugins (vécu : `NSPhotoLibraryUsageDescription` manquant → crash TCC au picker photo).
 
+⚠️ **`npm run ios` ne compile plus en local depuis les liens d'invitation** (constaté le
+2026-09-11). Il s'arrête avant tout build, avec un message qui parle d'appareil physique alors qu'on
+vise le simulateur :
+
+```
+› Your computer requires some additional setup before you can build onto physical iOS devices.
+CommandError: No code signing certificates are available to use.
+```
+
+Cause : `@expo/cli` exige la signature de développement **même pour le simulateur** dès que les
+entitlements contiennent `com.apple.developer.associated-domains` ou `…applesignin`
+(`simulatorBuildRequiresCodeSigning`, dans `run/ios/codeSigning/simulatorCodeSigning.js`). Or
+`associatedDomains` est déclaré depuis le 2026-09-09, et ce Mac n'a pas de Team ID Apple. Ce n'est
+pas une régression de version : la règle est la même en 57.0.4 et en 57.0.23. Le dev client du
+simulateur datait du 6 septembre, et personne n'avait rebuildé iOS depuis. **Sign in with Apple
+déclenchera la même règle.**
+
+Contournement **sans rien modifier au projet** : Xcode, lui, signe en local pour le simulateur, sans
+équipe. On compile directement, on installe, puis on connecte l'app à Metro :
+
+```bash
+LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 npx expo prebuild --clean -p ios
+SENTRY_DISABLE_AUTO_UPLOAD=true LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 xcodebuild \
+  -workspace ios/TryCast.xcworkspace -scheme TryCast -configuration Debug \
+  -destination "id=<UDID du simulateur>" -derivedDataPath ios/build build
+xcrun simctl install booted ios/build/Build/Products/Debug-iphonesimulator/TryCast.app
+xcrun simctl openurl booted "trycast://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"
+```
+
+Metro doit tourner (`npm start`, ou celui d'un `npm run android`, qui sert les deux plateformes).
+Le schéma et le workspace s'écrivent **`TryCast`**, pas `trycast` : `xcodebuild` sort en erreur 65
+sur un nom de schéma inconnu. `SENTRY_DISABLE_AUTO_UPLOAD` se transmet ici par l'environnement, pour
+la même raison que dans `npm run ios`. Le jour où un Team ID existera, `npm run ios` refonctionnera
+tel quel.
+
 ⚠️ **`pod install` refuse les pods Swift dont les dépendances ne définissent pas de module** (vécu 2026-07-23, ajout de `@react-native-google-signin/google-signin`). Message : *« The Swift pod `AppCheckCore` depends upon `GoogleUtilities` and `RecaptchaInterop`, which do not define modules »* — le prebuild s'arrête net à l'étape CocoaPods. Correctif **dans `app.json`**, jamais dans le `Podfile` (généré, effacé par `--clean`) : plugin `expo-build-properties` avec les pods fautifs en `modular_headers`.
 
 ```json

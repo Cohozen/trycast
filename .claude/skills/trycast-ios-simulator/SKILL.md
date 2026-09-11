@@ -82,6 +82,18 @@ Après chaque interaction : `sleep 1-2` puis vérifier (screenshot ou describe-u
 
 ## Pièges connus (vécus)
 
+- **`npm run ios` réclame un certificat de signature** (« No code signing certificates are
+  available ») depuis que l'app déclare ses liens d'invitation (`associatedDomains`, 2026-09-09).
+  Pas de Team ID, donc pas de `expo run:ios` : compiler avec `xcodebuild` en direct, puis
+  `simctl install`. La recette complète est dans le skill `trycast-dev-builds`, section iOS.
+- **Tester un lien d'invitation sans liens universels** (inertes sans Team ID) : utiliser
+  `xcrun simctl openurl booted "trycast:///rejoindre/<CODE>"`, **avec trois barres obliques**. Avec
+  deux, `rejoindre` devient l'hôte de l'URL et non son chemin : `+native-intent` n'y reconnaît pas
+  d'invitation, et l'app affiche « Unmatched Route ». Ce n'est pas un bug : seule la forme
+  `https://www.trycast.fr/rejoindre/<CODE>` circule. Le chemin nu passe par la même réécriture
+  (vérifié le 2026-09-11 : code pré-rempli et aperçu de la ligue affiché). Choisir un code qui existe
+  dans la base de dev, sinon « Code d'invitation invalide » est la bonne réponse.
+
 - **Clavier AZERTY** : si `axe type "TESTAXE1"` produit `TESTQXE&`, le clavier iOS actif est le français (AZERTY) — les keycodes HID d'AXe sont interprétés comme des positions QWERTY. ⚠️ Le correctif ne persiste **pas** de façon fiable (constaté le 10/07/2026 : AZERTY revenu sur le simulateur de référence) — **vérifier la première saisie de chaque session** (screenshot après `axe type`) et rejouer le correctif au besoin :
   ```bash
   xcrun simctl spawn booted defaults write .GlobalPreferences AppleKeyboards -array "en_US@sw=QWERTY;hw=Automatic" "emoji@sw=Emoji"
