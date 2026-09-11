@@ -1,13 +1,11 @@
 ---
-const items = [
-    'Gratuit, pour de vrai',
-    'Zéro argent réel',
-    '100% entre amis',
-    'Pensé pour le rugby',
-];
+import { getDictionary, toLocale } from '../i18n';
+
+const t = getDictionary(toLocale(Astro.currentLocale)).marquee;
+const items = [t.items.free, t.items.noMoney, t.items.friends, t.items.rugby];
 ---
 
-<section aria-label="TryCast en quatre promesses">
+<section aria-label={t.label}>
     <div class="track">
         {
             [false, true].map((clone) => (

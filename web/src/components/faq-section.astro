@@ -1,32 +1,13 @@
 ---
+import { getDictionary, toLocale } from '../i18n';
 import SectionHeading from './section-heading.astro';
 
-const faqs = [
-    {
-        q: 'C’est vraiment gratuit ?',
-        a: 'Oui, totalement. Aucun achat, aucune mise, aucune pub déguisée. Tu joues, tu chambres tes potes, point. C’est notre promesse de départ.',
-    },
-    {
-        q: 'C’est du pari d’argent ?',
-        a: 'Non, jamais. Zéro argent réel, zéro mise. TryCast est un jeu social entre amis : on parie sa fierté au classement, pas son portefeuille.',
-    },
-    {
-        q: 'Ça sort quand ?',
-        a: 'Lancement en février 2027 pour le coup d’envoi du Tournoi des 6 Nations, puis la Coupe du Monde à l’automne 2027. Inscris-toi pour être prévenu le jour J.',
-    },
-    {
-        q: 'Quelles compétitions ?',
-        a: '6 Nations, Champions Cup et Coupe du Monde 2027 dès le lancement. D’autres compétitions suivront au fil des saisons.',
-    },
-    {
-        q: 'Comment je joue avec mes potes ?',
-        a: 'Tu crées une ligue privée, tu partages le lien d’invitation, et vous vous affrontez au classement toute la saison. Simple comme une passe.',
-    },
-];
+const t = getDictionary(toLocale(Astro.currentLocale)).faq;
+const faqs = [t.items.free, t.items.money, t.items.when, t.items.competitions, t.items.friends];
 ---
 
 <section id="faq">
-    <SectionHeading kicker="Les questions" title="On te répond" />
+    <SectionHeading kicker={t.kicker} title={t.title} />
     <div>
         {
             faqs.map((faq) => (

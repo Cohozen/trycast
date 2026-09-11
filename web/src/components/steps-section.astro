@@ -1,27 +1,17 @@
 ---
+import { getDictionary, toLocale } from '../i18n';
 import SectionHeading from './section-heading.astro';
 
+const t = getDictionary(toLocale(Astro.currentLocale)).steps;
 const steps = [
-    {
-        n: '01',
-        title: 'Fais ton prono',
-        body: "Score exact, essais et bonus offensif. Un prono par match, ça s'enregistre tout seul. Aucun bouton à chercher.",
-    },
-    {
-        n: '02',
-        title: 'Marque des points malins',
-        body: 'Tes points sont pondérés par les cotes : oser le bon outsider rapporte gros. Le prono facile, moins.',
-    },
-    {
-        n: '03',
-        title: 'Domine ta ligue',
-        body: 'Grimpe au classement de ta ligue privée et au général. Le chambrage entre potes fait le reste.',
-    },
+    { n: '01', ...t.items.predict },
+    { n: '02', ...t.items.points },
+    { n: '03', ...t.items.league },
 ];
 ---
 
 <section id="concept">
-    <SectionHeading kicker="01 — 03" title="Comment ça marche" />
+    <SectionHeading kicker={t.kicker} title={t.title} />
     <div class="grid">
         {
             steps.map((step) => (

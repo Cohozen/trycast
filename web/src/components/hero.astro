@@ -1,5 +1,8 @@
 ---
+import { getDictionary, toLocale } from '../i18n';
 import TeamFlag from './team-flag.astro';
+
+const t = getDictionary(toLocale(Astro.currentLocale)).hero;
 ---
 
 <section id="top">
@@ -22,22 +25,19 @@ import TeamFlag from './team-flag.astro';
     </svg>
     <div class="inner">
         <div class="copy">
-            <span class="overline"><span class="dot"></span>Pronostics rugby entre potes · Route vers 2027</span>
-            <h1>Ton rugby.<br />Tes potes.<br /><span class="spark">Tes pronos.</span></h1>
-            <p class="lede">
-                L'appli gratuite de pronos pensée <b>pour le rugby</b> — score exact, essais, bonus
-                offensif, points pondérés par les cotes. Sans argent réel. 100% entre amis.
-            </p>
+            <span class="overline"><span class="dot"></span>{t.overline}</span>
+            <h1>{t.title.line1}<br />{t.title.line2}<br /><span class="spark">{t.title.spark}</span></h1>
+            <p class="lede">{t.lede.before}<b>{t.lede.strong}</b>{t.lede.after}</p>
             <div class="ctas">
-                <a class="primary" href="#waitlist">Rejoindre la liste d'attente</a>
-                <a class="secondary" href="#concept">Voir le concept</a>
+                <a class="primary" href="#waitlist">{t.ctaPrimary}</a>
+                <a class="secondary" href="#concept">{t.ctaSecondary}</a>
             </div>
             <div class="assurances">
-                <span class="item"><span class="check">✓</span>Gratuit</span>
+                <span class="item"><span class="check">✓</span>{t.assurances.free}</span>
                 <span class="sep"></span>
-                <span class="item"><span class="check">✓</span>Zéro argent réel</span>
+                <span class="item"><span class="check">✓</span>{t.assurances.noMoney}</span>
                 <span class="sep"></span>
-                <span class="item"><span class="check">✓</span>Sortie fév. 2027</span>
+                <span class="item"><span class="check">✓</span>{t.assurances.release}</span>
             </div>
         </div>
         <div class="phones">
@@ -45,8 +45,8 @@ import TeamFlag from './team-flag.astro';
                 <div class="phone phone-b">
                     <div class="notch-space"></div>
                     <div class="screen">
-                        <div class="screen-overline">Ligue privée</div>
-                        <div class="screen-title">Les Potes</div>
+                        <div class="screen-overline">{t.mockup.privateLeague}</div>
+                        <div class="screen-title">{t.mockup.leagueName}</div>
                         <div class="board">
                             <div class="row row-plain">
                                 <span class="rank">1</span>
@@ -56,8 +56,8 @@ import TeamFlag from './team-flag.astro';
                             </div>
                             <div class="row row-you">
                                 <span class="rank rank-you">2</span>
-                                <span class="avatar avatar-you">TO</span>
-                                <span class="name name-you">Toi</span>
+                                <span class="avatar avatar-you">{t.mockup.youInitials}</span>
+                                <span class="name name-you">{t.mockup.you}</span>
                                 <span class="pts">241</span>
                             </div>
                             <div class="row">
@@ -81,17 +81,17 @@ import TeamFlag from './team-flag.astro';
                         <span class="battery"></span>
                     </div>
                     <div class="screen">
-                        <div class="screen-overline">6 Nations 2027 · J2</div>
-                        <div class="screen-title">Mes matchs</div>
+                        <div class="screen-overline">{t.mockup.round}</div>
+                        <div class="screen-title">{t.mockup.myMatches}</div>
                         <div class="match-card">
                             <div class="match-head">
-                                <span class="kickoff">21h00</span>
-                                <span class="saved"><span class="saved-dot"></span>Enregistré</span>
+                                <span class="kickoff">{t.mockup.kickoff}</span>
+                                <span class="saved"><span class="saved-dot"></span>{t.mockup.saved}</span>
                             </div>
                             <div class="match-grid">
                                 <div class="team">
                                     <TeamFlag abbr="FRA" />
-                                    <span>France</span>
+                                    <span>{t.mockup.home}</span>
                                 </div>
                                 <div class="score">
                                     <span class="score-box">24</span>
@@ -100,16 +100,16 @@ import TeamFlag from './team-flag.astro';
                                 </div>
                                 <div class="team">
                                     <TeamFlag abbr="IRL" />
-                                    <span>Irlande</span>
+                                    <span>{t.mockup.away}</span>
                                 </div>
                             </div>
                             <div class="match-foot">
-                                <span class="bonus"><span class="bonus-dot"></span>Bonus off. FRA</span>
-                                <span class="points"><span class="points-num">8</span><span class="points-unit">pts</span></span>
+                                <span class="bonus"><span class="bonus-dot"></span>{t.mockup.bonus}</span>
+                                <span class="points"><span class="points-num">8</span><span class="points-unit">{t.mockup.pointsUnit}</span></span>
                             </div>
                         </div>
                         <div class="tabbar">
-                            <span class="tab-active">Matchs</span>
+                            <span class="tab-active">{t.mockup.matchesTab}</span>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8.4 12.4l2.4 2.4 4.8-5.2"></path></svg>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20V11"></path><path d="M12 20V4"></path><path d="M18 20v-6"></path></svg>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"></circle><path d="M4.5 20c0-3.4 3.4-5.8 7.5-5.8s7.5 2.4 7.5 5.8"></path></svg>

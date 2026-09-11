@@ -104,9 +104,24 @@ const home = localePath('home', locale);
         color: var(--on-accent);
     }
 
+    /* Sous 680 px, logo + sélecteur de langue + CTA doivent tenir sur 360 px (Android
+       courant) : l'espaceur et ses deux gaps cèdent la place à une marge automatique. */
     @media (max-width: 680px) {
-        .links {
+        nav {
+            gap: 8px;
+        }
+
+        .links,
+        .spacer {
             display: none;
+        }
+
+        .brand {
+            margin-right: auto;
+        }
+
+        .cta {
+            padding: 0 14px;
         }
     }
 </style>

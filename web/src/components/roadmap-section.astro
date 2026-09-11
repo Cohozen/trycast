@@ -1,31 +1,28 @@
 ---
+import { getDictionary, toLocale } from '../i18n';
 import SectionHeading from './section-heading.astro';
+
+const t = getDictionary(toLocale(Astro.currentLocale)).roadmap;
 ---
 
 <section id="competitions">
-    <SectionHeading kicker="La saison" title="Sur la route de 2027" />
+    <SectionHeading kicker={t.kicker} title={t.title} />
     <div class="grid">
         <div class="card">
-            <div class="badge"><span class="badge-dot"></span>Étape 1</div>
-            <div class="date">Février 2027</div>
-            <p>
-                Lancement pour le coup d'envoi du Tournoi des 6 Nations. Crée ta ligue, pronostique
-                la première journée.
-            </p>
+            <div class="badge"><span class="badge-dot"></span>{t.launch.badge}</div>
+            <div class="date">{t.launch.date}</div>
+            <p>{t.launch.body}</p>
             <div class="chips">
-                <span class="chip">6 Nations</span>
-                <span class="chip">Champions Cup</span>
+                <span class="chip">{t.launch.sixNations}</span>
+                <span class="chip">{t.launch.championsCup}</span>
             </div>
         </div>
         <div class="card card-highlight">
-            <div class="badge"><span class="badge-dot"></span>Le grand rendez-vous</div>
-            <div class="date">Automne 2027</div>
-            <p>
-                La Coupe du Monde 2027. Toute la compétition, tes potes, un seul classement. C'est
-                là que ça se joue.
-            </p>
+            <div class="badge"><span class="badge-dot"></span>{t.worldCup.badge}</div>
+            <div class="date">{t.worldCup.date}</div>
+            <p>{t.worldCup.body}</p>
             <div class="chips">
-                <span class="chip chip-accent">Coupe du Monde 2027</span>
+                <span class="chip chip-accent">{t.worldCup.chip}</span>
             </div>
         </div>
     </div>

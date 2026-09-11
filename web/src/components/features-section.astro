@@ -1,15 +1,16 @@
 ---
+import { getDictionary, toLocale } from '../i18n';
 import SectionHeading from './section-heading.astro';
 
+// Les textes viennent du dictionnaire, les icônes restent ici : rattachées par clé.
+const t = getDictionary(toLocale(Astro.currentLocale)).features;
 const features = [
     {
-        title: 'Pensé pour le rugby',
-        body: 'Score exact, essais, bonus offensif, cotes. Les vraies règles du jeu, pas du foot recyclé.',
+        ...t.items.rugby,
         paths: ['M12 3c4 2 6 5 6 9s-2 7-6 9c-4-2-6-5-6-9s2-7 6-9z', 'M8 8l8 8', 'M16 8l-8 8'],
     },
     {
-        title: 'Ligues privées',
-        body: 'Crée ta ligue, invite tes potes avec un simple lien. Votre saison, votre classement.',
+        ...t.items.leagues,
         paths: [
             'M9 11a3 3 0 100-6 3 3 0 000 6z',
             'M3 20c0-3 2.7-5 6-5s6 2 6 5',
@@ -18,23 +19,19 @@ const features = [
         ],
     },
     {
-        title: 'Points malins',
-        body: 'Les cotes sont intégrées : plus le pari est audacieux et juste, plus il rapporte de points.',
+        ...t.items.points,
         paths: ['M4 20V10', 'M10 20V4', 'M16 20v-7', 'M22 20V8'],
     },
     {
-        title: 'Classements live',
-        body: 'Suis ta place en temps réel — dans ta ligue et au général — au fil des matchs.',
+        ...t.items.live,
         paths: ['M12 21a9 9 0 100-18 9 9 0 000 18z', 'M12 7v5l3 2'],
     },
     {
-        title: 'Multi-compétitions',
-        body: '6 Nations, Champions Cup et Coupe du Monde 2027, réunies dans une seule appli.',
+        ...t.items.competitions,
         paths: ['M4 6h16', 'M4 12h16', 'M4 18h10'],
     },
     {
-        title: 'Gratuit & social',
-        body: 'Zéro argent réel, zéro mise, zéro pub déguisée. Juste toi, tes potes et le jeu.',
+        ...t.items.social,
         paths: [
             'M20.8 5.6a5.5 5.5 0 00-8.8 1 5.5 5.5 0 00-8.8-1 5.5 5.5 0 000 7.8L12 21l8.8-7.6a5.5 5.5 0 000-7.8z',
         ],
@@ -43,7 +40,7 @@ const features = [
 ---
 
 <section>
-    <SectionHeading kicker="Le kit" title="Tout ce qu'il te faut" />
+    <SectionHeading kicker={t.kicker} title={t.title} />
     <div class="grid">
         {
             features.map((feature) => (

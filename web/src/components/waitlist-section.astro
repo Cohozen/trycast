@@ -1,15 +1,14 @@
 ---
+import { getDictionary, toLocale } from '../i18n';
 
+const t = getDictionary(toLocale(Astro.currentLocale)).waitlist;
 ---
 
 <section id="waitlist">
     <div class="inner">
-        <span class="overline"><span class="dot"></span>Pré-lancement · places limitées au départ</span>
-        <h2>Sois là au<br />coup d'envoi.</h2>
-        <p class="lede">
-            Laisse ton e-mail : on te prévient dès l'ouverture, en février 2027. Pas de spam,
-            promis.
-        </p>
+        <span class="overline"><span class="dot"></span>{t.overline}</span>
+        <h2>{t.title.line1}<br />{t.title.line2}</h2>
+        <p class="lede">{t.lede}</p>
 
         <div class="success" hidden>
             <div class="success-icon">
@@ -25,8 +24,8 @@
                     <path d="M4 12.5l5 5 11-11"></path>
                 </svg>
             </div>
-            <div class="success-title">Merci, on te tient au courant.</div>
-            <p>Ton essai est marqué. Rendez-vous en février 2027 pour le coup d'envoi.</p>
+            <div class="success-title">{t.successTitle}</div>
+            <p>{t.successBody}</p>
         </div>
 
         <form novalidate>
@@ -34,24 +33,22 @@
                 <input
                     type="email"
                     name="email"
-                    placeholder="ton@email.fr"
-                    aria-label="Adresse e-mail"
+                    placeholder={t.placeholder}
+                    aria-label={t.emailLabel}
                     autocomplete="email"
                     required
                 />
                 <label class="trap" aria-hidden="true">
-                    Ne pas remplir ce champ
+                    {t.trap}
                     <input type="text" name="website" tabindex="-1" autocomplete="off" />
                 </label>
-                <button type="submit">Je m'inscris</button>
+                <button type="submit">{t.submit}</button>
             </div>
             <div class="message">
-                <span class="error error-email" hidden>Oups — vérifie ton adresse e-mail.</span>
-                <span class="error error-network" hidden>
-                    Oups — ça n'a pas voulu passer. Réessaie dans un instant.
-                </span>
+                <span class="error error-email" hidden>{t.errorEmail}</span>
+                <span class="error error-network" hidden>{t.errorNetwork}</span>
             </div>
-            <p class="reassurance">Gratuit, sans engagement. On ne partage jamais ton e-mail.</p>
+            <p class="reassurance">{t.reassurance}</p>
         </form>
     </div>
 </section>

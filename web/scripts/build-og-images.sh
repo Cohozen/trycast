@@ -2,7 +2,8 @@
 # Vignettes OpenGraph du site (1200×630), celles qu'affichent WhatsApp, iMessage
 # ou Discord quand on colle un lien TryCast.
 #
-# Régénère web/public/og-default.png et web/public/og-invite.png. Les PNG sont
+# Régénère web/public/og-default.png, sa version anglaise og-default-en.png
+# (landing /en/, choisie par landing-page.astro) et web/public/og-invite.png. Les PNG sont
 # versionnés : ce script ne tourne ni en CI ni au build, il n'existe que pour
 # reproduire les images à l'identique. Il demande ImageMagick (`brew install
 # imagemagick`) et lit les polices du design system dans les node_modules de
@@ -67,4 +68,5 @@ render() {
 
 echo "Vignettes OpenGraph :"
 render public/og-default.png 'Pronostics rugby entre amis'
+render public/og-default-en.png 'Rugby predictions with your mates'
 render public/og-invite.png  'Rejoins ma ligue de pronostics'

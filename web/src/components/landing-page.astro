@@ -1,0 +1,27 @@
+---
+// La landing complète, commune aux deux langues : src/pages/index.astro (FR) et
+// src/pages/en/index.astro (EN) ne font que la rendre, la langue venant de l'URL.
+import { getDictionary, toLocale } from '../i18n';
+import BaseLayout from '../layouts/base-layout.astro';
+import DifferenceSection from './difference-section.astro';
+import FaqSection from './faq-section.astro';
+import FeaturesSection from './features-section.astro';
+import Hero from './hero.astro';
+import MarqueeBand from './marquee-band.astro';
+import RoadmapSection from './roadmap-section.astro';
+import StepsSection from './steps-section.astro';
+import WaitlistSection from './waitlist-section.astro';
+
+const t = getDictionary(toLocale(Astro.currentLocale)).landing;
+---
+
+<BaseLayout title={t.title} description={t.description} image={t.ogImage} route="home">
+    <Hero />
+    <MarqueeBand />
+    <StepsSection />
+    <FeaturesSection />
+    <DifferenceSection />
+    <RoadmapSection />
+    <FaqSection />
+    <WaitlistSection />
+</BaseLayout>

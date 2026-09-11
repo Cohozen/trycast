@@ -1,34 +1,22 @@
 ---
 // Section « La différence » : bloc marque plein cadre assumé (data-theme="dark" figé comme
 // dans la maquette pour garder le même rendu vert + texte sombre dans les deux thèmes).
-const rows = [
-    {
-        bad: 'Une appli de foot avec du rugby collé dessus',
-        good: 'Pensée pour le rugby dès la première ligne de code',
-    },
-    { bad: 'Résultat sec : 1 · N · 2', good: 'Score exact, essais et bonus offensif' },
-    { bad: 'Tous les pronos valent pareil', good: 'Points pondérés par les cotes des bookmakers' },
-    { bad: 'Argent réel, mises et publicités', good: '100% gratuit, zéro mise, zéro argent réel' },
-    {
-        bad: 'Des joueurs anonymes que tu ne connais pas',
-        good: 'Des ligues privées, seulement entre potes',
-    },
-];
+import { getDictionary, toLocale } from '../i18n';
+
+const t = getDictionary(toLocale(Astro.currentLocale)).difference;
+const rows = [t.rows.rugby, t.rows.scores, t.rows.odds, t.rows.money, t.rows.friends];
 ---
 
 <section data-theme="dark">
     <div class="inner">
         <div class="intro">
-            <span class="overline">La différence</span>
-            <h2>Pensé pour le rugby, pas bricolé depuis le foot.</h2>
-            <p>
-                Le rugby a ses propres règles : score exact, essais, bonus offensif, cotes. On les a
-                mises au cœur du jeu — pas collées après coup.
-            </p>
+            <span class="overline">{t.overline}</span>
+            <h2>{t.title}</h2>
+            <p>{t.body}</p>
         </div>
         <div class="table">
             <div class="head">
-                <div class="head-them">Les apps génériques</div>
+                <div class="head-them">{t.them}</div>
                 <div class="head-us">
                     <svg width="16" height="16" viewBox="0 0 120 120" style="flex: none;">
                         <g transform="rotate(-25 72 54)">
