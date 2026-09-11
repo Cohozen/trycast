@@ -1,21 +1,47 @@
 ---
-// Layout des pages de contenu (légal) : colonne étroite, typographie sobre.
+// Layout des pages de contenu (légal) : colonne étroite, typographie sobre. Une page
+// légale existe dans chaque langue (src/pages/cgu.astro ↔ src/pages/en/terms.astro…) ;
+// sa date de mise à jour, commune aux deux, vient de la table legalUpdatedAt.
+import {
+    getDictionary,
+    intlLocales,
+    type LegalRoute,
+    legalUpdatedAt,
+    localePath,
+    toLocale,
+} from '../i18n';
 import BaseLayout from './base-layout.astro';
 
 interface Props {
     title: string;
     description: string;
     heading: string;
-    updatedAt: string;
+    route: LegalRoute;
 }
 
-const { title, description, heading, updatedAt } = Astro.props;
+const { title, description, heading, route } = Astro.props;
+
+const locale = toLocale(Astro.currentLocale);
+const t = getDictionary(locale).legal;
+const updatedAt = new Intl.DateTimeFormat(intlLocales[locale], {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+}).format(new Date(legalUpdatedAt[route]));
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} route={route}>
     <main>
         <h1>{heading}</h1>
-        <p class="updated">Dernière mise à jour : {updatedAt}</p>
+        <p class="updated">{t.updatedAt} {updatedAt}</p>
+        {
+            locale !== 'fr' && (
+                <p class="notice">
+                    {t.translationNotice.before}<a href={localePath(route, 'fr')} hreflang="fr">{t.translationNotice.link}</a>{t.translationNotice.after}
+                </p>
+            )
+        }
         <article>
             <slot />
         </article>
@@ -41,6 +67,17 @@ const { title, description, heading, updatedAt } = Astro.props;
         margin: 12px 0 0;
         font-size: 13px;
         color: var(--text-faint);
+    }
+
+    .notice {
+        margin: 20px 0 0;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        background: var(--surface-sunken);
+        border: 1px solid var(--border);
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--text-muted);
     }
 
     article {

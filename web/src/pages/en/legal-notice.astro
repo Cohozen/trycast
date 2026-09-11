@@ -1,0 +1,47 @@
+---
+// Traduction de src/pages/mentions-legales.astro, qui seule fait foi : toute
+// modification de l'une se reporte sur l'autre dans le même commit.
+import { localePath } from '../../i18n';
+import ContentLayout from '../../layouts/content-layout.astro';
+---
+
+<ContentLayout
+    title="Legal notice — TryCast"
+    description="Legal notice for the trycast.fr website."
+    heading="Legal notice"
+    route="legalNotice">
+    <h2>Site publisher</h2>
+    <p>
+        The trycast.fr website is published by a private individual residing in France, acting in
+        a non-professional capacity. In accordance with Article 6-III-2 of French Law No. 2004-575
+        of 21 June 2004 (LCEN), the publisher has chosen to remain anonymous and has provided the
+        information needed to identify them to their hosting provider.<br />
+        Contact: <a href="mailto:contact@trycast.fr">contact@trycast.fr</a><br />
+        Publication director: the site's publisher.
+    </p>
+
+    <h2>Hosting</h2>
+    <p>
+        <strong>Website</strong>: Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, United
+        States — vercel.com<br />
+        <strong>App data</strong>: Supabase Inc. (database and authentication) — supabase.com,
+        hosted in the European Union (AWS region eu-west-3, Paris)
+    </p>
+
+    <h2>Intellectual property</h2>
+    <p>
+        All content on the site (text, visuals, logo, code) is the property of its publisher,
+        unless stated otherwise. Any reproduction without prior permission is prohibited.
+    </p>
+
+    <h2>Non-affiliation</h2>
+    <p>
+        TryCast is an independent project, not affiliated with the competitions, unions, clubs or
+        brands mentioned. Competition names belong to their respective owners.
+    </p>
+
+    <h2>Personal data</h2>
+    <p>
+        See the <a href={localePath('privacy', 'en')}>privacy policy</a>.
+    </p>
+</ContentLayout>

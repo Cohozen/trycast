@@ -1,0 +1,75 @@
+---
+// Traduction de src/pages/suppression-compte.astro, qui seule fait foi (page exigée
+// par Google Play, voir son en-tête) : toute modification de l'une se reporte sur
+// l'autre dans le même commit. Libellés des menus alignés sur l'app en anglais.
+import { localePath } from '../../i18n';
+import ContentLayout from '../../layouts/content-layout.astro';
+---
+
+<ContentLayout
+    title="Delete my account — TryCast"
+    description="How to permanently delete your TryCast account and the associated data, from the app or by email."
+    heading="Delete my account"
+    route="deleteAccount">
+    <p>
+        Your account belongs to you. You can delete it whenever you like, permanently, without
+        having to justify yourself or ask anyone for anything.
+    </p>
+
+    <h2>From the app (immediate)</h2>
+    <p>
+        This is the fastest way: deletion takes effect straight away, with no approval needed from
+        us.
+    </p>
+    <ol>
+        <li>Open TryCast and log in.</li>
+        <li>Go to the <em>Profile</em> tab, then the <em>Settings</em> icon at the top of the screen.</li>
+        <li>At the very bottom, in the <em>Danger zone</em> section: <em>Delete my account</em>.</li>
+        <li>Confirm. Your account and its associated data are erased immediately.</li>
+    </ol>
+    <p>
+        If you'd like to keep a copy of your predictions before you go, first head
+        to <em>Settings → Privacy → Export my data</em>.
+    </p>
+
+    <h2>By email (if you've uninstalled the app)</h2>
+    <p>
+        Write to <a href="mailto:contact@trycast.fr">contact@trycast.fr</a> from <strong>your
+        account's email address</strong>, with “account deletion” as the subject. Matching
+        addresses is how we check that the request really comes from you — we never ask for a
+        password.
+    </p>
+    <p>
+        Requests are handled within one month at most, and in practice much faster.
+    </p>
+
+    <h2>What is deleted</h2>
+    <p>
+        Everything linking you to the service disappears permanently, with no recycle bin and no
+        cooling-off period:
+    </p>
+    <ul>
+        <li>your account and your login details;</li>
+        <li>your profile: username, email address, profile photo;</li>
+        <li>your predictions, points and leaderboard positions;</li>
+        <li>your league memberships — and the leagues you created, along with them;</li>
+        <li>your notification preferences and your phone's push tokens.</li>
+    </ul>
+    <p>
+        If you created a league, warn its members first: deleting it is irreversible and wipes out
+        everyone's leaderboard. You can also transfer ownership to another member from the
+        league's page, then delete your account — the league will live on.
+    </p>
+
+    <h2>What may remain</h2>
+    <p>
+        Nothing that could identify you again. Any usage measurements collected are anonymous from
+        the outset and not linked to any account: they can therefore be neither traced nor deleted
+        individually. If your address was on the beta waitlist, it will be removed on request to
+        the same address.
+    </p>
+    <p>
+        Full details of the processing and its retention periods are in
+        the <a href={localePath('privacy', 'en')}>privacy policy</a>.
+    </p>
+</ContentLayout>

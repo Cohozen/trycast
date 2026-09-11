@@ -205,4 +205,12 @@ export const en: Dictionary = {
         errorNetwork: 'Oops — that didn’t go through. Try again in a moment.',
         reassurance: 'Free, no strings attached. We never share your email.',
     },
+    legal: {
+        updatedAt: 'Last updated:',
+        translationNotice: {
+            before: 'This translation is provided for information only; ',
+            link: 'the French version',
+            after: ' is the only legally binding one.',
+        },
+    },
 };

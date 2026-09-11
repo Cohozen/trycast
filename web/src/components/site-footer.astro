@@ -28,10 +28,10 @@ const year = new Date().getFullYear();
             </div>
             <div class="column">
                 <span class="heading">{t.footer.legal}</span>
-                <a href="/cgu">{t.footer.terms}</a>
-                <a href="/confidentialite">{t.footer.privacy}</a>
-                <a href="/mentions-legales">{t.footer.legalNotice}</a>
-                <a href="/suppression-compte">{t.footer.deleteAccount}</a>
+                <a href={localePath('terms', locale)}>{t.footer.terms}</a>
+                <a href={localePath('privacy', locale)}>{t.footer.privacy}</a>
+                <a href={localePath('legalNotice', locale)}>{t.footer.legalNotice}</a>
+                <a href={localePath('deleteAccount', locale)}>{t.footer.deleteAccount}</a>
             </div>
             <div class="column">
                 <span class="heading">{t.footer.contact}</span>

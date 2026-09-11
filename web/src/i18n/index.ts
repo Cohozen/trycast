@@ -31,6 +31,10 @@ export function otherLocale(locale: Locale): Locale {
  */
 export const routes = {
     home: { fr: '/', en: '/en/' },
+    terms: { fr: '/cgu', en: '/en/terms' },
+    privacy: { fr: '/confidentialite', en: '/en/privacy' },
+    legalNotice: { fr: '/mentions-legales', en: '/en/legal-notice' },
+    deleteAccount: { fr: '/suppression-compte', en: '/en/delete-account' },
 } as const satisfies Record<string, Record<Locale, string>>;
 
 export type RouteName = keyof typeof routes;
@@ -38,3 +42,21 @@ export type RouteName = keyof typeof routes;
 export function localePath(route: RouteName, locale: Locale): string {
     return routes[route][locale];
 }
+
+/**
+ * Date de dernière mise à jour des pages légales, commune aux deux langues : la
+ * traduction anglaise suit la version française, qui seule fait foi. Modifier une page
+ * légale, c'est modifier sa jumelle dans le même commit et avancer cette date
+ * (garde-fou structurel : scripts/check-legal-parity.mjs).
+ */
+export const legalUpdatedAt = {
+    terms: '2026-09-03',
+    privacy: '2026-09-03',
+    legalNotice: '2026-07-15',
+    deleteAccount: '2026-07-27',
+} as const satisfies Partial<Record<RouteName, string>>;
+
+export type LegalRoute = keyof typeof legalUpdatedAt;
+
+/** Étiquettes BCP 47 pour Intl ; l'anglais est britannique, comme la voix du site. */
+export const intlLocales = { fr: 'fr-FR', en: 'en-GB' } as const satisfies Record<Locale, string>;

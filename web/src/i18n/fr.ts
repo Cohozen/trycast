@@ -210,6 +210,15 @@ export const fr = {
         errorNetwork: "Oups — ça n'a pas voulu passer. Réessaie dans un instant.",
         reassurance: 'Gratuit, sans engagement. On ne partage jamais ton e-mail.',
     },
+    legal: {
+        updatedAt: 'Dernière mise à jour :',
+        // Encart des traductions : n'apparaît que hors du français, qui fait foi.
+        translationNotice: {
+            before: 'Cette traduction est fournie pour information ; seule ',
+            link: 'la version française',
+            after: ' fait foi.',
+        },
+    },
 };
 
 export type Dictionary = typeof fr;

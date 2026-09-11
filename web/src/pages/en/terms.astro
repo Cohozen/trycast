@@ -1,0 +1,106 @@
+---
+// Traduction de src/pages/cgu.astro, qui seule fait foi : toute modification de l'une
+// se reporte sur l'autre dans le même commit (scripts/check-legal-parity.mjs).
+import { localePath } from '../../i18n';
+import ContentLayout from '../../layouts/content-layout.astro';
+---
+
+<ContentLayout
+    title="Terms of use — TryCast"
+    description="Terms of use of TryCast, the free rugby predictions game to play with your mates."
+    heading="Terms of use"
+    route="terms">
+    <h2>1. Purpose</h2>
+    <p>
+        These terms of use (the “Terms”) govern the use of the TryCast mobile app and the
+        trycast.fr website (together, the “Service”). TryCast is a <strong>free</strong> rugby
+        predictions game to play with friends: you predict the results of matches, score points
+        and compare yourself with the people close to you on leaderboards.
+    </p>
+    <p>
+        By creating an account or using the Service, you accept these Terms. If you disagree with
+        any of them, do not use the Service.
+    </p>
+
+    <h2>2. A free game, with no real money</h2>
+    <p>
+        TryCast is <strong>not a real-money betting service</strong>: no stakes, no winnings in cash
+        or in kind, no in-app purchases. Points and leaderboards have no monetary value and can be
+        neither exchanged nor cashed in. The odds displayed are used solely to calculate the
+        game's points and constitute neither an incentive nor an offer to bet.
+    </p>
+
+    <h2>3. Account and access</h2>
+    <ul>
+        <li>
+            Creating an account requires a valid email address and a username. You are
+            responsible for keeping your login details confidential.
+        </li>
+        <li>
+            The Service is reserved for people aged 16 or over. If you are under 18, make sure you
+            have the consent of a parent or guardian.
+        </li>
+        <li>
+            You can delete your account at any time from the app's settings; deletion is
+            permanent.
+        </li>
+    </ul>
+
+    <h2>4. Rules of use</h2>
+    <p>By using the Service, you agree to:</p>
+    <ul>
+        <li>choose a username and a league name that are neither offensive nor misleading;</li>
+        <li>not attempt to rig the leaderboards, automate access to the Service or get around its
+            protections;</li>
+        <li>not use the Service for commercial or unlawful purposes.</li>
+    </ul>
+    <p>
+        In the event of a breach, the publisher may suspend or delete the account concerned, after
+        notice where possible.
+    </p>
+
+    <h2>5. Content and competitions</h2>
+    <p>
+        Fixtures, results and odds come from third-party data providers and are provided for
+        information only; errors or delays may occur. TryCast is an independent project, <strong>not
+        affiliated</strong> with the competitions, unions, clubs or brands mentioned in the app.
+    </p>
+
+    <h2>6. Availability and liability</h2>
+    <p>
+        TryCast is a project run by an independent developer, provided “as is” with no guarantee of
+        continuous availability. The publisher does everything it can to provide a reliable
+        service, but cannot be held liable for interruptions, loss of game data or indirect damage
+        arising from the use of the Service, to the extent permitted by law.
+    </p>
+
+    <h2>7. Intellectual property</h2>
+    <p>
+        The TryCast brand, logo, interface and original content of the Service are protected. Any
+        unauthorised reproduction or use is prohibited.
+    </p>
+
+    <h2>8. Personal data</h2>
+    <p>
+        How your data is processed is described in the <a href={localePath('privacy', 'en')}>privacy
+        policy</a>.
+    </p>
+
+    <h2>9. Changes to these Terms</h2>
+    <p>
+        These Terms may change, particularly when new features launch. In the event of a
+        substantial change, you will be informed in the app or by email; continuing to use the
+        Service constitutes acceptance.
+    </p>
+
+    <h2>10. Governing law</h2>
+    <p>
+        These Terms are governed by French law. Any dispute falls under the jurisdiction of the
+        competent French courts, subject to mandatory consumer protection rules.
+    </p>
+
+    <h2>11. Contact</h2>
+    <p>
+        For any question: <a href="mailto:contact@trycast.fr">contact@trycast.fr</a>.
+    </p>
+</ContentLayout>

@@ -1,0 +1,224 @@
+---
+// Traduction de src/pages/confidentialite.astro, qui seule fait foi : toute
+// modification de l'une se reporte sur l'autre dans le même commit — et un nouveau
+// traitement se déclare ici aussi avant sa mise en service (règle RGPD d'AGENTS.md).
+import { localePath } from '../../i18n';
+import ContentLayout from '../../layouts/content-layout.astro';
+---
+
+<ContentLayout
+    title="Privacy policy — TryCast"
+    description="How TryCast collects, uses and protects your personal data."
+    heading="Privacy policy"
+    route="privacy">
+    <h2>1. Who is responsible?</h2>
+    <p>
+        The data controller is the publisher of TryCast, who can be reached
+        at <a href="mailto:contact@trycast.fr">contact@trycast.fr</a>. TryCast is an independent
+        project; the protection of your data follows the General Data Protection Regulation
+        (GDPR).
+    </p>
+
+    <h2>2. What data, and what for?</h2>
+    <p><strong>On this website (waitlist)</strong></p>
+    <ul>
+        <li>
+            <strong>Email address</strong> — used only to let you know when the app opens and
+            about the stages of the beta. Legal basis: your consent (voluntary sign-up). No resale,
+            no sharing, no third-party marketing.
+        </li>
+        <li>
+            <strong>IP address, in hashed form</strong> — to limit the number of sign-ups per
+            visitor and protect the form from bots. Your address is never stored in clear: only an
+            irreversible fingerprint, recalculated with a randomly drawn key every day, is kept for
+            24 hours at most. Legal basis: our legitimate interest in protecting the service
+            against abuse.
+        </li>
+    </ul>
+    <p><strong>In the app</strong></p>
+    <ul>
+        <li>
+            <strong>Email address and username</strong> — creating, logging in to and managing your
+            account. Legal basis: performance of the contract (the Terms).
+        </li>
+        <li>
+            <strong>If you choose “Continue with Google”</strong> — Google sends us your email
+            address, your Google account identifier, your name and the address of your Google
+            profile photo. <strong>Only the email address is used</strong>: it identifies your
+            account. Your Google name and photo are never displayed — you choose your username
+            yourself on first launch, and your profile photo remains the one you add in the app. We
+            keep no Google password or token. This option is <strong>optional</strong>: creating an
+            account with an email and password remains available. Legal basis: performance of the
+            contract.
+        </li>
+        <li>
+            <strong>Profile photo</strong> — optional. If you add one, it is resized on your phone
+            and then stored on our servers. Legal basis: performance of the contract. You can
+            remove it at any time.
+        </li>
+        <li>
+            <strong>Predictions, points and leaderboards</strong> — the heart of the game:
+            calculating scores and displaying your leagues' leaderboards. Legal basis: performance
+            of the contract.
+        </li>
+        <li>
+            <strong>Preferences</strong> (language, theme, notification choices) — so the app
+            behaves the way you set it up, and so we can write to you in your language. Legal
+            basis: performance of the contract.
+        </li>
+        <li>
+            <strong>Push notification token</strong> (if you turn notifications on) — sending match
+            reminders and results. Legal basis: your consent; the token is deleted as soon as you
+            turn notifications off or log out.
+        </li>
+        <li>
+            <strong>History of your consents</strong> — the date on which you accepted or refused
+            our communications, usage measurement and crash reports (see §8). Legal basis: our
+            obligation to be able to prove your choice.
+        </li>
+    </ul>
+    <p>
+        We collect <strong>no location data</strong>, no address book and no sensitive data.
+    </p>
+
+    <h2>3. What other users see</h2>
+    <p>
+        TryCast is a game between friends: inside a league you have joined, the other members see
+        your <strong>username</strong>, your <strong>profile photo</strong>,
+        your <strong>predictions</strong> once kick-off has passed, and
+        your <strong>points</strong>. Your email address is <strong>never</strong> visible to other
+        players. If you add a photo, it is served from a public web address: it is neither listed
+        nor indexed, but it remains accessible to anyone who has the link.
+    </p>
+
+    <h2>4. Where is the data hosted, and who else handles it?</h2>
+    <p>
+        Account and game data are hosted by <strong>Supabase</strong> (database, authentication and
+        photo storage) in the European Union (AWS region eu-west-3, Paris). The following also act
+        as processors or recipients within the meaning of the GDPR:
+    </p>
+    <ul>
+        <li><strong>Vercel</strong> — hosting of this website. A company established in the United
+            States; transfers are governed by the European Commission's standard contractual
+            clauses.</li>
+        <li><strong>Resend</strong> — delivery of account-related emails (address confirmation,
+            password reset), from servers located in the European Union (Ireland).</li>
+        <li><strong>Google</strong>, if and only if you use “Continue with Google” — Google then
+            authenticates you on our behalf and knows that one of its accounts is logging in to
+            TryCast. A company established in the United States; transfers are governed by the
+            Data Privacy Framework and standard contractual clauses. No game data (predictions,
+            leagues, leaderboards) is sent to it, and you can avoid this transfer entirely by
+            creating your account with an email address.</li>
+        <li><strong>Expo</strong> then <strong>Google (Firebase Cloud Messaging)</strong> or <strong>Apple</strong> —
+            technical delivery of push notifications to your phone. They receive your device's
+            token and the text of the notification; this step is imposed by the Android and iOS
+            systems.</li>
+        <li><strong>Aptabase</strong> (European Union) and <strong>Sentry</strong> (Germany) —
+            anonymous usage measurement and crash reports, both of which can be turned off. Details
+            in section 8.</li>
+        <li><strong>Highlightly</strong> — provider of fixtures, results and odds. <strong>No
+            personal data is sent to it</strong>: the exchanges concern matches only.</li>
+    </ul>
+    <p>
+        None of your data is sold, rented or passed on for advertising purposes.
+    </p>
+
+    <h2>5. How long?</h2>
+    <ul>
+        <li>
+            <strong>Waitlist</strong>: until the app launches, then at the latest 6 months
+            afterwards (or as soon as you ask for deletion).
+        </li>
+        <li>
+            <strong>IP address fingerprints</strong> (form anti-abuse): 24 hours maximum.
+        </li>
+        <li>
+            <strong>Account</strong>: for as long as your account exists. Deleting your account
+            (from the app's settings) immediately and permanently erases your personal data,
+            profile photo included.
+        </li>
+        <li>
+            <strong>Inactive account</strong>: if you don't log in for <strong>3 years</strong>,
+            your account and the associated data are deleted. You will be warned by email before
+            deletion, with the option to keep it by logging back in.
+        </li>
+    </ul>
+
+    <h2>6. Your rights</h2>
+    <p>
+        You have the rights of access, rectification, erasure, restriction, objection and
+        portability over your data, as well as the right to withdraw your consent at any time.
+    </p>
+    <p>
+        Two of these rights can be exercised <strong>directly in the app</strong>, without asking
+        anyone: <em>Settings → Privacy → Export my data</em> gives you a readable copy of all your
+        data, and <em>Settings → Delete my account</em> erases everything permanently.
+    </p>
+    <p>
+        If you have uninstalled the app, the <a href={localePath('deleteAccount', 'en')}>Delete my
+        account</a> page explains how to request deletion by email, and details what is erased.
+    </p>
+    <p>
+        For any other request, write
+        to <a href="mailto:contact@trycast.fr">contact@trycast.fr</a> — we reply within one month at
+        most. You can also lodge a complaint with the CNIL, the French data protection authority
+        (cnil.fr).
+    </p>
+
+    <h2>7. Minimum age</h2>
+    <p>
+        The Service is reserved for people aged 16 or over. This is the publisher's choice, stricter
+        than French law requires: in France, a minor can consent alone to the processing of their
+        data from the age of 15. 16 is the default threshold set by the GDPR, and it is also the
+        age rating declared to the app stores. If we learn that an account was created by a younger
+        child, it is deleted.
+    </p>
+
+    <h2>8. Usage measurement and diagnostics</h2>
+    <p>
+        To know which features are really used and to be alerted when the app crashes, it sends
+        two kinds of technical information. Both can be switched off in one tap
+        in <em>Settings → Privacy</em>, and nothing is lost by refusing them: the app works exactly
+        the same.
+    </p>
+    <ul>
+        <li>
+            <strong>Usage measurement</strong> — a handful of named events (“prediction saved”,
+            “league joined”…), with the app version and the operating system. <strong>No account or
+            device identifier</strong>: these events cannot be linked to anyone, not even by us.
+            Provider: <strong>Aptabase</strong>, in the European Union.
+        </li>
+        <li>
+            <strong>Crash reports</strong> — when an error occurs, its message, its technical stack
+            trace, your device model and the screens visited just before. Neither your username,
+            nor your email address, nor your predictions are included.
+            Provider: <strong>Sentry</strong>, on servers located in Germany.
+        </li>
+    </ul>
+    <p>
+        Legal basis: our legitimate interest in maintaining an app that works. None of this is used
+        to profile or target you.
+    </p>
+
+    <h2>9. Advertising</h2>
+    <p>
+        No advertising, no ad tracking, no data resale, no third-party trackers for commercial
+        purposes. This website uses <strong>no tracking cookies</strong>.
+    </p>
+
+    <h2>10. Security</h2>
+    <p>
+        Exchanges with our servers are encrypted (HTTPS/TLS) and your password is never stored in
+        clear. Access to data is partitioned by security rules enforced server-side: each account
+        can only read and write what concerns it, regardless of what the app does. As no system is
+        infallible, you will be informed as quickly as possible of any incident affecting your
+        data.
+    </p>
+
+    <h2>11. Changes to this policy</h2>
+    <p>
+        This policy may be updated, particularly when the app launches. The date of the last
+        update appears at the top of the page; in the event of a substantial change, you will be
+        informed by email or in the app.
+    </p>
+</ContentLayout>

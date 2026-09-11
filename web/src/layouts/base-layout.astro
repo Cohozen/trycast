@@ -8,7 +8,7 @@ import '../styles/tokens.css';
 import '../styles/global.css';
 import SiteFooter from '../components/site-footer.astro';
 import SiteNav from '../components/site-nav.astro';
-import { getDictionary, locales, type RouteName, routes, toLocale } from '../i18n';
+import { getDictionary, intlLocales, locales, type RouteName, routes, toLocale } from '../i18n';
 
 interface Props {
     title: string;
@@ -28,7 +28,7 @@ const { title, description, image = '/og-default.png', noindex = false, route } 
 
 const locale = toLocale(Astro.currentLocale);
 const t = getDictionary(locale);
-const ogLocales = { fr: 'fr_FR', en: 'en_GB' } as const;
+const ogLocale = (l: keyof typeof intlLocales) => intlLocales[l].replace('-', '_');
 
 // Absolues et non relatives : les robots d'aperçu (WhatsApp, iMessage,
 // Discord, Slack) ignorent une og:image relative, sans le signaler.
@@ -70,11 +70,11 @@ const alternates =
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:type" content="website" />
-        <meta property="og:locale" content={ogLocales[locale]} />
+        <meta property="og:locale" content={ogLocale(locale)} />
         {
             alternates
                 .filter((a) => a.locale !== locale)
-                .map((a) => <meta property="og:locale:alternate" content={ogLocales[a.locale]} />)
+                .map((a) => <meta property="og:locale:alternate" content={ogLocale(a.locale)} />)
         }
         <meta property="og:site_name" content="TryCast" />
         <meta property="og:image" content={imageUrl.href} />
