@@ -44,15 +44,12 @@ describe('validateEmail', () => {
         expect(validateEmail(email)).toBeNull();
     });
 
-    it.each([
-        '',
-        'pas-un-email',
-        'manque@tld',
-        '@sans-local.fr',
-        'espace @mail.fr',
-    ])('refuse %s', (email) => {
-        expect(validateEmail(email)).not.toBeNull();
-    });
+    it.each(['', 'pas-un-email', 'manque@tld', '@sans-local.fr', 'espace @mail.fr'])(
+        'refuse %s',
+        (email) => {
+            expect(validateEmail(email)).not.toBeNull();
+        },
+    );
 });
 
 describe('validatePassword', () => {

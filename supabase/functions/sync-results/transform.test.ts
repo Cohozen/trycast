@@ -58,17 +58,13 @@ describe('extractFinalScore', () => {
         expect(extractFinalScore(match)).toBeNull();
     });
 
-    it.each([
-        '34 : 32',
-        '34 - 32 - 1',
-        'abc - 12',
-        '12.5 - 3',
-        '-1 - 3',
-        '',
-    ])('null sur score malformé "%s"', (score) => {
-        const match = apiMatch({ id: 1, state: { score, description: 'Finished' } });
-        expect(extractFinalScore(match)).toBeNull();
-    });
+    it.each(['34 : 32', '34 - 32 - 1', 'abc - 12', '12.5 - 3', '-1 - 3', ''])(
+        'null sur score malformé "%s"',
+        (score) => {
+            const match = apiMatch({ id: 1, state: { score, description: 'Finished' } });
+            expect(extractFinalScore(match)).toBeNull();
+        },
+    );
 });
 
 describe('partitionActionableMatches', () => {
