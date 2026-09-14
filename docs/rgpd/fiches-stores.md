@@ -226,7 +226,7 @@ ce bloc puis rebuilder.
 - [ ] Formulaire Data Safety rempli sur Play Console
 - [ ] Nutrition Labels remplies sur App Store Connect
 - [ ] `ios.privacyManifests` ajouté à `app.json` et build iOS régénéré
-- [ ] Boîte `contact@trycast.fr` opérationnelle (adresse de support déclarée aux deux stores)
+- [x] Boîte `contact@trycast.fr` opérationnelle (adresse de support déclarée aux deux stores)
 - [x] ~~Si Aptabase / Sentry sont en service : déclarations mises à jour~~ → fait le
       22 juillet 2026, avant leur mise en service
 - [ ] `SENTRY_AUTH_TOKEN` en secret EAS + `organization`/`project` dans le plugin

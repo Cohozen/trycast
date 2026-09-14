@@ -41,7 +41,7 @@
 | 5.5 | Design system + i18n (tokens light/dark, primitives, 4 onglets, i18next FR) | ✅ Livré (V0 + correctifs retours + tokens v2) |
 | **6** | **Push (expo-notifications, tokens, EF notify, deep links, préférences)** | ✅ **Livré et validé sur Android réel** (2026-07-23) |
 | 7 | Finitions (confirmation email, changement d'e-mail, RGPD minimal, anglais + sélecteur de langue) | ✅ **Livré, déployé et actif** (EF + config Auth + domaine + **SMTP Resend** + **e-mails FR en ligne** + **reset par code validé**) — OAuth + iOS/APNs **différés** |
-| Web | Site vitrine Astro (`web/` : landing, waitlist beta, pages légales, **invitations de ligue**) | ✅ Livré, **en ligne sur trycast.fr** (canonique `www.`), textes légaux validés — reste : boîte mail contact@ |
+| Web | Site vitrine Astro (`web/` : landing, waitlist beta, pages légales, **invitations de ligue**) | ✅ Livré, **en ligne sur trycast.fr** (canonique `www.`), textes légaux validés, boîte `contact@trycast.fr` opérationnelle |
 | **8** | **Connexion Google** (socle multi-fournisseur, écran de choix du pseudo, RGPD) | ✅ **Livré et validé sur Android réel** (2026-07-23) |
 | **9** | **Mise en beta Play** (découplage dev/prod, OTA, config EAS, fiche et visuels, test interne) | 🔶 **Phases 1 à 6 livrées** — l'app s'installe depuis le Play Store, **liens d'invitation vérifiés en prod** ; reste la phase 7, la **beta fermée visée début octobre 2026** |
 
@@ -333,7 +333,7 @@ Le lien de réinitialisation n'atterrissait nulle part (`resetPasswordForEmail` 
 - **Site vitrine : rien** — la courbe d'inscriptions se lit déjà dans `waitlist_signups.created_at`, et la promesse « aucun cookie de suivi » reste intacte.
 - À la mise en service : élargir le `check` de `consents` à `('communications', 'analytics', 'diagnostics')`, ajouter deux toggles dans `privacy-settings.tsx`, et **publier la section « Mesure d'audience et diagnostics » de la politique avant** le premier envoi de données.
 
-**Reste à faire** : appliquer `ios.privacyManifests` au premier build iOS (différé), remplir les fiches stores à la soumission, créer la boîte `contact@trycast.fr`, automatiser la purge des comptes inactifs (la règle des 3 ans est publiée, le cron n'existe pas), et brancher les source maps Sentry au premier build de release (`organization`/`project` dans le plugin `app.json` + `SENTRY_AUTH_TOKEN` en secret EAS).
+**Reste à faire** : appliquer `ios.privacyManifests` au premier build iOS (différé), remplir les fiches stores à la soumission, automatiser la purge des comptes inactifs (la règle des 3 ans est publiée, le cron n'existe pas), et brancher les source maps Sentry au premier build de release (`organization`/`project` dans le plugin `app.json` + `SENTRY_AUTH_TOKEN` en secret EAS).
 
 ### Lot 8 — Connexion Google : ✅ validé sur l'Android réel (2026-07-23)
 
@@ -349,7 +349,7 @@ Livré le 2026-07-23 (bis). **Décision : Google seul, pas Apple** — « Sign i
 - ~~Relire et valider les pages légales~~ → **validées le 2026-07-20** : éditeur anonyme (particulier non-pro, LCEN 6-III-2 — ni nom ni adresse publics), contact `contact@trycast.fr`, bandeau brouillon retiré. À revoir au passage commercial/App Store (bascule éditeur « professionnel » ⇒ identité complète obligatoire).
 - ~~Brancher les URLs légales dans l'app~~ → **fait le 2026-07-22 (ter)** (Réglages + mention à l'inscription, cf. section RGPD ci-dessus).
 - ~~Redéployer le site~~ → **en ligne et à jour** (vérifié le 2026-07-23 : `www.trycast.fr/confidentialite` affiche la version du 23 juillet 2026, section « Mesure d'usage » incluse).
-- **Créer la boîte `contact@trycast.fr`** (l'adresse est référencée partout sur le site).
+- ~~Créer la boîte `contact@trycast.fr`~~ → **opérationnelle**, confirmé par Corentin le 2026-09-14. Reste à noter son fournisseur dans `docs/rgpd/sous-traitants.md` (sous-traitant du traitement « support »).
 - ~~Domaine du site~~ → **fait le 2026-07-20** : `trycast.fr` branché sur Vercel (canonique `www.`, redirection 308 depuis l'apex).
 - ~~Site en anglais~~ → **en ligne le 2026-09-11 (ter)**, poussé par Corentin, contrôles de production au vert. Les pages légales anglaises sont une traduction de ma main : une relecture reste utile si elle n'a pas été faite avant le push. Suites :
   - **enregistrer la langue d'inscription à la waitlist** (migration de `join_waitlist` et registre RGPD), pour écrire aux anglophones dans leur langue au lancement ;
