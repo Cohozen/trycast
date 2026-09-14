@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Génère les templates d'e-mails d'auth Supabase dans `supabase/templates/`.
+ * Génère les templates d'e-mails d'auth Supabase dans `supabase/templates/`, et les
+ * e-mails de la beta envoyés en broadcast Resend dans `docs/emails/`.
  *
  * Pourquoi un générateur plutôt que 7 fichiers écrits à la main : un e-mail HTML
  * ne peut pas inclure de partiel ni de feuille de style externe, donc l'habillage
@@ -9,6 +10,13 @@
  *
  *   node scripts/build-email-templates.mjs           écrit les fichiers
  *   node scripts/build-email-templates.mjs --check   échoue si un fichier a dérivé
+ *   node scripts/build-email-templates.mjs --league-code ABCD2345
+ *       écrit en plus docs/emails/beta-league.local.html, l'e-mail de la ligue des
+ *       testeurs. Le dépôt est public et le code ouvre la ligue à qui le lit : ce
+ *       fichier est ignoré par git, et rien n'est écrit sans le code.
+ *
+ * Les broadcasts ne passent pas par GoTrue : pas de variables Go. Seules les
+ * variables Resend fonctionnent, en triple accolade ({{{RESEND_UNSUBSCRIBE_URL}}}).
  *
  * Contraintes du support e-mail (ne pas « moderniser » sans vérifier) :
  *  - styles INLINE uniquement pour tout ce qui compte ; le <style> du <head> est
@@ -30,7 +38,18 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const OUT_DIR = join(ROOT, 'supabase', 'templates');
+const BROADCAST_DIR = join(ROOT, 'docs', 'emails');
 const SITE = 'https://www.trycast.fr';
+
+/**
+ * Lien d'inscription au test fermé Play : le même pour tous les testeurs, il ne
+ * dépend que du package. Le comparer à celui de la console (Tests fermés → Testeurs)
+ * avant un envoi.
+ */
+const PLAY_TESTING_URL = 'https://play.google.com/apps/testing/com.cohozen.trycast';
+
+/** Alphabet des codes de ligue — miroir de normalizeInviteCode (src/features/leagues/validation.ts). */
+const LEAGUE_CODE = /^[A-HJ-KM-NP-Z2-9]{8}$/;
 
 /* ---- Tokens du design system, recopiés en hex (aucun var() en e-mail) ---- */
 const C = {
@@ -95,7 +114,45 @@ const callout = (html) => `
                                 </tr>
                             </table>`;
 
-export const render = ({ preheader, title, blocks }) => `<!doctype html>
+/** Intertitre dans le corps du message — même pile que le titre, en plus petit. */
+const h2 = (text) =>
+    `<h2 style="margin:32px 0 0;font-family:${DISPLAY};font-size:20px;font-weight:700;line-height:26px;letter-spacing:0.3px;color:${C.text};">${text}</h2>`;
+
+/**
+ * Étapes numérotées. Pas de <ol> : les puces et retraits varient trop d'un client à
+ * l'autre, et Outlook décale les numéros. Le numéro reste neutre : le grenat est
+ * réservé au bouton.
+ */
+const steps = (items) => `
+                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="margin:20px 0 0;">
+${items
+    .map(
+        (html, i) => `                                <tr>
+                                    <td valign="top" width="36" style="width:36px;padding:${i === 0 ? 0 : 14}px 0 0;">
+                                        <div style="width:26px;height:26px;border-radius:13px;background-color:${C.page};border:1px solid ${C.border};font-family:${DISPLAY};font-size:15px;font-weight:700;line-height:26px;text-align:center;color:${C.text};">${i + 1}</div>
+                                    </td>
+                                    <td valign="top" style="padding:${i === 0 ? 3 : 17}px 0 0;font-family:${BODY};font-size:16px;line-height:24px;color:${C.muted};">${html}</td>
+                                </tr>`,
+    )
+    .join('\n')}
+                            </table>`;
+
+const footerLink = (label, url) =>
+    `<a href="${url}" style="color:${C.faint};text-decoration:underline;">${label}</a>`;
+
+/** Pied des e-mails d'auth : partis sans que personne ne les attende, on ne lit pas les réponses. */
+const AUTH_FOOTER = `E-mail automatique envoyé par TryCast — inutile d'y répondre.<br />
+                                Une question ? ${footerLink('contact@trycast.fr', 'mailto:contact@trycast.fr')}`;
+
+/**
+ * Pied des broadcasts : l'inverse, les réponses sont attendues (elles arrivent sur
+ * contact@, adresse d'expédition). Resend remplace le lien de désinscription à l'envoi.
+ */
+const BROADCAST_FOOTER = `Tu reçois cet e-mail parce que tu as demandé à tester TryCast.<br />
+                                Une question ? Réponds simplement à ce message.<br />
+                                ${footerLink('Ne plus recevoir ces e-mails', '{{{RESEND_UNSUBSCRIBE_URL}}}')}`;
+
+export const render = ({ preheader, title, blocks, footer = AUTH_FOOTER }) => `<!doctype html>
 <html lang="fr" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -143,10 +200,9 @@ ${blocks.join('\n')}
                     <tr>
                         <td class="tc-pad" style="padding:20px 32px 0;">
                             <p style="margin:0;font-family:${BODY};font-size:12px;line-height:19px;color:${C.faint};">
-                                E-mail automatique envoyé par TryCast — inutile d'y répondre.<br />
-                                Une question ? <a href="mailto:contact@trycast.fr" style="color:${C.faint};text-decoration:underline;">contact@trycast.fr</a>
-                                · <a href="${SITE}/confidentialite" style="color:${C.faint};text-decoration:underline;">Confidentialité</a>
-                                · <a href="${SITE}/mentions-legales" style="color:${C.faint};text-decoration:underline;">Mentions légales</a>
+                                ${footer}
+                                · ${footerLink('Confidentialité', `${SITE}/confidentialite`)}
+                                · ${footerLink('Mentions légales', `${SITE}/mentions-legales`)}
                             </p>
                         </td>
                     </tr>
@@ -297,6 +353,72 @@ export const TEMPLATES = [
     },
 ];
 
+/* ---- Les e-mails de la beta (broadcasts Resend, docs/emails/) ---- */
+
+const strong = (text) => `<strong style="color:${C.text};">${text}</strong>`;
+
+/** Commun aux deux e-mails : les testeurs écrivent par où ils veulent. */
+const feedback = p(
+    `Un bug, une idée, un écran pas clair ? Réponds simplement à cet e-mail, ou écris-moi directement si on se connaît. Tous les retours comptent, même pour dire que tout va bien.`,
+    { top: 12 },
+);
+
+export const BETA_INVITE = {
+    file: 'beta-invite.html',
+    subject: 'La beta TryCast est ouverte',
+    preheader: 'Installe TryCast sur Android et commence à pronostiquer avant tout le monde.',
+    title: 'La beta est ouverte',
+    footer: BROADCAST_FOOTER,
+    blocks: [
+        p(
+            "Merci de vouloir tester TryCast, l'app de pronostics rugby entre potes. La beta fermée démarre, et ta place est prête.",
+        ),
+        callout(
+            `${strong('Android uniquement pour l’instant.')} La version iPhone viendra plus tard : sur iPhone, tu n'as rien à faire pour le moment.`,
+        ),
+        h2('Installer l’app en 3 étapes'),
+        steps([
+            `Ouvre le lien ci-dessous ${strong('sur ton téléphone Android')}, connecté au compte Google inscrit à la beta.`,
+            `Appuie sur ${strong('Devenir testeur')}.`,
+            'Installe TryCast depuis le Play Store, puis crée ton compte (avec Google ou par e-mail).',
+        ]),
+        cta('Rejoindre la beta', PLAY_TESTING_URL),
+        fallbackLink(PLAY_TESTING_URL),
+        h2('Un service à te demander'),
+        p(
+            `Garde l'app installée ${strong('au moins 14 jours')} : c'est la condition posée par Google avant de laisser TryCast sortir sur le Play Store. Pas besoin d'y passer tous les jours.`,
+            { top: 12 },
+        ),
+        h2('Un retour ?'),
+        feedback,
+        callout('Tu peux quitter la beta à tout moment, depuis le même lien.'),
+    ],
+};
+
+export const betaLeague = (code) => ({
+    file: 'beta-league.local.html',
+    subject: 'La ligue des testeurs t’attend',
+    preheader: 'Rejoins la ligue des testeurs de la beta et affronte les autres pronostiqueurs.',
+    title: 'La ligue des testeurs',
+    footer: BROADCAST_FOOTER,
+    blocks: [
+        p(
+            "Maintenant que TryCast est installé, place au jeu : j'ai créé une ligue réservée aux testeurs de la beta. Pronostique les prochains matchs et vois où tu te situes face aux autres.",
+        ),
+        cta('Rejoindre la ligue', `${SITE}/rejoindre/${code}`),
+        p(
+            `Le bouton ouvre directement l'app. Tu préfères saisir le code ? Dans l'onglet ${strong('Matchs')}, appuie sur ${strong('Rejoindre une ligue')} :`,
+            { top: 28 },
+        ),
+        codeBlock(code),
+        callout(
+            "Le bouton n'ouvre pas l'app ? Elle n'est sans doute pas encore installée : suis d'abord les étapes de l'e-mail d'invitation à la beta.",
+        ),
+        h2('Un retour ?'),
+        feedback,
+    ],
+});
+
 /* ---- Écriture / vérification ---- */
 
 /** Les sujets vivent ici ; config.toml en garde une copie pour `supabase start`. */
@@ -309,14 +431,36 @@ function checkConfigTomlSubjects() {
     return missing.length;
 }
 
+/** Valeur de --league-code, validée ; null si l'option est absente. */
+function leagueCodeArg() {
+    const i = process.argv.indexOf('--league-code');
+    if (i === -1) return null;
+    const code = (process.argv[i + 1] ?? '').toUpperCase().replaceAll(/[\s-]/g, '');
+    if (!LEAGUE_CODE.test(code)) {
+        console.error(
+            `✗ --league-code : « ${process.argv[i + 1] ?? ''} » n'est pas un code de ligue`,
+        );
+        console.error('  8 caractères, sans 0, O, 1, I ni L (cf. normalizeInviteCode)');
+        process.exit(1);
+    }
+    return code;
+}
+
 function main() {
     const check = process.argv.includes('--check');
+    const leagueCode = leagueCodeArg();
     mkdirSync(OUT_DIR, { recursive: true });
+    mkdirSync(BROADCAST_DIR, { recursive: true });
+
+    const outputs = [
+        ...TEMPLATES.map((template) => ({ template, dir: OUT_DIR, label: 'supabase/templates' })),
+        { template: BETA_INVITE, dir: BROADCAST_DIR, label: 'docs/emails' },
+    ];
 
     let drifted = 0;
-    for (const template of TEMPLATES) {
+    for (const { template, dir, label } of outputs) {
         const html = render(template);
-        const path = join(OUT_DIR, template.file);
+        const path = join(dir, template.file);
         if (check) {
             let current = null;
             try {
@@ -331,7 +475,7 @@ function main() {
             continue;
         }
         writeFileSync(path, html, 'utf8');
-        console.log(`✓ supabase/templates/${template.file}`);
+        console.log(`✓ ${label}/${template.file}`);
     }
 
     if (check) {
@@ -340,7 +484,15 @@ function main() {
             console.error(`\n${drifted} écart(s) : npm run emails:build, puis recaler config.toml`);
             process.exit(1);
         }
-        console.log(`✓ ${TEMPLATES.length} templates à jour, sujets config.toml en phase`);
+        console.log(`✓ ${outputs.length} templates à jour, sujets config.toml en phase`);
+        return;
+    }
+
+    // Généré à la demande seulement, et jamais vérifié : il n'existe pas dans le dépôt.
+    if (leagueCode) {
+        const template = betaLeague(leagueCode);
+        writeFileSync(join(BROADCAST_DIR, template.file), render(template), 'utf8');
+        console.log(`✓ docs/emails/${template.file} (ligue ${leagueCode}, ignoré par git)`);
     }
 }
 

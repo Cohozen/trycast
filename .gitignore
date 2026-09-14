@@ -54,3 +54,6 @@ google-services.json
 # Site web : .well-known généré au build depuis les variables d’environnement
 # (empreintes de signature, Team ID Apple) — jamais versionné.
 web/public/.well-known/
+
+# E-mail de la ligue des testeurs : porte un code de ligue, le dépôt est public
+docs/emails/*.local.html
