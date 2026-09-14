@@ -26,6 +26,9 @@
  *  - pas de @font-face fiable : Anton/Inter ne se chargent pas, d'où les piles
  *    de repli ; le titre tombe sur Arial Narrow gras
  *  - images en URL absolue https uniquement (servies par trycast.fr)
+ *  - tout fond coloré en DOUBLE : attribut `bgcolor` (Outlook) ET `background-color`
+ *    inline. Proton Mail supprime l'attribut : le bandeau et le bouton, qui n'avaient
+ *    que lui, sortaient blanc sur blanc (vu le 2026-09-14 sur l'e-mail de la beta)
  *
  * Variables Go disponibles côté GoTrue : .ConfirmationURL, .Token, .TokenHash,
  * .SiteURL, .RedirectTo, .Data, .Email, .NewEmail (email_change uniquement),
@@ -77,8 +80,8 @@ const p = (html, { size = 16, color = C.muted, top = 0 } = {}) =>
 const cta = (label, url) => `
                             <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin:28px 0 0;">
                                 <tr>
-                                    <td align="center" bgcolor="${C.accent}" style="border-radius:999px;">
-                                        <a href="${url}" style="display:inline-block;padding:15px 32px;font-family:${BODY};font-size:16px;font-weight:600;line-height:20px;color:${C.onAccent};text-decoration:none;border-radius:999px;">${label}</a>
+                                    <td align="center" bgcolor="${C.accent}" style="background-color:${C.accent};border-radius:999px;">
+                                        <a href="${url}" style="display:inline-block;background-color:${C.accent};padding:15px 32px;font-family:${BODY};font-size:16px;font-weight:600;line-height:20px;color:${C.onAccent};text-decoration:none;border-radius:999px;">${label}</a>
                                     </td>
                                 </tr>
                             </table>`;
@@ -98,7 +101,7 @@ const fallbackLink = (url) => `
 const codeBlock = (token) => `
                             <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="margin:28px 0 0;">
                                 <tr>
-                                    <td align="center" bgcolor="${C.page}" style="padding:22px 16px;border:1px solid ${C.border};border-radius:14px;">
+                                    <td align="center" bgcolor="${C.page}" style="background-color:${C.page};padding:22px 16px;border:1px solid ${C.border};border-radius:14px;">
                                         <div style="font-family:${DISPLAY};font-size:38px;font-weight:700;line-height:44px;letter-spacing:10px;color:${C.text};">${token}</div>
                                     </td>
                                 </tr>
@@ -178,7 +181,7 @@ export const render = ({ preheader, title, blocks, footer = AUTH_FOOTER }) => `<
             <td align="center" style="padding:32px 12px;">
                 <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="600" class="tc-card" style="width:600px;max-width:600px;background-color:${C.card};border:1px solid ${C.border};border-radius:16px;overflow:hidden;">
                     <tr>
-                        <td bgcolor="${C.brand}" class="tc-pad" style="padding:20px 32px;">
+                        <td bgcolor="${C.brand}" class="tc-pad" style="background-color:${C.brand};padding:20px 32px;">
                             <table border="0" cellpadding="0" cellspacing="0" role="presentation">
                                 <tr>
                                     <td style="padding-right:12px;line-height:0;">

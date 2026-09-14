@@ -5,7 +5,9 @@ description: Modifier les e-mails transactionnels TryCast (templates d'auth Supa
 
 # E-mails transactionnels TryCast
 
-Les 7 e-mails d'auth (GoTrue) : confirmation d'inscription, réinitialisation de mot de passe, changement d'adresse, invitation, réauthentification, + 2 notifications de sécurité (mot de passe modifié, adresse modifiée). Envoyés par **SMTP custom Resend** (domaine `trycast.fr` vérifié, région EU, 30 e-mails/h).
+Les 7 e-mails d'auth (GoTrue) : confirmation d'inscription, réinitialisation de mot de passe, changement d'adresse, invitation, réauthentification, + 2 notifications de sécurité (mot de passe modifié, adresse modifiée). Envoyés par **SMTP custom Resend** (domaine `trycast.fr` vérifié, région d'envoi EU, 30 e-mails/h).
+
+Le même générateur produit les **e-mails de la beta** (`docs/emails/`), envoyés en broadcast Resend et non par GoTrue : procédure dans `docs/emails/README.md`.
 
 ## Ne jamais éditer `supabase/templates/*.html` à la main
 
@@ -27,6 +29,8 @@ Le rendu se fait dans Gmail / Outlook / Apple Mail, pas dans un navigateur.
 - **Pas de flex ni de grid** : mise en page en `<table>` imbriquées, largeur 600px.
 - **`@font-face` non fiable** : **Anton et Inter ne se chargent pas** chez la majorité. Les piles de repli comptent plus que le premier nom — les titres tombent en pratique sur `Arial Narrow` gras.
 - **`border-radius` ignoré par Outlook Windows** : boutons à angles droits chez lui, accepté (pas de hack VML).
+- ⚠️ **Tout fond coloré en double : `bgcolor` ET `background-color` inline.** Proton Mail supprime l'attribut `bgcolor` : le bandeau vert et le bouton grenat, qui n'avaient que lui, sortaient **blanc sur blanc** (bouton invisible, wordmark illisible), alors que les encadrés en `background-color` tenaient. Constaté le 2026-09-14 sur un envoi réel. Le navigateur ne montre rien : il lit l'attribut. Contrôle : `grep -o 'bgcolor="[^"]*" style="[^"]*"' supabase/templates/*.html docs/emails/*.html | grep -v background-color` doit être vide.
+- **Un aperçu fidèle, c'est un envoi réel** (Resend → Proton, Gmail). Un export PDF d'un e-mail n'est pas fiable non plus : l'impression retire les fonds et assombrit les textes clairs.
 - **Images en URL absolue https uniquement**, servies par `trycast.fr`. Aucun SVG (aucun client mail ne le rend).
 - **Dark mode volontairement non traité** : `<meta name="color-scheme" content="light">` est déclaré pour limiter l'inversion d'Apple Mail, mais Gmail inverse tout seul et de façon imprévisible. Une palette claire robuste vaut mieux qu'une bataille perdue d'avance.
 - Règle DS conservée : **le grenat est l'étincelle**, réservé au bouton d'action. L'URL de repli sous le bouton reste en gris, sinon deux lignes d'URL grenat volent la vedette au CTA.
