@@ -2,7 +2,10 @@
 /**
  * Pousse UNIQUEMENT la configuration e-mail d'un projet, via l'API Management.
  *
- *   SUPABASE_ACCESS_TOKEN='sbp_...' node scripts/push-email-config.mjs [--dry-run]
+ *   node scripts/push-email-config.mjs [--dry-run]
+ *
+ * Le jeton vient de la session `supabase login` (trousseau macOS), ou de
+ * SUPABASE_ACCESS_TOKEN si la variable est posée — elle a priorité.
  *
  * La cible par défaut est le projet **de dev** (celui du `.env`). Pousser en
  * production se fait en la nommant explicitement — c'est le seul script du
@@ -23,6 +26,7 @@
  * `--dry-run` affiche le diff avant/après sans rien écrire.
  */
 
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -33,10 +37,33 @@ const override = process.argv.find((a) => a.startsWith('--project='))?.slice('--
 const PROJECT_REF = override || devProjectRef();
 const API = `https://api.supabase.com/v1/projects/${PROJECT_REF}/config/auth`;
 
-const token = process.env.SUPABASE_ACCESS_TOKEN;
+/**
+ * Jeton de l'API Management : la variable d'environnement si elle est posée, sinon
+ * celui que `supabase login` a rangé dans le trousseau macOS (service « Supabase CLI »,
+ * compte « supabase »). Le CLI l'y stocke préfixé `go-keyring-base64:`. Jamais affiché.
+ */
+function accessToken() {
+    if (process.env.SUPABASE_ACCESS_TOKEN) return process.env.SUPABASE_ACCESS_TOKEN;
+    if (process.platform !== 'darwin') return null;
+    try {
+        const raw = execFileSync(
+            'security',
+            ['find-generic-password', '-s', 'Supabase CLI', '-a', 'supabase', '-w'],
+            { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
+        ).trim();
+        const prefix = 'go-keyring-base64:';
+        return raw.startsWith(prefix)
+            ? Buffer.from(raw.slice(prefix.length), 'base64').toString('utf8')
+            : raw || null;
+    } catch {
+        return null; // pas d'entrée : `supabase login` n'a jamais été fait sur cette machine
+    }
+}
+
+const token = accessToken();
 if (!token) {
     console.error(
-        "SUPABASE_ACCESS_TOKEN manquant.\nCrée un token sur https://supabase.com/dashboard/account/tokens puis :\n  export SUPABASE_ACCESS_TOKEN='sbp_...'",
+        "Aucun jeton Supabase : ni SUPABASE_ACCESS_TOKEN, ni session du CLI dans le trousseau.\nLance `supabase login`, ou crée un token sur https://supabase.com/dashboard/account/tokens puis :\n  export SUPABASE_ACCESS_TOKEN='sbp_...'",
     );
     process.exit(1);
 }

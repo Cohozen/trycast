@@ -54,10 +54,11 @@ Les templates contiennent des `{{ .Variables }}` non rendues. Recette : copier l
 ## Mise en ligne : `npm run emails:push`, jamais `supabase config push`
 
 ```bash
-export SUPABASE_ACCESS_TOKEN='sbp_...'   # https://supabase.com/dashboard/account/tokens
 npm run emails:push -- --dry-run          # diff champ par champ, n'écrit rien
 npm run emails:push
 ```
+
+Le jeton vient de la session **`supabase login`**, lue dans le trousseau macOS (service « Supabase CLI ») : rien à exporter. `SUPABASE_ACCESS_TOKEN`, si elle est posée, a priorité. Ne pas l'écrire dans `~/.zshrc` : le jeton passerait du trousseau à un fichier en clair, et `npm run` (lancé par `sh`) ne le lirait pas.
 
 `scripts/push-email-config.mjs` PATCHe l'API Management avec les seuls champs e-mail (sujets, contenus, `mailer_otp_length`, activation des 2 notifications) et **relit la config après écriture** au lieu de se fier au code retour.
 
