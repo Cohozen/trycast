@@ -9,6 +9,10 @@
 // Mode audit (body {"mode":"audit"}) : vise les matchs dont les essais sont DÉJÀ
 // saisis, n'écrit rien et renvoie la comparaison Wikipedia / base. Sert à mesurer
 // la fiabilité de la source avant de brancher une nouvelle compétition.
+//
+// Mode rattrapage (body {"mode":"backfill"}) : comme le cron, mais sans la borne
+// de 14 jours — après une panne prolongée, ou pour une compétition dont on vient
+// de renseigner les pages en cours de saison.
 import { createClient, type SupabaseClient } from 'jsr:@supabase/supabase-js@2';
 import {
     extractRugbyboxes,
@@ -16,6 +20,8 @@ import {
     type SourcedBox,
     type TriesCandidate,
 } from './transform.ts';
+
+type Mode = 'cron' | 'audit' | 'backfill';
 
 type Competition = { id: string; slug: string; wikipedia_pages: string[] };
 
@@ -53,7 +59,8 @@ Deno.serve(async (req: Request) => {
         return json({ error: 'unauthorized' }, 401);
     }
     const body = await req.json().catch(() => ({}));
-    const audit = body?.mode === 'audit';
+    const mode: Mode = body?.mode === 'audit' || body?.mode === 'backfill' ? body.mode : 'cron';
+    const audit = mode === 'audit';
 
     const admin = createClient(
         Deno.env.get('SUPABASE_URL')!,
@@ -61,14 +68,18 @@ Deno.serve(async (req: Request) => {
     );
 
     const since = new Date(Date.now() - LOOKBACK_DAYS * 86_400_000);
-    // Compétitions actives, y compris celles terminées depuis moins de 14 jours :
-    // les essais d'une finale arrivent après ends_on.
-    const { data: competitions, error: competitionsError } = await admin
+    // Compétitions actives dont les pages sont renseignées. En cron, y compris
+    // celles terminées depuis moins de 14 jours : les essais d'une finale
+    // arrivent après ends_on.
+    let competitionsQuery = admin
         .from('competitions')
         .select('id, slug, wikipedia_pages')
         .eq('is_active', true)
-        .gte('ends_on', since.toISOString().slice(0, 10))
         .neq('wikipedia_pages', '{}');
+    if (mode === 'cron') {
+        competitionsQuery = competitionsQuery.gte('ends_on', since.toISOString().slice(0, 10));
+    }
+    const { data: competitions, error: competitionsError } = await competitionsQuery;
     if (competitionsError) {
         console.error('sync-tries: select competitions', competitionsError.message);
         return json({ error: 'select_competitions_failed' }, 500);
@@ -82,7 +93,7 @@ Deno.serve(async (req: Request) => {
         candidates = await selectCandidates(
             admin,
             competitions.map((competition) => competition.id),
-            audit,
+            mode,
             since,
         );
     } catch (error) {
@@ -200,6 +211,7 @@ Deno.serve(async (req: Request) => {
             finished_at: new Date().toISOString(),
             api_calls_used: pages.size,
             detail: {
+                mode,
                 written,
                 rejected,
                 ...(pageErrors.length > 0 ? { errors: pageErrors } : {}),
@@ -210,14 +222,14 @@ Deno.serve(async (req: Request) => {
         }
     }
 
-    return json({ success: true, written: written.length, rejected: rejected.length }, 200);
+    return json({ success: true, mode, written, rejected, page_errors: pageErrors }, 200);
 });
 
 /** Matchs terminés en attente d'essais (ou, en audit, déjà pourvus). */
 async function selectCandidates(
     admin: SupabaseClient,
     competitionIds: string[],
-    audit: boolean,
+    mode: Mode,
     since: Date,
 ): Promise<MatchRow[]> {
     let query = admin
@@ -228,9 +240,14 @@ async function selectCandidates(
         .eq('needs_review', false)
         .not('home_score', 'is', null)
         .not('away_score', 'is', null);
-    query = audit
-        ? query.not('home_tries', 'is', null).not('away_tries', 'is', null)
-        : query.eq('tries_missing', true).gte('kickoff_at', since.toISOString());
+    if (mode === 'audit') {
+        query = query.not('home_tries', 'is', null).not('away_tries', 'is', null);
+    } else {
+        query = query.eq('tries_missing', true);
+        if (mode === 'cron') {
+            query = query.gte('kickoff_at', since.toISOString());
+        }
+    }
     const { data, error } = await query;
     if (error) {
         throw new Error(error.message);
