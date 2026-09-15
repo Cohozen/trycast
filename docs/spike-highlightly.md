@@ -99,5 +99,7 @@ le repli.
 - le format varie d'un tournoi à l'autre : la Coupe du monde 2023 n'utilise pas
   `{{rugbybox}}`. Toute nouvelle compétition passe d'abord par le mode `audit` de
   l'EF, et la RWC 2027 est à vérifier dès que ses pages existent ;
-- l'audit n'a pas pu être rejoué contre des essais saisis à la main : les scores
-  de juillet du projet dev ne sont pas les vrais résultats. À rejouer en prod.
+- l'audit ne peut pas se mesurer sur le dev, dont les scores de juillet sont fictifs.
+
+**Audit en prod (2026-09-15)** : sur les **17 matchs** de juillet dont les essais
+avaient été saisis à la main, **17 accords, 0 désaccord, 0 rejet**.
