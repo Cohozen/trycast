@@ -71,6 +71,14 @@ echo "$RES" | grep -q '42501' ||
   fail "rpc admin_set_match_tries (attendu 42501, obtenu $RES)"
 ok "la RPC admin_set_match_tries est verrouillée (service_role uniquement)"
 
+# Import des essais (EF sync-tries) : un JWT utilisateur ne remplace pas le secret
+# du cron — sans lui, n'importe qui pourrait déclencher des appels à Wikipedia.
+CODE=$(curl -s -o /dev/null -w '%{http_code}' -X POST "$URL/functions/v1/sync-tries" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" -d '{"mode":"backfill"}')
+[ "$CODE" = "401" ] || fail "sync-tries sans secret (attendu 401, obtenu $CODE)"
+ok "sync-tries refuse un appel sans le secret du cron"
+
 # Accès anonyme au barème → refusé (aucun grant anon)
 RES=$(curl -s "$URL/rest/v1/scoring_rules?select=version" -H "apikey: $KEY")
 echo "$RES" | grep -q '42501' || fail "accès anonyme scoring_rules (attendu 42501, obtenu $RES)"
