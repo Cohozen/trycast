@@ -8,20 +8,29 @@
 --   curl -H "x-rapidapi-key: $HIGHLIGHTLY_API_KEY" \
 --     "https://rugby.highlightly.net/leagues?leagueName=Six Nations"
 -- Ne pas utiliser d'ids trouvés ailleurs que dans la réponse Highlightly elle-même.
+--
+-- wikipedia_pages : pages EN dont sync-tries lit les essais (titres exacts, espaces
+-- et non underscores). Une page qui n'existe pas encore est inoffensive : le run
+-- trace l'erreur et retente au tick suivant.
 
 insert into public.competitions
-  (api_league_id, api_season, name, slug, starts_on, ends_on, is_active)
+  (api_league_id, api_season, name, slug, starts_on, ends_on, is_active, wikipedia_pages)
 values
   -- Nations Championship 2026 (juil-nov, inclut la TRC) — banc d'essai réel du pipeline (Jalon 1)
   (124179, 2026, 'Nations Championship', 'nc-2026',
-   '2026-07-04', '2026-11-21', true),
+   '2026-07-04', '2026-11-21', true,
+   array['2026 Nations Championship Southern Hemisphere Series',
+         '2026 Nations Championship Northern Hemisphere Series',
+         '2026 Nations Championship']),
   -- Tournoi des Six Nations 2027 — soft-launch (inactive tant que le NC tourne)
   (44185, 2027, 'Tournoi des Six Nations 2027', 'six-nations-2027',
-   '2027-02-05', '2027-03-13', false)
+   '2027-02-05', '2027-03-13', false,
+   array['2027 Six Nations Championship'])
 on conflict (slug) do update set
   api_league_id = excluded.api_league_id,
   api_season = excluded.api_season,
   name = excluded.name,
   starts_on = excluded.starts_on,
   ends_on = excluded.ends_on,
-  is_active = excluded.is_active;
+  is_active = excluded.is_active,
+  wikipedia_pages = excluded.wikipedia_pages;

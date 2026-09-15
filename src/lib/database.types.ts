@@ -18,6 +18,7 @@ export type Database = {
                     name: string;
                     slug: string;
                     starts_on: string;
+                    wikipedia_pages: string[];
                 };
                 Insert: {
                     api_league_id: number;
@@ -28,6 +29,7 @@ export type Database = {
                     name: string;
                     slug: string;
                     starts_on: string;
+                    wikipedia_pages?: string[];
                 };
                 Update: {
                     api_league_id?: number;
@@ -38,6 +40,7 @@ export type Database = {
                     name?: string;
                     slug?: string;
                     starts_on?: string;
+                    wikipedia_pages?: string[];
                 };
                 Relationships: [];
             };
