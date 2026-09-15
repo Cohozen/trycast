@@ -55,6 +55,19 @@ Chaque script re-seede son état avant exécution. Ordre de seed cumulatif : use
 
 Les scripts lisent `.env` (`EXPO_PUBLIC_SUPABASE_URL` / `_KEY`, clé publishable uniquement) et acceptent `EMAIL1/EMAIL2/PASSWORD` en override.
 
+## Pousser une migration en prod (geste de Corentin)
+
+Le projet lié est toujours le dev. Pour la prod (ref dans `DASHBOARD.md`, phase 3 du Lot 9), procédure appliquée le 2026-09-15 :
+
+1. **Secrets Vault d'abord** : toute migration qui lit un secret Vault exige qu'il existe en prod. `select name from vault.secrets` dans le SQL editor prod. Oublier `edge_functions_base_url` y a coupé tous les crons du 2026-08-15 au 2026-09-15, sans aucune alerte.
+2. `supabase link --project-ref <ref-prod>`
+3. `supabase db push --dry-run` : la liste doit contenir exactement les migrations attendues. Si d'autres apparaissent, s'arrêter : la prod a du retard.
+4. `supabase db push`
+5. **Relier le dev aussitôt** : `supabase link --project-ref <ref-dev>`, puis `cat supabase/.temp/project-ref` pour vérifier. Sinon, le prochain `db push` d'un agent part en prod.
+6. Contrôle : derniers `cron.job_run_details` en `succeeded`.
+
+Appeler une EF de cron en prod sans sortir son secret de la base : `select net.http_post(...)` avec l'URL et le secret lus dans `vault.decrypted_secrets` (même corps que les migrations de planification), puis `select status_code, content from net._http_response order by created desc limit 1`.
+
 ## Exécuter du SQL sur le dev
 
 ⚠️ **Le MCP Supabase (`execute_sql`) est en lecture seule** (constaté le 2026-09-15 : `25006 cannot execute UPDATE in a read-only transaction`). Il sert aux constats ; pour écrire (seed, données de test, secret Vault), passer par la CLI sur le projet lié :
