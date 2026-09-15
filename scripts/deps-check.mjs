@@ -43,8 +43,8 @@ const ECARTES = {
 
 /** Précisions attachées à un paquet, affichées sous sa ligne. */
 const NOTES = {
-    '@biomejs/biome':
-        'version épinglée, écrite aussi en dur dans `.github/workflows/web.yml` — bumper les deux',
+    '@biomejs/biome': 'version épinglée : formate tout le dépôt, CI comprise',
+    vitest: 'déclaré à la fois à la racine et dans `apps/mobile/` : garder les deux alignés',
     typescript:
         'déclaré à la fois dans `apps/mobile/` et dans `apps/web/` : garder les deux alignés',
 };
@@ -255,9 +255,13 @@ const precisions = (bloc, l) => {
     if (bloc.cle === 'rattrapage' && l.wanted !== l.latest) {
         bouts.push(`hors plage, à décider séparément : ${l.latest}`);
     }
-    // La section du site mélange les trois familles : la cible affichée y est le
-    // `latest`, donc il faut dire quand `npm update` n'ira pas jusque-là.
-    if (bloc.cle === 'web' && l.wanted !== l.current && l.wanted !== l.latest) {
+    // Les sections du site et de l'outillage mélangent les trois familles : la cible
+    // affichée y est le `latest`, donc il faut dire quand `npm update` n'ira pas jusque-là.
+    if (
+        (bloc.cle === 'web' || bloc.cle === 'outillage') &&
+        l.wanted !== l.current &&
+        l.wanted !== l.latest
+    ) {
         bouts.push(`\`npm update\` s'arrête à ${l.wanted}`);
     }
     if (bloc.cle === 'majeures' && l.current !== l.wanted) {
@@ -268,7 +272,7 @@ const precisions = (bloc, l) => {
 
 const dansUneIssue = (n) => (n === 1 ? '1 paquet' : `${n} paquets`);
 
-const construireRapport = (app, web, sdk) => {
+const construireRapport = (app, web, sdk, outillage) => {
     const s = [];
     const total = (bloc) =>
         ['sdk', 'rattrapage', 'mineures', 'majeures'].reduce(
@@ -339,6 +343,20 @@ const construireRapport = (app, web, sdk) => {
             ].sort((a, b) => a.nom.localeCompare(b.nom)),
         });
     }
+    if (!outillage.absent) {
+        s.push({
+            type: 'section',
+            cle: 'outillage',
+            titre: 'Outillage du dépôt (racine)',
+            pourquoi:
+                'Formatage et tests des Edge Functions, sans effet sur les builds — vérifié avec `npm run verify` à la racine.',
+            lignes: [
+                ...outillage.familles.majeures,
+                ...outillage.familles.rattrapage,
+                ...outillage.familles.mineures,
+            ].sort((a, b) => a.nom.localeCompare(b.nom)),
+        });
+    }
     return s;
 };
 
@@ -385,7 +403,7 @@ const rendreTexte = (rapport, app, web) => {
             out.push(
                 `  app : ${dansUneIssue(bloc.totalApp)} en retard (+ ${bloc.ecartesApp} écarté(s))` +
                     (bloc.totalWeb === undefined
-                        ? '  ·  web : non installé (npm ci --prefix web)'
+                        ? '  ·  web : non installé (npm ci --prefix apps/web)'
                         : `  ·  web : ${dansUneIssue(bloc.totalWeb)}`),
             );
             out.push('');
@@ -505,18 +523,26 @@ const web = existsSync(join(cheminWeb, 'node_modules'))
           familles: { sdk: [], rattrapage: [], mineures: [], majeures: [], ecartes: [] },
       };
 
-const rapport = construireRapport(bloc, web, sdk);
+const outillage = existsSync(join(RACINE, 'node_modules'))
+    ? analyser({ cwd: RACINE })
+    : {
+          absent: true,
+          familles: { sdk: [], rattrapage: [], mineures: [], majeures: [], ecartes: [] },
+      };
+
+const rapport = construireRapport(bloc, web, sdk, outillage);
 const majeures = [
     ...new Set([
         ...bloc.familles.majeures.map((l) => `${l.nom}@${l.latest}`),
         ...(web.familles?.majeures ?? []).map((l) => `web/${l.nom}@${l.latest}`),
+        ...(outillage.familles?.majeures ?? []).map((l) => `racine/${l.nom}@${l.latest}`),
     ]),
 ].sort();
 
 const codeSortie = bloc.erreur ? 1 : 0;
 
 if (process.argv.includes('--json')) {
-    console.log(JSON.stringify({ sdk, app: bloc, web, majeures }, null, 2));
+    console.log(JSON.stringify({ sdk, app: bloc, web, outillage, majeures }, null, 2));
 } else if (process.argv.includes('--markdown')) {
     console.log(rendreMarkdown(rapport, bloc, web, majeures));
 } else {
