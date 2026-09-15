@@ -1,0 +1,18 @@
+<!-- en.wikipedia.org « 2026 Nations Championship Southern Hemisphere Series », révision 1370305444 (CC BY-SA 4.0), encadré brut : essai de pénalité (7 pts) et essai de M. Smith sans mention c/m -->
+{{rugbybox
+|id = Argentina v England
+|date = 18 July 2026
+|time = 16:10 [[Time in Argentina|ART]] ([[UTC-03]])
+|team1= (1 BP) {{ru-rt|ARG}}
+|score = 24–31
+|report = [https://www.rugbypass.com/news/ill-disciplined-england-survive-tense-finish-to-edge-out-argentina/ Report]
+|team2 = {{ru|ENG}} (1 BP)
+|try1 = [[Mateo Carreras|M. Carreras]] 43' c<br />[[Try (rugby)#Penalty try|Penalty try]] 56'<br />[[Justo Piccardo|Piccardo]] 80' c
+|con1 = [[Tomás Albornoz|Albornoz]] (2/2) 44', 80'
+|pen1 = [[Tomás Albornoz|Albornoz]] (1/1) 30'
+|try2 = [[Tommy Freeman (rugby union)|Freeman]] 4' m<br />[[Ben Earl|Earl]] (2) 24' c, 33' c<br />[[Marcus Smith (rugby union)|M. Smith]] 62'<br />[[Immanuel Feyi-Waboso|Feyi-Waboso]] 69' m
+|con2 = [[Fin Smith|F. Smith]] (3/5) 24', 33', 62' 
+|stadium = [[Estadio Único Madre de Ciudades]], [[Santiago del Estero]]
+|attendance = 22,225
+|referee = [[Angus Gardner]] ([[Rugby Australia|Australia]])
+}}

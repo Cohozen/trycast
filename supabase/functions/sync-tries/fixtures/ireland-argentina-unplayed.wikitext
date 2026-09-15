@@ -1,0 +1,21 @@
+<!-- en.wikipedia.org « 2026 Nations Championship Northern Hemisphere Series », révision 1365368069 (CC BY-SA 4.0), encadré brut d'un match pas encore joué -->
+{{rugbybox
+|id = Ireland v Argentina
+|date = 6 November 2026
+|time = 20:10 [[Greenwich Mean Time|GMT]] ([[UTC+0]])
+|team1 = {{ru-rt|IRE}}
+|score =
+|report =
+|team2 = {{ru|ARG}}
+|try1 =
+|con1 =
+|pen1 =
+|drop1 =
+|try2 =
+|con2 =
+|pen2 =
+|drop2 =
+|stadium = [[Aviva Stadium]], [[Dublin]]
+|attendance =
+|referee =
+}}

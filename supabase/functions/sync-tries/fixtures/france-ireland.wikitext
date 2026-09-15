@@ -1,0 +1,18 @@
+<!-- en.wikipedia.org « 2026 Six Nations Championship », révision 1371653413 (CC BY-SA 4.0), encadré brut -->
+{{rugbybox
+|id = France v Ireland
+|date = 5 February 2026
+|time = 21:10 [[Central European Time|CET]]
+|team1 = (1 BP) {{ru-rt|FRA}}
+|score = 36–14
+|report =[https://www.sixnationsrugby.com/en/m6n/news/france-ireland-match-report-highlights-six-nations-2026 Report]
+|team2 = {{ru|IRE}}
+|try1 = [[Louis Bielle-Biarrey|Bielle-Biarrey]] (2) 12' c, 46' c<br />[[Matthieu Jalibert|Jalibert]] 21' m<br />[[Charles Ollivon|Ollivon]] 33' c<br />[[Théo Attissogbe|Attissogbe]] 80' c
+|con1 = [[Thomas Ramos (rugby union)|Ramos]] (4/5) 13', 34', 47', 80+1'
+|pen1 = [[Thomas Ramos (rugby union)|Ramos]] (1/1) 27'
+|try2 = [[Nick Timoney|Timoney]] 58' c<br />[[Michael Milne|Milne]] 61' c
+|con2 = [[Sam Prendergast|S. Prendergast]] (2/2) 58', 61'
+|stadium = [[Stade de France]], [[Saint-Denis, Seine-Saint-Denis|Saint-Denis]]
+|attendance = 80,000<ref>{{cite news |last=Martel |first=Clément |date=6 February 2026 |title=Six Nations: France holds promises with decisive victory against Ireland |url=https://www.lemonde.fr/en/sports/article/2026/02/06/six-nations-france-holds-promises-with-decisive-victory-against-ireland_6750210_9.html |work=Le Monde}}</ref>
+|referee = [[Karl Dickson]] ([[Rugby Football Union|England]])<ref name="Referees">{{cite news |title=Match Officials Appointments {{!}} Guinness Men's Six Nations 2026 |url=https://www.world.rugby/the-game/high-performance/officiating/1019597 |work=[[World Rugby]] |access-date=18 December 2025 |url-status=live }}</ref>
+}}
