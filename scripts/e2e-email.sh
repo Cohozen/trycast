@@ -9,7 +9,7 @@ source apps/mobile/.env
 URL="$EXPO_PUBLIC_SUPABASE_URL"
 KEY="$EXPO_PUBLIC_SUPABASE_KEY"
 WEB="${EXPO_PUBLIC_WEB_URL:-https://www.trycast.fr}"
-# Slash final retiré comme le fait src/lib/urls.ts : sans ça, un .env qui
+# Slash final retiré comme le fait apps/mobile/src/lib/urls.ts : sans ça, un .env qui
 # se termine par « / » produit une URL à double slash, absente de
 # l'allow-list des Redirect URLs — GoTrue la rejette en silence et retombe
 # sur site_url, donc le lien de confirmation n'atterrit pas où ce script

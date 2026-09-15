@@ -51,7 +51,7 @@ const SITE = 'https://www.trycast.fr';
  */
 const PLAY_TESTING_URL = 'https://play.google.com/apps/testing/com.cohozen.trycast';
 
-/** Alphabet des codes de ligue — miroir de normalizeInviteCode (src/features/leagues/validation.ts). */
+/** Alphabet des codes de ligue — miroir de normalizeInviteCode (apps/mobile/src/features/leagues/validation.ts). */
 const LEAGUE_CODE = /^[A-HJ-KM-NP-Z2-9]{8}$/;
 
 /* ---- Tokens du design system, recopiés en hex (aucun var() en e-mail) ---- */

@@ -22,7 +22,11 @@ Pronostic unique par match (score exact + bonus offensifs), points pondérés pa
 
 ## Démarrage
 
+Le dépôt tient deux apps et un backend commun, **sans workspaces npm** : `apps/mobile/` (l'app Expo), `apps/web/` (le site), `supabase/` à la racine (partagé par les deux), et un `package.json` racine réservé à l'outillage (Biome, tests des Edge Functions, scripts Supabase). Chaque dossier a son lock et s'installe séparément.
+
 ```bash
+npm install                      # racine : outillage commun
+cd apps/mobile
 npm install
 cp .env.example .env   # puis renseigner l'URL et la clé publishable Supabase
 npm run ios            # simulateur iOS
@@ -32,9 +36,11 @@ npm run android:emulator  # démarrer l'émulateur et ATTENDRE qu'il soit prêt
 npm run android           # compiler, installer, lancer Metro
 ```
 
-Le projet embarque `expo-dev-client` : l'app tourne dans un **development build local** (pas dans Expo Go). `npm run ios` (`expo run:ios`) et `npm run android` (`expo run:android`) compilent le client de dev natif, l'installent sur le simulateur/émulateur et démarrent Metro. La **première** compilation prend quelques minutes (prebuild + CocoaPods/Gradle — 5 min 30 de Gradle côté Android, mesuré sur Apple Silicon) ; ensuite `npm start` (`expo start`) suffit pour relancer Metro et rouvrir l'app déjà installée (`w` ouvre le web, `j` les React Native DevTools). Les dossiers natifs `/ios` et `/android` sont régénérés à la volée par le prebuild et **non versionnés**.
+Toutes les commandes de l'app (`expo`, `eas`, `npm run android|ios|build:*|ota:*|release`) se lancent depuis `apps/mobile` ; `supabase`, `npm run typegen|emails:*|deps:check|verify` et les scripts `bash scripts/…` depuis la racine.
 
-Côté Android, tout l'environnement (JDK, `ANDROID_HOME`, `PATH`, `local.properties`, AVD visé) vient de `scripts/android-env.sh`, sourcé par les scripts npm — **rien à exporter dans son `~/.zshrc`** : npm exécute ses scripts via `sh`, qui ne lit pas le profil du shell. `TRYCAST_AVD=<nom>` vise un autre émulateur.
+Le projet embarque `expo-dev-client` : l'app tourne dans un **development build local** (pas dans Expo Go). `npm run ios` (`expo run:ios`) et `npm run android` (`expo run:android`) compilent le client de dev natif, l'installent sur le simulateur/émulateur et démarrent Metro. La **première** compilation prend quelques minutes (prebuild + CocoaPods/Gradle — 5 min 30 de Gradle côté Android, mesuré sur Apple Silicon) ; ensuite `npm start` (`expo start`) suffit pour relancer Metro et rouvrir l'app déjà installée (`w` ouvre le web, `j` les React Native DevTools). Les dossiers natifs `apps/mobile/ios` et `apps/mobile/android` sont régénérés à la volée par le prebuild et **non versionnés**.
+
+Côté Android, tout l'environnement (JDK, `ANDROID_HOME`, `PATH`, `local.properties`, AVD visé) vient de `apps/mobile/scripts/android-env.sh`, sourcé par les scripts npm — **rien à exporter dans son `~/.zshrc`** : npm exécute ses scripts via `sh`, qui ne lit pas le profil du shell. `TRYCAST_AVD=<nom>` vise un autre émulateur.
 
 ⚠️ **Un build release et un dev client ne cohabitent pas** : signatures différentes, l'installation échoue en `INSTALL_FAILED_UPDATE_INCOMPATIBLE` — désinstaller d'abord (`adb uninstall com.cohozen.trycast`). Et surtout, **un build release ne se connecte jamais à Metro** : il s'ouvre et s'utilise normalement, mais tourne sur son JS embarqué, ce qui donne l'illusion parfaite d'un correctif qui ne prend pas. Le seul signe est l'absence de `Android Bundled` dans la sortie.
 
@@ -45,51 +51,64 @@ npx eas-cli build --profile development --platform android   # APK à installer 
 npx eas-cli build --profile development --platform ios       # build simulateur (iOS device = compte Apple Developer requis, Lot 7)
 ```
 
-Le build Android embarque l'identité Firebase (FCM) de l'app : le fichier `google-services.json` n'est pas versionné, il vit à la racine en local et dans l'env EAS `GOOGLE_SERVICES_JSON` pour les builds cloud. Un push de test peut s'envoyer à la main depuis [expo.dev/notifications](https://expo.dev/notifications) avec le token affiché dans les logs Metro.
+Le build Android embarque l'identité Firebase (FCM) de l'app : le fichier `google-services.json` n'est pas versionné, il vit dans `apps/mobile/` en local et dans l'env EAS `GOOGLE_SERVICES_JSON` pour les builds cloud. Un push de test peut s'envoyer à la main depuis [expo.dev/notifications](https://expo.dev/notifications) avec le token affiché dans les logs Metro.
 
 ## Scripts
 
+Depuis la **racine** :
+
 | Commande                          | Rôle                                                                           |
 | --------------------------------- | ------------------------------------------------------------------------------ |
-| `npm run test`                    | Tests unitaires Vitest                                                         |
-| `npm run android:doctor`          | Diagnostic de la chaîne Android : JDK, SDK, AVD, appareils connectés            |
-| `npm run android:emulator`        | Démarre l'émulateur et attend qu'il soit réellement prêt                        |
-| `npm run typecheck`               | `tsc --noEmit`                                                                 |
-| `npm run lint`                    | ESLint (config Expo, règles stylistiques désactivées)                          |
-| `npm run format` / `format:check` | Biome (formatage : 4 espaces, 100 colonnes)                                    |
-| `npm run typegen`                 | Régénère `src/lib/database.types.ts` depuis le schéma Supabase                 |
+| `npm run verify`                  | Tout ce que vérifie la CI de l'app : formatage, tests des Edge Functions, typecheck, lint, tests de l'app |
+| `npm run format` / `format:check` | Biome sur tout le dépôt (formatage : 4 espaces, 100 colonnes)                  |
+| `npm test`                        | Tests Vitest des modules purs des Edge Functions (dont le barème partagé)      |
+| `npm run typegen`                 | Régénère `apps/mobile/src/lib/database.types.ts` depuis le schéma Supabase    |
+| `npm run emails:build` / `emails:check` / `emails:push` | Templates d'e-mails d'auth (voir `scripts/README.md`) |
 | `npm run deps:check`              | Ce qui est en retard, rangé par famille — ne modifie rien (voir `docs/dependances.md`) |
-| `npm run build:dev` / `build:preview` / `build:prod` | Builds EAS Android (dev client / release sur le dev / AAB pour la Play Console) |
-| `npm run ota:preview` / `ota:prod` | Mise à jour à distance sur le canal correspondant (garde-fous : voir `scripts/README.md`) |
-| `npm run env:preview` / `env:prod` | Variables EAS de l'environnement, à vérifier avant un build |
 | `node scripts/seed-demo-account.mjs` | Compte de démonstration exigé par les stores |
 | `bash scripts/e2e-auth.sh`        | Vérification E2E auth + RLS contre le projet Supabase (voir en-tête du script) |
 | `bash scripts/e2e-predictions.sh` | Vérification E2E RLS des pronostics (deadline kickoff, colonnes de points)     |
 | `bash scripts/e2e-scoring.sh`     | Vérification E2E du scoring côté client (barème lisible, RPC verrouillée)      |
 
+Depuis **`apps/mobile`** :
+
+| Commande                          | Rôle                                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------ |
+| `npm run test`                    | Tests unitaires Vitest de l'app                                              |
+| `npm run typecheck`               | `tsc --noEmit`                                                                 |
+| `npm run lint`                    | ESLint (config Expo, règles stylistiques désactivées)                          |
+| `npm run android:doctor`          | Diagnostic de la chaîne Android : JDK, SDK, AVD, appareils connectés            |
+| `npm run android:emulator`        | Démarre l'émulateur et attend qu'il soit réellement prêt                        |
+| `npm run build:dev` / `build:preview` / `build:prod` | Builds EAS Android (dev client / release sur le dev / AAB pour la Play Console) |
+| `npm run ota:preview` / `ota:prod` | Mise à jour à distance sur le canal correspondant (garde-fous : voir `apps/mobile/scripts/README.md`) |
+| `npm run env:preview` / `env:prod` | Variables EAS de l'environnement, à vérifier avant un build |
+| `npm run release`                 | Prépare une version (voir « Numéro de version »)                               |
+
 ## Structure
 
 ```
-src/
-  app/            # Écrans Expo Router — (auth): login/signup/reset, (app): onglets (matchs, résultats, classement, ligues, profil) + écrans ligue
-  components/     # Composants UI partagés
-  features/       # Logique par domaine (auth, profile, matches, predictions, scoring…) + tests colocalisés
-  lib/            # Client Supabase typé, stockage session chiffré, React Query
-  hooks/ constants/ tw/
-supabase/
-  migrations/     # Migrations SQL (source de vérité du schéma)
-  functions/      # Edge Functions (delete-account, sync-fixtures) — logique pure testée sous Vitest
-scripts/          # Seeds (compétitions, users/matchs de test), saisie admin des essais, scripts E2E
-docs/             # Notes de décision (choix du fournisseur de données…)
-web/              # Site vitrine Astro (landing + waitlist beta + pages légales) — projet autonome, voir ci-dessous
+apps/
+  mobile/           # App Expo (app.json, eas.json, CHANGELOG, scripts release/ota/android)
+    src/
+      app/          # Écrans Expo Router — (auth): login/signup/reset, (app): onglets (matchs, résultats, classement, ligues, profil) + écrans ligue
+      components/   # Composants UI partagés
+      features/     # Logique par domaine (auth, profile, matches, predictions, scoring…) + tests colocalisés
+      lib/          # Client Supabase typé, stockage session chiffré, React Query
+      hooks/ constants/ tw/
+  web/              # Site vitrine Astro (landing + waitlist beta + pages légales) — projet autonome, voir ci-dessous
+supabase/           # Backend commun aux deux apps (la CLI supabase se lance depuis la racine)
+  migrations/       # Migrations SQL (source de vérité du schéma)
+  functions/        # Edge Functions — logique pure testée sous Vitest ; _shared/scoring est aussi embarqué par l'app
+scripts/            # Outillage commun : typegen, e-mails, seeds, saisie admin des essais, scripts E2E
+docs/               # Notes de décision (choix du fournisseur de données…)
 ```
 
-## Site vitrine (`web/`)
+## Site vitrine (`apps/web/`)
 
 Site statique [Astro](https://astro.build) totalement indépendant de l'app (son propre `package.json`, pas de workspaces) : landing marketing, formulaire d'inscription à la beta (RPC Supabase `join_waitlist`, anti-spam côté SQL) et pages légales (CGU, confidentialité, mentions). Mêmes tokens de design que l'app, copiés en CSS vanilla.
 
 ```bash
-cd web
+cd apps/web
 cp .env.example .env        # PUBLIC_SUPABASE_URL + clé publishable
 npm install
 npm run dev                 # http://localhost:4321
@@ -99,11 +118,11 @@ npm run check && npm run build
 Le site sert aussi les **liens d'invitation de ligue** (`/rejoindre/<CODE>`) et les fichiers
 `.well-known/` qui autorisent l'app à les ouvrir directement. Ces fichiers sont **générés au build**
 depuis `ANDROID_CERT_FINGERPRINTS` et `APPLE_TEAM_ID` (variables du projet Vercel, cf.
-`web/.env.example`) : sans elles, rien n'est écrit et les liens restent de simples pages web.
+`apps/web/.env.example`) : sans elles, rien n'est écrit et les liens restent de simples pages web.
 
-CI dédiée (`.github/workflows/web.yml`, déclenchée sur `web/**` uniquement). ⚠️ Elle formate `web/`
-avec une version **épinglée** de biome (`@biomejs/biome@2.5.2`), distincte de celle du dépôt : la
-rejouer telle quelle avant de conclure. Hébergement : Vercel (projet `trycast-web`).
+CI dédiée (`.github/workflows/web.yml`, déclenchée sur `apps/web/**` uniquement), qui formate `apps/web/`
+avec le Biome de la racine (`npx biome format apps/web`). Hébergement : Vercel (projet `trycast-web`,
+Root Directory `apps/web`).
 
 ## Backend Supabase
 
@@ -125,7 +144,7 @@ lointain) ; l'onglet **Résultats** montre le score réel, le prono et les point
   écriture, quelle que soit l'UI. Les colonnes de points ne sont accordées qu'au rôle serveur
   (grants par colonne) — un client ne peut pas s'attribuer de points.
 - **Barème dans `supabase/functions/_shared/scoring/`** (module TS pur, testé unitairement,
-  ré-exporté vers l'app par `src/features/scoring/`) : points vainqueur = **15 × la cote** du
+  ré-exporté vers l'app par `apps/mobile/src/features/scoring/`) : points vainqueur = **15 × la cote** du
   résultat prédit (×2.0 par défaut sans cotes), +50 pour le score exact, volets écart et bonus
   défensif ; **bonus offensif indexé sur la cote de victoire de l'équipe cochée** (25 % × 15 ×
   cote), avec un **malus −10** si la case est cochée mais que l'équipe reste sous 4 essais.
@@ -135,7 +154,7 @@ lointain) ; l'onglet **Résultats** montre le score réel, le prono et les point
   serveur (voir §Scoring) avec le même barème versionné.
 - **Auto-enregistrement** : pas de bouton « Valider » — toute saisie complète part après un
   court debounce, avec une pastille de statut et un retour haptique de succès (expo-haptics,
-  helper `src/lib/haptics.ts` — réservé aux confirmations, jamais de vibration décorative).
+  helper `apps/mobile/src/lib/haptics.ts` — réservé aux confirmations, jamais de vibration décorative).
 
 ## Scoring
 
@@ -261,16 +280,19 @@ lancement suivant — aucune attente perçue). Pas de relecture Google, pas de t
 
 ⚠️ **Une mise à jour n'est délivrée qu'aux builds portant exactement la même empreinte**, et le
 non-appariement est **muet** : rien n'échoue, le correctif n'arrive simplement jamais. Comparer
-avant de publier, l'empreinte du build étant visible sur `npm run build:list` :
+avant de publier, l'empreinte du build étant visible sur `npm run build:list` (les deux depuis
+`apps/mobile`) :
 
 ```bash
 npx expo-updates fingerprint:generate --platform android
 ```
 
 Ce qui la déplace : dépendance native, `app.json`, `eas.json`, plugins de configuration, assets
-déclarés dans la config, montée de SDK — et `fingerprint.config.js` lui-même. Le champ `scripts`
-de `package.json` en est **exclu** (`fingerprint.config.js`) : sans cette exclusion, ajouter une
-commande npm coupe les builds déjà distribués de toute mise à jour.
+déclarés dans la config, montée de SDK, `fingerprint.config.js` lui-même — et `apps/mobile/.gitignore`,
+versionné pour cette raison (Expo le recrée s'il manque, ce qui ferait diverger l'empreinte locale de
+celle d'EAS). Le `.gitignore` racine n'y entre pas. Le champ `scripts` d'`apps/mobile/package.json`
+en est **exclu** (`fingerprint.config.js`) : sans cette exclusion, ajouter une commande npm coupe les
+builds déjà distribués de toute mise à jour.
 
 iOS reste différé (pas de compte Apple Developer) : les scripts de build ne visent qu'Android.
 
@@ -286,7 +308,7 @@ Deux compteurs bien distincts :
 La version marketing suit le semver : MINOR pour de nouvelles fonctionnalités,
 PATCH pour des correctifs — pas de bump à chaque lot livré. Elle vaut `1.0.0`
 tant que rien n'est publié ; la beta TestFlight / Play interne se joue en 1.0.0
-avec des builds 1, 2, 3… `src/lib/app-version.test.ts` casse la CI si `app.json`
+avec des builds 1, 2, 3… `apps/mobile/src/lib/app-version.test.ts` casse la CI si `app.json`
 et `package.json` divergent, donc les deux se bumpent dans le même commit.
 
 ```bash
@@ -294,12 +316,12 @@ npm run release -- --minor --notes "Ce que cette version apporte" --dry-run
 ```
 
 Le script bumpe les deux fichiers, rejoue les vérifications de la CI, écrit
-l'entrée de [`CHANGELOG.md`](CHANGELOG.md), commite et pose le tag `vX.Y.Z` —
+l'entrée de [`CHANGELOG.md`](apps/mobile/CHANGELOG.md), commite et pose le tag `vX.Y.Z` —
 qui déclenche la GitHub Release. Il ne pousse rien et ne build rien. Il annonce
 surtout si l'empreinte a bougé, donc si la version peut partir en mise à jour à
 distance ou impose un build. ⚠️ **`expo.version` fait partie de l'empreinte** :
 tout bump impose aujourd'hui un build, un correctif JS se publie donc sans bump.
-Détails et retour arrière : `scripts/README.md` et le skill `trycast-release`.
+Détails et retour arrière : `apps/mobile/scripts/README.md` et le skill `trycast-release`.
 
 L'écran Réglages affiche `nativeApplicationVersion (nativeBuildVersion)`
 d'`expo-application`, c'est-à-dire le binaire réellement installé — pas la
