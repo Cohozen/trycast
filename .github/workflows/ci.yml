@@ -1,14 +1,14 @@
 name: CI
 
-# Le site (web/**) a sa propre CI, sauf sa table de routes : src/lib/urls.test.ts
-# vérifie que l'app ouvre bien les chemins qu'elle déclare. Motifs lus dans
-# l'ordre, le dernier qui correspond l'emporte.
+# Le site (apps/web/**) a sa propre CI, sauf sa table de routes :
+# apps/mobile/src/lib/urls.test.ts vérifie que l'app ouvre bien les chemins
+# qu'elle déclare. Motifs lus dans l'ordre, le dernier qui correspond l'emporte.
 on:
   push:
     branches: [main]
-    paths: ['**', '!web/**', 'web/src/i18n/index.ts']
+    paths: ['**', '!apps/web/**', 'apps/web/src/i18n/index.ts']
   pull_request:
-    paths: ['**', '!web/**', 'web/src/i18n/index.ts']
+    paths: ['**', '!apps/web/**', 'apps/web/src/i18n/index.ts']
 
 jobs:
   checks:
@@ -19,10 +19,23 @@ jobs:
         with:
           node-version: 24
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            apps/mobile/package-lock.json
+
+      # Racine : formatage de tout le dépôt et tests des Edge Functions (dont le
+      # barème que l'app embarque). Pas de workspaces npm : deux installations.
       - run: npm ci
+      - run: npm run format:check
+      - run: npm test
+
+      - run: npm ci
+        working-directory: apps/mobile
       - run: npm run lint -- --max-warnings 0
+        working-directory: apps/mobile
         env:
           CI: '1'
-      - run: npm run format:check
       - run: npm run typecheck
+        working-directory: apps/mobile
       - run: npm test
+        working-directory: apps/mobile

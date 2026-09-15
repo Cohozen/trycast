@@ -41,11 +41,17 @@ jobs:
         with:
           node-version: 24
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            apps/mobile/package-lock.json
+            apps/web/package-lock.json
+      # Trois locks (pas de workspaces npm) : sans chacune de ces installations,
+      # la section correspondante du rapport serait annoncée non analysée.
       - run: npm ci
-      # Le site a son propre lock (pas de workspaces npm) : sans cette install,
-      # la section « Site vitrine » du rapport serait annoncée non analysée.
       - run: npm ci
-        working-directory: web
+        working-directory: apps/mobile
+      - run: npm ci
+        working-directory: apps/web
       - name: Rapport
         run: npm run deps:check -- --markdown > rapport.md
 

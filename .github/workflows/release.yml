@@ -20,17 +20,26 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+          cache-dependency-path: |
+            package-lock.json
+            apps/mobile/package-lock.json
 
-      # Les quatre vérifications de ci.yml, rejouées sur le commit taggé
-      # lui-même. Doublon partiel assumé : il garantit que c'est bien CET état
-      # qui est vert, indépendamment de ce qui a pu être poussé sur main depuis.
+      # Les vérifications de ci.yml, rejouées sur le commit taggé lui-même.
+      # Doublon partiel assumé : il garantit que c'est bien CET état qui est
+      # vert, indépendamment de ce qui a pu être poussé sur main depuis.
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm test
+      - run: npm ci
+        working-directory: apps/mobile
       - run: npm run lint -- --max-warnings 0
+        working-directory: apps/mobile
         env:
           CI: '1'
-      - run: npm run format:check
       - run: npm run typecheck
+        working-directory: apps/mobile
       - run: npm test
+        working-directory: apps/mobile
 
       # Le seul garde-fou possible contre un tag posé à la main : `npm run
       # release` rend les deux cohérents par construction, un `git tag` isolé
@@ -38,17 +47,17 @@ jobs:
       - name: Le tag doit correspondre à app.json
         run: |
           version="${GITHUB_REF_NAME#v}"
-          declaree=$(node -p "require('./app.json').expo.version")
+          declaree=$(node -p "require('./apps/mobile/app.json').expo.version")
           if [ "$version" != "$declaree" ]; then
             echo "::error::Le tag $GITHUB_REF_NAME annonce $version, app.json déclare $declaree."
             exit 1
           fi
 
-      # L'extraction vit dans scripts/release.mjs, qui est propriétaire du
+      # L'extraction vit dans apps/mobile/scripts/release.mjs, qui est propriétaire du
       # format du journal et testé : un awk dans ce YAML ne se découvrirait
       # cassé que le jour d'une release.
       - name: Notes de version
-        run: node scripts/release.mjs --section="${GITHUB_REF_NAME#v}" > "$RUNNER_TEMP/notes.md"
+        run: node apps/mobile/scripts/release.mjs --section="${GITHUB_REF_NAME#v}" > "$RUNNER_TEMP/notes.md"
 
       - name: Publier la GitHub Release
         env:
