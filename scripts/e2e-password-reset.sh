@@ -8,7 +8,7 @@
 #   2) EMAIL=... CODE=418207 ./scripts/e2e-password-reset.sh                 → déroule les assertions
 set -euo pipefail
 
-source .env
+source apps/mobile/.env
 URL="$EXPO_PUBLIC_SUPABASE_URL"
 KEY="$EXPO_PUBLIC_SUPABASE_KEY"
 EMAIL="${EMAIL:-}"

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Régénère `src/lib/database.types.ts` depuis le schéma du projet **de dev**
+ * Régénère `apps/mobile/src/lib/database.types.ts` depuis le schéma du projet **de dev**
  * (celui du `.env`), puis le reformate.
  *
  *   npm run typegen
@@ -34,7 +34,7 @@ if (gen.status !== 0) {
 
 // L'écriture ne se fait qu'après un run réussi : une redirection shell aurait
 // vidé le fichier avant même de savoir si la commande aboutit.
-const OUT = 'src/lib/database.types.ts';
+const OUT = 'apps/mobile/src/lib/database.types.ts';
 const { writeFileSync } = await import('node:fs');
 writeFileSync(OUT, gen.stdout);
 

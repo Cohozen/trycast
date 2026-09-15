@@ -1,5 +1,6 @@
 /**
- * Ref du projet Supabase visé par les scripts, déduit du `.env` local.
+ * Ref du projet Supabase visé par les scripts, déduit du `.env` local de l'app
+ * (`apps/mobile/.env`).
  *
  * Le projet est passé à deux bases (Lot 9) : celle d'origine est devenue la
  * **production**, une nouvelle porte le **développement**. Écrire un ref en dur
@@ -16,7 +17,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ENV_PATH = join(dirname(dirname(fileURLToPath(import.meta.url))), '.env');
+const ENV_PATH = join(dirname(dirname(fileURLToPath(import.meta.url))), 'apps', 'mobile', '.env');
 
 /** Valeur d'une clé du `.env`, sans guillemets ni espaces superflus. */
 function readEnv(key) {
@@ -24,7 +25,9 @@ function readEnv(key) {
     try {
         content = readFileSync(ENV_PATH, 'utf8');
     } catch {
-        throw new Error(`.env introuvable (${ENV_PATH}) — copie .env.example et renseigne-le.`);
+        throw new Error(
+            `.env introuvable (${ENV_PATH}) — copie apps/mobile/.env.example et renseigne-le.`,
+        );
     }
     for (const line of content.split('\n')) {
         const match = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)$/);

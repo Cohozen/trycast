@@ -4,7 +4,7 @@ import { normalizeInviteCode } from './validation';
  * Segment de chemin des liens d'invitation, côté site comme côté natif.
  *
  * Il doit rester identique à trois autres endroits : `buildInviteUrl`
- * (`src/lib/urls.ts`), le rewrite de `web/vercel.json`, et le `pathPrefix` des
+ * (`src/lib/urls.ts`), le rewrite de `apps/web/vercel.json`, et le `pathPrefix` des
  * liens d'application déclarés dans `app.json`.
  */
 export const INVITE_PATH_SEGMENT = 'rejoindre';

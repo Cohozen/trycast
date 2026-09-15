@@ -1,0 +1,20 @@
+{
+    "name": "trycast-repo",
+    "private": true,
+    "description": "Outillage commun du dépôt (formatage, tests des Edge Functions, scripts Supabase). L'app vit dans apps/mobile, le site dans apps/web : chacun son package.json et son lock, pas de workspaces npm.",
+    "scripts": {
+        "format": "biome format --write .",
+        "format:check": "biome format .",
+        "test": "vitest run",
+        "verify": "npm run format:check && npm test && npm --prefix apps/mobile run verify",
+        "typegen": "node ./scripts/typegen.mjs",
+        "emails:build": "node ./scripts/build-email-templates.mjs",
+        "emails:check": "node ./scripts/build-email-templates.mjs --check",
+        "emails:push": "node ./scripts/push-email-config.mjs",
+        "deps:check": "node ./scripts/deps-check.mjs"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "2.5.13",
+        "vitest": "^4.1.11"
+    }
+}

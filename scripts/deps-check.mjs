@@ -29,6 +29,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const RACINE = join(dirname(fileURLToPath(import.meta.url)), '..');
+const APP = join(RACINE, 'apps', 'mobile');
 
 /**
  * Paquets dont le retard affiché par npm est un artefact, avec sa raison.
@@ -44,7 +45,8 @@ const ECARTES = {
 const NOTES = {
     '@biomejs/biome':
         'version épinglée, écrite aussi en dur dans `.github/workflows/web.yml` — bumper les deux',
-    typescript: 'déclaré à la fois à la racine et dans `web/` : garder les deux alignés',
+    typescript:
+        'déclaré à la fois dans `apps/mobile/` et dans `apps/web/` : garder les deux alignés',
 };
 
 // --- Lecture des sources --------------------------------------------------
@@ -93,7 +95,7 @@ const lireAudit = (cwd) => {
  * Sortie parsée : « expo-image@57.0.0 - expected version: ~57.0.4 ».
  */
 const desalignementsSdk = () => {
-    const res = executer('npx', ['expo', 'install', '--check'], RACINE);
+    const res = executer('npx', ['expo', 'install', '--check'], APP);
     const sortie = `${res.stdout ?? ''}\n${res.stderr ?? ''}`;
     if (res.error) return { erreur: res.error.message, attendu: new Map() };
     const attendu = new Map();
@@ -111,7 +113,7 @@ const desalignementsSdk = () => {
 
 /** Les 122 paquets dont le SDK dicte la version — leur `latest` ne se suit pas. */
 const perimetreSdk = () => {
-    const chemin = join(RACINE, 'node_modules/expo/bundledNativeModules.json');
+    const chemin = join(APP, 'node_modules/expo/bundledNativeModules.json');
     if (!existsSync(chemin)) return new Map();
     try {
         return new Map(Object.entries(JSON.parse(readFileSync(chemin, 'utf8'))));
@@ -122,7 +124,7 @@ const perimetreSdk = () => {
 
 /** Version majeure du SDK installé, pour nommer les familles sans la coder en dur. */
 const versionSdk = () => {
-    const chemin = join(RACINE, 'node_modules/expo/package.json');
+    const chemin = join(APP, 'node_modules/expo/package.json');
     if (!existsSync(chemin)) return '?';
     try {
         return JSON.parse(readFileSync(chemin, 'utf8')).version.split('.')[0];
@@ -327,9 +329,9 @@ const construireRapport = (app, web, sdk) => {
         s.push({
             type: 'section',
             cle: 'web',
-            titre: 'Site vitrine (`web/`)',
+            titre: 'Site vitrine (`apps/web/`)',
             pourquoi:
-                'Sous-dossier autonome, son propre lock — vérifié avec `cd web && npm run check && npm run build`.',
+                'Sous-dossier autonome, son propre lock — vérifié avec `cd apps/web && npm run check && npm run build`.',
             lignes: [
                 ...web.familles.majeures,
                 ...web.familles.rattrapage,
@@ -489,13 +491,13 @@ const rendreMarkdown = (rapport, app, web, majeures) => {
 const sdk = versionSdk();
 const { attendu, erreur: erreurSdk } = desalignementsSdk();
 const bloc = analyser({
-    cwd: RACINE,
+    cwd: APP,
     sdkAttendu: attendu,
     sdkPerimetre: perimetreSdk(),
 });
 if (erreurSdk) bloc.erreur = [bloc.erreur, erreurSdk].filter(Boolean).join(' · ');
 
-const cheminWeb = join(RACINE, 'web');
+const cheminWeb = join(RACINE, 'apps', 'web');
 const web = existsSync(join(cheminWeb, 'node_modules'))
     ? analyser({ cwd: cheminWeb })
     : {

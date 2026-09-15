@@ -8,7 +8,7 @@
  *
  * Pourquoi un script : une release, c'est six gestes qui doivent tomber
  * ensemble — deux fichiers de version qui ne doivent jamais diverger
- * (`src/lib/app-version.test.ts` casse la CI sinon), un journal, les quatre
+ * (`src/lib/app-version.test.ts` casse la CI sinon), un journal, les
  * vérifications de la CI, un commit, un tag. En faire cinq sur six produit un
  * état qu'on ne découvre qu'au build suivant. Ici, soit tout passe, soit
  * l'arbre est rendu tel qu'il était.
@@ -31,7 +31,7 @@
  * et aucune version bumpée ne peut partir en OTA. Le script détecte le régime
  * et le dit, plutôt que de conclure à tort qu'une mise à jour suffirait.
  *
- * `--skip-checks` saute les quatre vérifications, `--skip-fingerprint` la
+ * `--skip-checks` saute les vérifications, `--skip-fingerprint` la
  * comparaison d'empreinte, `--dry-run` affiche tout sans rien écrire.
  */
 
@@ -42,6 +42,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const RACINE = join(dirname(fileURLToPath(import.meta.url)), '..');
+// Racine du dépôt : le formatage (biome) et les tests du code partagé avec les
+// Edge Functions (supabase/functions) y vivent, pas dans l'app.
+const DEPOT = join(RACINE, '..', '..');
 const APP_JSON = join(RACINE, 'app.json');
 const PACKAGE_JSON = join(RACINE, 'package.json');
 const CHANGELOG = join(RACINE, 'CHANGELOG.md');
@@ -517,8 +520,8 @@ function verifierEcriture(cible) {
     if (app !== cible || pkg !== cible) {
         return `relecture : app.json=${app}, package.json=${pkg}, attendu ${cible}`;
     }
-    const format = spawnSync('npx', ['biome', 'format', 'app.json', 'package.json'], {
-        cwd: RACINE,
+    const format = spawnSync('npx', ['biome', 'format', APP_JSON, PACKAGE_JSON], {
+        cwd: DEPOT,
         stdio: 'inherit',
         encoding: 'utf8',
     });
@@ -644,13 +647,14 @@ function main() {
 
     // 5) Vérifications de la CI
     if (sansVerifs) {
-        console.warn('⚠️  --skip-checks : les 4 vérifications de la CI sont sautées.\n');
+        console.warn('⚠️  --skip-checks : les vérifications de la CI sont sautées.\n');
     } else {
         console.log('Vérifications avant release…\n');
         const etapes = [
-            ['format:check', ['run', 'format:check']],
+            ['format:check', ['--prefix', DEPOT, 'run', 'format:check']],
             ['typecheck', ['run', 'typecheck']],
             ['tests', ['test']],
+            ['tests (supabase/functions)', ['--prefix', DEPOT, 'test']],
             ['lint', ['run', 'lint', '--', '--max-warnings', '0']],
         ];
         for (const [libelle, args] of etapes) {

@@ -4,7 +4,7 @@
 # Usage : EMAIL1=... EMAIL2=... PASSWORD=... ./scripts/e2e-auth.sh
 set -euo pipefail
 
-source .env
+source apps/mobile/.env
 URL="$EXPO_PUBLIC_SUPABASE_URL"
 KEY="$EXPO_PUBLIC_SUPABASE_KEY"
 EMAIL1="${EMAIL1:-e2e.user1@trycast.local}"

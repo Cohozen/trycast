@@ -22,6 +22,8 @@
  */
 
 import { execFileSync, spawnSync } from 'node:child_process';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const CANAUX = {
     preview: { environment: 'preview', public: false },
@@ -75,11 +77,15 @@ if (sale && !arbreSaleAutorise) {
 // --- 2) Vérifications -----------------------------------------------------
 if (!sansVerifs) {
     console.log('Vérifications avant publication…\n');
-    for (const [libelle, script] of [
-        ['typecheck', 'typecheck'],
-        ['tests', 'test'],
+    // Le barème embarqué dans le bundle vit dans supabase/functions/_shared :
+    // ses tests tournent à la racine du dépôt, pas dans l'app.
+    const depot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+    for (const [libelle, args] of [
+        ['typecheck', ['run', 'typecheck']],
+        ['tests', ['run', 'test']],
+        ['tests (supabase/functions)', ['--prefix', depot, 'run', 'test']],
     ]) {
-        const res = run('npm', ['run', script]);
+        const res = run('npm', args);
         if (res.status !== 0) {
             console.error(`\n✗ ${libelle} en échec — rien n'a été publié.`);
             process.exit(1);

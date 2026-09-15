@@ -71,7 +71,6 @@
         "ios_saf >= 17.5"
     ],
     "devDependencies": {
-        "@biomejs/biome": "2.5.13",
         "@types/aes-js": "^3.1.4",
         "@types/react": "~19.2.2",
         "eslint": "^9.0.0",
@@ -89,8 +88,6 @@
         "web": "expo start --web",
         "lint": "expo lint",
         "test": "vitest run",
-        "format": "biome format --write .",
-        "format:check": "biome format .",
         "typecheck": "tsc --noEmit",
         "build:dev": "eas build --platform android --profile development",
         "build:preview": "eas build --platform android --profile preview",
@@ -102,11 +99,7 @@
         "ota:list": "eas update:list --limit 5",
         "env:preview": "eas env:list --environment preview",
         "env:prod": "eas env:list --environment production",
-        "emails:build": "node ./scripts/build-email-templates.mjs",
-        "emails:check": "node ./scripts/build-email-templates.mjs --check",
-        "emails:push": "node ./scripts/push-email-config.mjs",
-        "typegen": "node ./scripts/typegen.mjs",
-        "deps:check": "node ./scripts/deps-check.mjs"
+        "verify": "npm run typecheck && npm run lint -- --max-warnings 0 && npm test"
     },
     "private": true
 }

@@ -1,4 +1,4 @@
-// URLs du site vitrine `web/` utilisées depuis l'app : pages d'atterrissage des
+// URLs du site vitrine `apps/web/` utilisées depuis l'app : pages d'atterrissage des
 // liens d'e-mail Supabase, pages légales, et liens d'invitation de ligue.
 //
 // L'hôte est `www.trycast.fr`, domaine **primaire** côté Vercel — l'apex y
@@ -28,7 +28,7 @@ export const EMAIL_CHANGE_URL = `${WEB_BASE_URL}/app/email-modifie`;
 //
 // Le site les sert en français à la racine et en anglais sous /en/, avec des
 // slugs traduits. Ces chemins répliquent la table `routes` de
-// web/src/i18n/index.ts, que l'app ne peut pas importer (web/ est un paquet à
+// apps/web/src/i18n/index.ts, que l'app ne peut pas importer (apps/web/ est un paquet à
 // part) : urls.test.ts casse si les deux divergent.
 const LEGAL_PATHS = {
     /** Conditions générales d'utilisation. */
@@ -55,7 +55,7 @@ export function legalUrl(page: LegalPage, language: string | undefined): string 
  * Lien d'invitation à une ligue, partagé depuis l'app (`InviteShareActions`).
  *
  * Unique endroit qui connaît la forme de cette URL : elle est aussi celle que
- * le site sert (`web/src/pages/rejoindre.astro`, via un rewrite Vercel) et
+ * le site sert (`apps/web/src/pages/rejoindre.astro`, via un rewrite Vercel) et
  * celle que les liens d'application déclarent côté natif (`pathPrefix`
  * `/rejoindre`). La changer ici impose de la changer aux deux autres endroits.
  */

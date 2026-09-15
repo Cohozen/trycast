@@ -106,7 +106,10 @@ describe('noms d’équipes', () => {
     // l'être de l'autre, sinon ce test casse.
     it('reste aligné sur les traductions de l’app (src/locales/fr/matches.json)', () => {
         const appTeams: Record<string, string> = JSON.parse(
-            readFileSync(new URL('../../../src/locales/fr/matches.json', import.meta.url), 'utf8'),
+            readFileSync(
+                new URL('../../../apps/mobile/src/locales/fr/matches.json', import.meta.url),
+                'utf8',
+            ),
         ).teams;
         for (const [code, expected] of Object.entries(appTeams)) {
             const message = buildReminderMessage('fr', {

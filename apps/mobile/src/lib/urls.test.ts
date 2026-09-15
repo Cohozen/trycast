@@ -21,13 +21,13 @@ describe('legalUrl', () => {
 });
 
 /**
- * Les slugs viennent du site (table `routes` de web/src/i18n/index.ts), que
- * l'app ne peut pas importer : web/ est un paquet à part. Une page renommée
+ * Les slugs viennent du site (table `routes` de apps/web/src/i18n/index.ts), que
+ * l'app ne peut pas importer : apps/web/ est un paquet à part. Une page renommée
  * d'un côté seulement ouvrirait une 404 dans l'app, sans que rien ne le signale.
  */
 function parseSiteRoutes(): Record<string, { fr: string; en: string }> {
     const source = readFileSync(
-        fileURLToPath(new URL('../../web/src/i18n/index.ts', import.meta.url)),
+        fileURLToPath(new URL('../../../../web/src/i18n/index.ts', import.meta.url)),
         'utf8',
     );
     const routes: Record<string, { fr: string; en: string }> = {};

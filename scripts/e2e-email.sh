@@ -5,7 +5,7 @@
 # Usage : EMAIL=ton.adresse@exemple.fr ./scripts/e2e-email.sh
 set -euo pipefail
 
-source .env
+source apps/mobile/.env
 URL="$EXPO_PUBLIC_SUPABASE_URL"
 KEY="$EXPO_PUBLIC_SUPABASE_KEY"
 WEB="${EXPO_PUBLIC_WEB_URL:-https://www.trycast.fr}"
