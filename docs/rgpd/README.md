@@ -20,7 +20,7 @@ plantages, e-mailing, hébergeur), il faut mettre à jour **dans le même lot** 
 
 1. `docs/rgpd/registre-des-traitements.md`
 2. `docs/rgpd/sous-traitants.md`
-3. `web/src/pages/confidentialite.astro` (la version publique)
+3. `apps/web/src/pages/confidentialite.astro` (la version publique)
 4. Les déclarations des stores si l'app est déjà publiée
 
 Côté code, la mécanique de la télémétrie (Aptabase, Sentry) est documentée dans le skill

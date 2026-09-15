@@ -1,6 +1,6 @@
 ---
 name: trycast-telemetry
-description: Mesure d'usage (Aptabase, région EU) et rapports de plantage (Sentry, région EU) de TryCast — catalogue d'événements typé, garde-fou par préférence locale et non par la table consents, ajout d'un événement, pièges de build sentry-cli, vues Debug/Release du tableau de bord Aptabase, obligations RGPD associées. À consulter dès qu'on ajoute ou modifie un événement de mesure, qu'on touche à src/lib/analytics*.ts ou diagnostics.ts, aux interrupteurs de Réglages → Confidentialité, ou qu'un build échoue en erreur 65.
+description: Mesure d'usage (Aptabase, région EU) et rapports de plantage (Sentry, région EU) de TryCast — catalogue d'événements typé, garde-fou par préférence locale et non par la table consents, ajout d'un événement, pièges de build sentry-cli, vues Debug/Release du tableau de bord Aptabase, obligations RGPD associées. À consulter dès qu'on ajoute ou modifie un événement de mesure, qu'on touche à apps/mobile/src/lib/analytics*.ts ou diagnostics.ts, aux interrupteurs de Réglages → Confidentialité, ou qu'un build échoue en erreur 65.
 ---
 
 # Télémétrie TryCast — Aptabase & Sentry
@@ -14,7 +14,7 @@ clé** — la CI et un clone frais du dépôt tournent sans configuration.
 | Sert à | Quelles fonctionnalités sont utilisées | Quand et pourquoi l'app plante |
 | Région | UE — encodée dans la clé `A-EU-…` | UE — hôte `…ingest.de.sentry.io` |
 | Variable | `EXPO_PUBLIC_APTABASE_KEY` | `EXPO_PUBLIC_SENTRY_DSN` |
-| Enveloppe | `src/lib/analytics.ts` | `src/lib/diagnostics.ts` |
+| Enveloppe | `apps/mobile/src/lib/analytics.ts` | `apps/mobile/src/lib/diagnostics.ts` |
 | Module natif | **Non** (0 dépendance de prod) | **Oui** ⇒ rebuild du dev client |
 
 ⚠️ **La résidence des données Sentry se choisit à la création de l'organisation et n'est
@@ -28,11 +28,11 @@ traitements et la politique de confidentialité.
 Les deux SDK démarrent **avant toute session**, or les policies de `consents` sont indexées
 sur `auth.uid()` : un plantage sur l'écran de connexion échapperait au réglage. D'où :
 
-- `src/features/privacy/telemetry-state.ts` — **module pur, sans import natif**, état en
+- `apps/mobile/src/features/privacy/telemetry-state.ts` — **module pur, sans import natif**, état en
   mémoire lu de façon **synchrone** (le `beforeSend` de Sentry n'attend personne). Opt-out
   assumé : actif tant qu'aucun `'false'` explicite n'a été lu, ce qui couvre les plantages
   survenus avant la fin de l'hydratation.
-- `src/features/privacy/telemetry-preference.ts` — persistance AsyncStorage, modèle
+- `apps/mobile/src/features/privacy/telemetry-preference.ts` — persistance AsyncStorage, modèle
   `profile/theme-preference.ts`.
 - La table `consents` reste la **trace horodatée** du choix (exigence RGPD), écrite au
   mieux : un échec réseau ne doit jamais empêcher quelqu'un de couper la télémétrie.
@@ -43,7 +43,7 @@ doit vivre dans un module sans import React Native.
 
 ### 2. Le catalogue d'événements est typé
 
-`src/lib/analytics-events.ts` est une **union discriminée** : chaque événement déclare
+`apps/mobile/src/lib/analytics-events.ts` est une **union discriminée** : chaque événement déclare
 exactement les propriétés qu'il accepte, toutes en booléens ou littéraux fermés. Passer un
 `user_id`, un pseudo ou un e-mail est une **erreur de compilation**, verrouillée par des
 `@ts-expect-error` dans `analytics-events.test.ts` — c'est `tsc` qui les valide (il signale
@@ -61,7 +61,7 @@ l'exiger, c'est le besoin qu'il faut revoir.
 3. Vérifier que le nouvel événement ne sort pas du cadre déclaré au §7 de
    `docs/rgpd/registre-des-traitements.md` (« mesure d'usage »). S'il en sort, mettre à jour
    le registre **et** la politique publique avant de livrer.
-4. `npm run typecheck && npm run test`.
+4. `npm run typecheck && npm run test` depuis `apps/mobile` (ou `npm run verify` à la racine).
 
 Les 10 événements actuels : `account_created`, `signed_in`, `prediction_saved` (`first`
 déduit de `created_at === updated_at`, le trigger `predictions_set_updated_at` ne touchant
@@ -155,7 +155,7 @@ impose de mettre à jour, dans le même lot :
 
 1. `docs/rgpd/registre-des-traitements.md` (§7 mesure d'usage, §8 diagnostics)
 2. `docs/rgpd/sous-traitants.md`
-3. `web/src/pages/confidentialite.astro` (§8) — ⚠️ piège Astro : un retour à la ligne
+3. `apps/web/src/pages/confidentialite.astro` (§8) — ⚠️ piège Astro : un retour à la ligne
    adjacent à une balise inline supprime l'espace au rendu
 4. `docs/rgpd/fiches-stores.md` si l'app est publiée
 

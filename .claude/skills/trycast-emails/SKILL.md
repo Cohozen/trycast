@@ -37,9 +37,9 @@ Le rendu se fait dans Gmail / Outlook / Apple Mail, pas dans un navigateur.
 
 ## Le logo
 
-`web/public/email-logo.png` = **le ballon seul**, sur fond vert marque cuit dans l'image (pas d'alpha à gérer), géométrie strictement identique au favicon. Le wordmark « TryCast » est du **texte HTML** à côté : il reste lisible quand les images sont bloquées, ce qui est le cas par défaut chez beaucoup de clients.
+`apps/web/public/email-logo.png` = **le ballon seul**, sur fond vert marque cuit dans l'image (pas d'alpha à gérer), géométrie strictement identique au favicon. Le wordmark « TryCast » est du **texte HTML** à côté : il reste lisible quand les images sont bloquées, ce qui est le cas par défaut chez beaucoup de clients.
 
-Pourquoi pas un lockup complet en image : la machine n'a **ni rasteriseur SVG avec support des polices custom, ni Chrome headless, ni fontkit** — Anton ne peut pas être cuit proprement dans un PNG. Régénération : voir le script dans le scratchpad de la session du 2026-07-21 (sharp est fourni par `web/node_modules`, entrée `dist/index.mjs` et non `lib/index.js`).
+Pourquoi pas un lockup complet en image : la machine n'a **ni rasteriseur SVG avec support des polices custom, ni Chrome headless, ni fontkit** — Anton ne peut pas être cuit proprement dans un PNG. Régénération : voir le script dans le scratchpad de la session du 2026-07-21 (sharp est fourni par `apps/web/node_modules`, entrée `dist/index.mjs` et non `lib/index.js`).
 
 ## Variables Go disponibles (GoTrue)
 
@@ -87,7 +87,7 @@ Décision actée (2026-07-21) : le template `recovery` affiche `{{ .Token }}` et
 
 **Piège de l'ordre des appels** : `verifyOtp` **ouvre la session**, ce qui fait basculer `Stack.Protected` sur `(app)` et **démonte l'écran** dans la foulée. Une erreur renvoyée ensuite par `updateUser` n'aurait plus où s'afficher → le mot de passe doit être **validé côté client avant** d'appeler le hook (longueur, confirmation). Reste le cas `same_password`, bénin.
 
-**Renvoi du code** : GoTrue refuse deux e-mails de recovery rapprochés pour un même compte (`smtp_max_frequency`, **60 s** en ligne) et répond 429 `over_email_send_rate_limit`. L'app tient le même délai (`RESEND_COOLDOWN_MS` dans `src/features/auth/reset-code.ts`) pour ne pas proposer une action vouée à échouer — **les deux valeurs doivent rester d'accord**. Un renvoi **invalide le code précédent** côté serveur : l'écran vide la saisie et le dit.
+**Renvoi du code** : GoTrue refuse deux e-mails de recovery rapprochés pour un même compte (`smtp_max_frequency`, **60 s** en ligne) et répond 429 `over_email_send_rate_limit`. L'app tient le même délai (`RESEND_COOLDOWN_MS` dans `apps/mobile/src/features/auth/reset-code.ts`) pour ne pas proposer une action vouée à échouer — **les deux valeurs doivent rester d'accord**. Un renvoi **invalide le code précédent** côté serveur : l'écran vide la saisie et le dit.
 
 **`mailer_otp_length` doit rester à 6** : le projet dev était à 8 (défaut hérité), ce qui rendait le parcours impossible — l'app valide un code à 6 chiffres (`RESET_CODE_LENGTH`, miroir de ce réglage).
 

@@ -10,7 +10,7 @@ pas de données sensibles).
 **Dernière mise à jour** : 14 septembre 2026 (§10 beta fermée ; Proton pour la boîte de contact au §9 ; transfert vers les États-Unis de Resend corrigé aux §1 et §4).
 
 Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](procedure-droits.md),
-[fiches-stores.md](fiches-stores.md). Version publique : `web/src/pages/confidentialite.astro`.
+[fiches-stores.md](fiches-stores.md). Version publique : `apps/web/src/pages/confidentialite.astro`.
 
 ---
 
@@ -116,7 +116,7 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 | **Destinataires** | Aptabase |
 | **Transferts hors UE** | Aucun |
 | **Conservation** | Selon la politique de rétention d'Aptabase ; les événements ne sont rattachables à personne |
-| **Sécurité** | Sessions anonymes par construction (sel rotatif quotidien côté Aptabase). Le catalogue d'événements est **typé** côté code (`src/lib/analytics-events.ts`) : transmettre un identifiant, un pseudo ou une adresse e-mail est une erreur de compilation, verrouillée par des tests |
+| **Sécurité** | Sessions anonymes par construction (sel rotatif quotidien côté Aptabase). Le catalogue d'événements est **typé** côté code (`apps/mobile/src/lib/analytics-events.ts`) : transmettre un identifiant, un pseudo ou une adresse e-mail est une erreur de compilation, verrouillée par des tests |
 
 ## 8. Diagnostics techniques (plantages)
 

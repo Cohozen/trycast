@@ -2,7 +2,7 @@
 
 > Brouillon à recopier dans les consoles au moment de la soumission. Ces déclarations
 > engagent : une réponse fausse est un motif de rejet, et de retrait après publication.
-> Elles doivent rester cohérentes avec `web/src/pages/confidentialite.astro` et
+> Elles doivent rester cohérentes avec `apps/web/src/pages/confidentialite.astro` et
 > [registre-des-traitements.md](registre-des-traitements.md).
 
 **Dernière mise à jour** : 22 juillet 2026 — état du produit : mesure d'usage anonyme
@@ -35,7 +35,7 @@ l'app ; **aucune publicité, aucun suivi publicitaire**.
 
 ⚠️ **Ne pas cocher** « Nom d'utilisateur, mot de passe et autres méthodes
 d'authentification » : cette ligne vise les comptes à second facteur. L'app n'en propose
-aucun — vérifié, il n'existe aucune UI d'enrôlement MFA/TOTP dans `src/`, même si le
+aucun — vérifié, il n'existe aucune UI d'enrôlement MFA/TOTP dans `apps/mobile/src/`, même si le
 projet Supabase a le TOTP activé côté plateforme.
 
 L'e-mail compte comme « nom d'utilisateur » : l'aide de la question le dit

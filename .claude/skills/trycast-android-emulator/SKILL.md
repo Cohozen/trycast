@@ -5,6 +5,8 @@ description: Lancer, voir et piloter TryCast dans l'émulateur Android — dev b
 
 # Piloter TryCast dans l'émulateur Android
 
+> **Toutes les commandes de ce skill se lancent depuis `apps/mobile`** (le projet Expo), et les chemins relatifs (`android/`, `ios/`, `scripts/…`, `app.json`) s'y rapportent. Seules exceptions : `supabase` et `bash scripts/e2e-*.sh`, à la racine.
+
 Pendant du skill `trycast-ios-simulator`, côté Android. L'app tourne dans un **dev build local**
 (`expo-dev-client`, paquet `com.cohozen.trycast`), pas Expo Go. Tout se fait en CLI via `adb`, aucune
 app MCP requise.
@@ -22,7 +24,7 @@ Google APIs PlayStore, Android 17), JDK 17 Homebrew, Gradle 9.3.1, AGP compileSd
   va la chercher directement dans `/opt/homebrew/opt/openjdk@17/…`.
 - **SDK Android** + AVD, via Android Studio. `cmdline-tools` n'est **pas** installé et n'est pas
   nécessaire : les licences sont acceptées et AGP télécharge seul les composants manquants.
-- Ne rien exporter dans `~/.zshrc` : tout l'environnement vient de `scripts/android-env.sh`.
+- Ne rien exporter dans `~/.zshrc` : tout l'environnement vient de `apps/mobile/scripts/android-env.sh`.
 
 ## Démarrage
 
@@ -220,7 +222,7 @@ les accents. Après chaque interaction, vérifier (screenshot ou dump) — ne ja
   cf. `trycast-dev-builds`) : après tout ajout de dépendance native ou de plugin,
   `prebuild --clean` **avant** de rebuilder.
 - **Le Fast Refresh ne recharge PAS les fichiers de locale** (vécu 2026-09-05). Modifier une chaîne
-  dans `src/locales/fr/*.json` ne change rien à l'écran : i18next initialise son magasin de
+  dans `apps/mobile/src/locales/fr/*.json` ne change rien à l'écran : i18next initialise son magasin de
   ressources une fois pour toutes au démarrage, et remplacer le module JSON ne le réinitialise pas.
   Le JSX, lui, se recharge parfaitement (vérifié de bout en bout). Piège trompeur : on croit le dev
   client cassé alors qu'il fonctionne. Pour voir un changement de traduction, recharger l'app
@@ -233,7 +235,7 @@ les accents. Après chaque interaction, vérifier (screenshot ou dump) — ne ja
   `INSTALL_FAILED_UPDATE_INCOMPATIBLE` **après cinq minutes de Gradle**. Le Quick Boot par défaut
   sauvegarde à l'extinction, ce qui est exactement ce qu'on veut. Pour un vrai démarrage à froid,
   c'est `-no-snapshot-load`, et ça se demande explicitement.
-- **Le conflit de signature est détecté avant Gradle** par `scripts/android-preflight.sh`, branché
+- **Le conflit de signature est détecté avant Gradle** par `apps/mobile/scripts/android-preflight.sh`, branché
   dans `npm run android` : il nomme l'appareil fautif et affiche la commande de désinstallation,
   sans jamais la jouer (gratuit sur un émulateur, coûteux sur le téléphone de Corentin, où c'est le
   build du Play Store qui partirait). Discriminant utilisé : un build de debug porte le drapeau

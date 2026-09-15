@@ -5,6 +5,8 @@ description: Savoir quand le dev client (émulateur Android + simulateur iOS) do
 
 # Dev builds TryCast — quand et comment rebuilder
 
+> **Toutes les commandes de ce skill se lancent depuis `apps/mobile`** (le projet Expo), et les chemins relatifs (`android/`, `ios/`, `scripts/…`, `app.json`) s'y rapportent. Seules exceptions : `supabase` et `bash scripts/e2e-*.sh`, à la racine.
+
 L'app tourne dans un **dev build** (`expo-dev-client`) sur l'**émulateur Android** et le **simulateur iOS**. Le dev build est une coquille native : le JS est servi par Metro (`npm start`), donc **le quotidien (écrans, hooks, styles, i18n, SQL) ne demande jamais de build**. Seul le natif embarqué dans l'APK/l'app compte.
 
 ⚠️ **Le téléphone de Corentin n'est pas une cible de développement** (acté le 2026-09-06, une fois
@@ -201,13 +203,13 @@ Un build **`development`** n'embarque pas de bundle JS : il le télécharge depu
 
 Un build **`preview`/`production`** bundle **sur les serveurs EAS** : les `EXPO_PUBLIC_*` y sont **inlinées à ce moment-là**, depuis l'**environnement EAS** (`eas env:create`, ou le dashboard Expo), jamais depuis le `.env` de la machine — il n'est pas envoyé.
 
-⚠️ **L'oubli est silencieux** quand le code traite l'absence d'une clé comme « fonctionnalité non configurée » — c'est le cas d'Aptabase, de Sentry et des fournisseurs d'identité (`src/features/auth/providers.ts` n'affiche pas un bouton dont les identifiants manquent). Pas de crash, pas de log : la fonctionnalité **disparaît de l'app distribuée**. Réflexe : toute nouvelle `EXPO_PUBLIC_*` se pose dans `.env`, dans `.env.example` **et** dans les environnements EAS avant la première distribution.
+⚠️ **L'oubli est silencieux** quand le code traite l'absence d'une clé comme « fonctionnalité non configurée » — c'est le cas d'Aptabase, de Sentry et des fournisseurs d'identité (`apps/mobile/src/features/auth/providers.ts` n'affiche pas un bouton dont les identifiants manquent). Pas de crash, pas de log : la fonctionnalité **disparaît de l'app distribuée**. Réflexe : toute nouvelle `EXPO_PUBLIC_*` se pose dans `.env`, dans `.env.example` **et** dans les environnements EAS avant la première distribution.
 
 ## Piège : le répertoire de travail du shell (vécu 2026-07-22)
 
-`npx expo run:ios` lancé alors que le shell était resté dans `web/` (après un `cd web && npm run check` d'une commande précédente) a **traité le site Astro comme un projet Expo** : ajout d'`expo`, `react` et `react-native` à `web/package.json`, création d'un `web/ios/` et d'un `web/app.json`, le tout en violation de la règle « pas de deps Expo dans le site ». Symptôme dans les logs : `Apple bundle identifier: com.cohozen.trycast-web` et `env: export PUBLIC_SUPABASE_KEY` (les variables du site, pas de l'app).
+`npx expo run:ios` lancé alors que le shell était resté dans `web/` (aujourd'hui `apps/web/` ; après un `cd web && npm run check` d'une commande précédente) a **traité le site Astro comme un projet Expo** : ajout d'`expo`, `react` et `react-native` à `web/package.json`, création d'un `web/ios/` et d'un `web/app.json`, le tout en violation de la règle « pas de deps Expo dans le site ». Symptôme dans les logs : `Apple bundle identifier: com.cohozen.trycast-web` et `env: export PUBLIC_SUPABASE_KEY` (les variables du site, pas de l'app).
 
-**Toujours vérifier `pwd` avant une commande de build**, ou préfixer par un `cd` absolu. Le répertoire de travail de l'outil Bash persiste d'un appel à l'autre — c'est le même piège que zoxide sur `cd web`, par une autre porte.
+**Toujours vérifier `pwd` avant une commande de build**, ou préfixer par un `cd` absolu. Le répertoire de travail de l'outil Bash persiste d'un appel à l'autre — c'est le même piège que zoxide sur `cd apps/web`, par une autre porte. Depuis la réorganisation du 2026-09-15, le projet Expo est `apps/mobile` : toute commande `expo`, `eas` ou `npm run android|ios|build:*|ota:*` se lance **depuis ce dossier**, jamais depuis la racine ni depuis `apps/web`.
 
 ## Piège : l'app de l'émulateur Android n'est pas forcément un dev client (vécu 2026-09-05)
 

@@ -5,6 +5,8 @@ description: Publier une version de TryCast — arbitrer entre mise à jour à d
 
 # Release TryCast — arbitrer, bumper, taguer
 
+> **Toutes les commandes de ce skill se lancent depuis `apps/mobile`** (le projet Expo), et les chemins relatifs (`android/`, `ios/`, `scripts/…`, `app.json`) s'y rapportent. Seules exceptions : `supabase` et `bash scripts/e2e-*.sh`, à la racine.
+
 Deux compteurs, deux canaux de livraison, une seule question qui les arbitre.
 
 | | Où | Qui l'écrit |
@@ -35,7 +37,9 @@ npm run build:list                                          # ligne Fingerprint 
 `npm run release` fait cette comparaison à ta place et annonce laquelle des deux sorties
 s'applique. Ce qui déplace légitimement l'empreinte : une dépendance native ajoutée ou retirée,
 `app.json`, `eas.json`, les plugins de configuration, les assets déclarés dans la config, une
-montée de SDK — et `fingerprint.config.js` lui-même. Détails dans `scripts/README.md`.
+montée de SDK, `fingerprint.config.js` lui-même — et `apps/mobile/.gitignore`, versionné pour
+cette raison. Détails dans `apps/mobile/scripts/README.md`. Toutes ces commandes se lancent depuis
+`apps/mobile`.
 
 ### ⚠️ `expo.version` fait partie de l'empreinte
 
@@ -95,9 +99,9 @@ Le `--dry-run` n'est pas une politesse : il affiche les commits groupés depuis 
 et c'est là qu'on écrit les notes. Sans lui, il faudrait se rappeler trois semaines de travail.
 
 Ce que le script garantit — c'est la raison pour laquelle il existe, cf. l'en-tête de
-`scripts/release.mjs` :
+`apps/mobile/scripts/release.mjs` :
 
-1. `app.json` et `package.json` bumpés **ensemble** (leur divergence casse `src/lib/app-version.test.ts`, qui ne faisait jusqu'ici que la constater) ;
+1. `app.json` et `package.json` bumpés **ensemble** (leur divergence casse `apps/mobile/src/lib/app-version.test.ts`, qui ne faisait jusqu'ici que la constater) ;
 2. les **quatre** vérifications de la CI vertes avant toute écriture ;
 3. le **verdict d'empreinte**, avec les données du dernier build de production ;
 4. l'entrée de `CHANGELOG.md`, le commit `chore(release): X.Y.Z` et le tag annoté `vX.Y.Z` ;
@@ -119,7 +123,7 @@ aucune adresse personnelle dans les notes — même règle que `docs/rgpd/`.
 
 `git push --follow-tags` déclenche `.github/workflows/release.yml` : les quatre vérifications sur
 le commit taggé, un refus si le tag ment sur `app.json`, puis la GitHub Release dont le corps est
-l'entrée du journal (extraite par `node scripts/release.mjs --section=X.Y.Z`).
+l'entrée du journal (extraite par `node apps/mobile/scripts/release.mjs --section=X.Y.Z`).
 
 Un `git push` **seul** laisse le tag en local et ne déclenche rien : le workflow n'écoute que
 `push: tags: ['v*']`.

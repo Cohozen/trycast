@@ -5,14 +5,14 @@ description: Faire évoluer le schéma Supabase de TryCast — écrire une migra
 
 # TryCast — migration Supabase & RLS
 
-Schéma **uniquement par migrations** dans `supabase/migrations/`. Jamais d'édition manuelle de `src/lib/database.types.ts` (généré).
+Schéma **uniquement par migrations** dans `supabase/migrations/`. Jamais d'édition manuelle de `apps/mobile/src/lib/database.types.ts` (généré).
 
 ## Workflow
 
 1. **Créer la migration** : `supabase/migrations/AAAAMMJJ000N00_<sujet>.sql` (timestamp croissant, cf. fichiers existants `20260708000300_leagues.sql`). Un fichier = un changement cohérent ; découper table / RPC / grants / realtime en migrations séparées (comme le lot leagues : `..300_leagues`, `..400_league_rpcs`, `..500_leaderboards`, `..600_realtime_standings`).
 2. **Appliquer** : `supabase db push`
-3. **Régénérer les types** : `npm run typegen` (writes `database.types.ts`, projet id figé dans le script)
-4. **Vérifier** : `npm run typecheck && npm run lint && npm run format:check && npm run test`
+3. **Régénérer les types** : `npm run typegen` à la racine (écrit `apps/mobile/src/lib/database.types.ts`, projet déduit d'`apps/mobile/.env`)
+4. **Vérifier** : `npm run verify` à la racine (formatage, tests des Edge Functions, typecheck, lint et tests de l'app)
 5. **E2E RLS** (voir plus bas) contre `trycast-dev`.
 6. **Commit** petit et ciblé (`feat:` / `fix:`). **Jamais `git push` ni `supabase` destructif sans accord explicite de Corentin.**
 

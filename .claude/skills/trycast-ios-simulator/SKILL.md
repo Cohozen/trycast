@@ -5,6 +5,8 @@ description: Lancer, voir et piloter TryCast dans le simulateur iOS — dev buil
 
 # Piloter TryCast dans le simulateur iOS
 
+> **Toutes les commandes de ce skill se lancent depuis `apps/mobile`** (le projet Expo), et les chemins relatifs (`android/`, `ios/`, `scripts/…`, `app.json`) s'y rapportent. Seules exceptions : `supabase` et `bash scripts/e2e-*.sh`, à la racine.
+
 Workflow validé le 10/07/2026 (Xcode 26.6, simulateurs iOS 26.5, AXe 1.7.1). L'app tourne dans un **dev build local** (`expo-dev-client`, bundle id `com.cohozen.trycast`), pas dans Expo Go. Tout se fait en CLI, aucune app MCP requise.
 
 ## Prérequis (déjà installés)

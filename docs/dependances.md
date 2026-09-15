@@ -16,7 +16,7 @@ ce que le SDK réclame (`npx expo install --fix`), les rattrapages dans la plage
 
 | Paquet | Installé | Disponible | Décision | Revoir quand |
 |---|---|---|---|---|
-| `typescript` (app + `web/`) | 6.0.3 | 7.0.2 | ❌ **bloqué** | TypeScript 7.1 publié **et** adopté par typescript-eslint et le tooling Astro |
+| `typescript` (app + `apps/web/`) | 6.0.3 | 7.0.2 | ❌ **bloqué** | TypeScript 7.1 publié **et** adopté par typescript-eslint et le tooling Astro |
 | `eslint` | 9.39.5 | 10.10.0 | ❌ **bloqué** (essayé le 2026-09-11) | `eslint-plugin-react` publié avec le support d'ESLint 10, et repris par `eslint-config-expo` |
 | `vitest` | 4.1.11 | 5.0.0 | ⏸️ différé, par choix | prochain lot d'outillage — n'attend plus ESLint |
 | `@aptabase/react-native` ⚑ | 0.5.1 | 0.6.0 | ⏸️ sans objet | quand une release native passe de toute façon |
@@ -36,12 +36,12 @@ livrée sans API programmatique stable** — elle est annoncée pour la 7.1. Les
 de cette API ne peuvent donc pas l'utiliser.
 
 **Pourquoi on ne monte pas.** Ce projet dépend deux fois de cette API : `expo lint` passe par
-typescript-eslint, et `web/` par `@astrojs/check`. Les deux restent sur TypeScript 6 tant que la 7.1
+typescript-eslint, et `apps/web/` par `@astrojs/check`. Les deux restent sur TypeScript 6 tant que la 7.1
 n'est pas là. Monter maintenant reviendrait à échanger quelques secondes de `tsc` contre un lint et
 un `astro check` cassés — les deux commandes que la CI exécute.
 
 **Condition de montée.** TypeScript 7.1 publié, **et** typescript-eslint et Astro passés dessus.
-Les deux `package.json` (racine et `web/`) se bumpent ensemble.
+Les deux `package.json` (`apps/mobile/` et `apps/web/`) se bumpent ensemble.
 
 ## `eslint` 9 → 10 — bloqué par les plugins qu'embarque Expo
 
@@ -87,10 +87,12 @@ déclenche une règle de chaque plugin doit rendre les mêmes constats avant et 
 (`vi.mock`) doivent être au premier niveau, `toHaveTextContent` devient strict, `@vitest/runner`
 n'est plus publié séparément, `attachmentsDir` déménage.
 
-**Pourquoi on ne monte pas.** Rien de plus qu'un lot à ouvrir. [vitest.config.ts](../vitest.config.ts)
-tient en trois options (`environment: 'node'`, `include`, un alias) dont **aucune ne figure dans la
-liste des ruptures**, et les tests sont des modules purs sans DOM : ni matcher DOM, ni pièces
-jointes, ni exécution séquentielle. Le risque tient dans un `npm test`.
+**Pourquoi on ne monte pas.** Rien de plus qu'un lot à ouvrir. [La config de l'app](../apps/mobile/vitest.config.ts)
+tient en trois options (`environment: 'node'`, `include`, un alias), [celle de la racine](../vitest.config.ts)
+(tests des Edge Functions) en deux, et **aucune ne figure dans la liste des ruptures** ; les tests sont
+des modules purs sans DOM : ni matcher DOM, ni pièces jointes, ni exécution séquentielle. Le risque
+tient dans un `npm run verify`. Vitest est déclaré deux fois (racine et `apps/mobile/`) : les deux
+montent ensemble.
 
 **Condition de montée.** Le prochain lot d'outillage. Elle était couplée à ESLint 10 ; ce couplage
 tombe avec le blocage d'ESLint, et Vitest 5 n'a aucun obstacle connu. Le 2026-09-11, Corentin a
@@ -105,7 +107,7 @@ les erreurs JavaScript non gérées. Pas de rupture annoncée par rapport à 0.5
 **Pourquoi on ne monte pas.** La nouveauté est précisément ce qu'on ne veut pas : **les plantages
 sont déjà collectés par Sentry**, déclaré au registre des traitements et à la page de confidentialité.
 Brancher un second collecteur de crash serait un **nouveau traitement** — donc `docs/rgpd/registre-des-traitements.md`,
-`docs/rgpd/sous-traitants.md`, `web/src/pages/confidentialite.astro` et les déclarations des stores à
+`docs/rgpd/sous-traitants.md`, `apps/web/src/pages/confidentialite.astro` et les déclarations des stores à
 reprendre — pour une redondance. Reste un correctif de 0.5.1 à prendre au passage.
 
 ⚠️ Si cette version est un jour installée : **ne pas activer `enableCrashReporting`**, ou traiter la

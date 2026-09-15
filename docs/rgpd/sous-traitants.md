@@ -2,7 +2,7 @@
 
 > Article 28 du RGPD : chaque sous-traitant doit être lié par un contrat (DPA) et offrir des
 > garanties suffisantes. Cette liste doit rester alignée avec le §4 de
-> `web/src/pages/confidentialite.astro` : **toute ligne ajoutée ici doit l'être là aussi**.
+> `apps/web/src/pages/confidentialite.astro` : **toute ligne ajoutée ici doit l'être là aussi**.
 
 **Dernière mise à jour** : 14 septembre 2026.
 
