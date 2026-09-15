@@ -2,14 +2,14 @@
 # Vignettes OpenGraph du site (1200×630), celles qu'affichent WhatsApp, iMessage
 # ou Discord quand on colle un lien TryCast.
 #
-# Régénère web/public/og-default.png, sa version anglaise og-default-en.png
-# (landing /en/, choisie par landing-page.astro) et web/public/og-invite.png. Les PNG sont
+# Régénère apps/web/public/og-default.png, sa version anglaise og-default-en.png
+# (landing /en/, choisie par landing-page.astro) et apps/web/public/og-invite.png. Les PNG sont
 # versionnés : ce script ne tourne ni en CI ni au build, il n'existe que pour
 # reproduire les images à l'identique. Il demande ImageMagick (`brew install
 # imagemagick`) et lit les polices du design system dans les node_modules de
-# l'app Expo — pas de police système, pas de CDN.
+# l'app Expo (apps/mobile) — pas de police système, pas de CDN.
 #
-# Le motif du ballon est celui de web/src/components/ball-logo.astro (viewBox
+# Le motif du ballon est celui de apps/web/src/components/ball-logo.astro (viewBox
 # 120×120, passe vissée, rotation -25°), tracé ici à l'échelle 4 puis réduit :
 # ImageMagick n'a pas de délégué SVG fiable, et un rendu approximatif du logo
 # serait plus visible sur une vignette que partout ailleurs.
@@ -17,12 +17,12 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-FONTS="../node_modules/@expo-google-fonts"
+FONTS="../mobile/node_modules/@expo-google-fonts"
 ANTON="$FONTS/anton/400Regular/Anton_400Regular.ttf"
 INTER="$FONTS/inter/600SemiBold/Inter_600SemiBold.ttf"
 
 for f in "$ANTON" "$INTER"; do
-    [ -f "$f" ] || { echo "Police absente : $f (npm install à la racine ?)" >&2; exit 1; }
+    [ -f "$f" ] || { echo "Police absente : $f (npm install dans apps/mobile ?)" >&2; exit 1; }
 done
 
 BG='#100e0b'        # char-900 — base charbon chaud du thème sombre

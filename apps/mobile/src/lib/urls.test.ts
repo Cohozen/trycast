@@ -27,7 +27,7 @@ describe('legalUrl', () => {
  */
 function parseSiteRoutes(): Record<string, { fr: string; en: string }> {
     const source = readFileSync(
-        fileURLToPath(new URL('../../../../web/src/i18n/index.ts', import.meta.url)),
+        fileURLToPath(new URL('../../../web/src/i18n/index.ts', import.meta.url)),
         'utf8',
     );
     const routes: Record<string, { fr: string; en: string }> = {};

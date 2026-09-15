@@ -1,4 +1,4 @@
-// Génère web/public/.well-known/ avant le build Astro.
+// Génère apps/web/public/.well-known/ avant le build Astro.
 //
 // Ces deux fichiers sont ce qui autorise l'app à revendiquer www.trycast.fr :
 // sans eux, un lien https://www.trycast.fr/rejoindre/<code> reste une page web
@@ -73,7 +73,7 @@ const written = [];
 
 if (teamId) {
     // Servi sans extension : le Content-Type application/json est imposé par
-    // web/vercel.json, faute de quoi Apple ignore le fichier sans rien dire.
+    // apps/web/vercel.json, faute de quoi Apple ignore le fichier sans rien dire.
     await writeFile(
         join(outDir, 'apple-app-site-association'),
         `${JSON.stringify(
