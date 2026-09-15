@@ -55,9 +55,20 @@ Chaque script re-seede son état avant exécution. Ordre de seed cumulatif : use
 
 Les scripts lisent `.env` (`EXPO_PUBLIC_SUPABASE_URL` / `_KEY`, clé publishable uniquement) et acceptent `EMAIL1/EMAIL2/PASSWORD` en override.
 
+## Exécuter du SQL sur le dev
+
+⚠️ **Le MCP Supabase (`execute_sql`) est en lecture seule** (constaté le 2026-09-15 : `25006 cannot execute UPDATE in a read-only transaction`). Il sert aux constats ; pour écrire (seed, données de test, secret Vault), passer par la CLI sur le projet lié :
+
+- `supabase db query --linked "<sql>"`, ou `-f fichier.sql` ;
+- vérifier d'abord que le projet lié est le dev : `cat supabase/.temp/project-ref` doit correspondre à l'URL du `.env` ;
+- un secret (Vault, par exemple) va dans un fichier `-f` créé sous `umask 077` puis supprimé, jamais en argument de commande.
+
 ## Edge Functions
 
 Dans `supabase/functions/`, déploiement `supabase functions deploy <name>`.
+
+- Pas de Deno sur la machine, et `supabase/functions` est exclu de `tsc` et d'eslint : seule la logique pure (`transform.ts`, testée sous Vitest) est vérifiée localement. Les erreurs d'`index.ts` n'apparaissent qu'au déploiement ou à l'appel. Garder `index.ts` mince et **l'appeler réellement sur le dev** après déploiement.
+- EF de cron : secret d'appel dans les secrets EF (`supabase secrets set`) **et** dans Vault sous la même valeur, avant la migration `cron.schedule` (modèle : `20260915000200_schedule_sync_tries.sql`).
 
 ⚠️ **Toute EF appelée par pg_cron doit être déclarée `verify_jwt = false` dans `supabase/config.toml`** (bloc `[functions.<name>]`) **avant son premier deploy**. Par défaut la passerelle exige un JWT dans `Authorization` — or le cron n'envoie que le header `x-sync-secret` → chaque tick prend un 401 `UNAUTHORIZED_NO_AUTH_HEADER` **avant** d'atteindre le code de la fonction (vécu au Lot 6 sur `notify`, 2026-07-11 ; la protection réelle est le secret partagé vérifié dans la fonction). Diagnostic : `select status_code, content from net._http_response order by created desc` — c'est là que pg_net loge les réponses des ticks. Un deploy parti sans le bloc se corrige par un simple redeploy après ajout du bloc.
 

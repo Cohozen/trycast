@@ -71,3 +71,33 @@ API-Sports inutile pour le live. ⚠️ le live in-play dépend du renouvellemen
 plan Pro (même échéance que les odds, ~2026-08-06).
 
 Les **essais** restent sans source exploitable (saisie admin) — inchangé.
+
+## Source trouvée (2026-09-15) : Wikipedia
+
+La condition de réévaluation posée plus haut est remplie, mais pas par un
+fournisseur. Scraper L'Équipe ou Flashscore a été écarté : leurs CGU l'interdisent,
+le droit des bases de données (CPI L.342-2) vise justement l'extraction répétée,
+et Flashscore se protège des robots. Wikipedia EN publie en revanche chaque
+match dans un encadré `{{rugbybox}}` (marqueurs et minutes, transformations,
+pénalités, drops), lisible par l'**API MediaWiki officielle** sous licence libre.
+
+**Contrôle qui rend la source exploitable** : 5 × essais + 7 × essais de pénalité
++ 2 × transformations + 3 × pénalités + 3 × drops doit redonner le score, et ce
+score doit être celui de Highlightly. Mesure sur les pages réelles avec le parseur
+livré : **33 matchs joués sur 33 cohérents** (6 Nations 2026 et série de juillet de
+la Nations Championship). Les deux pièges repérés au premier passage (essai de
+pénalité à 7 points, mention transformé/manqué oubliée) sont couverts par les
+tests, sur des extraits réels.
+
+**Livré** : EF `sync-tries` (cron `sync-tries-30min`), pages déclarées par
+compétition dans `competitions.wikipedia_pages`. Écriture automatique dès que les
+contrôles passent ; sinon rejet motivé dans `job_runs`, et la saisie admin reste
+le repli.
+
+**Limites assumées** :
+- délai de quelques heures, le temps que des bénévoles remplissent l'encadré ;
+- le format varie d'un tournoi à l'autre : la Coupe du monde 2023 n'utilise pas
+  `{{rugbybox}}`. Toute nouvelle compétition passe d'abord par le mode `audit` de
+  l'EF, et la RWC 2027 est à vérifier dès que ses pages existent ;
+- l'audit n'a pas pu être rejoué contre des essais saisis à la main : les scores
+  de juillet du projet dev ne sont pas les vrais résultats. À rejouer en prod.

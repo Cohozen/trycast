@@ -1,10 +1,12 @@
 -- Saisie admin des essais — aide-mémoire à coller dans le SQL editor du projet DEV
 -- (ou via MCP execute_sql). Outillage créé par la migration 20260723000100.
 --
--- Les essais ne viennent pas de l'API : c'est la seule donnée de match saisie à
--- la main. Une fois saisis, les points suivent tout seuls au prochain tick de
--- sync-results (cron toutes les 10 min, passe 2 du bonus offensif) — rien à
--- déclencher.
+-- Les essais ne viennent pas de l'API. Depuis le 2026-09-15, le cron sync-tries-30min
+-- les importe de Wikipedia quand le décompte reconstitue le score : cette saisie
+-- n'est plus que le REPLI, pour les matchs qu'il a rejetés (motif : requête 5) ou
+-- qui dépassent ses 14 jours. Une fois saisis, les points suivent tout seuls au
+-- prochain tick de sync-results (cron toutes les 10 min, passe 2 du bonus
+-- offensif) — rien à déclencher.
 
 -- 1. Qu'y a-t-il à faire ? La vue est vide quand tout est à jour.
 --    Colonne `etat` :
@@ -33,3 +35,16 @@ from (values
 --   update public.matches
 --   set needs_review = false
 --   where api_game_id = <api_game_id>;
+
+-- 5. Pourquoi l'import Wikipedia n'a-t-il pas écrit un match ? Derniers runs de
+--    sync-tries : écritures (avec la révision de page utilisée) et rejets motivés.
+--      score_mismatch  → l'encadré ne porte pas le score Highlightly (encadré en
+--                        cours d'édition, ou score fournisseur à corriger)
+--      checksum_failed → le décompte ne redonne pas le score : encadré incomplet
+--      ambiguous       → deux encadrés pour la même affiche à ±1 jour
+--    Un encadré pas encore rempli (not_found) ne laisse pas de ligne.
+select started_at, status, detail -> 'written' as ecrits, detail -> 'rejected' as rejetes, detail -> 'errors' as erreurs
+from public.job_runs
+where job = 'sync-tries'
+order by started_at desc
+limit 10;

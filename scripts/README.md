@@ -292,9 +292,21 @@ curl -s -X POST https://exp.host/--/api/v2/push/send -H "Content-Type: applicati
 
 ---
 
-## Saisie admin des essais
+## Essais : import Wikipedia et saisie admin
 
-Les essais ne sont pas fournis par l'API : c'est la seule donnée de match saisie à la main, après chaque journée. `admin-set-tries.sql` n'est pas un seed mais un **aide-mémoire** à coller dans le SQL editor du projet dev, adossé à l'outillage de la migration `20260723000100_admin_tries.sql` :
+Aucun fournisseur ne publie les essais. Depuis le 2026-09-15, le cron **`sync-tries-30min`** (EF `sync-tries`) les lit dans les encadrés `{{rugbybox}}` des pages Wikipedia déclarées dans `competitions.wikipedia_pages`. Il n'écrit que si le décompte reconstitue le score fourni par Highlightly (détail : `docs/spike-highlightly.md`). Il ne remonte pas au-delà de 14 jours.
+
+L'EF accepte trois modes (body JSON, en-tête `x-sync-secret`) :
+
+| Mode | Effet |
+|---|---|
+| `{}` (cron) | Matchs terminés en attente d'essais depuis moins de 14 jours |
+| `{"mode":"backfill"}` | Idem sans la borne de 14 jours — après une panne, ou pour une compétition branchée en cours de saison |
+| `{"mode":"audit"}` | N'écrit rien : compare Wikipedia aux essais **déjà saisis**. À lancer avant de renseigner les pages d'une nouvelle compétition |
+
+Un match rejeté (`score_mismatch`, `checksum_failed`, `ambiguous`) reste dans la vue et se saisit à la main ; le motif est dans `job_runs` (requête 5 de `admin-set-tries.sql`). Un encadré pas encore rempli (`not_found`) se retente en silence, sans ligne `job_runs`.
+
+La saisie manuelle devient le **repli**. `admin-set-tries.sql` n'est pas un seed mais un **aide-mémoire** à coller dans le SQL editor du projet dev, adossé à l'outillage de la migration `20260723000100_admin_tries.sql` :
 
 | Objet | Rôle |
 |---|---|
