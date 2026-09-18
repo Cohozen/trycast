@@ -161,6 +161,7 @@ describe('buildScoringPayload', () => {
     function prediction(overrides: Partial<PredictionRow> = {}): PredictionRow {
         return {
             id: 'p1',
+            user_id: 'u1',
             predicted_home_score: 30,
             predicted_away_score: 25,
             predicted_bonus_off_home: false,
@@ -190,6 +191,18 @@ describe('buildScoringPayload', () => {
         expect(entry.points_breakdown.offensiveBonusPending).toBe(false);
         expect(entry.points_breakdown.offensiveHome.points).toBe(6); // 0.25 × 15 × 1.5 = 5.625 → 6
         expect(entry.points_awarded).toBeGreaterThan(23);
+    });
+
+    it('joker posé par le joueur → total doublé, les autres inchangés', () => {
+        const [avec, sans] = buildScoringPayload(
+            { ...match, home_tries: 4, away_tries: 1 },
+            [prediction(), prediction({ id: 'p2', user_id: 'u2' })],
+            BAREME_V2,
+            new Set(['u1']),
+        );
+        expect(avec.points_breakdown.jokerMultiplier).toBe(2);
+        expect(sans.points_breakdown.jokerMultiplier).toBe(1);
+        expect(avec.points_awarded).toBe(sans.points_awarded * 2);
     });
 
     it('mauvais vainqueur → 0 partout', () => {

@@ -28,6 +28,8 @@ export type PredictionInput = {
     awayScore: number;
     bonusOffHome: boolean;
     bonusOffAway: boolean;
+    /** Joker de la phase posé sur ce match : total doublé. Absent = false. */
+    joker?: boolean;
 };
 
 export type MatchResultInput = {
@@ -77,6 +79,9 @@ export type PointsBreakdown = {
     /** = offensiveHome.pending || offensiveAway.pending. Conservé à la racine :
      * lu tel quel en SQL par le SELECT de la passe 2 (sync-results). */
     offensiveBonusPending: boolean;
+    /** 2 = joker de la phase posé sur ce match (total doublé). Absent dans les
+     * breakdowns antérieurs au joker (2026-09-18) : équivaut à 1. */
+    jokerMultiplier?: 1 | 2;
 };
 
 export type MatchPoints = {

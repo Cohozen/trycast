@@ -119,6 +119,7 @@ export type MatchScoringRow = {
 
 export type PredictionRow = {
     id: string;
+    user_id: string;
     predicted_home_score: number;
     predicted_away_score: number;
     predicted_bonus_off_home: boolean;
@@ -144,11 +145,14 @@ function toOdds(value: number | string | null): number | null {
  * Calcule les points de tous les pronos d'un match. Même fonction pour les
  * deux passes : la passe 1 reçoit des essais null (bonus offensif en attente),
  * la passe 2 les essais saisis — computeMatchPoints fait le reste.
+ * `jokerUserIds` : les joueurs dont le joker de la phase est posé sur ce match
+ * (phase_jokers), relus à chaque passe — leur total est doublé.
  */
 export function buildScoringPayload(
     match: MatchScoringRow,
     predictions: PredictionRow[],
     rules: ScoringRules,
+    jokerUserIds: ReadonlySet<string> = new Set(),
 ): RpcPredictionEntry[] {
     const odds: MatchOdds = {
         home: toOdds(match.odds_home),
@@ -169,6 +173,7 @@ export function buildScoringPayload(
                 awayScore: prediction.predicted_away_score,
                 bonusOffHome: prediction.predicted_bonus_off_home,
                 bonusOffAway: prediction.predicted_bonus_off_away,
+                joker: jokerUserIds.has(prediction.user_id),
             },
             result,
             odds,

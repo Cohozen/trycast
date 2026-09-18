@@ -328,17 +328,27 @@ async function scoreMatch(
         const { data: predictions, error: predictionsError } = await admin
             .from('predictions')
             .select(
-                'id, predicted_home_score, predicted_away_score, predicted_bonus_off_home, predicted_bonus_off_away',
+                'id, user_id, predicted_home_score, predicted_away_score, predicted_bonus_off_home, predicted_bonus_off_away',
             )
             .eq('match_id', matchId);
         if (predictionsError) {
             throw new Error(`select predictions: ${predictionsError.message}`);
         }
 
+        // Jokers posés sur ce match : figés depuis le kickoff (set_phase_joker)
+        const { data: jokers, error: jokersError } = await admin
+            .from('phase_jokers')
+            .select('user_id')
+            .eq('match_id', matchId);
+        if (jokersError) {
+            throw new Error(`select phase_jokers: ${jokersError.message}`);
+        }
+
         const payload = buildScoringPayload(
             { ...match, home_score: match.home_score, away_score: match.away_score },
             predictions ?? [],
             rules,
+            new Set((jokers ?? []).map((joker) => joker.user_id)),
         );
         const { error: rpcError } = await admin.rpc('apply_match_scores', {
             p_match_id: matchId,

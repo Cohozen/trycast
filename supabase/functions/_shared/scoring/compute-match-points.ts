@@ -9,6 +9,10 @@ import type {
     ScoringRules,
 } from './types.ts';
 
+/** Joker par phase : multiplicateur du total d'un match. Constante, et non clé
+ * du barème : il ne varie pas d'une version à l'autre. */
+export const JOKER_MULTIPLIER = 2;
+
 function outcomeOf(homeScore: number, awayScore: number): MatchOutcome {
     if (homeScore === awayScore) return 'draw';
     return homeScore > awayScore ? 'home' : 'away';
@@ -110,6 +114,7 @@ export function computeMatchPoints(
         offensiveHome,
         offensiveAway,
         offensiveBonusPending: offensiveHome.pending || offensiveAway.pending,
+        jokerMultiplier: prediction.joker ? JOKER_MULTIPLIER : 1,
     };
 
     if (!winnerCorrect) {
@@ -142,7 +147,8 @@ export function computeMatchPoints(
     }
 
     // Total plafonné à 0 : le malus offensif ne rend jamais un match négatif.
-    const total = Math.max(
+    // Le joker double ensuite ce total net — bonus, malus et cote compris.
+    const base = Math.max(
         0,
         breakdown.winnerPoints +
             breakdown.exactScorePoints +
@@ -152,7 +158,7 @@ export function computeMatchPoints(
             breakdown.offensiveAway.points,
     );
 
-    return { total, breakdown };
+    return { total: base * (breakdown.jokerMultiplier ?? 1), breakdown };
 }
 
 /**

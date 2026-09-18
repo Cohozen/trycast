@@ -260,3 +260,66 @@ describe('computePotentialPoints — aperçu « peut rapporter N pts »', () => 
         expect(breakdown.winnerPoints).toBe(30);
     });
 });
+
+describe('computeMatchPoints — joker de la phase (×2)', () => {
+    const odds = cotes(1.5, 25, 2.6);
+    const withJoker = (p: PredictionInput): PredictionInput => ({ ...p, joker: true });
+
+    it('double le total du match, bonus offensif compris', () => {
+        const sans = computeMatchPoints(
+            prono(35, 10, { home: true }),
+            resultat(40, 12, { home: 5, away: 1 }),
+            odds,
+            BAREME_V2,
+        );
+        const avec = computeMatchPoints(
+            withJoker(prono(35, 10, { home: true })),
+            resultat(40, 12, { home: 5, away: 1 }),
+            odds,
+            BAREME_V2,
+        );
+        // 23 (vainqueur) + 8 (écart proche) + 6 (bonus) = 37 → 74
+        expect(sans.total).toBe(37);
+        expect(avec.total).toBe(74);
+        expect(avec.breakdown.jokerMultiplier).toBe(2);
+        // Les volets restent en valeur de base : seul le total est doublé
+        expect(avec.breakdown.winnerPoints).toBe(23);
+    });
+
+    it('le plancher à 0 s’applique avant le doublement (malus sous zéro → 0)', () => {
+        const { total } = computeMatchPoints(
+            withJoker(prono(40, 6, { home: true, away: true })),
+            resultat(50, 6, { home: 1, away: 1 }),
+            cotes(1.05, 30, 12),
+            BAREME_V2,
+        );
+        expect(total).toBe(0);
+    });
+
+    it('mauvais vainqueur : 0, même doublé', () => {
+        const { total, breakdown } = computeMatchPoints(
+            withJoker(prono(17, 20)),
+            resultat(20, 17, { home: 2, away: 1 }),
+            odds,
+            BAREME_V2,
+        );
+        expect(total).toBe(0);
+        expect(breakdown.jokerMultiplier).toBe(2);
+    });
+
+    it('bonus en attente (passe 1) : doublé sur la part acquise, rejoué en passe 2', () => {
+        const passe1 = computeMatchPoints(
+            withJoker(prono(35, 10, { home: true })),
+            resultat(40, 12),
+            odds,
+            BAREME_V2,
+        );
+        expect(passe1.breakdown.offensiveBonusPending).toBe(true);
+        expect(passe1.total).toBe((23 + 8) * 2);
+    });
+
+    it('sans joker : multiplicateur 1', () => {
+        const { breakdown } = computeMatchPoints(prono(20, 10), resultat(20, 10), odds, BAREME_V2);
+        expect(breakdown.jokerMultiplier).toBe(1);
+    });
+});
