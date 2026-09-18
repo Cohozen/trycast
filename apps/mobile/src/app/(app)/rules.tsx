@@ -1,4 +1,5 @@
 import {
+    ChevronsUp,
     EyeOff,
     LockKeyhole,
     MoveHorizontal,
@@ -93,6 +94,13 @@ export default function RulesScreen() {
                     value={t('scoring:rules.bareme.offensive.value', {
                         percent: fmt.format(rules.offensiveBonusRatio * 100),
                     })}
+                />
+                <RuleCard
+                    description={t('scoring:rules.bareme.joker.description')}
+                    icon={<ChevronsUp {...iconProps} />}
+                    note={t('scoring:rules.bareme.joker.note')}
+                    title={t('scoring:rules.bareme.joker.title')}
+                    value={t('scoring:rules.bareme.joker.value')}
                 />
                 <Text className="px-1.5 text-center font-body text-[12px] text-text-faint">
                     {t('scoring:rules.bareme.floor')}

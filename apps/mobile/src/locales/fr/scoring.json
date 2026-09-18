@@ -35,6 +35,12 @@
                 "description": "Coche une équipe que tu vois inscrire {{tries}} essais ou plus. Réussi : {{percent}} % de {{factor}} × sa cote de victoire. Coché mais raté : −{{malus}} pts.",
                 "note": "Le bonus n'est évalué que si tu as trouvé le bon vainqueur."
             },
+            "joker": {
+                "title": "Point double",
+                "value": "×2",
+                "description": "Une fois par phase de compétition, double tous les points d'un match de ton choix, bonus et malus compris. Touche ×2 sur la carte du match ; tu peux le déplacer jusqu'au coup d'envoi du match doublé, il est ensuite joué.",
+                "note": "Il faut un prono enregistré sur le match pour le doubler."
+            },
             "floor": "Quoi qu'il arrive, le total d'un match ne descend jamais sous 0."
         },
         "general": {

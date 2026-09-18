@@ -7,7 +7,8 @@
         "predictions": {
             "title": "Un prono, c'est un score",
             "body": "Tu annonces le score exact que tu imagines. Rien à valider : ta saisie s'enregistre toute seule, et se verrouille au coup d'envoi.",
-            "bonus": "Coche le bonus offensif si tu penses qu'une équipe marquera au moins quatre essais. Réussi, ça rapporte ; raté, ça coûte 10 points."
+            "bonus": "Coche le bonus offensif si tu penses qu'une équipe marquera au moins quatre essais. Réussi, ça rapporte ; raté, ça coûte 10 points.",
+            "joker": "Un match te semble couru d'avance ? Pose ton point double ×2 : un par phase, il double tous les points du match."
         },
         "leagues": {
             "title": "Le sel du jeu, c'est la ligue",

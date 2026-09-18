@@ -26,6 +26,7 @@ import { ResultCard } from '@/features/predictions/components/result-card';
 import { useCommunityDistributions } from '@/features/predictions/use-community-distributions';
 import { useMatchLeaguePredictions } from '@/features/predictions/use-match-league-predictions';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
+import { useMyJokers } from '@/features/jokers/use-my-jokers';
 import { useOpenPlayerProfile } from '@/features/profile/use-open-player-profile';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 
@@ -54,6 +55,7 @@ export default function MatchScreen() {
     const kickoffPassed = phase !== null && phase !== 'upcoming';
 
     const myPredictions = useMyPredictions(competitionId);
+    const myJokers = useMyJokers(competitionId);
     const distributions = useCommunityDistributions(competitionId);
     const myLeagues = useMyLeagues();
 
@@ -163,7 +165,13 @@ export default function MatchScreen() {
                         prediction={prediction}
                     />
                 ) : (
-                    <LockedPredictionCard match={currentMatch} prediction={prediction} />
+                    <LockedPredictionCard
+                        jokerOn={[...(myJokers.data?.values() ?? [])].some(
+                            (joker) => joker.matchId === currentMatch.id,
+                        )}
+                        match={currentMatch}
+                        prediction={prediction}
+                    />
                 )}
                 {/* Lien discret vers le référentiel des règles — texte faint,
                     jamais de grenat (réservé CTA/live/sélection) */}

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { Avatar } from '@/components/ui/avatar';
+import { JokerBadge } from '@/features/jokers/components/joker-badge';
 import type { MatchWithTeams } from '@/features/matches/types';
 import type { MemberPrediction } from '@/features/predictions/types';
 import { Pressable, Text, View } from '@/tw';
@@ -60,6 +61,7 @@ export function MemberPredictionRow({ entry, isMe, match, onPress }: MemberPredi
                     </View>
                 ) : null}
             </View>
+            {entry.is_joker ? <JokerBadge /> : null}
             <View className="rounded-pill bg-surface-sunken px-2.5 py-0.5">
                 <Text className="font-body-bold text-[13px] text-text-muted">
                     {hasPrediction

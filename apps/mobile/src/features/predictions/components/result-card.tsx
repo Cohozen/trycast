@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Badge } from '@/components/ui/badge';
+import { JokerBadge } from '@/features/jokers/components/joker-badge';
+import { JokerMark } from '@/features/jokers/components/joker-mark';
 import { TeamFlag } from '@/features/matches/components/team-flag';
 import { formatKickoffTime, statusLabel, teamName } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
@@ -9,7 +11,7 @@ import { CommunityDistribution } from '@/features/predictions/components/communi
 import { PointsDetailSheet } from '@/features/predictions/components/points-detail-sheet';
 import { VerdictPill } from '@/features/predictions/components/verdict-pill';
 import type { PredictionDistribution, PredictionRow } from '@/features/predictions/types';
-import { parseBreakdown, verdictOf } from '@/features/predictions/verdict';
+import { isJokerScored, parseBreakdown, verdictOf } from '@/features/predictions/verdict';
 import { useActiveScoringRules } from '@/features/scoring/use-active-scoring-rules';
 import { i18n } from '@/lib/i18n';
 import { Pressable, Text, View } from '@/tw';
@@ -56,6 +58,7 @@ export function ResultCard({
     const verdict = prediction ? verdictOf(prediction) : null;
     const scored = prediction != null && prediction.points_awarded !== null;
     const statusKey = statusLabel(match.status);
+    const jokerScored = prediction ? isJokerScored(prediction) : false;
     const predictedOutcome = prediction
         ? prediction.predicted_home_score > prediction.predicted_away_score
             ? ('home' as const)
@@ -134,11 +137,14 @@ export function ResultCard({
                             {formatKickoffTime(match.kickoff_at, { locale: i18n.language })}
                         </Text>
                         {verdict ? <VerdictPill verdict={verdict} /> : null}
-                        {statusKey ? (
-                            <Text className="font-body-semibold text-[10.5px] uppercase tracking-[0.84px] text-text-faint">
-                                {t(statusKey)}
-                            </Text>
-                        ) : null}
+                        <View className="flex-row items-center gap-1.5">
+                            {jokerScored ? <JokerBadge /> : null}
+                            {statusKey ? (
+                                <Text className="font-body-semibold text-[10.5px] uppercase tracking-[0.84px] text-text-faint">
+                                    {t(statusKey)}
+                                </Text>
+                            ) : null}
+                        </View>
                     </View>
 
                     <View className="gap-2.5">
@@ -205,11 +211,14 @@ export function ResultCard({
                                         ? 'border border-accent/30 bg-accent/10'
                                         : 'bg-surface-sunken',
                                 )}>
-                                <Text className="font-body-bold text-[9px] uppercase tracking-[0.63px] text-text-faint">
-                                    {scored
-                                        ? t('predictions:reconciliation.pointsWon')
-                                        : t('predictions:verdict.pending')}
-                                </Text>
+                                <View className="flex-row items-center gap-1">
+                                    <Text className="font-body-bold text-[9px] uppercase tracking-[0.63px] text-text-faint">
+                                        {scored
+                                            ? t('predictions:reconciliation.pointsWon')
+                                            : t('predictions:verdict.pending')}
+                                    </Text>
+                                    {jokerScored ? <JokerMark size="sm" /> : null}
+                                </View>
                                 <View className="flex-row items-baseline gap-1">
                                     <Text
                                         className={cn(

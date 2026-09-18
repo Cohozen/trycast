@@ -35,6 +35,12 @@
                 "description": "Tick a team you expect to score {{tries}} tries or more. Success: {{percent}}% of {{factor}} × its win odds. Ticked but missed: −{{malus}} pts.",
                 "note": "The bonus only counts if you picked the right winner."
             },
+            "joker": {
+                "title": "Double points",
+                "value": "×2",
+                "description": "Once per competition phase, double all the points of a match of your choice, bonuses and penalties included. Tap ×2 on the match card; you can move it until the doubled match kicks off, after which it's played.",
+                "note": "You need a saved prediction on the match to double it."
+            },
             "floor": "Whatever happens, a match total never drops below 0."
         },
         "general": {

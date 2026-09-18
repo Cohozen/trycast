@@ -20,6 +20,11 @@ import { useLiveMatches } from '@/features/matches/use-live-matches';
 import { useMatches } from '@/features/matches/use-matches';
 import { PredictionCard } from '@/features/predictions/components/prediction-card';
 import { splitMatches } from '@/features/predictions/split-matches';
+import { JokerPhasePill } from '@/features/jokers/components/joker-phase-pill';
+import { findCompetitionPhase, jokerCardState } from '@/features/jokers/find-competition-phase';
+import { useCompetitionPhases } from '@/features/jokers/use-competition-phases';
+import type { JokersByPhase } from '@/features/jokers/types';
+import { useMyJokers } from '@/features/jokers/use-my-jokers';
 import { useCommunityDistributions } from '@/features/predictions/use-community-distributions';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
 import { i18n } from '@/lib/i18n';
@@ -79,6 +84,8 @@ export default function MatchesScreen() {
     const liveMatches = useLiveMatches(competition.data?.id);
     const predictions = useMyPredictions(competition.data?.id);
     const distributions = useCommunityDistributions(competition.data?.id);
+    const phases = useCompetitionPhases(competition.data?.id);
+    const jokers = useMyJokers(competition.data?.id);
     const myLeagues = useMyLeagues();
     const standing = useMyStanding(competition.data?.id, userId);
     const leaderboard = useGlobalLeaderboard(competition.data?.id);
@@ -90,6 +97,7 @@ export default function MatchesScreen() {
             liveMatches.refetch(),
             predictions.refetch(),
             distributions.refetch(),
+            jokers.refetch(),
             standing.refetch(),
             leaderboard.refetch(),
             myLeagues.refetch(),
@@ -151,6 +159,20 @@ export default function MatchesScreen() {
     const { upcoming } = splitMatches(matches.data, new Date());
     const groups = groupByDate(upcoming, t);
     const toPredict = upcoming.filter((m) => !predictions.data?.get(m.id)).length;
+
+    // Joker de la phase en cours = celle du prochain match à venir. La
+    // pastille d'en-tête dit s'il est libre ou sur quel match il est posé.
+    const jokerMap: JokersByPhase = jokers.data ?? new Map();
+    const currentPhase = upcoming[0]
+        ? findCompetitionPhase(phases.data ?? [], upcoming[0].kickoff_at)
+        : null;
+    const currentJoker = currentPhase ? jokerMap.get(currentPhase.id) : undefined;
+    const jokerMatch = currentJoker
+        ? matches.data.find((m) => m.id === currentJoker.matchId)
+        : undefined;
+    const jokerPlacedOn = jokerMatch
+        ? `${jokerMatch.home_team?.code ?? '?'}–${jokerMatch.away_team?.code ?? '?'}`
+        : null;
     const hasLeagues = (myLeagues.data?.length ?? 0) > 0;
     const myRank = leaderboard.data?.find((row) => row.user_id === userId)?.rank ?? null;
     const totalPoints = standing.data?.total_points ?? 0;
@@ -322,9 +344,16 @@ export default function MatchesScreen() {
                 </View>,
             );
             for (const match of group.matches) {
+                const phase = findCompetitionPhase(phases.data ?? [], match.kickoff_at);
+                const jokerState = jokerCardState(match.id, phase, jokerMap);
                 listChildren.push(
                     <PredictionCard
                         distribution={distributions.data?.get(match.id)}
+                        joker={
+                            phase && jokerState !== 'none'
+                                ? { phaseId: phase.id, state: jokerState }
+                                : undefined
+                        }
                         key={match.id}
                         match={match}
                         prediction={predictions.data?.get(match.id)}
@@ -348,6 +377,7 @@ export default function MatchesScreen() {
                     <Text className="font-display text-[27px] leading-7 tracking-[0.27px] text-text">
                         {competition.data.name}
                     </Text>
+                    {currentPhase ? <JokerPhasePill placedOn={jokerPlacedOn} /> : null}
                 </View>
                 <NotificationsBell />
             </View>

@@ -22,7 +22,11 @@ const CONTENT = {
     },
     predictions: {
         icon: PencilLine,
-        bodyKeys: ['welcome:steps.predictions.body', 'welcome:steps.predictions.bonus'],
+        bodyKeys: [
+            'welcome:steps.predictions.body',
+            'welcome:steps.predictions.bonus',
+            'welcome:steps.predictions.joker',
+        ],
     },
     leagues: {
         icon: Users,

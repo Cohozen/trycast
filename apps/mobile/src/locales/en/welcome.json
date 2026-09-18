@@ -7,7 +7,8 @@
         "predictions": {
             "title": "A prediction is a score",
             "body": "Call the exact score you expect. Nothing to submit: your entry saves itself, and locks at kick-off.",
-            "bonus": "Tick the attacking bonus if you think a team will score at least four tries. Get it right and it pays; get it wrong and it costs 10 points."
+            "bonus": "Tick the attacking bonus if you think a team will score at least four tries. Get it right and it pays; get it wrong and it costs 10 points.",
+            "joker": "Feeling sure about a match? Play your ×2 double points: one per phase, it doubles all the points of that match."
         },
         "leagues": {
             "title": "Leagues are where it's at",

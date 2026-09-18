@@ -22,3 +22,9 @@ export function verdictOf(prediction: PredictionRow): Verdict {
     }
     return breakdown.winnerCorrect ? 'good' : 'missed';
 }
+
+/** Le joker de la phase a-t-il doublé ce prono ? Lu dans le breakdown : les
+ * breakdowns antérieurs au joker n'ont pas le champ et valent donc « non ». */
+export function isJokerScored(prediction: PredictionRow): boolean {
+    return parseBreakdown(prediction)?.jokerMultiplier === 2;
+}

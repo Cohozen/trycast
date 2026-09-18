@@ -28,7 +28,7 @@ type PointsDetailSheetProps = {
 type Row = {
     key: string;
     label: string;
-    mark: 'ok' | 'ko' | 'info' | 'malus';
+    mark: 'ok' | 'ko' | 'info' | 'malus' | 'joker';
     points: number | null;
     /** Badge optionnel affiché après le libellé (ex. bonus défensif). */
     badge?: string;
@@ -164,6 +164,16 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
             });
         }
     }
+    // Joker de la phase : le total est doublé — la ligne rapporte la seconde
+    // moitié (= total de base), le total reste celui écrit par le scoring.
+    if (breakdown.jokerMultiplier === 2) {
+        rows.push({
+            key: 'joker',
+            label: t('predictions:breakdown.joker'),
+            mark: 'joker',
+            points: (prediction.points_awarded ?? 0) / 2,
+        });
+    }
     const bonusTags: string[] = [];
     if (prediction.predicted_bonus_off_home) {
         bonusTags.push(match.home_team?.code ?? match.home_team?.name ?? '?');
@@ -275,6 +285,7 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
                                 row.mark === 'ko' && 'bg-text/10',
                                 row.mark === 'malus' && 'bg-danger/15',
                                 row.mark === 'info' && 'border border-border-strong',
+                                row.mark === 'joker' && 'w-auto min-w-[22px] bg-brand px-1',
                             )}>
                             <Text
                                 className={cn(
@@ -283,8 +294,15 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
                                     row.mark === 'ko' && 'text-text-faint',
                                     row.mark === 'malus' && 'text-danger',
                                     row.mark === 'info' && 'text-text-faint',
+                                    row.mark === 'joker' && 'font-display text-on-brand',
                                 )}>
-                                {row.mark === 'ok' ? '✓' : row.mark === 'info' ? 'i' : '✗'}
+                                {row.mark === 'ok'
+                                    ? '✓'
+                                    : row.mark === 'info'
+                                      ? 'i'
+                                      : row.mark === 'joker'
+                                        ? '×2'
+                                        : '✗'}
                             </Text>
                         </View>
                         <View className="flex-1 flex-row items-center gap-2">
@@ -301,7 +319,8 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
                             <Text
                                 className={cn(
                                     'font-body-bold text-[14px]',
-                                    row.points > 0 && 'text-text',
+                                    row.points > 0 &&
+                                        (row.mark === 'joker' ? 'text-brand' : 'text-text'),
                                     row.points < 0 && 'text-danger',
                                     row.points === 0 && 'text-text-faint',
                                 )}>

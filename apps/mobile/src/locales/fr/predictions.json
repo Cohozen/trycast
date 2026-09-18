@@ -67,7 +67,8 @@
         "offensiveMissed": "Attaque {{code}} · {{tries}} essais",
         "offensivePendingTeam": "Attaque {{code}} · en attente des essais",
         "finalScore": "Score final",
-        "totalWon": "Total gagné"
+        "totalWon": "Total gagné",
+        "joker": "Point double de la phase"
     },
     "errors": {
         "deadline": "Trop tard : le coup d'envoi est passé, le prono est verrouillé.",

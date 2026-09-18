@@ -67,7 +67,8 @@
         "offensiveMissed": "{{code}} attack · {{tries}} tries",
         "offensivePendingTeam": "{{code}} attack · awaiting tries",
         "finalScore": "Final score",
-        "totalWon": "Total won"
+        "totalWon": "Total won",
+        "joker": "Phase double points"
     },
     "errors": {
         "deadline": "Too late: kickoff has passed, the prediction is locked.",

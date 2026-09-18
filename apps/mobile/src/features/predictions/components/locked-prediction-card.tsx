@@ -1,6 +1,8 @@
 import { Lock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 
+import { JokerBadge } from '@/features/jokers/components/joker-badge';
+import { JokerMark } from '@/features/jokers/components/joker-mark';
 import { TeamFlag } from '@/features/matches/components/team-flag';
 import { teamName } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
@@ -12,6 +14,8 @@ import { Text, useThemeColor, View } from '@/tw';
 type LockedPredictionCardProps = {
     match: MatchWithTeams;
     prediction: PredictionRow | undefined;
+    /** Mon joker de la phase est posé sur ce match. */
+    jokerOn?: boolean;
 };
 
 /**
@@ -22,7 +26,11 @@ type LockedPredictionCardProps = {
  * Pas de projection contre le score live (décision live-match-card) : le
  * badge affiche les points potentiels pondérés par la cote.
  */
-export function LockedPredictionCard({ match, prediction }: LockedPredictionCardProps) {
+export function LockedPredictionCard({
+    match,
+    prediction,
+    jokerOn = false,
+}: LockedPredictionCardProps) {
     const { t } = useTranslation(['predictions', 'matches']);
     const textFaint = useThemeColor('text-faint');
     const rules = useActiveScoringRules();
@@ -93,6 +101,7 @@ export function LockedPredictionCard({ match, prediction }: LockedPredictionCard
                                     {prediction.predicted_away_score}
                                 </Text>
                             </View>
+                            {jokerOn ? <JokerBadge /> : null}
                             {bonusTags.map((code) => (
                                 <View
                                     className="flex-row items-center gap-1 rounded-pill border border-accent/40 px-2 py-0.5"
@@ -105,9 +114,12 @@ export function LockedPredictionCard({ match, prediction }: LockedPredictionCard
                             ))}
                         </View>
                         <View className="flex-row items-center justify-between gap-2.5">
-                            <Text className="font-body-semibold text-[11px] uppercase tracking-[0.44px] text-text-faint">
-                                {t('predictions:form.potentialLabel')}
-                            </Text>
+                            <View className="flex-row items-center gap-1">
+                                <Text className="font-body-semibold text-[11px] uppercase tracking-[0.44px] text-text-faint">
+                                    {t('predictions:form.potentialLabel')}
+                                </Text>
+                                {jokerOn ? <JokerMark size="sm" /> : null}
+                            </View>
                             <View className="flex-row items-baseline gap-1 rounded-pill bg-accent px-3 py-1 tc-shadow-sm">
                                 <Text className="font-display text-[20px] leading-[21px] text-on-accent">
                                     {potential?.total ?? '–'}

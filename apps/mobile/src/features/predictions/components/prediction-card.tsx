@@ -3,6 +3,11 @@ import { Shield } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { JokerChip } from '@/features/jokers/components/joker-chip';
+import { JokerMark } from '@/features/jokers/components/joker-mark';
+import { toJokerMessageKey } from '@/features/jokers/errors';
+import type { JokerCardState } from '@/features/jokers/types';
+import { useToggleJoker } from '@/features/jokers/use-toggle-joker';
 import { TeamFlag } from '@/features/matches/components/team-flag';
 import { formatKickoff, teamName } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
@@ -22,7 +27,7 @@ import {
 import { useActiveScoringRules } from '@/features/scoring/use-active-scoring-rules';
 import { hapticSuccess } from '@/lib/haptics';
 import { i18n } from '@/lib/i18n';
-import { Text, useThemeColor, View } from '@/tw';
+import { Pressable, Text, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
 type PredictionCardProps = {
@@ -31,6 +36,8 @@ type PredictionCardProps = {
     userId: string;
     /** Distribution communautaire du match (remplace les barres de cotes dès qu'un prono existe). */
     distribution?: PredictionDistribution;
+    /** Joker de la phase du match, absent si le match n'est dans aucune phase. */
+    joker?: { phaseId: string; state: Exclude<JokerCardState, 'none'> };
 };
 
 type SaveStatus = 'toPredict' | 'saving' | 'saved';
@@ -53,8 +60,14 @@ const TONE_CLASSES = {
  * carte, aucun bouton). La deadline reste portée par la RLS : après kickoff
  * le serveur refuse (42501) et l'erreur s'affiche.
  */
-export function PredictionCard({ match, prediction, userId, distribution }: PredictionCardProps) {
-    const { t } = useTranslation(['predictions', 'matches']);
+export function PredictionCard({
+    match,
+    prediction,
+    userId,
+    distribution,
+    joker,
+}: PredictionCardProps) {
+    const { t } = useTranslation(['predictions', 'matches', 'jokers']);
     const [homeRaw, setHomeRaw] = useState(
         prediction ? String(prediction.predicted_home_score) : '',
     );
@@ -173,6 +186,29 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
         saved: t('predictions:status.saved'),
     };
 
+    // Joker de la phase (maquette « Point double ») : bouton ×2 ou appui long
+    // sur la carte. La RPC exige un prono enregistré — le bouton l'attend.
+    const toggleJoker = useToggleJoker(match.competition_id);
+    const jokerOn = joker?.state === 'on';
+    const hasSavedPrediction = prediction != null || upsert.isSuccess;
+    const canToggleJoker = joker !== undefined && joker.state !== 'spent' && hasSavedPrediction;
+    const onToggleJoker = () => {
+        if (!joker || !canToggleJoker) return;
+        toggleJoker.mutate({
+            phaseId: joker.phaseId,
+            matchId: match.id,
+            kickoffAt: match.kickoff_at,
+            on: !jokerOn,
+        });
+    };
+    const jokerHint = !joker
+        ? null
+        : !hasSavedPrediction
+          ? t('jokers:hint.needsPrediction')
+          : joker.state === 'spent'
+            ? null
+            : t(`jokers:hint.${joker.state}`);
+
     const cells: { key: '1' | 'N' | '2'; outcome: 'home' | 'draw' | 'away' }[] = [
         { key: '1', outcome: 'home' },
         { key: 'N', outcome: 'draw' },
@@ -180,25 +216,40 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
     ];
 
     return (
-        <View className="gap-3.5 rounded-lg border border-border bg-surface p-4 tc-shadow-md">
-            {/* Coup d'envoi + statut */}
+        <Pressable
+            className={cn(
+                'gap-3.5 rounded-lg border-[1.5px] bg-surface p-4',
+                jokerOn ? 'border-brand tc-glow-brand' : 'border-border tc-shadow-md',
+            )}
+            delayLongPress={480}
+            onLongPress={canToggleJoker ? onToggleJoker : undefined}>
+            {/* Coup d'envoi + ×2 + statut */}
             <View className="flex-row items-center justify-between gap-2">
                 <Text className="font-body-semibold text-[11px] uppercase tracking-[0.77px] text-text-faint">
                     {formatKickoff(match.kickoff_at, { locale: i18n.language })}
                 </Text>
-                <View
-                    className={cn(
-                        'flex-row items-center gap-1.5 rounded-pill px-2.5 py-1',
-                        statusClasses.pill,
-                    )}>
-                    <View className={cn('h-1.5 w-1.5 rounded-pill', statusClasses.dot)} />
-                    <Text
+                <View className="flex-row items-center gap-1.5">
+                    {joker ? (
+                        <JokerChip
+                            disabled={!hasSavedPrediction}
+                            onPress={onToggleJoker}
+                            state={joker.state}
+                        />
+                    ) : null}
+                    <View
                         className={cn(
-                            'font-body-bold text-[10.5px] uppercase tracking-[0.4px]',
-                            statusClasses.text,
+                            'flex-row items-center gap-1.5 rounded-pill px-2.5 py-1',
+                            statusClasses.pill,
                         )}>
-                        {statusLabels[status]}
-                    </Text>
+                        <View className={cn('h-1.5 w-1.5 rounded-pill', statusClasses.dot)} />
+                        <Text
+                            className={cn(
+                                'font-body-bold text-[10.5px] uppercase tracking-[0.4px]',
+                                statusClasses.text,
+                            )}>
+                            {statusLabels[status]}
+                        </Text>
+                    </View>
                 </View>
             </View>
 
@@ -305,9 +356,14 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
                                     )}>
                                     {key}
                                 </Text>
-                                <Text className="font-display text-[20px] leading-5.25 text-text">
-                                    {active && potential ? potential.total : winnerPoints[outcome]}
-                                </Text>
+                                <View className="flex-row items-baseline gap-1">
+                                    <Text className="font-display text-[20px] leading-5.25 text-text">
+                                        {active && potential
+                                            ? potential.total
+                                            : winnerPoints[outcome]}
+                                    </Text>
+                                    {active && jokerOn ? <JokerMark /> : null}
+                                </View>
                             </View>
                         );
                     })}
@@ -339,11 +395,26 @@ export function PredictionCard({ match, prediction, userId, distribution }: Pred
                 ) : null}
             </View>
 
+            {jokerHint ? (
+                <Text
+                    className={cn(
+                        'font-body-semibold text-[11px]',
+                        jokerOn ? 'text-brand' : 'text-text-faint',
+                    )}>
+                    {jokerHint}
+                </Text>
+            ) : null}
+
             {upsert.isError ? (
                 <Text className="font-body text-[13px] text-accent">
                     {t(toPredictionMessageKey(upsert.error as PostgrestError))}
                 </Text>
             ) : null}
-        </View>
+            {toggleJoker.isError ? (
+                <Text className="font-body text-[13px] text-accent">
+                    {t(toJokerMessageKey(toggleJoker.error))}
+                </Text>
+            ) : null}
+        </Pressable>
     );
 }
