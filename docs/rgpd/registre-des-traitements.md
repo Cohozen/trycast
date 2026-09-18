@@ -41,9 +41,9 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 | **Finalité** | Enregistrer les pronostics, calculer les points, établir les classements des ligues |
 | **Base légale** | Exécution du contrat — art. 6.1.b |
 | **Personnes concernées** | Utilisateurs de l'application |
-| **Catégories de données** | Pronostics (scores et bonus prédits), points obtenus et leur détail, appartenance aux ligues, rôle dans la ligue, totaux et statistiques de classement |
+| **Catégories de données** | Pronostics (scores et bonus prédits, point double de la phase), points obtenus et leur détail, appartenance aux ligues, rôle dans la ligue, totaux et statistiques de classement |
 | **Où** | `public.predictions`, `public.league_members`, `public.leagues`, `public.standings` |
-| **Destinataires** | Supabase. Les pronostics d'un joueur deviennent visibles des autres membres de ses ligues **après le coup d'envoi** du match (règle imposée par RLS, pas par le client) |
+| **Destinataires** | Supabase. Les pronostics d'un joueur (point double compris) deviennent visibles des autres membres de ses ligues **après le coup d'envoi** du match (règle imposée par RLS, pas par le client) |
 | **Transferts hors UE** | Aucun |
 | **Conservation** | Durée de vie du compte (cascade à la suppression) |
 | **Sécurité** | RLS, deadline au coup d'envoi appliquée côté serveur, écriture des scores par une RPC unique et atomique |
@@ -111,7 +111,7 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 | **Finalité** | Savoir quelles fonctionnalités sont utilisées, pour décider quoi améliorer |
 | **Base légale** | Intérêt légitime — art. 6.1.f. Mesure d'audience anonyme, sans identifiant ni traceur : impact nul sur la vie privée, et désactivable à tout moment dans l'application |
 | **Personnes concernées** | Utilisateurs de l'application n'ayant pas coupé la mesure |
-| **Catégories de données** | 10 événements de parcours nommés (compte créé, pronostic enregistré, ligue créée ou rejointe, classement consulté, notifications activées, export demandé, compte supprimé, guide d'accueil fermé), la version de l'app et le système d'exploitation. **Aucun identifiant utilisateur, aucun identifiant d'appareil** |
+| **Catégories de données** | 11 événements de parcours nommés (compte créé, pronostic enregistré, point double posé / déplacé / retiré, ligue créée ou rejointe, classement consulté, notifications activées, export demandé, compte supprimé, guide d'accueil fermé), la version de l'app et le système d'exploitation. **Aucun identifiant utilisateur, aucun identifiant d'appareil** |
 | **Où** | Aptabase, région UE. Rien n'est stocké dans notre base |
 | **Destinataires** | Aptabase |
 | **Transferts hors UE** | Aucun |

@@ -63,9 +63,9 @@ l'exiger, c'est le besoin qu'il faut revoir.
    le registre **et** la politique publique avant de livrer.
 4. `npm run typecheck && npm run test` depuis `apps/mobile` (ou `npm run verify` à la racine).
 
-Les 10 événements actuels : `account_created`, `signed_in`, `prediction_saved` (`first`
+Les 11 événements actuels : `account_created`, `signed_in`, `prediction_saved` (`first`
 déduit de `created_at === updated_at`, le trigger `predictions_set_updated_at` ne touchant
-`updated_at` qu'à l'UPDATE), `league_created`, `league_joined`, `leaderboard_viewed`
+`updated_at` qu'à l'UPDATE), `joker_changed` (`action` : `set` / `moved` / `cleared`), `league_created`, `league_joined`, `leaderboard_viewed`
 (`scope`), `notifications_enabled`, `data_exported`, `account_deleted`,
 `welcome_guide_closed` (`completed` : suivi jusqu'au bout ou sorti par un de ses boutons,
 vs. passé ou glissé).

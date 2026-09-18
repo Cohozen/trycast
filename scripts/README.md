@@ -55,6 +55,7 @@ EMAIL1=e2e.user1@trycast.local EMAIL2=e2e.user2@trycast.local PASSWORD=motdepass
 | `e2e-predictions.sh` | RLS des pronostics, deadline au coup d'envoi | + `seed-test-predictions.sql` |
 | `e2e-scoring.sh` | Barème lisible mais inviolable, `apply_match_scores` et l'outillage admin des essais verrouillés | + `seed-test-scoring.sql` |
 | `e2e-leagues.sh` | Invisibilité aux non-membres, anti-énumération, quitter/exclure | + `seed-test-leagues.sql` |
+| `e2e-jokers.sh` | Joker par phase : pose, déplacement, refus (sans prono, match commencé, hors phase, joker consommé), aucune écriture directe, visibilité ligue après kickoff | `seed-test-users.sql` + `seed-test-jokers.sql` (à rejouer avant chaque run) |
 | `e2e-notifications.sh` | Tokens push par RPC, isolation des préférences | `seed-test-users.sql` |
 | `e2e-privacy.sh` | `consents` append-only, Edge Function `export-data`, étanchéité des tables waitlist | `seed-test-users.sql` |
 | `e2e-email.sh` | Transport SMTP Resend | aucun |
@@ -75,7 +76,7 @@ EMAIL=une.vraie@adresse.fr bash scripts/e2e-password-reset.sh              # env
 EMAIL=une.vraie@adresse.fr CODE=418207 bash scripts/e2e-password-reset.sh  # déroule les assertions
 ```
 
-`e2e-leagues.sh` et `e2e-scoring.sql` ne sont pas idempotents : **rejouer leur seed avant chaque exécution**.
+`e2e-leagues.sh`, `e2e-jokers.sh` et `e2e-scoring.sql` ne sont pas idempotents : **rejouer leur seed avant chaque exécution**.
 
 ### ⚠️ Les seeds ne se cumulent pas
 
@@ -117,9 +118,13 @@ seed-test-users.sql          →  e2e.user1@trycast.local / e2e.user2@trycast.lo
 seed-test-predictions.sql    →  matchs de test
       ↓
 seed-test-scoring.sql  ·  seed-test-leagues.sql
+
+seed-test-users.sql  →  seed-test-jokers.sql   (compétition e2e-jokers à part, avec ses phases et sa ligue)
 ```
 
-`seed-competitions.sql` est indépendant et **idempotent** (upsert sur le slug) : les compétitions réelles du pipeline.
+`seed-test-leagues.sql` supprime **toutes** les ligues des users e2e, dont celle du seed jokers : rejouer `seed-test-jokers.sql` juste avant `e2e-jokers.sh`.
+
+`seed-competitions.sql` est indépendant et **idempotent** (upsert sur le slug) : les compétitions réelles du pipeline, **et leurs phases** (fenêtres de dates du joker, upsert sur `competition_id, key`).
 
 ---
 
