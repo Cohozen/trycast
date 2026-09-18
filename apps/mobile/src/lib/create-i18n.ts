@@ -4,6 +4,7 @@ import { initReactI18next } from 'react-i18next';
 import authEn from '@/locales/en/auth.json';
 import celebrationEn from '@/locales/en/celebration.json';
 import commonEn from '@/locales/en/common.json';
+import jokersEn from '@/locales/en/jokers.json';
 import leaguesEn from '@/locales/en/leagues.json';
 import matchesEn from '@/locales/en/matches.json';
 import notificationsEn from '@/locales/en/notifications.json';
@@ -14,6 +15,7 @@ import welcomeEn from '@/locales/en/welcome.json';
 import auth from '@/locales/fr/auth.json';
 import celebration from '@/locales/fr/celebration.json';
 import common from '@/locales/fr/common.json';
+import jokers from '@/locales/fr/jokers.json';
 import leagues from '@/locales/fr/leagues.json';
 import matches from '@/locales/fr/matches.json';
 import notifications from '@/locales/fr/notifications.json';
@@ -35,6 +37,7 @@ export const resources = {
         auth,
         matches,
         predictions,
+        jokers,
         leagues,
         profile,
         scoring,
@@ -47,6 +50,7 @@ export const resources = {
         auth: authEn,
         matches: matchesEn,
         predictions: predictionsEn,
+        jokers: jokersEn,
         leagues: leaguesEn,
         profile: profileEn,
         scoring: scoringEn,

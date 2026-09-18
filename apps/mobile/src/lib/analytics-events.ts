@@ -38,6 +38,11 @@ export type AnalyticsEvent =
     | { name: 'signed_in'; props: SignInMethodProp }
     /** Un pronostic a été enregistré. `first` distingue la création d'une correction. */
     | { name: 'prediction_saved'; props: { first: boolean } }
+    /**
+     * Le joker d'une phase a bougé : posé (`set`), déplacé d'un match à un
+     * autre (`moved`) ou retiré (`cleared`). Jamais le match ni la phase.
+     */
+    | { name: 'joker_changed'; props: { action: 'set' | 'moved' | 'cleared' } }
     /** Une ligue a été créée. */
     | { name: 'league_created' }
     /**

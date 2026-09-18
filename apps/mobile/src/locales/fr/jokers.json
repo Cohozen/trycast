@@ -1,0 +1,29 @@
+{
+    "chip": {
+        "label": "Point double",
+        "on": "Point double posé sur ce match. Touche pour le retirer.",
+        "available": "Double les points de ce match. Un seul point double par phase.",
+        "movable": "Ton point double est sur un autre match. Touche pour le déplacer ici.",
+        "spent": "Ton point double de la phase est déjà joué."
+    },
+    "hint": {
+        "on": "Point double actif · appui long sur la carte pour le retirer",
+        "available": "Touche ×2 ou appui long sur la carte pour doubler ce match",
+        "movable": "Appui long sur la carte pour déplacer ton ×2 ici",
+        "needsPrediction": "Pronostique ce match pour pouvoir le doubler"
+    },
+    "badge": {
+        "label": "Point double joué sur ce match"
+    },
+    "pill": {
+        "available": "disponible",
+        "placed": "{{match}}"
+    },
+    "errors": {
+        "matchStarted": "Le match a commencé : le point double ne bouge plus.",
+        "locked": "Ton point double de la phase est déjà joué sur un match commencé.",
+        "noPrediction": "Enregistre d’abord ton prono pour doubler ce match.",
+        "noPhase": "Pas de point double sur ce match.",
+        "failed": "Le point double n’a pas pu être enregistré. Réessaie."
+    }
+}

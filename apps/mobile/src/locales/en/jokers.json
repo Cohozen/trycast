@@ -1,0 +1,29 @@
+{
+    "chip": {
+        "label": "Double points",
+        "on": "Double points played on this match. Tap to remove it.",
+        "available": "Doubles this match's points. One double per phase.",
+        "movable": "Your double points are on another match. Tap to move them here.",
+        "spent": "Your double points for this phase have already been played."
+    },
+    "hint": {
+        "on": "Double points on · long-press the card to remove",
+        "available": "Tap ×2 or long-press the card to double this match",
+        "movable": "Long-press the card to move your ×2 here",
+        "needsPrediction": "Predict this match to be able to double it"
+    },
+    "badge": {
+        "label": "Double points played on this match"
+    },
+    "pill": {
+        "available": "available",
+        "placed": "{{match}}"
+    },
+    "errors": {
+        "matchStarted": "The match has started: your double points can't move anymore.",
+        "locked": "Your double points for this phase are already on a match that has started.",
+        "noPrediction": "Save your prediction first to double this match.",
+        "noPhase": "No double points on this match.",
+        "failed": "Your double points couldn't be saved. Try again."
+    }
+}

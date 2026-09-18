@@ -194,6 +194,10 @@
     .tc-glow-accent {
         box-shadow: 0 4px 18px rgba(230, 62, 99, 0.35);
     }
+    /* Glow vert marque — réservé à la carte dont le joker (×2) est posé */
+    .tc-glow-brand {
+        box-shadow: 0 6px 22px rgba(20, 67, 42, 0.26);
+    }
 
     @media (prefers-color-scheme: dark) {
         .tc-shadow-sm {
@@ -204,6 +208,9 @@
         }
         .tc-shadow-lg {
             box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+        }
+        .tc-glow-brand {
+            box-shadow: 0 6px 22px rgba(95, 196, 138, 0.26);
         }
     }
 }
