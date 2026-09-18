@@ -1,7 +1,7 @@
 # TryCast — Dashboard
 
 > Suivi d'avancement et décisions. Mis à jour à la fin de chaque session.
-> Dernière mise à jour : **2026-09-15 (bis)** (**le dépôt passe en `apps/mobile` + `apps/web`**, `supabase/` reste à la racine comme backend commun, **sans workspaces npm**. Tout est vert : `npm run verify` (formatage, 126 tests des Edge Functions, typecheck, lint, 322 tests de l'app), bundle Android réel qui embarque le barème partagé, site construit **sans le stub tsconfig Expo**, qui devient inutile (témoin : un tsconfig racine refait casser le build), dev client Android recompilé depuis `apps/mobile` et app ouverte sur Metro. **Deux pièges d'empreinte découverts** : le `.gitignore` du projet Expo est haché, et c'est très probablement la ligne `docs/emails` du 2026-09-14 qui avait déjà déplacé l'empreinte de `main` sans toucher à l'app (`0b2ae336…` → `87ed987…` ; seul fichier hors code source modifié depuis la mesure du SDK 57) ; et `expo start` recrée un `apps/mobile/.gitignore` absent, d'où son versionnement. Empreinte de `main` : **`c51c5de1…`**, sans effet sur les testeurs puisque les OTA sont gelées jusqu'au prochain build. **À faire par Corentin au push : Root Directory Vercel `web` → `apps/web`.** Rien de poussé.)
+> Dernière mise à jour : **2026-09-18** (**le dépôt passe en `apps/mobile` + `apps/web`**, `supabase/` reste à la racine comme backend commun, **sans workspaces npm**. Tout est vert : `npm run verify` (formatage, 126 tests des Edge Functions, typecheck, lint, 322 tests de l'app), bundle Android réel qui embarque le barème partagé, site construit **sans le stub tsconfig Expo**, qui devient inutile (témoin : un tsconfig racine refait casser le build), dev client Android recompilé depuis `apps/mobile` et app ouverte sur Metro. **Deux pièges d'empreinte découverts** : le `.gitignore` du projet Expo est haché, et c'est très probablement la ligne `docs/emails` du 2026-09-14 qui avait déjà déplacé l'empreinte de `main` sans toucher à l'app (`0b2ae336…` → `87ed987…` ; seul fichier hors code source modifié depuis la mesure du SDK 57) ; et `expo start` recrée un `apps/mobile/.gitignore` absent, d'où son versionnement. Empreinte de `main` : **`c51c5de1…`**, sans effet sur les testeurs puisque les OTA sont gelées jusqu'au prochain build. **Poussée le 2026-09-18** : CI et Web verts, déploiement Vercel de production réussi avec le Root Directory `apps/web`.)
 >
 > Précédemment : **2026-09-15** (**les essais s'importent seuls depuis Wikipedia, et les crons prod repartent**. Aucun fournisseur ne publiant les essais, le cron `sync-tries` lit les encadrés `{{rugbybox}}` de Wikipedia et n'écrit que si le décompte reconstitue le score au point près ; la saisie admin devient le repli. **En prod et audité : 17 matchs de juillet sur 17 identiques à la saisie manuelle.** Le déploiement a révélé que **tous les crons prod étaient en panne depuis le 2026-08-15**, faute du secret Vault `edge_functions_base_url` : corrigé, sans dégât puisqu'aucun match n'a été joué entre-temps, et fixtures rejouées.)
 >
@@ -87,23 +87,21 @@ Le build qu'installeront les testeurs, et celui qui servira aux journées de nov
 
 ## Ce qu'il reste à faire
 
-### 🔶 Réorganisation du dépôt — à pousser (2026-09-15)
+### ✅ Réorganisation du dépôt — poussée et déployée (2026-09-18)
 
 Le dépôt est passé en `apps/mobile` (l'app Expo) + `apps/web` (le site), `supabase/` et `scripts/`
 communs à la racine, un `package.json` racine réservé à l'outillage. Organisation et couplages :
 section « Organisation du dépôt » d'`AGENTS.md`.
 
-- **Au moment du push, dans le dashboard Vercel** : Root Directory `web` → **`apps/web`**. Sans ce
-  réglage, le premier déploiement échoue (le dossier `web/` n'existe plus). L'`installCommand`
-  personnalisée a disparu de `vercel.json` : l'installation par défaut suffit
-- **Déjà fait sur ta machine** : `.env`, `google-services.json`, `node_modules`, `android/` et `ios/`
-  déplacés dans `apps/mobile/`, `npm install` à la racine, `prebuild --clean` Android refait. À
-  refaire côté iOS le jour où on repasse sur le simulateur (`npx expo prebuild --clean -p ios`
-  depuis `apps/mobile`)
-- **Premier passage de la CI** à surveiller après le push : les quatre workflows ont changé de
-  chemins (`ci.yml` installe désormais la racine **et** l'app). La veille des dépendances
-  notifiera une fois : sa signature gagne `racine/vitest@5.0.1` (Vitest est maintenant déclaré à
-  la racine aussi)
+- **Poussée par Corentin le 2026-09-18** : CI et Web verts sur `0b6f2b7` (premier passage des
+  workflows sur les nouveaux chemins), déploiement Vercel de production `success` (statut GitHub
+  du commit) — le Root Directory `apps/web` est donc en place, sans `installCommand`
+  personnalisée. En production : landing FR/EN, rewrite `/rejoindre/<code>` et `assetlinks.json`
+  servis (200)
+- **Reste à constater** : le prochain passage de la veille des dépendances (lundi 2026-09-21)
+  notifiera une fois, sa signature gagnant `racine/vitest@5.0.1` — attendu, pas une régression
+- **iOS** : refaire `npx expo prebuild --clean -p ios` depuis `apps/mobile` le jour où on repasse
+  sur le simulateur (`ios/` contient des chemins absolus de l'ancienne disposition)
 - **Empreinte `c51c5de1…`** : aucune conséquence tant que les OTA restent gelées, le prochain build
   de production la portera. La comparer à ce build avant toute OTA, comme d'habitude
 - Worktree `.claude/worktrees/stoic-dewdney-33788e` et branches `claude/*` : de juillet, antérieurs
@@ -463,6 +461,7 @@ Livré le 2026-07-23 (bis). **Décision : Google seul, pas Apple** — « Sign i
 - Base dev : aucun prono n'a obtenu le **bonus défensif** et aucun match NC n'est à venir → le badge « Défense · écart ≤ 7 » de la result-card et l'indicateur de la carte de prono ne sont pas observables au simulateur (couverts par `breakdown-labels.test.ts`).
 
 ## Journal des sessions
+- **2026-09-18** — **Réorganisation poussée par Corentin** et contrôlée : `CI` et `Web` verts sur `0b6f2b7`, déploiement Vercel de production `success` d'après le statut GitHub du commit (donc Root Directory `apps/web` en place), et en production la landing, `/en/`, le rewrite `/rejoindre/<code>` et `assetlinks.json` répondent 200 (l'AASA reste en 404, faute de Team ID, comme avant). Tableau de bord mis à jour.
 - **2026-09-15 (bis)** — **Réorganisation du dépôt en `apps/`** (`be09280`→`71371d7` et les commits de doc ; rien de poussé). **Demande** : sortir l'app Expo de la racine, où `web/` et `supabase/` s'étaient greffés. **Plan validé** : `apps/mobile` + `apps/web`, `supabase/` à la racine (backend des deux apps, et la CLI le cherche dans le répertoire courant), **pas de workspaces npm** (Expo passerait en mode monorepo : Metro sur tout le dépôt, résolution d'autolinking forcée, pour aucun paquet partagé).
   - **Commits** : deux déplacements purs (renames à 100 %, `git log --follow` intact), puis les corrections : `watchFolders` de Metro sur `supabase/functions/_shared` (le barème partagé est désormais hors du projet Expo), `package.json` racine (Biome, Vitest, `npm run verify`), scripts communs qui lisent `apps/mobile/.env`, `release`/`ota` qui rejouent aussi les vérifications de la racine, CI sur les nouveaux chemins, section « Outillage » dans la veille des dépendances.
   - **Stub tsconfig Expo supprimé** de `web.yml` et `vercel.json` : sans tsconfig à la racine, la découverte de rolldown ne trouve plus rien. Témoin positif : un `tsconfig.json` racine qui étend `expo/tsconfig.base` refait échouer le build (`TSCONFIG_ERROR`). Règle inscrite dans `AGENTS.md` et le skill `trycast-site-web`.
