@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/styles.css">
+  <script src="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/_ds_bundle.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    [data-theme="light"] {
+      --bg: var(--sand-050); --surface: var(--sand-100); --surface-sunken: var(--sand-150);
+      --border: var(--sand-200); --border-strong: var(--sand-300);
+      --text: var(--ink-900); --text-muted: var(--ink-600); --text-faint: var(--ink-400);
+      --brand: var(--green-800); --on-brand: var(--sand-050);
+      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: #FFFFFF;
+      --focus-ring: var(--grenat-500);
+      --shadow-sm: 0 1px 2px rgba(22,19,14,0.06); --shadow-md: 0 4px 14px rgba(22,19,14,0.08); --shadow-lg: 0 12px 32px rgba(22,19,14,0.12);
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-press); text-decoration: underline; }
+  </style>
+</helmet>
+
+<section data-theme="{{ theme }}" data-screen-label="Point double — spec" style="font-family: var(--font-body); background: var(--bg); color: var(--text); padding: 40px; display: flex; flex-direction: column; gap: 28px;">
+
+  <div style="display: flex; flex-direction: column; gap: 10px; max-width: 760px;">
+    <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint);">Point double · spec retenue</span>
+    <h1 style="margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 34px; line-height: 1.05; letter-spacing: 0.01em;">Un ×2 par phase, en vert marque</h1>
+    <p style="margin: 0; font-size: 15px; line-height: 1.55; color: var(--text-muted); text-wrap: pretty;">Bouton ×2 dans la barre de statut de la card prono. Activation par tap sur le bouton, double-tap sur la carte ou appui long (~0,5 s). Quand c'est actif : bordure et glow verts, bouton plein, et un ×2 vert à côté des points de l'issue pronostiquée — les points restent affichés en valeur de base. Le grenat garde son rôle : issue choisie, score exact, points gagnés.</p>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start;">
+    <div style="width: 390px; display: flex; flex-direction: column; gap: 14px;">
+      <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint);">Cards prono · 1 seul ×2 pour la phase</span>
+
+      <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius-md); background: {{ strip.bg }}; border: 1px solid {{ strip.border }};">
+        <span style="font-family: var(--font-display); font-size: 18px; line-height: 1; color: {{ strip.ink }};">×2</span>
+        <span style="flex: 1; font-size: 12.5px; line-height: 1.35; color: var(--text-muted);">{{ strip.text }}</span>
+      </div>
+
+      <sc-for list="{{ cards }}" as="c" hint-placeholder-count="2">
+        <div onDoubleClick="{{ c.onDouble }}" onPointerDown="{{ c.onDown }}" onPointerUp="{{ c.onUp }}" onPointerLeave="{{ c.onUp }}" style="display: flex; flex-direction: column; gap: 14px; padding: 16px; background: var(--surface); border: 1.5px solid {{ c.borderColor }}; border-radius: var(--radius-lg); box-shadow: {{ c.shadow }}; user-select: none; -webkit-user-select: none; cursor: pointer; transition: border-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-faint); white-space: nowrap;">{{ c.date }}</span>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <button type="button" role="switch" onClick="{{ c.onToggle }}" title="{{ c.chipTitle }}" style="display: inline-flex; align-items: center; justify-content: center; height: 26px; min-width: 34px; padding: 0 9px; border-radius: var(--radius-pill); background: {{ c.chipBg }}; border: 1.5px solid {{ c.chipBorder }}; color: {{ c.chipInk }}; font-family: var(--font-display); font-size: 14px; letter-spacing: 0.02em; cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: background var(--dur-fast) var(--ease-out);" style-active="transform: scale(0.94);">×2</button>
+              <span style="display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px; border-radius: var(--radius-pill); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); color: var(--accent); font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;"><span style="width: 5px; height: 5px; border-radius: 50%; background: var(--accent);"></span>{{ c.status }}</span>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; column-gap: 4px; row-gap: 8px;">
+            <span style="text-align: center; font-size: 17px; font-weight: 700; line-height: 1.15;">{{ c.home.name }}</span>
+            <span></span>
+            <span style="text-align: center; font-size: 17px; font-weight: 700; line-height: 1.15;">{{ c.away.name }}</span>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+              <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TeamFlag" abbr="{{ c.home.abbr }}" color="{{ c.home.color }}" size="lg" hint-size="62px,55px"></x-import>
+              <input type="text" readOnly="{{ true }}" aria-label="Score domicile" value="{{ c.sh }}" style="width: 56px; text-align: center; font-family: var(--font-display); font-size: 32px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums; background: var(--surface-sunken); border: 2px solid transparent; border-radius: var(--radius-md); outline: none; padding: 6px 2px;">
+            </div>
+            <span style="font-family: var(--font-display); font-size: 24px; color: var(--text-faint);">–</span>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+              <input type="text" readOnly="{{ true }}" aria-label="Score extérieur" value="{{ c.sa }}" style="width: 56px; text-align: center; font-family: var(--font-display); font-size: 32px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums; background: var(--surface-sunken); border: 2px solid transparent; border-radius: var(--radius-md); outline: none; padding: 6px 2px;">
+              <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TeamFlag" abbr="{{ c.away.abbr }}" color="{{ c.away.color }}" size="lg" hint-size="62px,55px"></x-import>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: auto 1fr auto 1fr auto; align-items: center; gap: 12px;">
+            <span style="justify-self: center; display: flex; flex-direction: column; align-items: center; line-height: 1;">
+              <span style="font-family: var(--font-display); font-size: 16px; color: var(--accent); font-variant-numeric: tabular-nums;">{{ c.bh }}</span>
+              <span style="margin-top: 3px; font-size: 10px; font-weight: 700; color: color-mix(in srgb, var(--accent) 70%, var(--surface)); font-variant-numeric: tabular-nums;">−10</span>
+            </span>
+            <span style="justify-self: center; position: relative; display: inline-block; width: 38px; height: 22px; border-radius: 11px; background: color-mix(in srgb, var(--text) 18%, transparent);"><span style="position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: var(--shadow-sm);"></span></span>
+            <span style="text-align: center; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); white-space: nowrap;">Bonus offensif</span>
+            <span style="justify-self: center; position: relative; display: inline-block; width: 38px; height: 22px; border-radius: 11px; background: color-mix(in srgb, var(--text) 18%, transparent);"><span style="position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: var(--shadow-sm);"></span></span>
+            <span style="justify-self: center; display: flex; flex-direction: column; align-items: center; line-height: 1;">
+              <span style="font-family: var(--font-display); font-size: 16px; color: var(--accent); font-variant-numeric: tabular-nums;">{{ c.ba }}</span>
+              <span style="margin-top: 3px; font-size: 10px; font-weight: 700; color: color-mix(in srgb, var(--accent) 70%, var(--surface)); font-variant-numeric: tabular-nums;">−10</span>
+            </span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; background: {{ c.c1.bg }}; border: 1.5px solid {{ c.c1.border }}; border-radius: var(--radius-sm);">
+                <span style="font-size: 11px; font-weight: 700; color: {{ c.c1.kInk }};">1</span>
+                <span style="display: inline-flex; align-items: baseline; gap: 4px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ c.c1.v }}</span><sc-if value="{{ c.c1.showX2 }}" hint-placeholder-val="{{ false }}"><span style="font-family: var(--font-display); font-size: 13px; line-height: 1; color: var(--brand); letter-spacing: 0.02em;">×2</span></sc-if></span>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; background: {{ c.cN.bg }}; border: 1.5px solid {{ c.cN.border }}; border-radius: var(--radius-sm);">
+                <span style="font-size: 11px; font-weight: 700; color: {{ c.cN.kInk }};">N</span>
+                <span style="display: inline-flex; align-items: baseline; gap: 4px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ c.cN.v }}</span><sc-if value="{{ c.cN.showX2 }}" hint-placeholder-val="{{ false }}"><span style="font-family: var(--font-display); font-size: 13px; line-height: 1; color: var(--brand); letter-spacing: 0.02em;">×2</span></sc-if></span>
+              </div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; background: {{ c.c2.bg }}; border: 1.5px solid {{ c.c2.border }}; border-radius: var(--radius-sm);">
+                <span style="font-size: 11px; font-weight: 700; color: {{ c.c2.kInk }};">2</span>
+                <span style="display: inline-flex; align-items: baseline; gap: 4px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ c.c2.v }}</span><sc-if value="{{ c.c2.showX2 }}" hint-placeholder-val="{{ false }}"><span style="font-family: var(--font-display); font-size: 13px; line-height: 1; color: var(--brand); letter-spacing: 0.02em;">×2</span></sc-if></span>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+              <span style="height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--text) 10%, transparent); overflow: hidden;"><span style="display: block; height: 100%; border-radius: 2px; width: {{ c.pct1 }}; background: {{ c.pct1Color }};"></span></span>
+              <span style="height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--text) 10%, transparent); overflow: hidden;"><span style="display: block; height: 100%; border-radius: 2px; width: {{ c.pctN }}; background: {{ c.pctNColor }};"></span></span>
+              <span style="height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--text) 10%, transparent); overflow: hidden;"><span style="display: block; height: 100%; border-radius: 2px; width: {{ c.pct2 }}; background: {{ c.pct2Color }};"></span></span>
+            </div>
+          </div>
+          <span style="font-size: 11px; font-weight: 600; color: {{ c.hintInk }};">{{ c.hint }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="width: 390px; display: flex; flex-direction: column; gap: 14px;">
+      <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint);">Card résultat · ×2 consommé</span>
+      <div style="display: flex; flex-direction: column; gap: 14px; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+          <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-faint); white-space: nowrap;">16h45</span>
+          <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--success-500) 18%, transparent); color: var(--success-500); font-size: 11px; font-weight: 700;">Bon résultat</span>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="display: inline-flex; align-items: center; justify-content: center; height: 24px; min-width: 32px; padding: 0 9px; border-radius: var(--radius-pill); background: var(--brand); color: var(--on-brand); font-family: var(--font-display); font-size: 13px; letter-spacing: 0.02em;">×2</span>
+            <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);">Terminé</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TeamFlag" abbr="IRL" color="#169B62" size="md" hint-size="46px,41px"></x-import>
+            <span style="flex: 1; font-size: 16px; font-weight: 700;">Irlande</span>
+            <span style="font-family: var(--font-display); font-size: 26px; line-height: 1; font-variant-numeric: tabular-nums;">33</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TeamFlag" abbr="ROU" color="#002B7F" size="md" hint-size="46px,41px"></x-import>
+            <span style="flex: 1; font-size: 16px; font-weight: 600; color: var(--text-muted);">Roumanie</span>
+            <span style="font-family: var(--font-display); font-size: 26px; line-height: 1; color: var(--text-muted); font-variant-numeric: tabular-nums;">20</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-top: 12px; border-top: 1px dashed var(--border);">
+          <div style="display: flex; flex-direction: column; gap: 7px;">
+            <span style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);">Ton prono</span>
+            <span style="align-self: flex-start; padding: 3px 11px; border-radius: var(--radius-pill); background: var(--surface-sunken); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums;">28 – 17</span>
+            <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-muted);"><span style="width: 5px; height: 5px; border-radius: 50%; background: var(--text-faint);"></span>IRL bonus</span>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 18px; border-radius: var(--radius-md); background: color-mix(in srgb, var(--accent) 12%, transparent);">
+            <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted);">Points gagnés<span style="font-family: var(--font-display); font-size: 12px; color: var(--brand); letter-spacing: 0.02em;">×2</span></span>
+            <span style="display: inline-flex; align-items: baseline; gap: 3px; color: var(--accent);"><span style="font-family: var(--font-display); font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums;">+12</span><span style="font-size: 12px; font-weight: 700;">pts</span></span>
+          </div>
+        </div>
+        <span style="align-self: center; font-size: 12.5px; font-weight: 600; color: var(--text-muted);">Voir le détail des points ›</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);">
+        <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);">Règles</span>
+        <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 7px; font-size: 13px; line-height: 1.45; color: var(--text-muted);">
+          <li>1 point double par phase de compétition (poules, quarts, demies, finale).</li>
+          <li>Déplaçable jusqu'au coup d'envoi du match doublé ; verrouillé après.</li>
+          <li>Double le total du match, bonus offensif et pondération de cote comprises.</li>
+          <li>Identité visuelle : vert marque. Le grenat reste réservé à l'issue choisie, au score exact et aux points gagnés.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'light' | 'dark'&quot;}}">
+class Component extends DCLogic {
+  state = { used: 'p1', pressing: null };
+
+  matches() {
+    return [
+      { id: 'p1', date: 'sam. 7 nov. à 16:40', status: 'Enregistré', sh: 12, sa: 3,
+        home: { abbr: 'ECO', name: 'Écosse', color: '#3A6EA5' },
+        away: { abbr: 'NZL', name: 'Nlle-Zélande', color: '#16130E' },
+        bh: '+14', ba: '+5', p1: 82, pN: 360, p2: 19, dist: [34, 8, 58] },
+      { id: 'p2', date: 'sam. 13 févr. à 21:00', status: 'À pronostiquer', sh: 24, sa: 18,
+        home: { abbr: 'FRA', name: 'France', color: '#2C5697' },
+        away: { abbr: 'IRL', name: 'Irlande', color: '#169B62' },
+        bh: '+9', ba: '+11', p1: 41, pN: 280, p2: 66, dist: [57, 16, 27] },
+    ];
+  }
+
+  label(id) {
+    const m = this.matches().find((x) => x.id === id);
+    return m ? m.home.abbr + '–' + m.away.abbr : '';
+  }
+
+  pctColor(v) {
+    const p = Math.max(0, Math.min(100, v));
+    const hue = p < 60 ? (p / 60) * 40 : 40 + ((p - 60) / 40) * 100;
+    return 'hsl(' + hue.toFixed(0) + ' 72% 45%)';
+  }
+
+  renderVals() {
+    const used = this.state.used;
+    const G = 'var(--brand)';
+    const toggle = (id) => { clearTimeout(this._lp); this.setState((s) => ({ used: s.used === id ? null : id, pressing: null })); };
+    const startPress = (id) => {
+      clearTimeout(this._lp);
+      this.setState({ pressing: id });
+      this._lp = setTimeout(() => toggle(id), 480);
+    };
+    const endPress = () => { clearTimeout(this._lp); this.setState({ pressing: null }); };
+
+    return {
+      theme: this.props.theme || 'dark',
+      strip: used
+        ? { bg: 'color-mix(in srgb, var(--brand) 10%, transparent)', border: 'color-mix(in srgb, var(--brand) 32%, transparent)', ink: G, text: 'Point double posé sur ' + this.label(used) + ' · phase de poules' }
+        : { bg: 'var(--surface-sunken)', border: 'var(--border)', ink: 'var(--text-faint)', text: '1 point double disponible pour cette phase' },
+      cards: this.matches().map((m) => {
+        const on = used === m.id;
+        const taken = !!used && !on;
+        const pressing = this.state.pressing === m.id;
+        const outcome = m.sh > m.sa ? '1' : (m.sh < m.sa ? '2' : 'N');
+        const cell = (br, v) => {
+          const sel = br === outcome;
+          return {
+            v,
+            bg: sel ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'var(--surface-sunken)',
+            border: sel ? 'var(--accent)' : 'transparent',
+            kInk: sel ? 'var(--accent)' : 'var(--text-faint)',
+            showX2: sel && on,
+          };
+        };
+        return { ...m,
+          on,
+          c1: cell('1', m.p1), cN: cell('N', m.pN), c2: cell('2', m.p2),
+          borderColor: on ? G : 'var(--border)',
+          shadow: on ? '0 6px 22px color-mix(in srgb, var(--brand) 26%, transparent)' : 'var(--shadow-sm)',
+          chipBg: on ? G : (pressing ? 'color-mix(in srgb, var(--brand) 35%, transparent)' : 'transparent'),
+          chipBorder: on ? G : (taken ? 'var(--border)' : 'color-mix(in srgb, var(--brand) 60%, transparent)'),
+          chipInk: on ? 'var(--on-brand)' : (taken ? 'var(--text-faint)' : G),
+          chipTitle: on ? 'Point double activé — appuie pour retirer' : (taken ? 'Déplacer le point double ici' : 'Activer le point double'),
+          hint: on ? 'Point double actif · double-tape ou appui long pour retirer' : (taken ? 'Double-tape la carte pour déplacer ton ×2 ici' : 'Tape ×2, double-tape la carte ou appui long'),
+          hintInk: on ? G : 'var(--text-faint)',
+          pct1: m.dist[0] + '%', pctN: m.dist[1] + '%', pct2: m.dist[2] + '%',
+          pct1Color: this.pctColor(m.dist[0]), pctNColor: this.pctColor(m.dist[1]), pct2Color: this.pctColor(m.dist[2]),
+          onToggle: () => toggle(m.id),
+          onDouble: () => toggle(m.id),
+          onDown: () => startPress(m.id),
+          onUp: endPress };
+      }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

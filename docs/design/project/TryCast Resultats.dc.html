@@ -232,7 +232,12 @@
                           {{ m.verdictText }}
                         </span>
                       </sc-if>
-                      <span style="font-family: var(--font-body); font-weight: 600; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);">Terminé</span>
+                      <div style="flex: none; display: flex; align-items: center; gap: 6px;">
+                        <sc-if value="{{ m.isDouble }}" hint-placeholder-val="{{ false }}">
+                          <span title="Point double utilisé sur ce match" style="display: inline-flex; align-items: center; justify-content: center; height: 22px; min-width: 30px; padding: 0 8px; border-radius: var(--radius-pill); background: var(--brand); color: var(--on-brand); font-family: var(--font-display); font-size: 12px; letter-spacing: 0.02em;">×2</span>
+                        </sc-if>
+                        <span style="font-family: var(--font-body); font-weight: 600; font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);">Terminé</span>
+                      </div>
                     </div>
 
                     <!-- teams + final score -->
@@ -269,7 +274,7 @@
                           </div>
                           <!-- points (mis en évidence) -->
                           <div style="flex: none; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 8px 16px; border-radius: var(--radius-md); background: {{ m.pointsBg }}; border: {{ m.pointsBorder }};">
-                            <span style="font-family: var(--font-body); font-weight: 700; font-size: 9px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-faint); white-space: nowrap;">Points gagnés</span>
+                            <span style="display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-body); font-weight: 700; font-size: 9px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-faint); white-space: nowrap;">Points gagnés<sc-if value="{{ m.isDouble }}" hint-placeholder-val="{{ false }}"><span style="font-family: var(--font-display); font-size: 12px; letter-spacing: 0.02em; color: var(--brand);">×2</span></sc-if></span>
                             <span style="display: inline-flex; align-items: baseline; gap: 3px;"><span style="font-family: var(--font-display); font-size: 36px; line-height: 1.02; color: {{ m.pointsColor }}; font-variant-numeric: tabular-nums;">{{ m.pointsStr }}</span><span style="font-family: var(--font-body); font-weight: 700; font-size: 13px; color: {{ m.pointsColor }};">{{ m.pointsUnit }}</span></span>
                           </div>
                         </div>
@@ -453,7 +458,7 @@ class Component extends DCLogic {
           { label: 'Bonus offensif · FRA', ok: true, pts: 3 },
           { label: 'Pondération cote (×1,2)', ok: null, pts: 3, weighting: true },
         ] },
-        { id: 'm25_2', home: T.IRL, away: T.ROU, hs: 33, as: 20, time: '16h45', type: 'partial', prono: { h: 28, a: 17 }, bonus: ['IRL'], rows: [
+        { id: 'm25_2', home: T.IRL, away: T.ROU, hs: 33, as: 20, time: '16h45', type: 'partial', double: true, prono: { h: 28, a: 17 }, bonus: ['IRL'], rows: [
           { label: 'Bon vainqueur · IRL', ok: true, pts: 5 },
           { label: 'Score exact', ok: false, pts: 0 },
           { label: 'Bonus offensif · IRL', ok: false, pts: 0 },
@@ -497,7 +502,8 @@ class Component extends DCLogic {
       return 'var(--text-faint)';
     };
     const rowsFor = (m) => m.rows.filter((r) => showW || !r.weighting);
-    const totalFor = (m) => rowsFor(m).reduce((s, r) => s + (r.pts || 0), 0);
+    const baseFor = (m) => rowsFor(m).reduce((s, r) => s + (r.pts || 0), 0);
+    const totalFor = (m) => (m.double ? baseFor(m) * 2 : baseFor(m));
 
     const transform = (fid, m) => {
       const winner = m.hs > m.as ? 'home' : (m.hs < m.as ? 'away' : 'draw');
@@ -520,6 +526,7 @@ class Component extends DCLogic {
         cardShadow: exactSpark ? 'var(--glow-accent)' : 'var(--shadow-sm)',
         predicted,
         notPredicted: !predicted,
+        isDouble: !!m.double,
         pronoStr: m.prono ? (m.prono.h + ' – ' + m.prono.a) : '',
         bonusTags: (m.bonus || []).map((a) => ({ abbr: a, dot: exactSpark ? 'var(--accent)' : 'var(--text-muted)' })),
         hasBonus: (m.bonus || []).length > 0,
@@ -547,6 +554,13 @@ class Component extends DCLogic {
         const valColor = r.accent ? 'var(--accent)' : (r.pts > 0 ? 'var(--text)' : 'var(--text-faint)');
         return { label: r.label, mark, markBg, markColor, markBorder, valStr, valColor };
       });
+      if (m.double) {
+        rows.push({
+          label: 'Point double de la phase',
+          mark: '×2', markBg: 'var(--brand)', markColor: 'var(--on-brand)', markBorder: 'none',
+          valStr: '+' + baseFor(m), valColor: 'var(--brand)',
+        });
+      }
       const exactSpark = m.type === 'exact' && hlExact;
       const bonusTags = (m.bonus || []).map((a) => ({
         label: (T[a] ? T[a].name : a) + ' · bonus offensif',

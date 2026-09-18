@@ -62,7 +62,10 @@
         <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint);">Compétition en cours</span>
         <span style="font-family: var(--font-display); font-size: 27px; line-height: 1.02; letter-spacing: 0.01em; color: var(--text);">{{ competitionName }}</span>
       </div>
-      <span style="flex: none; display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: var(--radius-pill); background: var(--surface-sunken); border: 1px solid var(--border); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); margin-top: 20px; white-space: nowrap;">J2</span>
+      <div style="flex: none; display: flex; align-items: center; gap: 6px; margin-top: 20px;">
+        <span style="display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: var(--radius-pill); background: {{ x2PillBg }}; border: 1px solid {{ x2PillBorder }}; color: {{ x2PillInk }}; font-size: 11px; font-weight: 700; letter-spacing: 0.03em; white-space: nowrap;" title="{{ x2PillTitle }}"><span style="font-family: var(--font-display); font-size: 13px; letter-spacing: 0.02em;">×2</span>{{ x2PillText }}</span>
+        <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: var(--radius-pill); background: var(--surface-sunken); border: 1px solid var(--border); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap;">J2</span>
+      </div>
     </div>
 
     <!-- ================= DEFAULT ================= -->
@@ -140,6 +143,9 @@
                   <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                     <span style="font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint);">Ton prono</span>
                     <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); font-family: var(--font-body); font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums;">{{ m.pronoStr }}</span>
+                    <sc-if value="{{ m.showX2 }}" hint-placeholder-val="{{ false }}">
+                      <span style="display: inline-flex; align-items: center; justify-content: center; height: 22px; min-width: 30px; padding: 0 8px; border-radius: var(--radius-pill); background: var(--brand); color: var(--on-brand); font-family: var(--font-display); font-size: 12px; letter-spacing: 0.02em;">×2</span>
+                    </sc-if>
                     <sc-if value="{{ m.showBonusHome }}" hint-placeholder-val="{{ false }}">
                       <span style="display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: var(--radius-pill); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); color: var(--accent); font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: 0.02em;"><span style="width: 5px; height: 5px; border-radius: 50%; background: var(--accent);"></span>{{ m.home.abbr }} bonus</span>
                     </sc-if>
@@ -168,14 +174,17 @@
               <div style="display: flex; flex-direction: column; gap: 8px;">
                 <!-- editable prediction -->
                 <sc-if value="{{ m.editable }}" hint-placeholder-val="{{ true }}">
-                  <div style="display: flex; flex-direction: column; gap: 14px; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+                  <div onDoubleClick="{{ m.onX2Double }}" onPointerDown="{{ m.onX2Down }}" onPointerUp="{{ m.onX2Up }}" onPointerLeave="{{ m.onX2Up }}" style="display: flex; flex-direction: column; gap: 14px; padding: 16px; background: var(--surface); border: 1.5px solid {{ m.x2Border }}; border-radius: var(--radius-lg); box-shadow: {{ m.x2Shadow }}; user-select: none; -webkit-user-select: none; transition: border-color var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);">
 
                     <!-- kickoff time + status -->
                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
                       <span style="font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-faint);">{{ m.time }}</span>
-                      <span style="flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-pill); background: {{ m.statusBg }}; color: {{ m.statusColor }}; font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap;">
-                        <span style="width: 6px; height: 6px; border-radius: 50%; background: {{ m.statusColor }};"></span>{{ m.statusText }}
-                      </span>
+                      <div style="flex: none; display: flex; align-items: center; gap: 6px;">
+                        <button type="button" role="switch" onClick="{{ m.onX2Toggle }}" title="{{ m.x2Title }}" aria-label="{{ m.x2Title }}" style="display: inline-flex; align-items: center; justify-content: center; height: 26px; min-width: 34px; padding: 0 9px; border-radius: var(--radius-pill); background: {{ m.x2ChipBg }}; border: 1.5px solid {{ m.x2ChipBorder }}; color: {{ m.x2ChipInk }}; font-family: var(--font-display); font-size: 14px; letter-spacing: 0.02em; cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: background var(--dur-fast) var(--ease-out);" style-active="transform: scale(0.94);">×2</button>
+                        <span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-pill); background: {{ m.statusBg }}; color: {{ m.statusColor }}; font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap;">
+                          <span style="width: 6px; height: 6px; border-radius: 50%; background: {{ m.statusColor }};"></span>{{ m.statusText }}
+                        </span>
+                      </div>
                     </div>
 
                     <!-- score row: team name on top, flag+input below -->
@@ -202,7 +211,7 @@
                     <div style="display: grid; grid-template-columns: auto 1fr auto 1fr auto; align-items: center; gap: 12px;">
                       <span style="justify-self: center; display: flex; flex-direction: column; align-items: center; line-height: 1;">
                         <span style="font-family: var(--font-display); font-size: 16px; color: var(--accent); font-variant-numeric: tabular-nums;">+3</span>
-                        <span style="margin-top: 2px; font-family: var(--font-body); font-weight: 600; font-size: 8px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">pts</span>
+                        <span style="margin-top: 3px; font-family: var(--font-body); font-weight: 700; font-size: 10px; letter-spacing: 0.02em; color: color-mix(in srgb, var(--accent) 70%, var(--surface)); font-variant-numeric: tabular-nums;">−10</span>
                       </span>
                       <button type="button" role="switch" aria-label="Bonus offensif domicile" onClick="{{ m.toggleHome }}" style="justify-self: center; display: flex; align-items: center; padding: 2px; background: transparent; border: none; cursor: pointer; -webkit-tap-highlight-color: transparent;">
                         <span style="position: relative; display: inline-block; width: 38px; height: 22px; border-radius: 11px; background: {{ m.homeTrackBg }}; transition: background var(--dur) var(--ease-out);">
@@ -217,25 +226,24 @@
                       </button>
                       <span style="justify-self: center; display: flex; flex-direction: column; align-items: center; line-height: 1;">
                         <span style="font-family: var(--font-display); font-size: 16px; color: var(--accent); font-variant-numeric: tabular-nums;">+3</span>
-                        <span style="margin-top: 2px; font-family: var(--font-body); font-weight: 600; font-size: 8px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">pts</span>
+                        <span style="margin-top: 3px; font-family: var(--font-body); font-weight: 700; font-size: 10px; letter-spacing: 0.02em; color: color-mix(in srgb, var(--accent) 70%, var(--surface)); font-variant-numeric: tabular-nums;">−10</span>
                       </span>
                     </div>
 
                     <!-- potential points · 1 N 2 -->
                     <div style="display: flex; flex-direction: column; gap: 8px;">
-                      <span style="text-align: center; font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">Points potentiels</span>
                       <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
                         <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; background: {{ m.pt1Bg }}; border: 1.5px solid {{ m.pt1Border }}; border-radius: var(--radius-sm);">
                           <span style="font-family: var(--font-body); font-weight: 700; font-size: 11px; color: {{ m.pt1kColor }};">1</span>
-                          <span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ m.pts1 }}</span>
+                          <span style="display: inline-flex; align-items: baseline; gap: 4px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ m.pts1 }}</span><sc-if value="{{ m.x2Cell1 }}" hint-placeholder-val="{{ false }}"><span style="font-family: var(--font-display); font-size: 13px; line-height: 1; color: var(--brand); letter-spacing: 0.02em;">×2</span></sc-if></span>
                         </div>
                         <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; background: {{ m.ptNBg }}; border: 1.5px solid {{ m.ptNBorder }}; border-radius: var(--radius-sm);">
                           <span style="font-family: var(--font-body); font-weight: 700; font-size: 11px; color: {{ m.ptNkColor }};">N</span>
-                          <span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ m.ptsN }}</span>
+                          <span style="display: inline-flex; align-items: baseline; gap: 4px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ m.ptsN }}</span><sc-if value="{{ m.x2CellN }}" hint-placeholder-val="{{ false }}"><span style="font-family: var(--font-display); font-size: 13px; line-height: 1; color: var(--brand); letter-spacing: 0.02em;">×2</span></sc-if></span>
                         </div>
                         <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; background: {{ m.pt2Bg }}; border: 1.5px solid {{ m.pt2Border }}; border-radius: var(--radius-sm);">
                           <span style="font-family: var(--font-body); font-weight: 700; font-size: 11px; color: {{ m.pt2kColor }};">2</span>
-                          <span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ m.pts2 }}</span>
+                          <span style="display: inline-flex; align-items: baseline; gap: 4px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ m.pts2 }}</span><sc-if value="{{ m.x2Cell2 }}" hint-placeholder-val="{{ false }}"><span style="font-family: var(--font-display); font-size: 13px; line-height: 1; color: var(--brand); letter-spacing: 0.02em;">×2</span></sc-if></span>
                         </div>
                       </div>
                       <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
@@ -323,7 +331,21 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light' | 'dark'&quot;},&quot;screenState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;default&quot;,&quot;loading&quot;,&quot;no-league&quot;,&quot;no-matches&quot;],&quot;default&quot;:&quot;default&quot;,&quot;tsType&quot;:&quot;'default' | 'loading' | 'no-league' | 'no-matches'&quot;},&quot;competitionName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Tournoi des 6 Nations 2027&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showGlobalRank&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
 class Component extends DCLogic {
-  state = { preds: null, touched: null, saving: {}, tab: 'matchs' };
+  state = { preds: null, touched: null, saving: {}, tab: 'matchs', x2: 'm2', x2Pressing: null };
+
+  toggleX2(id) {
+    clearTimeout(this._x2lp);
+    this.setState((s) => ({ x2: s.x2 === id ? null : id, x2Pressing: null }));
+  }
+  startX2Press(id) {
+    clearTimeout(this._x2lp);
+    this.setState({ x2Pressing: id });
+    this._x2lp = setTimeout(() => this.toggleX2(id), 480);
+  }
+  endX2Press() {
+    clearTimeout(this._x2lp);
+    if (this.state.x2Pressing) this.setState({ x2Pressing: null });
+  }
 
   ensure() {
     if (this.state.preds) return;
@@ -395,6 +417,7 @@ class Component extends DCLogic {
         showBonusHome: !!value.bonusHome,
         showBonusAway: !!value.bonusAway,
         points: (outc === liveOutc ? 8 : 0) + bonusPts,
+        showX2: this.state.x2 === m.id,
       });
     }));
 
@@ -437,9 +460,27 @@ class Component extends DCLogic {
         const pillBg = (on) => on ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'var(--surface)';
         const pillBorder = (on) => on ? 'var(--accent)' : 'var(--border)';
 
+        const x2On = this.state.x2 === m.id;
+        const x2Taken = !!this.state.x2 && !x2On;
+        const x2Pressing = this.state.x2Pressing === m.id;
+
         return {
           ...m,
           title: m.home.name + ' \u2013 ' + m.away.name,
+          x2On,
+          x2Cell1: x2On && outcome === '1',
+          x2CellN: x2On && outcome === 'N',
+          x2Cell2: x2On && outcome === '2',
+          x2Border: x2On ? 'var(--brand)' : 'var(--border)',
+          x2Shadow: x2On ? '0 6px 22px color-mix(in srgb, var(--brand) 26%, transparent)' : 'var(--shadow-md)',
+          x2ChipBg: x2On ? 'var(--brand)' : (x2Pressing ? 'color-mix(in srgb, var(--brand) 35%, transparent)' : 'transparent'),
+          x2ChipBorder: x2On ? 'var(--brand)' : (x2Taken ? 'var(--border)' : 'color-mix(in srgb, var(--brand) 60%, transparent)'),
+          x2ChipInk: x2On ? 'var(--on-brand)' : (x2Taken ? 'var(--text-faint)' : 'var(--brand)'),
+          x2Title: x2On ? 'Point double activé — appuie pour retirer' : (x2Taken ? 'Déplacer ton point double sur ce match' : 'Activer le point double (1 par phase)'),
+          onX2Toggle: () => this.toggleX2(m.id),
+          onX2Double: () => this.toggleX2(m.id),
+          onX2Down: () => this.startX2Press(m.id),
+          onX2Up: () => this.endX2Press(),
           value,
           displayHome: touched ? value.home : '',
           displayAway: touched ? value.away : '',
@@ -485,6 +526,11 @@ class Component extends DCLogic {
       hasLive: liveMatches.length > 0,
       liveMatches,
       toPredict,
+      x2PillText: this.state.x2 ? 'posé' : 'dispo',
+      x2PillTitle: this.state.x2 ? 'Ton point double est posé sur un match de cette phase' : 'Il te reste ton point double pour cette phase',
+      x2PillBg: this.state.x2 ? 'color-mix(in srgb, var(--brand) 14%, transparent)' : 'var(--surface-sunken)',
+      x2PillBorder: this.state.x2 ? 'color-mix(in srgb, var(--brand) 40%, transparent)' : 'var(--border)',
+      x2PillInk: this.state.x2 ? 'var(--brand)' : 'var(--text-muted)',
       selectAll: (e) => e.target.select(),
       tabItems,
       activeTab: this.state.tab,
