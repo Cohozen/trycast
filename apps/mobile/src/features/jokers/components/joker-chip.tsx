@@ -38,12 +38,13 @@ export function JokerChip({ state, onPress, disabled = false }: JokerChipProps) 
             accessibilityRole="switch"
             accessibilityState={{ checked: state === 'on', disabled: inert }}
             className={cn(
-                // will-change-variable : cf. button.tsx (scale-95 au press)
+                // will-change-variable : cf. button.tsx. Échelle en littéral : scale-95
+                // compile en « 95% », refusé par RN (Render Error au press)
                 'will-change-variable h-[26px] min-w-[34px] items-center justify-center rounded-pill border-[1.5px] px-2',
                 state === 'on' && 'border-brand bg-brand',
                 state === 'available' && 'border-brand/60 bg-transparent',
                 (state === 'movable' || state === 'spent') && 'border-border bg-transparent',
-                pressed && !inert && 'scale-95',
+                pressed && !inert && 'scale-[0.94]',
                 disabled && 'opacity-45',
             )}
             disabled={inert}
