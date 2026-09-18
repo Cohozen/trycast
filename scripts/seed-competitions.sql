@@ -34,3 +34,23 @@ on conflict (slug) do update set
   ends_on = excluded.ends_on,
   is_active = excluded.is_active,
   wikipedia_pages = excluded.wikipedia_pages;
+
+-- Phases de compétition (joker par phase, 2026-09-18) : fenêtres de dates
+-- [starts_at, ends_at), la phase d'un match se déduit de son kickoff. Un joker
+-- par phase. Dates NC relevées sur Wikipedia le 2026-09-18 : juillet 4-18,
+-- novembre 6-21, finales 27-29 novembre (Twickenham). Les bornes laissent de
+-- la marge pour un report, sans jamais se chevaucher (contrainte d'exclusion).
+insert into public.competition_phases (competition_id, key, name, starts_at, ends_at, sort)
+select c.id, v.key, v.name, v.starts_at::timestamptz, v.ends_at::timestamptz, v.sort
+from public.competitions c
+join (values
+  ('nc-2026', 'july_window', 'Fenêtre de juillet', '2026-06-01', '2026-08-15', 1),
+  ('nc-2026', 'november_window', 'Fenêtre de novembre', '2026-10-15', '2026-11-25', 2),
+  ('nc-2026', 'finals', 'Finales', '2026-11-25', '2026-12-20', 3),
+  ('six-nations-2027', 'tournament', 'Tournoi', '2027-01-15', '2027-04-01', 1)
+) as v (slug, key, name, starts_at, ends_at, sort) on v.slug = c.slug
+on conflict (competition_id, key) do update set
+  name = excluded.name,
+  starts_at = excluded.starts_at,
+  ends_at = excluded.ends_at,
+  sort = excluded.sort;

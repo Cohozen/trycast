@@ -8,6 +8,44 @@ export type Database = {
     };
     public: {
         Tables: {
+            competition_phases: {
+                Row: {
+                    competition_id: string;
+                    ends_at: string;
+                    id: string;
+                    key: string;
+                    name: string;
+                    sort: number;
+                    starts_at: string;
+                };
+                Insert: {
+                    competition_id: string;
+                    ends_at: string;
+                    id?: string;
+                    key: string;
+                    name: string;
+                    sort?: number;
+                    starts_at: string;
+                };
+                Update: {
+                    competition_id?: string;
+                    ends_at?: string;
+                    id?: string;
+                    key?: string;
+                    name?: string;
+                    sort?: number;
+                    starts_at?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'competition_phases_competition_id_fkey';
+                        columns: ['competition_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'competitions';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             competitions: {
                 Row: {
                     api_league_id: number;
@@ -374,6 +412,49 @@ export type Database = {
                     },
                 ];
             };
+            phase_jokers: {
+                Row: {
+                    match_id: string;
+                    phase_id: string;
+                    updated_at: string;
+                    user_id: string;
+                };
+                Insert: {
+                    match_id: string;
+                    phase_id: string;
+                    updated_at?: string;
+                    user_id: string;
+                };
+                Update: {
+                    match_id?: string;
+                    phase_id?: string;
+                    updated_at?: string;
+                    user_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'phase_jokers_match_id_fkey';
+                        columns: ['match_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'matches';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'phase_jokers_phase_id_fkey';
+                        columns: ['phase_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'competition_phases';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'phase_jokers_user_id_fkey';
+                        columns: ['user_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'profiles';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             predictions: {
                 Row: {
                     created_at: string;
@@ -730,6 +811,7 @@ export type Database = {
                     isSetofReturn: false;
                 };
             };
+            clear_phase_joker: { Args: { p_phase_id: string }; Returns: undefined };
             create_league: {
                 Args: { p_color?: string; p_name: string };
                 Returns: {
@@ -788,6 +870,7 @@ export type Database = {
                 Args: { p_league_id: string; p_match_id: string };
                 Returns: {
                     avatar_url: string;
+                    is_joker: boolean;
                     points_awarded: number;
                     predicted_away_score: number;
                     predicted_bonus_off_away: boolean;
@@ -851,6 +934,7 @@ export type Database = {
                 };
             };
             join_waitlist: { Args: { email: string }; Returns: undefined };
+            match_phase_id: { Args: { p_match_id: string }; Returns: string };
             notify_reminder_targets: {
                 Args: never;
                 Returns: {
@@ -904,6 +988,7 @@ export type Database = {
                 Args: { p_platform: string; p_token: string };
                 Returns: undefined;
             };
+            set_phase_joker: { Args: { p_match_id: string }; Returns: string };
             transfer_league_ownership: {
                 Args: { p_league_id: string; p_new_owner_id: string };
                 Returns: {
