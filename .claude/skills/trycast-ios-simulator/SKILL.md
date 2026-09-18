@@ -84,6 +84,13 @@ Après chaque interaction : `sleep 1-2` puis vérifier (screenshot ou describe-u
 
 ## Pièges connus (vécus)
 
+- **AXe cassé depuis Xcode 27** (vécu le 2026-09-18) : toute commande `axe` échoue en
+  `Failed to load essential private frameworks … Developer/Library/PrivateFrameworks/SimulatorKit.framework`
+  — Xcode 27 a déplacé SimulatorKit dans `Contents/SharedFrameworks`. En attendant une version
+  d'AXe compatible, piloter par l'**outil simulateur intégré** de Claude Code
+  (`mcp__Claude_Code_iOS_Simulator__control` : `screenshot`, `tap` avec `duration` pour un appui
+  long, `swipe`, `inspect`), en points logiques comme AXe. `simctl` (screenshot, openurl) marche toujours.
+
 - **`npm run ios` réclame un certificat de signature** (« No code signing certificates are
   available ») depuis que l'app déclare ses liens d'invitation (`associatedDomains`, 2026-09-09).
   Pas de Team ID, donc pas de `expo run:ios` : compiler avec `xcodebuild` en direct, puis
