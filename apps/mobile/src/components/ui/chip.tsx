@@ -30,12 +30,13 @@ export function Chip({
             accessibilityRole="button"
             accessibilityState={{ selected, disabled }}
             className={cn(
-                // will-change-variable : cf. button.tsx (scale-95 au press)
+                // will-change-variable : cf. button.tsx. Échelle en littéral : scale-95
+                // compile en « 95% », refusé par RN (Render Error au press)
                 'will-change-variable h-[34px] flex-row items-center gap-1.5 rounded-pill px-3.5',
                 selected
                     ? 'border-[1.5px] border-transparent bg-accent'
                     : 'border-[1.5px] border-border-strong bg-transparent',
-                pressed && !disabled && 'scale-95',
+                pressed && !disabled && 'scale-[0.95]',
                 disabled && 'opacity-45',
             )}
             disabled={disabled}
