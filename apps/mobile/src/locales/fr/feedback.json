@@ -1,0 +1,16 @@
+{
+    "button": "Signaler un problème",
+    "title": "Signaler un problème",
+    "intro": "Un bug, un affichage bizarre, une idée ? Décris ce qui s'est passé, on s'en occupe.",
+    "label": "Ton message",
+    "placeholder": "Ce que tu faisais, ce que tu attendais, ce qui s'est passé…",
+    "counter": "{{count}} / {{max}}",
+    "attachEmail": "Joindre mon e-mail pour qu'on puisse te répondre",
+    "technicalInfo": "Infos techniques jointes : l'écran ouvert, la version de l'app et de ton système. Rien d'autre.",
+    "send": "Envoyer",
+    "sent": "Merci ! Ton signalement est bien parti.",
+    "validation": {
+        "tooShort": "Quelques mots de plus, s'il te plaît (10 caractères minimum).",
+        "tooLong": "Message trop long (2 000 caractères maximum)."
+    }
+}

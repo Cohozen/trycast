@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/react-native';
 import * as Updates from 'expo-updates';
 
+import { noteErrorEvent } from '@/features/feedback/recent-error';
 import { isTelemetryEnabled } from '@/features/privacy/telemetry-state';
 
 /**
@@ -41,7 +42,13 @@ export function initDiagnostics(): void {
         // Le fil d'Ariane aide à reconstituer le chemin jusqu'au plantage ;
         // il ne contient que des noms d'écrans et des appels réseau.
         enableAutoPerformanceTracing: false,
-        beforeSend: (event) => (isTelemetryEnabled('diagnostics') ? event : null),
+        beforeSend: (event) => {
+            if (!isTelemetryEnabled('diagnostics')) return null;
+            // Retenue pour relier un signalement envoyé juste après à cette
+            // erreur (`associatedEventId`, cf. features/feedback).
+            noteErrorEvent(event.event_id);
+            return event;
+        },
         beforeBreadcrumb: (breadcrumb) => (isTelemetryEnabled('diagnostics') ? breadcrumb : null),
     });
 }

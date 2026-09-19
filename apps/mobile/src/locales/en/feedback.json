@@ -1,0 +1,16 @@
+{
+    "button": "Report a problem",
+    "title": "Report a problem",
+    "intro": "A bug, something that looks off, an idea? Tell us what happened and we'll look into it.",
+    "label": "Your message",
+    "placeholder": "What you were doing, what you expected, what happened…",
+    "counter": "{{count}} / {{max}}",
+    "attachEmail": "Include my email so we can reply",
+    "technicalInfo": "Technical details included: the open screen, the app version and your OS version. Nothing else.",
+    "send": "Send",
+    "sent": "Thanks! Your report is on its way.",
+    "validation": {
+        "tooShort": "A few more words, please (10 characters minimum).",
+        "tooLong": "Message too long (2,000 characters maximum)."
+    }
+}
