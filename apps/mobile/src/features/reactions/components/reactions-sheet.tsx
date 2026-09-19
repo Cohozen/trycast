@@ -122,7 +122,9 @@ export function ReactionsSheet({
                         ))}
                     </ScrollView>
 
-                    <ScrollView className="px-[18px]" style={{ maxHeight: window.height * 0.45 }}>
+                    <ScrollView
+                        contentContainerClassName="px-[18px]"
+                        style={{ maxHeight: window.height * 0.45 }}>
                         {reactors.isPending ? (
                             <View className="gap-2 py-1">
                                 <Skeleton className="h-10" variant="block" />
