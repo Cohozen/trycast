@@ -1,0 +1,36 @@
+{
+    "labels": {
+        "bravo": "Bravo",
+        "lucky": "Lucky",
+        "bold": "Bold",
+        "laugh": "LOL"
+    },
+    "trigger": "React to {{username}}’s prediction",
+    "picker": {
+        "label": "Pick a reaction",
+        "react": "React: {{label}}"
+    },
+    "summary": {
+        "open": "See reactions to {{username}}’s prediction",
+        "chip": "{{label}}: {{value}}"
+    },
+    "sheet": {
+        "title": "Reactions",
+        "subtitle_one": "{{username}} · {{count}} reaction",
+        "subtitle_other": "{{username}} · {{count}} reactions",
+        "all": "All",
+        "allLabel": "All reactions",
+        "filterLabel": "{{label}}, {{value}}",
+        "formerMember": "Former member",
+        "formerMemberNote": "Left the league",
+        "you": "{{username}} (you)",
+        "error": "Reactions could not be loaded."
+    },
+    "footer": "Reactions stay within this league.",
+    "errors": {
+        "notStarted": "The match hasn’t started yet: predictions are still secret.",
+        "noPrediction": "This member didn’t predict this match.",
+        "notMember": "This prediction is no longer in your league.",
+        "failed": "Your reaction couldn’t be saved. Try again."
+    }
+}

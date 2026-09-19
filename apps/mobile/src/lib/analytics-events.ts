@@ -43,6 +43,19 @@ export type AnalyticsEvent =
      * autre (`moved`) ou retiré (`cleared`). Jamais le match ni la phase.
      */
     | { name: 'joker_changed'; props: { action: 'set' | 'moved' | 'cleared' } }
+    /**
+     * Ma réaction au prono d'un membre a bougé : posée (`set`), remplacée
+     * (`changed`) ou retirée (`cleared`, avec la réaction retirée). Littéraux
+     * de `features/reactions/reactions.ts` ; jamais la ligue, le match ni la
+     * personne visée.
+     */
+    | {
+          name: 'reaction_changed';
+          props: {
+              action: 'set' | 'changed' | 'cleared';
+              reaction: 'bravo' | 'lucky' | 'bold' | 'laugh';
+          };
+      }
     /** Une ligue a été créée. */
     | { name: 'league_created' }
     /**

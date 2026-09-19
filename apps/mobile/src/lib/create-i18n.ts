@@ -11,6 +11,7 @@ import matchesEn from '@/locales/en/matches.json';
 import notificationsEn from '@/locales/en/notifications.json';
 import predictionsEn from '@/locales/en/predictions.json';
 import profileEn from '@/locales/en/profile.json';
+import reactionsEn from '@/locales/en/reactions.json';
 import scoringEn from '@/locales/en/scoring.json';
 import welcomeEn from '@/locales/en/welcome.json';
 import auth from '@/locales/fr/auth.json';
@@ -23,6 +24,7 @@ import matches from '@/locales/fr/matches.json';
 import notifications from '@/locales/fr/notifications.json';
 import predictions from '@/locales/fr/predictions.json';
 import profile from '@/locales/fr/profile.json';
+import reactions from '@/locales/fr/reactions.json';
 import scoring from '@/locales/fr/scoring.json';
 import welcome from '@/locales/fr/welcome.json';
 
@@ -40,6 +42,7 @@ export const resources = {
         matches,
         predictions,
         jokers,
+        reactions,
         leagues,
         profile,
         scoring,
@@ -54,6 +57,7 @@ export const resources = {
         matches: matchesEn,
         predictions: predictionsEn,
         jokers: jokersEn,
+        reactions: reactionsEn,
         leagues: leaguesEn,
         profile: profileEn,
         scoring: scoringEn,

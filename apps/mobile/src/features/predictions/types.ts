@@ -28,6 +28,11 @@ export type DistributionsByMatch = Map<string, PredictionDistribution>;
 /**
  * Prono d'un membre de ligue pour un match (RPC get_match_league_predictions,
  * uniquement après kickoff). Scores null = membre sans prono (ligne « — »).
+ * `reactions` : compteurs par clé (jsonb, à lire par parseReactionCounts) ;
+ * `my_reaction` : ma réaction à ce prono, null sans réaction — le typegen
+ * déclare non-nullables toutes les colonnes d'une RPC, d'où la correction.
  */
-export type MemberPrediction =
-    Database['public']['Functions']['get_match_league_predictions']['Returns'][number];
+export type MemberPrediction = Omit<
+    Database['public']['Functions']['get_match_league_predictions']['Returns'][number],
+    'my_reaction'
+> & { my_reaction: string | null };

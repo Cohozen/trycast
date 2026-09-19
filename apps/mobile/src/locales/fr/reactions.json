@@ -1,0 +1,36 @@
+{
+    "labels": {
+        "bravo": "Bravo",
+        "lucky": "Chanceux",
+        "bold": "Culotté",
+        "laugh": "Mort de rire"
+    },
+    "trigger": "Réagir au prono de {{username}}",
+    "picker": {
+        "label": "Choisir une réaction",
+        "react": "Réagir : {{label}}"
+    },
+    "summary": {
+        "open": "Voir les réactions au prono de {{username}}",
+        "chip": "{{label}} : {{value}}"
+    },
+    "sheet": {
+        "title": "Réactions",
+        "subtitle_one": "{{username}} · {{count}} réaction",
+        "subtitle_other": "{{username}} · {{count}} réactions",
+        "all": "Toutes",
+        "allLabel": "Toutes les réactions",
+        "filterLabel": "{{label}}, {{value}}",
+        "formerMember": "Ancien membre",
+        "formerMemberNote": "A quitté la ligue",
+        "you": "{{username}} (toi)",
+        "error": "Les réactions n’ont pas pu être chargées."
+    },
+    "footer": "Les réactions sont propres à cette ligue.",
+    "errors": {
+        "notStarted": "Le match n’a pas encore commencé : les pronos sont secrets.",
+        "noPrediction": "Ce membre n’a pas pronostiqué ce match.",
+        "notMember": "Ce prono n’est plus dans ta ligue.",
+        "failed": "Ta réaction n’a pas pu être enregistrée. Réessaie."
+    }
+}

@@ -75,6 +75,20 @@ describe('le catalogue interdit les données personnelles à la compilation', ()
         expect(event.name).toBe('league_invite_shared');
     });
 
+    it('refuse une réaction hors des quatre clés, et la personne visée', () => {
+        const unknown: AnalyticsEvent = {
+            name: 'reaction_changed',
+            // @ts-expect-error — seules les clés de REACTIONS sont admises
+            props: { action: 'set', reaction: '🔥' },
+        };
+        const targeted: AnalyticsEvent = {
+            name: 'reaction_changed',
+            // @ts-expect-error — la personne visée identifierait un membre
+            props: { action: 'set', reaction: 'bravo', target: 'TestUser2' },
+        };
+        expect([unknown.name, targeted.name]).toEqual(['reaction_changed', 'reaction_changed']);
+    });
+
     it("refuse un nom d'événement inventé", () => {
         // @ts-expect-error — le nom doit venir du catalogue
         const event: AnalyticsEvent = { name: 'user_email_captured' };

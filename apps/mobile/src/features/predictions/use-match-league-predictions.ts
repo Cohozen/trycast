@@ -7,9 +7,10 @@ import { supabase } from '@/lib/supabase';
  * Pronos des membres d'une ligue pour un match, via la RPC security definer
  * `get_match_league_predictions` — seule porte vers les lignes des autres,
  * et elle ne renvoie rien avant le kickoff. `kickoffPassed` évite l'appel
- * garanti vide en phase « masquée » ; pas d'invalidation nécessaire (les
- * pronos sont immuables après kickoff, RLS), staleTime court pour laisser
- * arriver les points au scoring.
+ * garanti vide en phase « masquée ». Les pronos sont immuables après
+ * kickoff (RLS), mais la liste porte aussi les réactions : useSetReaction la
+ * met à jour de façon optimiste puis l'invalide. staleTime court pour laisser
+ * arriver les points au scoring et les réactions des autres.
  */
 export function useMatchLeaguePredictions(
     matchId: string | undefined,
