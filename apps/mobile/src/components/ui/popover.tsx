@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useState } from 'react';
-import { Modal, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
+import { type LayoutChangeEvent, Modal, Pressable, StyleSheet } from 'react-native';
 import Animated, {
     Easing,
     runOnJS,
@@ -40,6 +40,20 @@ const EDGE = 16;
 /** En dessous de cette place au-dessus de l'ancre, le popover s'ouvre vers le bas. */
 const FLIP_THRESHOLD = 76;
 
+type Size = { width: number; height: number };
+
+/**
+ * Taille arrondie au pixel, et null si elle n'a pas bougé d'au moins un pixel :
+ * les variations sous le pixel (arrondi de la mise en page selon la position)
+ * ne doivent pas relancer un rendu.
+ */
+function nextSize(previous: Size | null, event: LayoutChangeEvent): Size | null {
+    const width = Math.round(event.nativeEvent.layout.width);
+    const height = Math.round(event.nativeEvent.layout.height);
+    if (previous && previous.width === width && previous.height === height) return null;
+    return { width, height };
+}
+
 /**
  * Popover ancré à un élément, avec flèche (sélecteur de réactions…). Modal RN
  * transparent comme `Select` : un overlay en zIndex se ferait clipper par les
@@ -51,6 +65,13 @@ const FLIP_THRESHOLD = 76;
  * et passe le rectangle : pas d'effet de mesure ici. Le popover reste monté le
  * temps de sa sortie, comme `BottomSheet`, et « réduire les animations » le
  * fait apparaître et disparaître sans translation ni échelle.
+ *
+ * Au-dessus de l'ancre, le popover est placé par son BAS (`bottom`), jamais par
+ * `top = ancre − hauteur mesurée` : cette forme bouclait (vécu le 2026-09-19).
+ * Déplacer la vue changeait l'arrondi au pixel de sa hauteur, donc sa position,
+ * donc de nouveau sa hauteur — un tremblement d'1 à 2 px à chaque image, filmé
+ * au simulateur. La position ne dépend plus de la taille du popover, seulement
+ * de celle de l'écran du Modal, qui ne bouge pas.
  */
 export function Popover({
     anchor,
@@ -60,7 +81,6 @@ export function Popover({
     accessibilityLabel,
     className,
 }: PopoverProps) {
-    const window = useWindowDimensions();
     const insets = useSafeAreaInsets();
     const reduce = useReducedMotion();
 
@@ -72,7 +92,9 @@ export function Popover({
     }
     // Taille mesurée du contenu : l'entrée n'est jouée qu'une fois connue,
     // sinon la première image serait mal placée.
-    const [size, setSize] = useState<{ width: number; height: number } | null>(null);
+    const [size, setSize] = useState<Size | null>(null);
+    // Taille de l'écran du Modal, référentiel de `bottom` et de la butée droite.
+    const [screen, setScreen] = useState<Size | null>(null);
     // Fermé avant d'avoir été mesuré : rien n'a été montré, rien à animer.
     if (!anchor && shown && !size) {
         setShown(null);
@@ -82,7 +104,7 @@ export function Popover({
     // Miroir de l'état voulu sur le thread UI (cf. BottomSheet : react-compiler
     // interdit de muter ailleurs une shared value lue par un effet).
     const target = useSharedValue(0);
-    const open = anchor !== null && size !== null;
+    const open = anchor !== null && size !== null && screen !== null;
     useEffect(() => {
         target.value = open ? 1 : 0;
     }, [open, target]);
@@ -121,9 +143,12 @@ export function Popover({
     if (!shown) return null;
 
     const width = size?.width ?? 0;
-    const height = size?.height ?? 0;
-    const left = Math.min(Math.max(shown.x + offsetX, EDGE), window.width - EDGE - width);
-    const top = below ? shown.y + shown.height - OVERLAP : shown.y + OVERLAP - height;
+    const left = screen
+        ? Math.min(Math.max(shown.x + offsetX, EDGE), screen.width - EDGE - width)
+        : shown.x + offsetX;
+    const vertical = below
+        ? { top: shown.y + shown.height - OVERLAP }
+        : { bottom: (screen?.height ?? 0) - shown.y - OVERLAP };
 
     return (
         <Modal
@@ -135,21 +160,26 @@ export function Popover({
             visible>
             {/* Scrim invisible sans rôle : la fermeture accessible passe par
              * onRequestClose (cf. Select) */}
-            <Pressable onPress={onClose} style={StyleSheet.absoluteFill} />
+            <Pressable
+                onLayout={(event) => {
+                    const next = nextSize(screen, event);
+                    if (next) setScreen(next);
+                }}
+                onPress={onClose}
+                style={StyleSheet.absoluteFill}
+            />
             <Animated.View
                 accessibilityLabel={accessibilityLabel}
                 accessibilityViewIsModal
                 onLayout={(event) => {
-                    const layout = event.nativeEvent.layout;
-                    if (!size || size.width !== layout.width || size.height !== layout.height) {
-                        setSize({ width: layout.width, height: layout.height });
-                    }
+                    const next = nextSize(size, event);
+                    if (next) setSize(next);
                 }}
                 style={[
                     styles.panel,
                     {
                         left,
-                        top,
+                        ...vertical,
                         // L'échelle part de la pointe de la flèche, côté ancre
                         transformOrigin: `${ARROW_LEFT + ARROW_SIZE / 2}px ${below ? '0%' : '100%'}`,
                     },
