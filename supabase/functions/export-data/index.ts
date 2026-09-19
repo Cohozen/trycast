@@ -33,24 +33,45 @@ Deno.serve(async (req: Request) => {
 
     // Chaque bloc est filtré sur l'utilisateur. Les jetons push sont un secret
     // d'appareil : on n'exporte que la plateforme et les dates, jamais la valeur.
-    const [profile, predictions, memberships, ownedLeagues, standings, prefs, consents, devices] =
-        await Promise.all([
-            admin.from('profiles').select('*').eq('id', uid).maybeSingle(),
-            admin.from('predictions').select('*').eq('user_id', uid),
-            admin.from('league_members').select('*').eq('user_id', uid),
-            admin
-                .from('leagues')
-                .select('id, name, color, invite_code, created_at')
-                .eq('owner_id', uid),
-            admin.from('standings').select('*').eq('user_id', uid),
-            admin.from('notification_prefs').select('*').eq('user_id', uid).maybeSingle(),
-            admin
-                .from('consents')
-                .select('*')
-                .eq('user_id', uid)
-                .order('created_at', { ascending: true }),
-            admin.from('push_tokens').select('platform, created_at, updated_at').eq('user_id', uid),
-        ]);
+    // Réactions reçues : sans l'auteur, qui est la donnée d'un autre membre.
+    const [
+        profile,
+        predictions,
+        jokers,
+        reactionsGiven,
+        reactionsReceived,
+        memberships,
+        ownedLeagues,
+        standings,
+        prefs,
+        consents,
+        devices,
+    ] = await Promise.all([
+        admin.from('profiles').select('*').eq('id', uid).maybeSingle(),
+        admin.from('predictions').select('*').eq('user_id', uid),
+        admin.from('phase_jokers').select('phase_id, match_id, updated_at').eq('user_id', uid),
+        admin
+            .from('prediction_reactions')
+            .select('league_id, match_id, target_user_id, reaction, created_at, updated_at')
+            .eq('reactor_id', uid),
+        admin
+            .from('prediction_reactions')
+            .select('league_id, match_id, reaction, created_at')
+            .eq('target_user_id', uid),
+        admin.from('league_members').select('*').eq('user_id', uid),
+        admin
+            .from('leagues')
+            .select('id, name, color, invite_code, created_at')
+            .eq('owner_id', uid),
+        admin.from('standings').select('*').eq('user_id', uid),
+        admin.from('notification_prefs').select('*').eq('user_id', uid).maybeSingle(),
+        admin
+            .from('consents')
+            .select('*')
+            .eq('user_id', uid)
+            .order('created_at', { ascending: true }),
+        admin.from('push_tokens').select('platform, created_at, updated_at').eq('user_id', uid),
+    ]);
 
     const payload = {
         exported_at: new Date().toISOString(),
@@ -61,6 +82,9 @@ Deno.serve(async (req: Request) => {
         },
         profile: profile.data ?? null,
         predictions: predictions.data ?? [],
+        phase_jokers: jokers.data ?? [],
+        reactions_given: reactionsGiven.data ?? [],
+        reactions_received: reactionsReceived.data ?? [],
         league_memberships: memberships.data ?? [],
         owned_leagues: ownedLeagues.data ?? [],
         standings: standings.data ?? [],
