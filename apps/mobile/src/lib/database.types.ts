@@ -455,6 +455,65 @@ export type Database = {
                     },
                 ];
             };
+            prediction_reactions: {
+                Row: {
+                    created_at: string;
+                    league_id: string;
+                    match_id: string;
+                    reaction: string;
+                    reactor_id: string;
+                    target_user_id: string;
+                    updated_at: string;
+                };
+                Insert: {
+                    created_at?: string;
+                    league_id: string;
+                    match_id: string;
+                    reaction: string;
+                    reactor_id: string;
+                    target_user_id: string;
+                    updated_at?: string;
+                };
+                Update: {
+                    created_at?: string;
+                    league_id?: string;
+                    match_id?: string;
+                    reaction?: string;
+                    reactor_id?: string;
+                    target_user_id?: string;
+                    updated_at?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'prediction_reactions_league_id_fkey';
+                        columns: ['league_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'leagues';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'prediction_reactions_match_id_fkey';
+                        columns: ['match_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'matches';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'prediction_reactions_reactor_id_fkey';
+                        columns: ['reactor_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'profiles';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'prediction_reactions_target_user_id_fkey';
+                        columns: ['target_user_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'profiles';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             predictions: {
                 Row: {
                     created_at: string;
@@ -812,6 +871,14 @@ export type Database = {
                 };
             };
             clear_phase_joker: { Args: { p_phase_id: string }; Returns: undefined };
+            clear_prediction_reaction: {
+                Args: {
+                    p_league_id: string;
+                    p_match_id: string;
+                    p_target_user_id: string;
+                };
+                Returns: undefined;
+            };
             create_league: {
                 Args: { p_color?: string; p_name: string };
                 Returns: {
@@ -871,11 +938,13 @@ export type Database = {
                 Returns: {
                     avatar_url: string;
                     is_joker: boolean;
+                    my_reaction: string;
                     points_awarded: number;
                     predicted_away_score: number;
                     predicted_bonus_off_away: boolean;
                     predicted_bonus_off_home: boolean;
                     predicted_home_score: number;
+                    reactions: Json;
                     user_id: string;
                     username: string;
                 }[];
@@ -887,6 +956,20 @@ export type Database = {
                     draw_count: number;
                     home_count: number;
                     match_id: string;
+                }[];
+            };
+            get_prediction_reactors: {
+                Args: {
+                    p_league_id: string;
+                    p_match_id: string;
+                    p_target_user_id: string;
+                };
+                Returns: {
+                    avatar_url: string;
+                    is_member: boolean;
+                    reaction: string;
+                    user_id: string;
+                    username: string;
                 }[];
             };
             get_user_predictions: {
@@ -989,6 +1072,15 @@ export type Database = {
                 Returns: undefined;
             };
             set_phase_joker: { Args: { p_match_id: string }; Returns: string };
+            set_prediction_reaction: {
+                Args: {
+                    p_league_id: string;
+                    p_match_id: string;
+                    p_reaction: string;
+                    p_target_user_id: string;
+                };
+                Returns: undefined;
+            };
             transfer_league_ownership: {
                 Args: { p_league_id: string; p_new_owner_id: string };
                 Returns: {
