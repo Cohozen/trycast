@@ -9,6 +9,7 @@ import { Screen } from '@/components/ui/screen';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Select } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/components/ui/toast-provider';
 import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { useSession } from '@/features/auth/session-context';
 import { LeaderboardRow } from '@/features/leagues/components/leaderboard-row';
@@ -28,6 +29,11 @@ import { useMatchLeaguePredictions } from '@/features/predictions/use-match-leag
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
 import { useMyJokers } from '@/features/jokers/use-my-jokers';
 import { useOpenPlayerProfile } from '@/features/profile/use-open-player-profile';
+import { ReactionsSheet } from '@/features/reactions/components/reactions-sheet';
+import { toReactionMessageKey } from '@/features/reactions/errors';
+import { parseReactionCounts } from '@/features/reactions/reactions';
+import type { ReactionsTarget } from '@/features/reactions/types';
+import { useSetReaction } from '@/features/reactions/use-set-reaction';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 
 type LeagueView = 'predictions' | 'leaderboard';
@@ -40,7 +46,14 @@ type LeagueView = 'predictions' | 'leaderboard';
  * qu'après le kickoff (garanti serveur par la RPC, le client n'est qu'une UX).
  */
 export default function MatchScreen() {
-    const { t } = useTranslation(['matches', 'predictions', 'leagues', 'scoring', 'common']);
+    const { t } = useTranslation([
+        'matches',
+        'predictions',
+        'leagues',
+        'scoring',
+        'reactions',
+        'common',
+    ]);
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const { session } = useSession();
@@ -77,6 +90,10 @@ export default function MatchScreen() {
         kickoffPassed,
     );
     const leagueBoard = useLeagueLeaderboard(view === 'leaderboard' ? currentLeagueId : undefined);
+    const setReaction = useSetReaction(currentLeagueId, id);
+    const toast = useToast();
+    // Prono dont la sheet des réactions est ouverte (une seule sheet pour la liste)
+    const [reactionsTarget, setReactionsTarget] = useState<ReactionsTarget | null>(null);
 
     const refreshControl = usePullToRefresh(() =>
         Promise.all([
@@ -133,164 +150,223 @@ export default function MatchScreen() {
     // Le hero (score/live + cotes) reste épinglé pendant le scroll :
     // stickyHeaderIndices={[0]} → MatchHero, enfant direct d'index 0 du
     // ScrollView de Screen, avec un fond opaque (cf. MatchHero).
-    return (
-        <Screen
-            contentClassName="gap-5 px-6"
-            refreshControl={refreshControl}
-            stickyHeaderIndices={[0]}
-            top="none">
-            <MatchHero match={currentMatch} />
+    const reactionsEntry = leaguePredictions.data?.find(
+        (entry) => entry.user_id === reactionsTarget?.userId,
+    );
 
-            {/* Mon prono, selon la phase */}
-            <View className="gap-3">
-                <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
-                    {t('predictions:reconciliation.yourProno')}
-                </Text>
-                {phase === 'upcoming' && userId ? (
-                    <View className="gap-2.5">
-                        <PredictionCard
+    return (
+        <>
+            <Screen
+                contentClassName="gap-5 px-6"
+                refreshControl={refreshControl}
+                stickyHeaderIndices={[0]}
+                top="none">
+                <MatchHero match={currentMatch} />
+
+                {/* Mon prono, selon la phase */}
+                <View className="gap-3">
+                    <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
+                        {t('predictions:reconciliation.yourProno')}
+                    </Text>
+                    {phase === 'upcoming' && userId ? (
+                        <View className="gap-2.5">
+                            <PredictionCard
+                                distribution={distribution}
+                                match={currentMatch}
+                                prediction={prediction}
+                                userId={userId}
+                            />
+                            <Text className="text-center font-body text-[12px] text-text-muted">
+                                {t('predictions:toPredict.autoSave')}
+                            </Text>
+                        </View>
+                    ) : phase === 'finished' ? (
+                        <ResultCard
                             distribution={distribution}
                             match={currentMatch}
                             prediction={prediction}
-                            userId={userId}
                         />
-                        <Text className="text-center font-body text-[12px] text-text-muted">
-                            {t('predictions:toPredict.autoSave')}
+                    ) : (
+                        <LockedPredictionCard
+                            jokerOn={[...(myJokers.data?.values() ?? [])].some(
+                                (joker) => joker.matchId === currentMatch.id,
+                            )}
+                            match={currentMatch}
+                            prediction={prediction}
+                        />
+                    )}
+                    {/* Lien discret vers le référentiel des règles — texte faint,
+                        jamais de grenat (réservé CTA/live/sélection) */}
+                    <Pressable
+                        accessibilityRole="button"
+                        className="flex-row items-center justify-center gap-1.5"
+                        hitSlop={8}
+                        onPress={() => router.push('/rules')}>
+                        <CircleHelp color={textFaintColor} size={14} strokeWidth={1.9} />
+                        <Text className="font-body-medium text-[12px] text-text-muted">
+                            {t('scoring:rules.link')}
                         </Text>
-                    </View>
-                ) : phase === 'finished' ? (
-                    <ResultCard
-                        distribution={distribution}
-                        match={currentMatch}
-                        prediction={prediction}
-                    />
-                ) : (
-                    <LockedPredictionCard
-                        jokerOn={[...(myJokers.data?.values() ?? [])].some(
-                            (joker) => joker.matchId === currentMatch.id,
-                        )}
-                        match={currentMatch}
-                        prediction={prediction}
-                    />
-                )}
-                {/* Lien discret vers le référentiel des règles — texte faint,
-                    jamais de grenat (réservé CTA/live/sélection) */}
-                <Pressable
-                    accessibilityRole="button"
-                    className="flex-row items-center justify-center gap-1.5"
-                    hitSlop={8}
-                    onPress={() => router.push('/rules')}>
-                    <CircleHelp color={textFaintColor} size={14} strokeWidth={1.9} />
-                    <Text className="font-body-medium text-[12px] text-text-muted">
-                        {t('scoring:rules.link')}
-                    </Text>
-                </Pressable>
-            </View>
-
-            {/* Mes ligues : pronos des membres + classement */}
-            {myLeagues.isPending ? null : leagues.length === 0 ? (
-                <View className="items-center gap-3 rounded-lg border border-border bg-surface px-5 py-6 tc-shadow-sm">
-                    <Text className="text-center font-display text-[22px] text-text">
-                        {t('leagues:hero.title')}
-                    </Text>
-                    <Text className="max-w-[260px] text-center font-body text-[13px] leading-[19px] text-text-muted">
-                        {t('leagues:hero.message')}
-                    </Text>
-                    <View className="mt-1 w-full max-w-[280px] gap-2.5">
-                        <Button
-                            fullWidth
-                            onPress={() => router.push('/league/new')}
-                            title={t('leagues:actions.create')}
-                        />
-                        <Button
-                            fullWidth
-                            onPress={() =>
-                                router.push({ pathname: '/league/new', params: { tab: 'join' } })
-                            }
-                            title={t('leagues:actions.join')}
-                            variant="secondary"
-                        />
-                    </View>
+                    </Pressable>
                 </View>
-            ) : (
-                <View className="gap-3">
-                    <View className="flex-row items-center justify-between gap-2">
-                        <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
-                            {t('leagues:leaderboard.tabs.leagues')}
+
+                {/* Mes ligues : pronos des membres + classement */}
+                {myLeagues.isPending ? null : leagues.length === 0 ? (
+                    <View className="items-center gap-3 rounded-lg border border-border bg-surface px-5 py-6 tc-shadow-sm">
+                        <Text className="text-center font-display text-[22px] text-text">
+                            {t('leagues:hero.title')}
                         </Text>
-                        {leagues.length === 1 ? (
-                            <Text className="font-body text-[11px] text-text-faint">
-                                {t('matches:detail.singleLeague')}
-                            </Text>
-                        ) : null}
-                    </View>
-
-                    {leagues.length > 1 && currentLeagueId ? (
-                        <Select
-                            accessibilityLabel={t('leagues:leaderboard.select.overline')}
-                            icon={<Users color={accentColor} size={18} strokeWidth={1.9} />}
-                            onChange={setSelectedLeagueId}
-                            options={leagues.map((league) => ({
-                                value: league.id,
-                                label: league.name,
-                                description: t('leagues:detail.members', {
-                                    count: league.member_count,
-                                }),
-                            }))}
-                            overline={t('leagues:leaderboard.select.overline')}
-                            trailing={
-                                currentLeague
-                                    ? t('leagues:detail.members', {
-                                          count: currentLeague.member_count,
-                                      })
-                                    : undefined
-                            }
-                            value={currentLeagueId}
-                        />
-                    ) : null}
-
-                    <SegmentedControl
-                        onChange={setView}
-                        options={[
-                            {
-                                value: 'predictions',
-                                label: t('matches:detail.tabs.predictions'),
-                            },
-                            {
-                                value: 'leaderboard',
-                                label: t('matches:detail.tabs.leaderboard'),
-                            },
-                        ]}
-                        value={view}
-                    />
-
-                    {currentLeague ? (
-                        <View className="flex-row items-baseline justify-between gap-2 px-0.5">
-                            <Text className="font-body-bold text-[12px] text-text-muted">
-                                {currentLeague.name}
-                            </Text>
-                            <Text className="font-body-bold text-[11px] uppercase tracking-[0.44px] text-text-faint">
-                                {t('leagues:leaderboard.players', {
-                                    count: currentLeague.member_count,
-                                })}
-                            </Text>
+                        <Text className="max-w-[260px] text-center font-body text-[13px] leading-[19px] text-text-muted">
+                            {t('leagues:hero.message')}
+                        </Text>
+                        <View className="mt-1 w-full max-w-[280px] gap-2.5">
+                            <Button
+                                fullWidth
+                                onPress={() => router.push('/league/new')}
+                                title={t('leagues:actions.create')}
+                            />
+                            <Button
+                                fullWidth
+                                onPress={() =>
+                                    router.push({
+                                        pathname: '/league/new',
+                                        params: { tab: 'join' },
+                                    })
+                                }
+                                title={t('leagues:actions.join')}
+                                variant="secondary"
+                            />
                         </View>
-                    ) : null}
+                    </View>
+                ) : (
+                    <View className="gap-3">
+                        <View className="flex-row items-center justify-between gap-2">
+                            <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
+                                {t('leagues:leaderboard.tabs.leagues')}
+                            </Text>
+                            {leagues.length === 1 ? (
+                                <Text className="font-body text-[11px] text-text-faint">
+                                    {t('matches:detail.singleLeague')}
+                                </Text>
+                            ) : null}
+                        </View>
 
-                    {deferredView === 'predictions' ? (
-                        !kickoffPassed ? (
-                            <MaskedPredictions />
-                        ) : leaguePredictions.isPending ? (
-                            <View className="gap-2">
-                                <Skeleton className="h-14" variant="block" />
-                                <Skeleton className="h-14" variant="block" />
-                                <Skeleton className="h-14" variant="block" />
+                        {leagues.length > 1 && currentLeagueId ? (
+                            <Select
+                                accessibilityLabel={t('leagues:leaderboard.select.overline')}
+                                icon={<Users color={accentColor} size={18} strokeWidth={1.9} />}
+                                onChange={setSelectedLeagueId}
+                                options={leagues.map((league) => ({
+                                    value: league.id,
+                                    label: league.name,
+                                    description: t('leagues:detail.members', {
+                                        count: league.member_count,
+                                    }),
+                                }))}
+                                overline={t('leagues:leaderboard.select.overline')}
+                                trailing={
+                                    currentLeague
+                                        ? t('leagues:detail.members', {
+                                              count: currentLeague.member_count,
+                                          })
+                                        : undefined
+                                }
+                                value={currentLeagueId}
+                            />
+                        ) : null}
+
+                        <SegmentedControl
+                            onChange={setView}
+                            options={[
+                                {
+                                    value: 'predictions',
+                                    label: t('matches:detail.tabs.predictions'),
+                                },
+                                {
+                                    value: 'leaderboard',
+                                    label: t('matches:detail.tabs.leaderboard'),
+                                },
+                            ]}
+                            value={view}
+                        />
+
+                        {currentLeague ? (
+                            <View className="flex-row items-baseline justify-between gap-2 px-0.5">
+                                <Text className="font-body-bold text-[12px] text-text-muted">
+                                    {currentLeague.name}
+                                </Text>
+                                <Text className="font-body-bold text-[11px] uppercase tracking-[0.44px] text-text-faint">
+                                    {t('leagues:leaderboard.players', {
+                                        count: currentLeague.member_count,
+                                    })}
+                                </Text>
                             </View>
-                        ) : leaguePredictions.isError ? (
+                        ) : null}
+
+                        {deferredView === 'predictions' ? (
+                            !kickoffPassed ? (
+                                <MaskedPredictions />
+                            ) : leaguePredictions.isPending ? (
+                                <View className="gap-2">
+                                    <Skeleton className="h-14" variant="block" />
+                                    <Skeleton className="h-14" variant="block" />
+                                    <Skeleton className="h-14" variant="block" />
+                                </View>
+                            ) : leaguePredictions.isError ? (
+                                <EmptyState
+                                    action={
+                                        <Button
+                                            onPress={() => void leaguePredictions.refetch()}
+                                            title={t('common:actions.retry')}
+                                            variant="secondary"
+                                        />
+                                    }
+                                    title={t('leagues:errors.load')}
+                                />
+                            ) : (
+                                <View className="gap-2">
+                                    {leaguePredictions.data.map((entry) => (
+                                        <MemberPredictionRow
+                                            entry={entry}
+                                            isMe={entry.user_id === userId}
+                                            key={entry.user_id}
+                                            match={currentMatch}
+                                            onOpenReactions={() =>
+                                                setReactionsTarget({
+                                                    userId: entry.user_id,
+                                                    username: entry.username,
+                                                })
+                                            }
+                                            onPress={openPlayerProfile(entry.user_id)}
+                                            onReact={(next) =>
+                                                setReaction.mutate(
+                                                    { targetUserId: entry.user_id, next },
+                                                    {
+                                                        onError: (error) =>
+                                                            toast.show(
+                                                                t(toReactionMessageKey(error)),
+                                                                'neutral',
+                                                            ),
+                                                    },
+                                                )
+                                            }
+                                        />
+                                    ))}
+                                    <Text className="mt-1.5 text-center font-body text-[11px] text-text-faint">
+                                        {t('reactions:footer')}
+                                    </Text>
+                                </View>
+                            )
+                        ) : leagueBoard.isPending ? (
+                            <View className="gap-2">
+                                <Skeleton className="h-16" variant="block" />
+                                <Skeleton className="h-16" variant="block" />
+                                <Skeleton className="h-16" variant="block" />
+                            </View>
+                        ) : leagueBoard.isError ? (
                             <EmptyState
                                 action={
                                     <Button
-                                        onPress={() => void leaguePredictions.refetch()}
+                                        onPress={() => void leagueBoard.refetch()}
                                         title={t('common:actions.retry')}
                                         variant="secondary"
                                     />
@@ -299,49 +375,28 @@ export default function MatchScreen() {
                             />
                         ) : (
                             <View className="gap-2">
-                                {leaguePredictions.data.map((entry) => (
-                                    <MemberPredictionRow
+                                {boardEntries.map((entry) => (
+                                    <LeaderboardRow
                                         entry={entry}
                                         isMe={entry.user_id === userId}
                                         key={entry.user_id}
-                                        match={currentMatch}
                                         onPress={openPlayerProfile(entry.user_id)}
+                                        tie={entry.tie}
                                     />
                                 ))}
                             </View>
-                        )
-                    ) : leagueBoard.isPending ? (
-                        <View className="gap-2">
-                            <Skeleton className="h-16" variant="block" />
-                            <Skeleton className="h-16" variant="block" />
-                            <Skeleton className="h-16" variant="block" />
-                        </View>
-                    ) : leagueBoard.isError ? (
-                        <EmptyState
-                            action={
-                                <Button
-                                    onPress={() => void leagueBoard.refetch()}
-                                    title={t('common:actions.retry')}
-                                    variant="secondary"
-                                />
-                            }
-                            title={t('leagues:errors.load')}
-                        />
-                    ) : (
-                        <View className="gap-2">
-                            {boardEntries.map((entry) => (
-                                <LeaderboardRow
-                                    entry={entry}
-                                    isMe={entry.user_id === userId}
-                                    key={entry.user_id}
-                                    onPress={openPlayerProfile(entry.user_id)}
-                                    tie={entry.tie}
-                                />
-                            ))}
-                        </View>
-                    )}
-                </View>
-            )}
-        </Screen>
+                        )}
+                    </View>
+                )}
+            </Screen>
+            <ReactionsSheet
+                counts={parseReactionCounts(reactionsEntry?.reactions)}
+                leagueId={currentLeagueId}
+                matchId={id}
+                onClose={() => setReactionsTarget(null)}
+                target={reactionsTarget}
+                userId={userId}
+            />
+        </>
     );
 }
