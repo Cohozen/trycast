@@ -189,6 +189,18 @@ et sont à ajuster **avant la publication du build 1.1.0** :
 - Les lignes **Diagnostics** ne changent pas : les rapports de plantage restent sans
   identifiant, puisque l'e-mail ne passe que par le signalement et jamais par `setUser`.
 
+### Réactions sur les pronos (v1.1.0, registre §2)
+
+Une réaction est une clé choisie parmi quatre, jamais un texte : c'est une **action dans
+l'app**, pas un contenu rédigé. Rien de nouveau à cocher, mais deux libellés s'élargissent
+**avant la publication du build 1.1.0** :
+
+- **Play, « Autres actions »** : ajouter les réactions à côté des points et classements.
+  Obligatoire, **Fonctionnalité de l'appli**.
+- **Apple, « Product Interaction » (liée)** : même ajout, **App Functionality**.
+- La mesure d'usage gagne l'événement `reaction_changed` (action et clé seulement) : la
+  ligne « Interactions / Analytics », non liée, ne change pas.
+
 ---
 
 ## Privacy manifest iOS (`PrivacyInfo.xcprivacy`)

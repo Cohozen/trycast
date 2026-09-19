@@ -41,12 +41,12 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 | **Finalité** | Enregistrer les pronostics, calculer les points, établir les classements des ligues |
 | **Base légale** | Exécution du contrat — art. 6.1.b |
 | **Personnes concernées** | Utilisateurs de l'application |
-| **Catégories de données** | Pronostics (scores et bonus prédits, point double de la phase), points obtenus et leur détail, appartenance aux ligues, rôle dans la ligue, totaux et statistiques de classement |
-| **Où** | `public.predictions`, `public.league_members`, `public.leagues`, `public.standings` |
-| **Destinataires** | Supabase. Les pronostics d'un joueur (point double compris) deviennent visibles des autres membres de ses ligues **après le coup d'envoi** du match (règle imposée par RLS, pas par le client) |
+| **Catégories de données** | Pronostics (scores et bonus prédits, point double de la phase), points obtenus et leur détail, appartenance aux ligues, rôle dans la ligue, totaux et statistiques de classement, **réactions** posées sur les pronostics des autres membres d'une ligue (une clé parmi quatre, jamais de texte libre) |
+| **Où** | `public.predictions`, `public.phase_jokers`, `public.prediction_reactions`, `public.league_members`, `public.leagues`, `public.standings` |
+| **Destinataires** | Supabase. Les pronostics d'un joueur (point double compris) deviennent visibles des autres membres de ses ligues **après le coup d'envoi** du match (règle imposée par RLS, pas par le client). Les réactions ne sont visibles que des membres de la ligue où elles ont été posées, après le coup d'envoi ; celles d'un joueur qui a quitté la ligue y restent comptées mais **anonymisées** (ni pseudo ni photo) |
 | **Transferts hors UE** | Aucun |
-| **Conservation** | Durée de vie du compte (cascade à la suppression) |
-| **Sécurité** | RLS, deadline au coup d'envoi appliquée côté serveur, écriture des scores par une RPC unique et atomique |
+| **Conservation** | Durée de vie du compte (cascade à la suppression, réactions posées et reçues comprises) |
+| **Sécurité** | RLS, deadline au coup d'envoi appliquée côté serveur, écriture des scores par une RPC unique et atomique ; réactions sans aucun accès direct à la table, écrites et lues par des RPC qui vérifient l'appartenance à la ligue |
 
 ## 3. Notifications push
 

@@ -19,8 +19,10 @@ simples existent. Ici, le moyen simple est l'adresse e-mail.
 
 L'utilisateur peut s'en occuper seul, immédiatement :
 **Réglages → Confidentialité → Exporter mes données**. L'export est produit par l'Edge
-Function `export-data` et couvre le compte, le profil, les pronostics, les ligues, les
-classements, les préférences de notification et l'historique des consentements. Le jeton de
+Function `export-data` et couvre le compte, le profil, les pronostics et les points doubles
+(jokers), les réactions posées et reçues (celles-ci sans leur auteur, donnée d'un autre
+membre), les ligues, les classements, les préférences de notification et l'historique des
+consentements. Le jeton de
 notification en est volontairement exclu (secret d'appareil) : seules la plateforme et les
 dates apparaissent.
 
