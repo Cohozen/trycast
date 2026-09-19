@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/styles.css">
+  <script src="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/_ds_bundle.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    [data-theme="light"] {
+      --bg: var(--sand-050); --surface: var(--sand-100); --surface-sunken: var(--sand-150);
+      --border: var(--sand-200); --border-strong: var(--sand-300);
+      --text: var(--ink-900); --text-muted: var(--ink-600); --text-faint: var(--ink-400);
+      --brand: var(--green-800); --on-brand: var(--sand-050);
+      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: #FFFFFF;
+      --focus-ring: var(--grenat-500);
+      --shadow-sm: 0 1px 2px rgba(22,19,14,0.06); --shadow-md: 0 4px 14px rgba(22,19,14,0.08); --shadow-lg: 0 12px 32px rgba(22,19,14,0.12);
+    }
+    .tc-scroll::-webkit-scrollbar { width: 0; height: 0; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); }
+    @keyframes tc-pop-up { from { opacity: 0; transform: translateY(6px) scale(0.92); } to { opacity: 1; transform: none; } }
+    @keyframes tc-pop-down { from { opacity: 0; transform: translateY(-6px) scale(0.92); } to { opacity: 1; transform: none; } }
+    @keyframes tc-chip-in { 0% { transform: scale(0.6); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+    @keyframes tc-sheet-in { from { transform: translateY(100%); } to { transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      .tc-pop, .tc-sheet, .tc-chip-anim { animation-duration: 1ms !important; animation-name: none !important; }
+    }
+  </style>
+</helmet>
+
+<div style="width: max-content; min-height: 100vh; padding: 48px; background: #7C776E; font-family: var(--font-body); display: flex; flex-direction: column; gap: 44px;">
+
+  <div style="display: flex; flex-direction: column; gap: 6px; color: var(--sand-050); max-width: 820px;">
+    <span style="font-family: var(--font-display); font-size: 34px; letter-spacing: 0.01em;">TryCast — Réactions emoji sur les pronos</span>
+    <span style="font-size: 14px; color: rgba(255,255,255,0.72); text-wrap: pretty;">v1.1.0 · onglet « Pronos » du détail match, après le coup d'envoi · 4 réactions fermées, une par personne et par prono · light &amp; dark</span>
+  </div>
+
+  <!-- ============ 1 · LIGNE MEMBRE + POPOVER (écrans vivants) ============ -->
+  <div style="display: flex; flex-direction: column; gap: 14px;">
+    <div style="display: inline-flex; align-items: center; gap: 10px; color: var(--sand-050);">
+      <span style="font-family: var(--font-display); font-size: 20px;">1 · La ligne membre, le popover &amp; la sheet</span>
+      <span style="font-size: 13px; color: rgba(255,255,255,0.6);">Vivant : tape l'icône en fin de ligne (ou appui long sur la ligne) pour réagir, tape les puces pour ouvrir la sheet.</span>
+    </div>
+
+    <div style="display: flex; gap: 40px; align-items: flex-start;">
+      <sc-for list="{{ screens }}" as="sc" hint-placeholder-count="2">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: inline-flex; align-items: center; gap: 8px; color: var(--sand-050); font-size: 13px; font-weight: 600; padding: 0 4px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ sc.dot }};"></span>{{ sc.label }}
+          </div>
+
+          <div data-theme="{{ sc.theme }}" data-screen-label="{{ sc.label }}" style="position: relative; width: 390px; height: 800px; background: var(--bg); color: var(--text); border-radius: 46px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column;">
+
+            <div style="flex: none; display: flex; justify-content: space-between; align-items: center; padding: 14px 30px 6px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums;">
+              <span>9:41</span>
+              <span style="display: flex; gap: 7px; align-items: center;">
+                <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"></rect><rect x="9" y="2" width="3" height="9" rx="1"></rect><rect x="13.5" y="0" width="3" height="11" rx="1"></rect></svg>
+                <svg width="26" height="12" viewBox="0 0 26 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity="0.4"></rect><rect x="2" y="2" width="17" height="8" rx="1.5" fill="currentColor"></rect><rect x="23" y="4" width="2" height="4" rx="1" fill="currentColor" opacity="0.4"></rect></svg>
+              </span>
+            </div>
+
+            <div style="flex: none; display: flex; align-items: center; gap: 8px; padding: 2px 14px 10px;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: var(--text);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+              </span>
+              <span style="flex: 1; display: flex; flex-direction: column; gap: 1px;">
+                <span style="font-size: 15px; font-weight: 700;">France 29 – 18 Irlande</span>
+                <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">Les Potes · 6 joueurs</span>
+              </span>
+              <span style="flex: none; display: inline-flex; align-items: center; height: 26px; padding: 0 11px; border-radius: var(--radius-pill); background: var(--surface-sunken); color: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">Terminé</span>
+            </div>
+
+            <div class="tc-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 4px 16px 32px; display: flex; flex-direction: column; gap: 6px;">
+              <sc-for list="{{ sc.rows }}" as="r" hint-placeholder-count="6">
+                <div style="position: relative;">
+                  <div onPointerDown="{{ r.onPressStart }}" onPointerUp="{{ r.onPressEnd }}" onPointerLeave="{{ r.onPressEnd }}" style="display: flex; flex-direction: column; gap: 7px; padding: 10px 12px; background: {{ r.rowBg }}; border-left: {{ r.rowEdge }}; border-radius: var(--radius-sm); cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none;">
+
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ r.name }}" size="sm" ring="{{ r.isMe }}" hint-size="32px,32px"></x-import>
+                      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                        <span style="font-size: 14px; font-weight: {{ r.nameWeight }}; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ r.displayName }}</span>
+                        <sc-if value="{{ r.hasBadges }}" hint-placeholder-val="{{ false }}">
+                          <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
+                            <sc-for list="{{ r.badges }}" as="b" hint-placeholder-count="0">
+                              <span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px; border-radius: var(--radius-pill); background: {{ b.bg }}; color: {{ b.color }}; border: {{ b.border }}; font-size: 10px; font-weight: 700; letter-spacing: 0.02em; white-space: nowrap;">{{ b.text }}</span>
+                            </sc-for>
+                          </div>
+                        </sc-if>
+                      </div>
+                      <span style="flex: none; display: inline-flex; align-items: center; padding: 3px 10px; border-radius: var(--radius-pill); background: var(--surface-sunken); color: {{ r.pronoColor }}; font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums;">{{ r.pronoStr }}</span>
+                      <sc-if value="{{ r.showPts }}" hint-placeholder-val="{{ true }}">
+                        <span style="flex: none; min-width: 40px; text-align: right; display: inline-flex; align-items: baseline; justify-content: flex-end; gap: 2px;"><span style="font-family: var(--font-display); font-size: 19px; line-height: 1; color: {{ r.ptsColor }}; font-variant-numeric: tabular-nums;">{{ r.ptsStr }}</span><span style="font-size: 9px; font-weight: 700; color: {{ r.ptsColor }};">pts</span></span>
+                      </sc-if>
+                      <sc-if value="{{ r.showSmile }}" hint-placeholder-val="{{ true }}">
+                        <button type="button" aria-label="Réagir au prono de {{ r.name }}" aria-expanded="{{ r.open }}" onClick="{{ r.onSmile }}" style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin: -6px -4px -6px 0; border: none; background: {{ r.smileBg }}; border-radius: var(--radius-pill); color: {{ r.smileColor }}; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);" style-hover="background: var(--surface-sunken); color: var(--text);">
+                          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11v1a10 10 0 1 1-5.93-9.14"></path><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line><path d="M16 5h6"></path><path d="M19 2v6"></path></svg>
+                        </button>
+                      </sc-if>
+                      <sc-if value="{{ r.noSmile }}" hint-placeholder-val="{{ false }}"><span style="flex: none; width: 28px;"></span></sc-if>
+                    </div>
+
+                    <sc-if value="{{ r.hasChips }}" hint-placeholder-val="{{ false }}">
+                      <button type="button" aria-label="Voir les réactions" onClick="{{ r.onOpenSheet }}" style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-left: 42px; padding: 0; border: none; background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent;">
+                        <sc-for list="{{ r.chips }}" as="c" hint-placeholder-count="0">
+                          <span class="tc-chip-anim" title="{{ c.label }}" style="display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px 0 6px; border-radius: var(--radius-pill); background: {{ c.bg }}; border: {{ c.border }}; transition: background var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; font-size: 13px; line-height: 1;">{{ c.emoji }}</span>
+                            <span style="font-size: 11px; font-weight: {{ c.weight }}; color: {{ c.color }}; font-variant-numeric: tabular-nums;">{{ c.count }}</span>
+                          </span>
+                        </sc-for>
+                      </button>
+                    </sc-if>
+                  </div>
+
+                  <!-- popover, ancré au-dessus -->
+                  <sc-if value="{{ r.popUp }}" hint-placeholder-val="{{ false }}">
+                    <div class="tc-pop" role="menu" aria-label="Choisir une réaction" style="position: absolute; left: 44px; bottom: calc(100% - 4px); z-index: 40; animation: tc-pop-up 0.2s var(--ease-out); transform-origin: bottom left;">
+                      <div style="display: flex; gap: 2px; padding: 5px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-pill); box-shadow: var(--shadow-lg);">
+                        <sc-for list="{{ r.picker }}" as="k" hint-placeholder-count="4">
+                          <button type="button" role="menuitemradio" aria-checked="{{ k.selected }}" aria-label="Réagir : {{ k.label }}" onClick="{{ k.onPick }}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: {{ k.ring }}; background: {{ k.bg }}; border-radius: var(--radius-pill); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);" style-hover="transform: scale(1.14);" style-active="transform: scale(0.94);">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; font-size: 25px; line-height: 1;">{{ k.emoji }}</span>
+                          </button>
+                        </sc-for>
+                      </div>
+                      <span style="position: absolute; left: 22px; bottom: -5px; width: 10px; height: 10px; background: var(--surface); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); transform: rotate(45deg);"></span>
+                    </div>
+                  </sc-if>
+
+                  <!-- popover, ancré en dessous (ligne en haut d'écran) -->
+                  <sc-if value="{{ r.popDown }}" hint-placeholder-val="{{ false }}">
+                    <div class="tc-pop" role="menu" aria-label="Choisir une réaction" style="position: absolute; left: 44px; top: calc(100% - 4px); z-index: 40; animation: tc-pop-down 0.2s var(--ease-out); transform-origin: top left;">
+                      <div style="display: flex; gap: 2px; padding: 5px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-pill); box-shadow: var(--shadow-lg);">
+                        <sc-for list="{{ r.picker }}" as="k" hint-placeholder-count="4">
+                          <button type="button" role="menuitemradio" aria-checked="{{ k.selected }}" aria-label="Réagir : {{ k.label }}" onClick="{{ k.onPick }}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: {{ k.ring }}; background: {{ k.bg }}; border-radius: var(--radius-pill); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);" style-hover="transform: scale(1.14);" style-active="transform: scale(0.94);">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; font-size: 25px; line-height: 1;">{{ k.emoji }}</span>
+                          </button>
+                        </sc-for>
+                      </div>
+                      <span style="position: absolute; left: 22px; top: -5px; width: 10px; height: 10px; background: var(--surface); border-left: 1px solid var(--border); border-top: 1px solid var(--border); transform: rotate(45deg);"></span>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+
+              <div style="margin-top: 6px; padding: 10px 12px; font-size: 11px; color: var(--text-faint); text-align: center; text-wrap: pretty;">Les réactions sont propres à cette ligue.</div>
+            </div>
+
+            <!-- bottom sheet -->
+            <sc-if value="{{ sc.sheetOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position: absolute; inset: 0; z-index: 60; display: flex; flex-direction: column; justify-content: flex-end;">
+                <div onClick="{{ sc.onCloseSheet }}" style="position: absolute; inset: 0; background: rgba(12,10,7,0.42);"></div>
+                <div class="tc-sheet" style="position: relative; background: var(--surface); border-top-left-radius: var(--radius-lg); border-top-right-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 10px 0 24px; animation: tc-sheet-in 0.24s var(--ease-out); max-height: 74%; display: flex; flex-direction: column;">
+                  <span style="align-self: center; width: 38px; height: 4px; border-radius: 2px; background: var(--border-strong); margin-bottom: 12px;"></span>
+                  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 0 18px 12px;">
+                    <span style="font-family: var(--font-display); font-size: 20px; letter-spacing: 0.01em; color: var(--text);">Réactions</span>
+                    <span style="font-size: 12px; color: var(--text-muted);">{{ sc.sheetSub }}</span>
+                  </div>
+                  <div class="tc-scroll" style="display: flex; gap: 6px; overflow-x: auto; padding: 0 18px 12px;">
+                    <sc-for list="{{ sc.filters }}" as="ft" hint-placeholder-count="5">
+                      <button type="button" aria-pressed="{{ ft.active }}" aria-label="{{ ft.aria }}" onClick="{{ ft.onPick }}" style="flex: none; display: inline-flex; align-items: center; gap: 5px; height: 32px; padding: 0 12px; border-radius: var(--radius-pill); background: {{ ft.bg }}; border: {{ ft.border }}; color: {{ ft.color }}; font-size: 12px; font-weight: 700; cursor: pointer; -webkit-tap-highlight-color: transparent; font-variant-numeric: tabular-nums;">
+                        <sc-if value="{{ ft.hasEmoji }}" hint-placeholder-val="{{ true }}"><span style="display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; font-size: 14px; line-height: 1;">{{ ft.emoji }}</span></sc-if>
+                        {{ ft.text }}
+                      </button>
+                    </sc-for>
+                  </div>
+                  <div class="tc-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 18px;">
+                    <sc-for list="{{ sc.sheetRows }}" as="sr" hint-placeholder-count="5">
+                      <div style="display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border);">
+                        <sc-if value="{{ sr.present }}" hint-placeholder-val="{{ true }}">
+                          <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ sr.name }}" size="sm" ring="{{ sr.isMe }}" hint-size="32px,32px"></x-import>
+                        </sc-if>
+                        <sc-if value="{{ sr.gone }}" hint-placeholder-val="{{ false }}">
+                          <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: var(--surface-sunken); color: var(--text-faint); border: 1px dashed var(--border-strong);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
+                        </sc-if>
+                        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;">
+                          <span style="font-size: 14px; font-weight: {{ sr.weight }}; color: {{ sr.nameColor }}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ sr.displayName }}</span>
+                          <sc-if value="{{ sr.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; color: var(--text-faint);">{{ sr.note }}</span></sc-if>
+                        </span>
+                        <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; font-size: 20px; line-height: 1;">{{ sr.emoji }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-for>
+
+      <!-- annotations -->
+      <div style="width: 330px; display: flex; flex-direction: column; gap: 14px; padding: 20px; background: var(--sand-050); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);" data-theme="light">
+        <span style="font-family: var(--font-display); font-size: 17px; color: var(--text);">Règles de la ligne</span>
+        <div style="display: flex; flex-direction: column; gap: 10px; font-size: 12.5px; color: var(--text-muted); line-height: 1.5;">
+          <span><b style="color: var(--text);">Tap</b> sur la ligne → profil du membre. <b style="color: var(--text);">Appui long</b> (≈450 ms) → popover. <b style="color: var(--text);">Tap</b> sur l'icône <i>SmilePlus</i> → popover. Zone tactile 44 pt (le bouton dessiné fait 32, la cible déborde sur le padding de ligne).</span>
+          <span>Pas d'icône sur <b style="color: var(--text);">ma ligne</b> ni sur une ligne <b style="color: var(--text);">« — »</b> (aucun prono) ; ma ligne affiche quand même les réactions reçues.</span>
+          <span>Les puces vivent sous le pseudo, décalées de 42 px (avatar + gouttière) : elles occupent toute la largeur utile et tiennent 4 réactions à 3 chiffres sur 360 pt.</span>
+          <span>Emoji système aujourd'hui, dans un <b style="color: var(--text);">emplacement carré fixe</b> : 15 px sur la puce, 28 px dans le popover, 24 px dans la sheet. Un picto maison s'y glisse sans toucher la mise en page.</span>
+        </div>
+        <div style="height: 1px; background: var(--border);"></div>
+        <span style="font-family: var(--font-display); font-size: 17px; color: var(--text);">Couleurs</span>
+        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; color: var(--text-muted); line-height: 1.5;">
+          <span><b style="color: var(--accent);">Grenat</b> : score exact, points, ma ligne. Jamais sur une réaction.</span>
+          <span><b style="color: var(--brand);">Vert marque</b> : joker, uniquement.</span>
+          <span><b style="color: var(--text);">Ma réaction</b> : puce <code style="font-family: var(--font-body); font-weight: 700;">surface-sunken</code> + contour d'encre à 38 % et compteur en <code style="font-family: var(--font-body); font-weight: 700;">text</code> gras. Neutre, donc jamais confondue avec le joker ou ma ligne.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 2 · PRIMITIVE POPOVER ============ -->
+  <div style="display: flex; flex-direction: column; gap: 14px;">
+    <span style="font-family: var(--font-display); font-size: 20px; color: var(--sand-050);">2 · Primitive <span style="font-family: var(--font-body); font-weight: 700;">Popover</span> — états</span>
+    <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+      <sc-for list="{{ popSpecs }}" as="ps" hint-placeholder-count="2">
+        <div data-theme="{{ ps.theme }}" style="width: 430px; display: flex; flex-direction: column; gap: 16px; padding: 22px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);">
+          <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);">{{ ps.label }}</span>
+          <sc-for list="{{ ps.states }}" as="st" hint-placeholder-count="4">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span style="flex: none; width: 108px; font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.3;">{{ st.name }}</span>
+              <div style="flex: none; display: flex; gap: 2px; padding: 5px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-pill); box-shadow: var(--shadow-lg); opacity: {{ st.opacity }}; transform: {{ st.transform }};">
+                <sc-for list="{{ st.items }}" as="it" hint-placeholder-count="4">
+                  <span style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: {{ it.ring }}; background: {{ it.bg }}; border-radius: var(--radius-pill); transform: {{ it.scale }};">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; font-size: 25px; line-height: 1;">{{ it.emoji }}</span>
+                  </span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+          <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 6px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+            <span>Ancrage : bord gauche aligné sur l'avatar + 12 px, flèche à 22 px. Bascule vers le bas si moins de 76 px au-dessus de la ligne.</span>
+            <span>Fermeture : choix, tap dehors, scroll, <i>Échap</i>. Focus piégé, navigation ← → entre les 4.</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ============ 3 · PUCES DE RÉSUMÉ ============ -->
+  <div style="display: flex; flex-direction: column; gap: 14px;">
+    <span style="font-family: var(--font-display); font-size: 20px; color: var(--sand-050);">3 · Puces de résumé &amp; tenue en largeur</span>
+    <div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
+      <sc-for list="{{ chipSpecs }}" as="cs" hint-placeholder-count="2">
+        <div data-theme="{{ cs.theme }}" style="width: 392px; display: flex; flex-direction: column; gap: 14px; padding: 22px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);">
+          <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);">{{ cs.label }}</span>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <sc-for list="{{ cs.samples }}" as="sa" hint-placeholder-count="2">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <span style="flex: none; width: 104px; font-size: 12px; font-weight: 700; color: var(--text);">{{ sa.name }}</span>
+                <span style="display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px 0 6px; border-radius: var(--radius-pill); background: {{ sa.bg }}; border: {{ sa.border }};">
+                  <span style="display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; font-size: 13px; line-height: 1;">{{ sa.emoji }}</span>
+                  <span style="font-size: 11px; font-weight: {{ sa.weight }}; color: {{ sa.color }}; font-variant-numeric: tabular-nums;">{{ sa.count }}</span>
+                </span>
+                <span style="flex: 1; font-size: 11.5px; color: var(--text-muted); text-wrap: pretty;">{{ sa.note }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="height: 1px; background: var(--border);"></div>
+          <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);">Ligne chargée · 360 pt</span>
+          <div style="width: 360px; max-width: 100%; padding: 10px 12px; background: var(--surface); border-left: 3px solid transparent; border-radius: var(--radius-sm); display: flex; flex-direction: column; gap: 7px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="Léa Berthier" size="sm" hint-size="32px,32px"></x-import>
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Léa Berthier</span>
+                <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
+                  <span style="display: inline-flex; align-items: center; padding: 1px 7px; border-radius: var(--radius-pill); background: var(--accent); color: var(--on-accent); font-size: 10px; font-weight: 700; white-space: nowrap;">Score exact</span>
+                  <span style="display: inline-flex; align-items: center; padding: 1px 7px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--brand) 16%, transparent); color: {{ cs.jokerColor }}; font-size: 10px; font-weight: 700; white-space: nowrap;">Joker</span>
+                </div>
+              </div>
+              <span style="flex: none; display: inline-flex; align-items: center; padding: 3px 10px; border-radius: var(--radius-pill); background: var(--surface-sunken); color: var(--text-muted); font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums;">29 – 18</span>
+              <span style="flex: none; display: inline-flex; align-items: baseline; gap: 2px;"><span style="font-family: var(--font-display); font-size: 19px; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums;">+36</span><span style="font-size: 9px; font-weight: 700; color: var(--accent);">pts</span></span>
+              <span style="flex: none; width: 24px;"></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-left: 42px;">
+              <sc-for list="{{ cs.loaded }}" as="lc" hint-placeholder-count="4">
+                <span style="display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px 0 6px; border-radius: var(--radius-pill); background: {{ lc.bg }}; border: {{ lc.border }};">
+                  <span style="display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; font-size: 13px; line-height: 1;">{{ lc.emoji }}</span>
+                  <span style="font-size: 11px; font-weight: {{ lc.weight }}; color: {{ lc.color }}; font-variant-numeric: tabular-nums;">{{ lc.count }}</span>
+                </span>
+              </sc-for>
+            </div>
+          </div>
+          <span style="font-size: 11.5px; color: var(--text-muted); text-wrap: pretty;">4 puces à 3 chiffres = 232 px sur les 306 px utiles : ça tient sans repli. Au-delà, les puces passent à la ligne suivante (wrap), jamais de troncature.</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ============ 4 · MOUVEMENT ============ -->
+  <div data-theme="light" style="width: 880px; display: flex; flex-direction: column; gap: 14px; padding: 24px 26px; background: var(--sand-050); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);">
+    <span style="font-family: var(--font-display); font-size: 20px; color: var(--text);">4 · Mouvement</span>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 28px;">
+      <sc-for list="{{ motion }}" as="m" hint-placeholder-count="6">
+        <div style="display: flex; flex-direction: column; gap: 3px; padding: 12px 0; border-top: 1px solid var(--border);">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px;">
+            <span style="font-size: 13px; font-weight: 700; color: var(--text);">{{ m.name }}</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap;">{{ m.timing }}</span>
+          </div>
+          <span style="font-size: 12.5px; color: var(--text-muted); line-height: 1.5; text-wrap: pretty;">{{ m.detail }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="padding: 12px 14px; background: var(--surface-sunken); border-radius: var(--radius-sm); font-size: 12.5px; color: var(--text-muted); line-height: 1.55; text-wrap: pretty;">
+      <b style="color: var(--text);">Réduire les animations</b> — popover et sheet apparaissent sans translation ni échelle (opacité seule, 1 image), la puce n'a pas de rebond, l'agrandissement au survol devient un changement de fond. Les durées tombent à 0 ms ; aucun état n'est perdu. <b style="color: var(--text);">Pictos animés (phase suivante)</b> — l'emplacement carré reste identique ; le picto joue sa boucle une seule fois à la sélection, puis reste statique sur la puce. Aucune animation en boucle dans une liste.
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:1000}}">
+class Component extends DCLogic {
+  state = {
+    picked: { s_light: { r2: null, r4: 'culotte', me: null, r5: null, r6: null }, s_dark: { r2: 'bravo', r4: 'culotte', me: null, r5: null, r6: null } },
+    open: { s_light: 'r2', s_dark: 'r1' },
+    sheet: { s_sheet_l: 'r2', s_sheet_d: 'r2' },
+    filter: { s_sheet_d: 'visio' },
+  };
+
+  setPick(sid, rid, kid) {
+    this.setState((s) => {
+      const cur = { ...(s.picked[sid] || {}) };
+      cur[rid] = cur[rid] === kid ? null : kid;
+      return { picked: { ...s.picked, [sid]: cur }, open: { ...s.open, [sid]: null } };
+    });
+  }
+
+  toggleOpen(sid, rid) {
+    this.setState((s) => ({ open: { ...s.open, [sid]: s.open[sid] === rid ? null : rid } }));
+  }
+
+  press(sid, rid, down) {
+    if (down) {
+      this._t = setTimeout(() => this.toggleOpen(sid, rid), 450);
+    } else {
+      clearTimeout(this._t);
+    }
+  }
+
+  setSheet(sid, rid) { this.setState((s) => ({ sheet: { ...s.sheet, [sid]: rid } })); }
+  setFilter(sid, f) { this.setState((s) => ({ filter: { ...s.filter, [sid]: f } })); }
+
+  renderVals() {
+    const KINDS = [
+      { id: 'bravo', emoji: '\u{1F44F}', label: 'Bravo' },
+      { id: 'visio', emoji: '\u{1F340}', label: 'Chanceux' },
+      { id: 'culotte', emoji: '\u{1F632}', label: 'Culotté' },
+      { id: 'mdr', emoji: '\u{1F602}', label: 'Mort de rire' },
+    ];
+
+    const restBg = 'var(--surface-sunken)';
+    const restBorder = '1px solid transparent';
+    const mineBg = 'var(--surface-sunken)';
+    const mineBorder = '1.5px solid color-mix(in srgb, var(--text) 38%, transparent)';
+
+    const chipStyle = (mine) => mine
+      ? { bg: mineBg, border: mineBorder, color: 'var(--text)', weight: 700 }
+      : { bg: restBg, border: restBorder, color: 'var(--text-muted)', weight: 600 };
+
+    // base data: prono rows for FRA 29–18 IRL, ligue "Les Potes"
+    const MEMBERS = [
+      { id: 'r1', name: 'Karim Mensah', prono: '27 – 15', pts: 6, base: {} },
+      { id: 'r2', name: 'Léa Berthier', prono: '29 – 18', pts: 36, exact: true, joker: true, base: { bravo: 3, visio: 4, culotte: 1, mdr: 1 } },
+      { id: 'me', name: 'Antoine Mercier', prono: '24 – 18', pts: 9, isMe: true, base: { bravo: 2, visio: 1 } },
+      { id: 'r4', name: 'Hugo Delaunay', prono: '22 – 16', pts: 5, base: { culotte: 3, mdr: 1 } },
+      { id: 'r5', name: 'Thomas Payet', prono: null, pts: 0, base: {} },
+      { id: 'r6', name: 'Sophie Lémaire', prono: '15 – 24', pts: 0, joker: true, base: { mdr: 2 } },
+    ];
+
+    const REACTORS = {
+      bravo: ['Karim Mensah', 'Hugo Delaunay', 'Sophie Lémaire'],
+      visio: ['Antoine Mercier', 'Thomas Payet', 'Clément Roy', 'Nadia Cherif'],
+      culotte: ['Hugo Delaunay'],
+      mdr: ['__gone__'],
+    };
+
+    const screenDefs = [
+      { id: 's_light', theme: 'light', label: 'Pronos · clair · popover au-dessus', dot: 'var(--sand-050)' },
+      { id: 's_dark', theme: 'dark', label: 'Sombre · 1re ligne, popover en dessous', dot: 'var(--green-800)' },
+      { id: 's_sheet_l', theme: 'light', label: 'Sheet « Réactions » · clair · Toutes', dot: 'var(--sand-050)' },
+      { id: 's_sheet_d', theme: 'dark', label: 'Sheet · sombre · filtre 🍀 + membre parti', dot: 'var(--green-800)' },
+    ];
+
+    const screens = screenDefs.map((sd) => {
+      const picked = this.state.picked[sd.id] || {};
+      const openRow = this.state.open[sd.id];
+      const sheetRow = this.state.sheet[sd.id];
+
+      const rows = MEMBERS.map((m, idx) => {
+        const hasProno = !!m.prono;
+        const mine = picked[m.id] || null;
+        const counts = { ...m.base };
+        if (mine) counts[mine] = (counts[mine] || 0) + 1;
+        const chips = KINDS.filter((k) => counts[k.id] > 0).map((k) => {
+          const st = chipStyle(mine === k.id);
+          return { emoji: k.emoji, label: k.label + ' · ' + counts[k.id], count: counts[k.id], ...st };
+        });
+        const canReact = hasProno && !m.isMe;
+        const open = openRow === m.id;
+        const badges = [];
+        if (m.exact) badges.push({ text: 'Score exact', bg: 'var(--accent)', color: 'var(--on-accent)', border: 'none' });
+        if (m.joker) badges.push({ text: 'Joker ×2', bg: 'color-mix(in srgb, var(--brand) 16%, transparent)', color: sd.theme === 'dark' ? 'var(--green-400)' : 'var(--brand)', border: 'none' });
+
+        return {
+          id: m.id,
+          name: m.name,
+          displayName: m.isMe ? m.name + ' (toi)' : m.name,
+          isMe: !!m.isMe,
+          nameWeight: m.isMe ? 700 : 600,
+          hasBadges: badges.length > 0,
+          badges,
+          pronoStr: hasProno ? m.prono : '—',
+          pronoColor: hasProno ? 'var(--text-muted)' : 'var(--text-faint)',
+          showPts: hasProno,
+          ptsStr: m.pts > 0 ? '+' + m.pts : '0',
+          ptsColor: m.pts > 0 ? (m.exact ? 'var(--accent)' : 'var(--text)') : 'var(--text-faint)',
+          rowBg: m.isMe ? 'color-mix(in srgb, var(--accent) 8%, var(--surface))' : 'var(--surface)',
+          rowEdge: m.isMe ? '3px solid var(--accent)' : '3px solid transparent',
+          hasChips: chips.length > 0,
+          chips,
+          showSmile: canReact,
+          noSmile: !canReact,
+          smileBg: open ? 'var(--surface-sunken)' : 'transparent',
+          smileColor: open ? 'var(--text)' : 'var(--text-faint)',
+          open,
+          popUp: open && idx > 0,
+          popDown: open && idx === 0,
+          picker: KINDS.map((k) => ({
+            emoji: k.emoji,
+            label: k.label,
+            selected: mine === k.id,
+            bg: mine === k.id ? 'var(--surface-sunken)' : 'transparent',
+            ring: mine === k.id ? '1.5px solid color-mix(in srgb, var(--text) 38%, transparent)' : '1.5px solid transparent',
+            onPick: () => this.setPick(sd.id, m.id, k.id),
+          })),
+          onSmile: (e) => { e.stopPropagation(); this.toggleOpen(sd.id, m.id); },
+          onPressStart: () => canReact && this.press(sd.id, m.id, true),
+          onPressEnd: () => this.press(sd.id, m.id, false),
+          onOpenSheet: (e) => { e.stopPropagation(); this.setSheet(sd.id, m.id); },
+        };
+      });
+
+      // sheet content
+      const sheetMember = MEMBERS.find((m) => m.id === sheetRow);
+      let sheetRows = [], filters = [], sheetSub = '';
+      if (sheetMember) {
+        const mine = picked[sheetMember.id] || null;
+        const counts = { ...sheetMember.base };
+        if (mine) counts[mine] = (counts[mine] || 0) + 1;
+        const total = Object.keys(counts).reduce((a, k) => a + counts[k], 0);
+        sheetSub = sheetMember.name + ' · ' + total + (total > 1 ? ' réactions' : ' réaction');
+        const cur = this.state.filter[sd.id] || 'all';
+        filters = [{ id: 'all', text: 'Toutes', hasEmoji: false, emoji: '', aria: 'Toutes les réactions' }].concat(
+          KINDS.filter((k) => counts[k.id] > 0).map((k) => ({ id: k.id, text: String(counts[k.id]), hasEmoji: true, emoji: k.emoji, aria: k.label + ', ' + counts[k.id] }))
+        ).map((f) => {
+          const active = f.id === cur;
+          return {
+            ...f,
+            active,
+            bg: active ? 'var(--surface-sunken)' : 'transparent',
+            border: active ? '1.5px solid color-mix(in srgb, var(--text) 38%, transparent)' : '1.5px solid var(--border)',
+            color: active ? 'var(--text)' : 'var(--text-muted)',
+            onPick: () => this.setFilter(sd.id, f.id),
+          };
+        });
+
+        const list = [];
+        KINDS.forEach((k) => {
+          const n = counts[k.id] || 0;
+          if (!n) return;
+          const names = (REACTORS[k.id] || []).slice(0, n - (mine === k.id ? 1 : 0));
+          if (mine === k.id) names.unshift('Antoine Mercier');
+          names.forEach((nm) => list.push({ kind: k.id, emoji: k.emoji, name: nm }));
+        });
+        sheetRows = list
+          .filter((it) => cur === 'all' || it.kind === cur)
+          .map((it) => {
+            const gone = it.name === '__gone__';
+            const isMe = it.name === 'Antoine Mercier';
+            return {
+              present: !gone,
+              gone,
+              isMe,
+              name: gone ? 'Ancien membre' : it.name,
+              displayName: gone ? 'Ancien membre' : (isMe ? it.name + ' (toi)' : it.name),
+              nameColor: gone ? 'var(--text-faint)' : 'var(--text)',
+              weight: isMe ? 700 : 500,
+              hasNote: gone,
+              note: 'A quitté la ligue',
+              emoji: it.emoji,
+            };
+          });
+      }
+
+      return {
+        id: sd.id, theme: sd.theme, label: sd.label, dot: sd.dot,
+        rows,
+        sheetOpen: !!sheetMember,
+        sheetSub,
+        filters,
+        sheetRows,
+        onCloseSheet: () => this.setSheet(sd.id, null),
+      };
+    });
+
+    // popover state specimens
+    const specState = (name, opacity, transform, hi, hovered) => ({
+      name, opacity, transform,
+      items: KINDS.map((k, i) => ({
+        emoji: k.emoji,
+        bg: hi === i ? 'var(--surface-sunken)' : 'transparent',
+        ring: hi === i ? '1.5px solid color-mix(in srgb, var(--text) 38%, transparent)' : '1.5px solid transparent',
+        scale: hovered === i ? 'scale(1.14)' : 'none',
+      })),
+    });
+    const popStates = [
+      specState('Ouverture (t=0)', 0.4, 'scale(0.92) translateY(6px)', -1, -1),
+      specState('Repos', 1, 'none', -1, -1),
+      specState('Survol / pressé', 1, 'none', -1, 1),
+      specState('Déjà choisie', 1, 'none', 2, -1),
+    ];
+    const popSpecs = [
+      { theme: 'light', label: 'Clair', states: popStates },
+      { theme: 'dark', label: 'Sombre', states: popStates },
+    ];
+
+    const samples = [
+      { name: 'Au repos', emoji: KINDS[0].emoji, count: '3', ...chipStyle(false), note: 'surface-sunken, compteur text-muted' },
+      { name: 'Contient ma réaction', emoji: KINDS[1].emoji, count: '5', ...chipStyle(true), note: 'contour encre 38 %, compteur gras' },
+      { name: 'Gros compteur', emoji: KINDS[3].emoji, count: '128', ...chipStyle(false), note: 'tabular-nums, la puce s\u2019allonge' },
+    ];
+    const loaded = [
+      { emoji: KINDS[0].emoji, count: '112', ...chipStyle(false) },
+      { emoji: KINDS[1].emoji, count: '87', ...chipStyle(true) },
+      { emoji: KINDS[2].emoji, count: '24', ...chipStyle(false) },
+      { emoji: KINDS[3].emoji, count: '9', ...chipStyle(false) },
+    ];
+    const chipSpecs = [
+      { theme: 'light', label: 'Clair', samples, loaded, jokerColor: 'var(--brand)' },
+      { theme: 'dark', label: 'Sombre', samples, loaded, jokerColor: 'var(--green-400)' },
+    ];
+
+    const motion = [
+      { name: 'Ouverture du popover', timing: '200 ms · ease-out', detail: 'Opacité 0→1, échelle 0,92→1, translation 6 px depuis le bord ancré. Origine au coin de la flèche.' },
+      { name: 'Fermeture', timing: '120 ms · ease-out', detail: 'Retour inverse, plus court : l’objet disparaît vite pour rendre la ligne.' },
+      { name: 'Appui sur une réaction', timing: '120 ms', detail: 'Le bouton passe à 0,94 pendant l’appui, revient à 1 au relâchement. Retour haptique léger sur mobile.' },
+      { name: 'Sélection → puce', timing: '220 ms', detail: 'Le popover se ferme, la puce apparaît en 0,6→1,12→1 et le compteur s’incrémente. Pas de confettis.' },
+      { name: 'Changement de réaction', timing: '160 ms', detail: 'Ancienne puce décrémentée et retirée en fondu, nouvelle puce en rebond. Les puces se réordonnent dans l’ordre fixe 👏 🍀 😲 😂.' },
+      { name: 'Ouverture de la sheet', timing: '240 ms · ease-out', detail: 'Translation depuis le bas + voile à 42 %. Fermeture par glissé, tap sur le voile ou Échap.' },
+    ];
+
+    return { screens, popSpecs, chipSpecs, motion };
+  }
+}
+
+</script>
+</body>
+</html>
