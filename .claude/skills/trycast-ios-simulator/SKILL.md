@@ -84,6 +84,14 @@ Après chaque interaction : `sleep 1-2` puis vérifier (screenshot ou describe-u
 
 ## Pièges connus (vécus)
 
+- **Outil simulateur intégré, limites constatées le 2026-09-19** : son `screenshot` peut
+  échouer en `captureFailed` et `inspect` être indisponible. Repli qui marche :
+  `xcrun simctl io booted screenshot <png>` puis `magick -resize 33%` avant de lire.
+  Son action `text` passe par un clavier **matériel** : le clavier logiciel ne s'affiche
+  pas, donc un comportement « au-dessus du clavier » ne se vérifie pas ici (le faire sur
+  l'émulateur Android). Un toast (2,2 s) se rate facilement : enchaîner plusieurs captures
+  juste après l'action.
+
 - **AXe cassé depuis Xcode 27** (vécu le 2026-09-18) : toute commande `axe` échoue en
   `Failed to load essential private frameworks … Developer/Library/PrivateFrameworks/SimulatorKit.framework`
   — Xcode 27 a déplacé SimulatorKit dans `Contents/SharedFrameworks`. En attendant une version
