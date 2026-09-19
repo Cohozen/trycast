@@ -69,7 +69,12 @@ export type AnalyticsEvent =
      * Le guide d'accueil a été fermé. `completed` distingue « suivi jusqu'au
      * bout » (ou sorti par un de ses boutons) de « passé / glissé ».
      */
-    | { name: 'welcome_guide_closed'; props: { completed: boolean } };
+    | { name: 'welcome_guide_closed'; props: { completed: boolean } }
+    /**
+     * Un signalement de problème est parti vers Sentry. `withEmail` : le
+     * testeur a laissé son adresse. Jamais le contenu du message.
+     */
+    | { name: 'feedback_sent'; props: { withEmail: boolean } };
 
 export type AnalyticsEventName = AnalyticsEvent['name'];
 

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { ToastProvider } from '@/components/ui/toast-provider';
 import { CelebrationHost } from '@/features/celebration/components/celebration-host';
+import { FeedbackProvider } from '@/features/feedback/components/feedback-provider';
 import { PendingInviteHost } from '@/features/leagues/components/pending-invite-host';
 import { useStandingsRealtime } from '@/features/leagues/use-standings-realtime';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
@@ -23,78 +24,80 @@ export default function AppLayout() {
     return (
         <ToastProvider>
             <WelcomeGuideProvider>
-                <Stack
-                    screenOptions={{
-                        headerShown: false,
-                        // Header natif aux couleurs du DS : fond identique à l'écran
-                        // (sans hairline → continuité visuelle), titre Inter SemiBold.
-                        // Le chevron reste couleur texte : le grenat est réservé aux
-                        // CTA/live/sélection, pas à la navigation.
-                        headerStyle: { backgroundColor: bgColor },
-                        headerShadowVisible: false,
-                        headerTintColor: textColor,
-                        headerTitleStyle: { fontFamily: 'Inter_600SemiBold', color: textColor },
-                    }}>
-                    {/* title vide : le back natif des écrans poussés affiche juste le
+                <FeedbackProvider>
+                    <Stack
+                        screenOptions={{
+                            headerShown: false,
+                            // Header natif aux couleurs du DS : fond identique à l'écran
+                            // (sans hairline → continuité visuelle), titre Inter SemiBold.
+                            // Le chevron reste couleur texte : le grenat est réservé aux
+                            // CTA/live/sélection, pas à la navigation.
+                            headerStyle: { backgroundColor: bgColor },
+                            headerShadowVisible: false,
+                            headerTintColor: textColor,
+                            headerTitleStyle: { fontFamily: 'Inter_600SemiBold', color: textColor },
+                        }}>
+                        {/* title vide : le back natif des écrans poussés affiche juste le
                     chevron, pas le nom technique « (tabs) » */}
-                    <Stack.Screen name="(tabs)" options={{ title: '' }} />
-                    <Stack.Screen
-                        name="settings"
-                        options={{
-                            headerShown: true,
-                            title: t('profile:settings.title'),
-                            gestureEnabled: true,
-                            animation: 'simple_push',
-                        }}
-                    />
-                    <Stack.Screen
-                        name="notifications"
-                        options={{
-                            headerShown: true,
-                            title: t('notifications:screenTitle'),
-                            gestureEnabled: true,
-                            animation: 'simple_push',
-                        }}
-                    />
-                    <Stack.Screen
-                        name="rules"
-                        options={{
-                            headerShown: true,
-                            title: t('scoring:rules.screenTitle'),
-                            gestureEnabled: true,
-                            animation: 'simple_push',
-                        }}
-                    />
-                    <Stack.Screen
-                        name="league/new"
-                        options={{
-                            headerShown: true,
-                            title: t('leagues:new.screenTitle'),
-                            gestureEnabled: true,
-                            animation: 'simple_push',
-                        }}
-                    />
-                    <Stack.Screen
-                        name="league/[id]"
-                        options={{
-                            headerShown: true,
-                            title: t('leagues:detail.screenTitle'),
-                            gestureEnabled: true,
-                            animation: 'simple_push',
-                        }}
-                    />
-                    <Stack.Screen
-                        name="match/[id]"
-                        options={{
-                            headerShown: true,
-                            title: t('matches:detail.screenTitle'),
-                            gestureEnabled: true,
-                            animation: 'simple_push',
-                        }}
-                    />
-                </Stack>
-                <CelebrationHost />
-                <PendingInviteHost />
+                        <Stack.Screen name="(tabs)" options={{ title: '' }} />
+                        <Stack.Screen
+                            name="settings"
+                            options={{
+                                headerShown: true,
+                                title: t('profile:settings.title'),
+                                gestureEnabled: true,
+                                animation: 'simple_push',
+                            }}
+                        />
+                        <Stack.Screen
+                            name="notifications"
+                            options={{
+                                headerShown: true,
+                                title: t('notifications:screenTitle'),
+                                gestureEnabled: true,
+                                animation: 'simple_push',
+                            }}
+                        />
+                        <Stack.Screen
+                            name="rules"
+                            options={{
+                                headerShown: true,
+                                title: t('scoring:rules.screenTitle'),
+                                gestureEnabled: true,
+                                animation: 'simple_push',
+                            }}
+                        />
+                        <Stack.Screen
+                            name="league/new"
+                            options={{
+                                headerShown: true,
+                                title: t('leagues:new.screenTitle'),
+                                gestureEnabled: true,
+                                animation: 'simple_push',
+                            }}
+                        />
+                        <Stack.Screen
+                            name="league/[id]"
+                            options={{
+                                headerShown: true,
+                                title: t('leagues:detail.screenTitle'),
+                                gestureEnabled: true,
+                                animation: 'simple_push',
+                            }}
+                        />
+                        <Stack.Screen
+                            name="match/[id]"
+                            options={{
+                                headerShown: true,
+                                title: t('matches:detail.screenTitle'),
+                                gestureEnabled: true,
+                                animation: 'simple_push',
+                            }}
+                        />
+                    </Stack>
+                    <CelebrationHost />
+                    <PendingInviteHost />
+                </FeedbackProvider>
             </WelcomeGuideProvider>
         </ToastProvider>
     );

@@ -3,7 +3,7 @@ import { Globe, Settings2, Users } from 'lucide-react-native';
 import { useDeferredValue, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { NotificationsBell } from '@/components/notifications-bell';
+import { HeaderActions } from '@/components/header-actions';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -133,7 +133,7 @@ export default function LeaderboardScreen() {
                             </Text>
                         ) : null}
                     </View>
-                    <NotificationsBell />
+                    <HeaderActions />
                 </View>
 
                 {leagues.length > 0 ? (

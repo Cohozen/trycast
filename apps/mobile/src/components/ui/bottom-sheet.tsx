@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useState } from 'react';
 import { Dimensions, Modal, Pressable, StyleSheet } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, {
     Easing,
     runOnJS,
@@ -32,6 +33,8 @@ type BottomSheetProps = {
     backdropOpacity?: number;
     /** Plancher du padding bas (au-dessus de la barre gestuelle). */
     bottomInset?: number;
+    /** Le volet remonte au-dessus du clavier (volet qui porte un champ de saisie). */
+    avoidKeyboard?: boolean;
 };
 
 // Fondu du fond en place + glissé du volet : ~320 ms à l'ouverture,
@@ -58,6 +61,7 @@ export function BottomSheet({
     backdropColor = palette['ink-900'].light,
     backdropOpacity = 0.4,
     bottomInset = 32,
+    avoidKeyboard = false,
 }: BottomSheetProps) {
     const insets = useSafeAreaInsets();
     const reduce = useReducedMotion();
@@ -171,38 +175,43 @@ export function BottomSheet({
             transparent
             visible={rendered}>
             <GestureHandlerRootView style={styles.root}>
-                <View className="flex-1 justify-end">
-                    <Animated.View
-                        pointerEvents="none"
-                        style={[
-                            StyleSheet.absoluteFill,
-                            { backgroundColor: backdropColor },
-                            backdropStyle,
-                        ]}
-                    />
-                    <Pressable
-                        accessibilityRole="button"
-                        onPress={onClose}
-                        style={StyleSheet.absoluteFill}
-                    />
-                    <GestureDetector gesture={pan}>
+                <KeyboardAvoidingView
+                    behavior="padding"
+                    enabled={avoidKeyboard}
+                    style={styles.root}>
+                    <View className="flex-1 justify-end">
                         <Animated.View
-                            onLayout={(event) => {
-                                height.value = event.nativeEvent.layout.height;
-                            }}
-                            style={sheetStyle}>
-                            <View
-                                className={cn(
-                                    'rounded-t-lg bg-surface pt-2 tc-shadow-lg',
-                                    className,
-                                )}
-                                style={{ paddingBottom: Math.max(insets.bottom, bottomInset) }}>
-                                <View className="mb-3 h-1 w-10 self-center rounded-pill bg-border-strong" />
-                                <View className={contentClassName}>{children}</View>
-                            </View>
-                        </Animated.View>
-                    </GestureDetector>
-                </View>
+                            pointerEvents="none"
+                            style={[
+                                StyleSheet.absoluteFill,
+                                { backgroundColor: backdropColor },
+                                backdropStyle,
+                            ]}
+                        />
+                        <Pressable
+                            accessibilityRole="button"
+                            onPress={onClose}
+                            style={StyleSheet.absoluteFill}
+                        />
+                        <GestureDetector gesture={pan}>
+                            <Animated.View
+                                onLayout={(event) => {
+                                    height.value = event.nativeEvent.layout.height;
+                                }}
+                                style={sheetStyle}>
+                                <View
+                                    className={cn(
+                                        'rounded-t-lg bg-surface pt-2 tc-shadow-lg',
+                                        className,
+                                    )}
+                                    style={{ paddingBottom: Math.max(insets.bottom, bottomInset) }}>
+                                    <View className="mb-3 h-1 w-10 self-center rounded-pill bg-border-strong" />
+                                    <View className={contentClassName}>{children}</View>
+                                </View>
+                            </Animated.View>
+                        </GestureDetector>
+                    </View>
+                </KeyboardAvoidingView>
             </GestureHandlerRootView>
         </Modal>
     );

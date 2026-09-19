@@ -43,16 +43,22 @@ export function TextField({
             ) : null}
             <View
                 className={cn(
-                    'h-14 flex-row items-center gap-2 rounded-sm border-[1.5px] border-border-strong bg-surface px-3.5',
+                    'flex-row gap-2 rounded-sm border-[1.5px] border-border-strong bg-surface px-3.5',
+                    // Multiligne : boîte haute, texte calé en haut
+                    inputProps.multiline ? 'h-32 items-start py-3' : 'h-14 items-center',
                     focused && !error && 'border-brand',
                     error && 'border-accent',
                     disabled && 'bg-surface-sunken opacity-60',
                 )}>
                 {leadingIcon}
                 <TextInput
-                    className="min-w-0 flex-1 font-body text-[15px] text-text"
+                    className={cn(
+                        'min-w-0 flex-1 font-body text-[15px] text-text',
+                        inputProps.multiline && 'h-full',
+                    )}
                     editable={!disabled}
                     placeholderTextColor={faintColor}
+                    textAlignVertical={inputProps.multiline ? 'top' : undefined}
                     {...inputProps}
                     onBlur={(e) => {
                         setFocused(false);

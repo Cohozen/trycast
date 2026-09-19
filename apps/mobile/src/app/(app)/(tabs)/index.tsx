@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { BrandMark } from '@/components/brand-mark';
-import { NotificationsBell } from '@/components/notifications-bell';
+import { HeaderActions } from '@/components/header-actions';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Screen } from '@/components/ui/screen';
@@ -379,7 +379,7 @@ export default function MatchesScreen() {
                     </Text>
                     {currentPhase ? <JokerPhasePill placedOn={jokerPlacedOn} /> : null}
                 </View>
-                <NotificationsBell />
+                <HeaderActions />
             </View>
 
             {/* Le scroll des pronos porte les inputs de score : Screen gère le

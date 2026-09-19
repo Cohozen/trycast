@@ -8,6 +8,7 @@ import {
     Globe,
     KeyRound,
     Mail,
+    MessageSquareWarning,
     ShieldCheck,
     Sparkles,
 } from 'lucide-react-native';
@@ -44,6 +45,7 @@ import {
     type ThemePreference,
 } from '@/features/profile/theme-preference';
 import { useDeleteAccount, useProfile } from '@/features/profile/use-profile';
+import { useFeedback } from '@/features/feedback/components/feedback-provider';
 import { useWelcomeGuide } from '@/features/welcome/components/welcome-guide-provider';
 import { supabase } from '@/lib/supabase';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
@@ -54,9 +56,10 @@ import { Pressable, Text, useThemeColor, View } from '@/tw';
  * portés par le header natif (déclaré dans le layout (app)).
  */
 export default function SettingsScreen() {
-    const { t } = useTranslation(['profile', 'scoring', 'common']);
+    const { t } = useTranslation(['profile', 'scoring', 'feedback', 'common']);
     const router = useRouter();
     const { replay } = useWelcomeGuide();
+    const feedback = useFeedback();
     const { session } = useSession();
     const { data: profile } = useProfile(session?.user.id);
     const deleteAccount = useDeleteAccount();
@@ -303,6 +306,23 @@ export default function SettingsScreen() {
                         <ChevronRight color={textFaintColor} size={18} strokeWidth={1.9} />
                     </Card>
                 </Pressable>
+                {feedback.available ? (
+                    <Pressable accessibilityRole="button" onPress={feedback.open}>
+                        <Card className="flex-row items-center gap-3 px-4 py-3.5">
+                            <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">
+                                <MessageSquareWarning
+                                    color={brandColor}
+                                    size={17}
+                                    strokeWidth={1.9}
+                                />
+                            </View>
+                            <Text className="flex-1 font-body-semibold text-[15px] text-text">
+                                {t('feedback:button')}
+                            </Text>
+                            <ChevronRight color={textFaintColor} size={18} strokeWidth={1.9} />
+                        </Card>
+                    </Pressable>
+                ) : null}
                 <Pressable accessibilityRole="button" onPress={() => router.push('/rules')}>
                     <Card className="flex-row items-center gap-3 px-4 py-3.5">
                         <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">

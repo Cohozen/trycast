@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 
-import { NotificationsBell } from '@/components/notifications-bell';
+import { HeaderActions } from '@/components/header-actions';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -185,7 +185,7 @@ export default function ResultsScreen() {
                         </Text>
                     ) : null}
                 </View>
-                <NotificationsBell />
+                <HeaderActions />
             </View>
 
             {results.length === 0 ? (
