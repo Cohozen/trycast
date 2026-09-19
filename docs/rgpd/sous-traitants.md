@@ -18,7 +18,7 @@
 | **Google (Sign in with Google)** | Fournisseur d'identité, au choix de l'utilisateur | Adresse e-mail, identifiant de compte Google, nom et photo du compte Google. Google sait qu'un de ses comptes se connecte à TryCast | États-Unis | Oui — Data Privacy Framework / clauses contractuelles types |
 | **Apple (APNs)** | Livraison des notifications sur iOS *(pas encore actif — iOS différé)* | Jeton d'appareil, contenu de la notification | États-Unis | Oui |
 | **Aptabase** | Mesure d'usage de l'application | Événements de parcours nommés, version de l'app, système d'exploitation. **Aucun identifiant** | UE (région encodée dans la clé `A-EU-…`) | Non |
-| **Sentry** | Rapports de plantage | Pile d'appel, modèle d'appareil, versions, fil d'Ariane des écrans | UE — Francfort (`ingest.de.sentry.io`) | Non |
+| **Sentry** | Rapports de plantage ; signalements de problèmes envoyés depuis l'app | Pile d'appel, modèle d'appareil, versions, fil d'Ariane des écrans ; pour un signalement, le message, l'écran ouvert et, si l'utilisateur le choisit, son e-mail et son pseudo | UE — Francfort (`ingest.de.sentry.io`) | Non |
 | **Highlightly** | Fournisseur de calendriers, résultats et cotes | **Aucune donnée personnelle** — les appels ne portent que sur des matchs | — | Sans objet |
 
 ## Points de vigilance
@@ -63,3 +63,5 @@ Aptabase ne pose pas d'identifiant d'appareil et fait tourner son sel chaque jou
 événements ne sont rattachables à personne, ce qui le sort du champ des traceurs soumis à
 consentement. Sentry, lui, voit des piles d'appel : c'est la raison du `sendDefaultPii:
 false` et de l'absence totale de `setUser`.
+Les signalements (registre §11) ne dérogent pas à cette règle : l'e-mail n'y est joint que si
+l'utilisateur coche la case, et seulement au signalement lui-même.

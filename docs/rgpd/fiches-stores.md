@@ -174,6 +174,21 @@ Sentry n'attache aucun identifiant de compte (`sendDefaultPii: false`, jamais de
 
 **Données utilisées pour le suivi** : aucune.
 
+### Signalements de problèmes (v1.1.0, registre §11)
+
+Le bouton « Signaler un problème » envoie à Sentry un message libre et, si l'utilisateur
+laisse la case cochée, son e-mail et son pseudo. Rien de nouveau à **cocher** (e-mail, nom
+d'utilisateur et « autre contenu généré » le sont déjà), mais deux lignes changent de sens
+et sont à ajuster **avant la publication du build 1.1.0** :
+
+- **Play, « Autre contenu généré »** : ajouter le message du signalement à côté des
+  pronostics. La ligne reste obligatoire à cause des pronostics ; finalité **Fonctionnalité
+  de l'appli**.
+- **Apple, « Other User Content »** : à déclarer, **lié** à l'utilisateur (l'e-mail peut y
+  être joint), finalité **App Functionality**. Apple compte l'assistance dans cette finalité.
+- Les lignes **Diagnostics** ne changent pas : les rapports de plantage restent sans
+  identifiant, puisque l'e-mail ne passe que par le signalement et jamais par `setUser`.
+
 ---
 
 ## Privacy manifest iOS (`PrivacyInfo.xcprivacy`)

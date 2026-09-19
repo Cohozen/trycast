@@ -7,7 +7,7 @@
 **Responsable du traitement** : l'éditeur de TryCast, joignable à `contact@trycast.fr`.
 **Délégué à la protection des données** : aucun (non requis — pas de suivi à grande échelle,
 pas de données sensibles).
-**Dernière mise à jour** : 14 septembre 2026 (§10 beta fermée ; Proton pour la boîte de contact au §9 ; transfert vers les États-Unis de Resend corrigé aux §1 et §4).
+**Dernière mise à jour** : 19 septembre 2026 (§11 signalements de problèmes). Précédente : 14 septembre 2026 (§10 beta fermée ; Proton pour la boîte de contact au §9 ; transfert vers les États-Unis de Resend corrigé aux §1 et §4).
 
 Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](procedure-droits.md),
 [fiches-stores.md](fiches-stores.md). Version publique : `apps/web/src/pages/confidentialite.astro`.
@@ -132,6 +132,10 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 | **Conservation** | Selon la politique de rétention de Sentry (90 jours par défaut) |
 | **Sécurité** | `sendDefaultPii: false` et **aucun identifiant utilisateur attaché** (`Sentry.setUser` n'est jamais appelé). Périmètre restreint aux plantages : ni mesure de performance, ni rejeu de session |
 
+> Les signalements envoyés depuis l'app passent par le même outil mais forment un
+> traitement distinct (§11) : l'e-mail éventuel n'y est porté que par le signalement, jamais
+> par les rapports de plantage, qui restent anonymes.
+
 ## 9. Support et exercice des droits
 
 | | |
@@ -158,6 +162,20 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 | **Transferts hors UE** | Oui, vers Resend et Google (États-Unis) — clauses contractuelles types et Data Privacy Framework ; vers Proton (Suisse) — décision d'adéquation |
 | **Conservation** | Jusqu'à la fin de la beta fermée : l'Audience Resend et la liste de testeurs Play sont alors **supprimées**. Plus tôt sur demande. La désinscription arrête les envois immédiatement (gérée par Resend, lien dans chaque e-mail) |
 | **Sécurité** | Aucune adresse dans le dépôt (public) ; le code de la ligue des testeurs n'y figure pas non plus (`docs/emails/*.local.html` ignoré par git) |
+
+## 11. Signalements de problèmes
+
+| | |
+|---|---|
+| **Finalité** | Recevoir les problèmes et suggestions que l'utilisateur décrit depuis l'app (bouton « Signaler un problème »), les corriger et, s'il le souhaite, lui répondre |
+| **Base légale** | Intérêt légitime — art. 6.1.f (corriger le service à la demande de l'utilisateur). L'envoi est toujours un geste de l'utilisateur, et joindre son adresse est un choix explicite |
+| **Personnes concernées** | Utilisateurs de l'application qui envoient un signalement |
+| **Catégories de données** | Message libre rédigé par l'utilisateur ; contexte technique (écran ouvert et identifiant technique du match, de la ligue ou du joueur affiché, version et build de l'app, mise à jour chargée, langue, thème, modèle d'appareil et version du système) ; **adresse e-mail et pseudo uniquement si l'utilisateur coche « Joindre mon e-mail »** (case cochée par défaut, adresse affichée avant l'envoi) ; lien vers la dernière erreur technique si elle date de moins de 10 minutes. **Pas de capture d'écran** |
+| **Où** | Sentry, organisation en résidence de données européenne (Francfort), rubrique User Feedback |
+| **Destinataires** | Sentry |
+| **Transferts hors UE** | Aucun |
+| **Conservation** | Selon la politique de rétention de Sentry (90 jours par défaut) ; suppression plus tôt sur demande |
+| **Sécurité** | L'identité ne passe que par le signalement (`captureFeedback`), jamais par `Sentry.setUser`. Les paramètres d'écran joints sont filtrés par liste blanche : le code d'invitation d'une ligue n'est jamais envoyé. Envoyé même si les diagnostics sont coupés, puisque c'est un geste explicite ; le fil d'Ariane reste alors vide |
 
 ---
 

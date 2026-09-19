@@ -51,7 +51,7 @@ export function localePath(route: RouteName, locale: Locale): string {
  */
 export const legalUpdatedAt = {
     terms: '2026-09-03',
-    privacy: '2026-09-14',
+    privacy: '2026-09-19',
     legalNotice: '2026-07-15',
     deleteAccount: '2026-07-27',
 } as const satisfies Partial<Record<RouteName, string>>;
