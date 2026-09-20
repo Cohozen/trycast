@@ -33,8 +33,43 @@
     @keyframes tc-pop-down { from { opacity: 0; transform: translateY(-6px) scale(0.92); } to { opacity: 1; transform: none; } }
     @keyframes tc-chip-in { 0% { transform: scale(0.6); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
     @keyframes tc-sheet-in { from { transform: translateY(100%); } to { transform: none; } }
+    .tc-ico { overflow: visible; }
+    .tc-ico .cl, .tc-ico .cr { transform-box: fill-box; transform-origin: 50% 90%; }
+    @keyframes tc-sys-pop { 0%,100% { transform: scale(1) rotate(0deg); } 30% { transform: scale(1.22) rotate(-7deg); } 62% { transform: scale(0.96) rotate(4deg); } }
+    .tc-ico-sys.tc-play, .tc-hit:hover .tc-ico-sys { animation: tc-sys-pop 620ms var(--ease-out) both; }
+    @media (prefers-reduced-motion: reduce) { .tc-ico-sys.tc-play, .tc-hit:hover .tc-ico-sys { animation: none; } }
+    .tc-ico .tint { fill: color-mix(in srgb, currentColor 15%, transparent); }
+    [data-theme="light"] .tc-ico-bravo { color: #C08420; }
+    [data-theme="light"] .tc-ico-visio { color: var(--green-500); }
+    [data-theme="light"] .tc-ico-culotte { color: #3C7DA6; }
+    [data-theme="light"] .tc-ico-mdr { color: var(--grenat-600); }
+    [data-theme="dark"] .tc-ico-bravo { color: #E9B554; }
+    [data-theme="dark"] .tc-ico-visio { color: var(--green-400); }
+    [data-theme="dark"] .tc-ico-culotte { color: #74AED2; }
+    [data-theme="dark"] .tc-ico-mdr { color: var(--grenat-400); }
+    .tc-ico .cl, .tc-ico .cr, .tc-ico .sp, .tc-ico .cv, .tc-ico .sf, .tc-ico .sm, .tc-ico .se, .tc-ico .fa, .tc-ico .tr { transform-box: fill-box; transform-origin: center; }
+    .tc-ico.tc-play .cl, .tc-hit:hover .tc-ico .cl { animation: tc-clap-l 0.62s var(--ease-out); }
+    .tc-ico.tc-play .cr, .tc-hit:hover .tc-ico .cr { animation: tc-clap-r 0.62s var(--ease-out); }
+    .tc-ico.tc-play .sp, .tc-hit:hover .tc-ico .sp { animation: tc-spark 0.62s var(--ease-out); }
+    .tc-ico.tc-play .cv, .tc-hit:hover .tc-ico .cv { animation: tc-clover 0.56s var(--ease-out); }
+    .tc-ico.tc-play .sf, .tc-hit:hover .tc-ico .sf { animation: tc-gasp 0.62s var(--ease-out); }
+    .tc-ico.tc-play .sm, .tc-hit:hover .tc-ico .sm { animation: tc-gasp-mouth 0.62s var(--ease-out); }
+    .tc-ico.tc-play .se, .tc-hit:hover .tc-ico .se { animation: tc-gasp-eyes 0.62s var(--ease-out); }
+    .tc-ico .tr2 { animation-delay: 90ms !important; }
+    .tc-ico.tc-play .fa, .tc-hit:hover .tc-ico .fa { animation: tc-laugh 0.64s var(--ease-out); }
+    .tc-ico.tc-play .tr, .tc-hit:hover .tc-ico .tr { animation: tc-tear 0.64s var(--ease-out); }
+    @keyframes tc-clap-l { 0%,100% { transform: translateX(0) rotate(0deg); } 26% { transform: translateX(-2.4px) rotate(-9deg); } 50% { transform: translateX(0.6px) rotate(3deg); } 74% { transform: translateX(-1.2px) rotate(-4deg); } }
+    @keyframes tc-clap-r { 0%,100% { transform: translateX(0) rotate(0deg); } 26% { transform: translateX(-2.4px) rotate(-9deg); } 50% { transform: translateX(0.6px) rotate(3deg); } 74% { transform: translateX(-1.2px) rotate(-4deg); } }
+    @keyframes tc-spark { 0% { transform: scale(0.5); opacity: 0.35; } 45% { transform: scale(1.18); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes tc-clover { 0%,100% { transform: rotate(0deg) scale(1); } 32% { transform: rotate(-15deg) scale(1.09); } 66% { transform: rotate(10deg) scale(1.03); } }
+    @keyframes tc-gasp { 0%,100% { transform: scale(1) rotate(0deg); } 30% { transform: scale(1.07) rotate(-5deg); } 64% { transform: scale(0.99) rotate(2deg); } }
+    @keyframes tc-gasp-mouth { 0%,100% { transform: scaleY(1); } 35% { transform: scaleY(1.35); } 70% { transform: scaleY(0.92); } }
+    @keyframes tc-gasp-eyes { 0%,100% { transform: scale(1); } 35% { transform: scale(1.3); } 70% { transform: scale(0.95); } }
+    @keyframes tc-laugh { 0%,100% { transform: rotate(0deg) translateY(0); } 24% { transform: rotate(-8deg) translateY(-1px); } 52% { transform: rotate(6deg) translateY(1px); } 78% { transform: rotate(-3deg) translateY(0); } }
+    @keyframes tc-tear { 0% { transform: translateY(0); opacity: 1; } 42% { transform: translateY(4.5px); opacity: 0; } 43% { transform: translateY(-1px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
     @media (prefers-reduced-motion: reduce) {
       .tc-pop, .tc-sheet, .tc-chip-anim { animation-duration: 1ms !important; animation-name: none !important; }
+      .tc-ico *, .tc-ico.tc-play *, .tc-hit:hover .tc-ico * { animation: none !important; }
     }
   </style>
 </helmet>
@@ -42,8 +77,31 @@
 <div style="width: max-content; min-height: 100vh; padding: 48px; background: #7C776E; font-family: var(--font-body); display: flex; flex-direction: column; gap: 44px;">
 
   <div style="display: flex; flex-direction: column; gap: 6px; color: var(--sand-050); max-width: 820px;">
-    <span style="font-family: var(--font-display); font-size: 34px; letter-spacing: 0.01em;">TryCast — Réactions emoji sur les pronos</span>
-    <span style="font-size: 14px; color: rgba(255,255,255,0.72); text-wrap: pretty;">v1.1.0 · onglet « Pronos » du détail match, après le coup d'envoi · 4 réactions fermées, une par personne et par prono · light &amp; dark</span>
+    <span style="font-family: var(--font-display); font-size: 34px; letter-spacing: 0.01em;">TryCast — Réactions sur les pronos</span>
+    <span style="font-size: 14px; color: rgba(255,255,255,0.72); text-wrap: pretty;">v1.2.0 · onglet « Pronos » du détail match, après le coup d'envoi · 4 pictos maison animés, une réaction par personne et par prono · light &amp; dark</span>
+  </div>
+
+  <!-- ============ 0 · JEU DE PICTOS ============ -->
+  <div style="display: flex; flex-direction: column; gap: 14px;">
+    <div style="display: inline-flex; align-items: center; gap: 10px; color: var(--sand-050);">
+      <span style="font-family: var(--font-display); font-size: 20px;">0 · Les quatre pictos maison</span>
+      <span style="font-size: 13px; color: rgba(255,255,255,0.6);">Survole ou tape un picto pour rejouer son animation.</span>
+    </div>
+    <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+      <sc-for list="{{ iconBoards }}" as="bd" hint-placeholder-count="2">
+        <div data-theme="{{ bd.theme }}" style="width: 430px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 22px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);">
+          <span style="grid-column: 1 / -1; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint);">{{ bd.label }}</span>
+          <sc-for list="{{ bd.items }}" as="ic" hint-placeholder-count="4">
+            <button type="button" class="tc-hit" onClick="{{ ic.onPlay }}" style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer; text-align: left; font-family: var(--font-body); -webkit-tap-highlight-color: transparent; transition: background var(--dur) var(--ease-out);" style-hover="background: var(--surface-sunken);">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: var(--text);">{{ ic.big }}</span>
+              <span style="font-size: 13px; font-weight: 700; color: var(--text);">{{ ic.label }}</span>
+              <span style="font-size: 11.5px; color: var(--text-muted); line-height: 1.45; text-wrap: pretty;">{{ ic.note }}</span>
+            </button>
+          </sc-for>
+          <span style="grid-column: 1 / -1; font-size: 11.5px; color: var(--text-muted); line-height: 1.5; text-wrap: pretty;">Trait 2 px sur grille 24, bouts arrondis, encre seule — jamais de grenat ni de vert sur une réaction.</span>
+        </div>
+      </sc-for>
+    </div>
   </div>
 
   <!-- ============ 1 · LIGNE MEMBRE + POPOVER (écrans vivants) ============ -->
@@ -102,23 +160,26 @@
                       <sc-if value="{{ r.showPts }}" hint-placeholder-val="{{ true }}">
                         <span style="flex: none; min-width: 40px; text-align: right; display: inline-flex; align-items: baseline; justify-content: flex-end; gap: 2px;"><span style="font-family: var(--font-display); font-size: 19px; line-height: 1; color: {{ r.ptsColor }}; font-variant-numeric: tabular-nums;">{{ r.ptsStr }}</span><span style="font-size: 9px; font-weight: 700; color: {{ r.ptsColor }};">pts</span></span>
                       </sc-if>
-                      <sc-if value="{{ r.showSmile }}" hint-placeholder-val="{{ true }}">
-                        <button type="button" aria-label="Réagir au prono de {{ r.name }}" aria-expanded="{{ r.open }}" onClick="{{ r.onSmile }}" style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin: -6px -4px -6px 0; border: none; background: {{ r.smileBg }}; border-radius: var(--radius-pill); color: {{ r.smileColor }}; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);" style-hover="background: var(--surface-sunken); color: var(--text);">
-                          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11v1a10 10 0 1 1-5.93-9.14"></path><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line><path d="M16 5h6"></path><path d="M19 2v6"></path></svg>
-                        </button>
-                      </sc-if>
-                      <sc-if value="{{ r.noSmile }}" hint-placeholder-val="{{ false }}"><span style="flex: none; width: 28px;"></span></sc-if>
+                      <sc-if value="{{ r.noSmile }}" hint-placeholder-val="{{ false }}"><span style="flex: none; width: 4px;"></span></sc-if>
                     </div>
 
-                    <sc-if value="{{ r.hasChips }}" hint-placeholder-val="{{ false }}">
-                      <button type="button" aria-label="Voir les réactions" onClick="{{ r.onOpenSheet }}" style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-left: 42px; padding: 0; border: none; background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent;">
-                        <sc-for list="{{ r.chips }}" as="c" hint-placeholder-count="0">
-                          <span class="tc-chip-anim" title="{{ c.label }}" style="display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px 0 6px; border-radius: var(--radius-pill); background: {{ c.bg }}; border: {{ c.border }}; transition: background var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);">
-                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; font-size: 13px; line-height: 1;">{{ c.emoji }}</span>
-                            <span style="font-size: 11px; font-weight: {{ c.weight }}; color: {{ c.color }}; font-variant-numeric: tabular-nums;">{{ c.count }}</span>
-                          </span>
-                        </sc-for>
-                      </button>
+                    <sc-if value="{{ r.showReactBar }}" hint-placeholder-val="{{ true }}">
+                      <div style="display: flex; align-items: center; gap: 10px; margin-left: 42px; min-height: 32px;">
+                        <sc-if value="{{ r.showSmile }}" hint-placeholder-val="{{ true }}">
+                          <button type="button" class="tc-hit" aria-label="Réagir au prono de {{ r.name }}" aria-expanded="{{ r.open }}" onClick="{{ r.onSmile }}" style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: {{ r.triggerRing }}; background: {{ r.triggerBg }}; border-radius: var(--radius-pill); color: {{ r.triggerColor }}; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);" style-hover="transform: scale(1.08); background: var(--surface-sunken);" style-active="transform: scale(0.94);">{{ r.triggerIcon }}</button>
+                        </sc-if>
+                        <span style="flex: 1;"></span>
+                        <sc-if value="{{ r.hasChips }}" hint-placeholder-val="{{ false }}">
+                          <button type="button" aria-label="Voir les réactions : {{ r.totalLabel }}" onClick="{{ r.onOpenSheet }}" style="flex: none; display: flex; align-items: center; gap: 7px; height: 28px; padding: 0 9px 0 4px; border: 1px solid transparent; border-radius: var(--radius-pill); background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);" style-hover="background: var(--surface-sunken); border-color: var(--border);">
+                            <span style="display: flex; align-items: center; padding-left: 7px;">
+                              <sc-for list="{{ r.pastilles }}" as="p" hint-placeholder-count="2">
+                                <span class="tc-chip-anim" title="{{ p.label }}" style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-left: -7px; border-radius: 50%; background: var(--surface-sunken); border: 1.5px solid var(--surface); box-shadow: var(--shadow-sm);">{{ p.icon }}</span>
+                              </sc-for>
+                            </span>
+                            <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); font-variant-numeric: tabular-nums;">{{ r.total }}</span>
+                          </button>
+                        </sc-if>
+                      </div>
                     </sc-if>
                   </div>
 
@@ -127,8 +188,8 @@
                     <div class="tc-pop" role="menu" aria-label="Choisir une réaction" style="position: absolute; left: 44px; bottom: calc(100% - 4px); z-index: 40; animation: tc-pop-up 0.2s var(--ease-out); transform-origin: bottom left;">
                       <div style="display: flex; gap: 2px; padding: 5px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-pill); box-shadow: var(--shadow-lg);">
                         <sc-for list="{{ r.picker }}" as="k" hint-placeholder-count="4">
-                          <button type="button" role="menuitemradio" aria-checked="{{ k.selected }}" aria-label="Réagir : {{ k.label }}" onClick="{{ k.onPick }}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: {{ k.ring }}; background: {{ k.bg }}; border-radius: var(--radius-pill); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);" style-hover="transform: scale(1.14);" style-active="transform: scale(0.94);">
-                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; font-size: 25px; line-height: 1;">{{ k.emoji }}</span>
+                          <button type="button" class="tc-hit" role="menuitemradio" aria-checked="{{ k.selected }}" aria-label="Réagir : {{ k.label }}" onClick="{{ k.onPick }}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: {{ k.ring }}; background: {{ k.bg }}; border-radius: var(--radius-pill); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);" style-hover="transform: scale(1.14);" style-active="transform: scale(0.94);">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; color: var(--text);">{{ k.icon }}</span>
                           </button>
                         </sc-for>
                       </div>
@@ -141,8 +202,8 @@
                     <div class="tc-pop" role="menu" aria-label="Choisir une réaction" style="position: absolute; left: 44px; top: calc(100% - 4px); z-index: 40; animation: tc-pop-down 0.2s var(--ease-out); transform-origin: top left;">
                       <div style="display: flex; gap: 2px; padding: 5px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-pill); box-shadow: var(--shadow-lg);">
                         <sc-for list="{{ r.picker }}" as="k" hint-placeholder-count="4">
-                          <button type="button" role="menuitemradio" aria-checked="{{ k.selected }}" aria-label="Réagir : {{ k.label }}" onClick="{{ k.onPick }}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: {{ k.ring }}; background: {{ k.bg }}; border-radius: var(--radius-pill); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);" style-hover="transform: scale(1.14);" style-active="transform: scale(0.94);">
-                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; font-size: 25px; line-height: 1;">{{ k.emoji }}</span>
+                          <button type="button" class="tc-hit" role="menuitemradio" aria-checked="{{ k.selected }}" aria-label="Réagir : {{ k.label }}" onClick="{{ k.onPick }}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: {{ k.ring }}; background: {{ k.bg }}; border-radius: var(--radius-pill); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);" style-hover="transform: scale(1.14);" style-active="transform: scale(0.94);">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; color: var(--text);">{{ k.icon }}</span>
                           </button>
                         </sc-for>
                       </div>
@@ -168,7 +229,7 @@
                   <div class="tc-scroll" style="display: flex; gap: 6px; overflow-x: auto; padding: 0 18px 12px;">
                     <sc-for list="{{ sc.filters }}" as="ft" hint-placeholder-count="5">
                       <button type="button" aria-pressed="{{ ft.active }}" aria-label="{{ ft.aria }}" onClick="{{ ft.onPick }}" style="flex: none; display: inline-flex; align-items: center; gap: 5px; height: 32px; padding: 0 12px; border-radius: var(--radius-pill); background: {{ ft.bg }}; border: {{ ft.border }}; color: {{ ft.color }}; font-size: 12px; font-weight: 700; cursor: pointer; -webkit-tap-highlight-color: transparent; font-variant-numeric: tabular-nums;">
-                        <sc-if value="{{ ft.hasEmoji }}" hint-placeholder-val="{{ true }}"><span style="display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; font-size: 14px; line-height: 1;">{{ ft.emoji }}</span></sc-if>
+                        <sc-if value="{{ ft.hasEmoji }}" hint-placeholder-val="{{ true }}"><span style="display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px;">{{ ft.icon }}</span></sc-if>
                         {{ ft.text }}
                       </button>
                     </sc-for>
@@ -186,7 +247,7 @@
                           <span style="font-size: 14px; font-weight: {{ sr.weight }}; color: {{ sr.nameColor }}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ sr.displayName }}</span>
                           <sc-if value="{{ sr.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; color: var(--text-faint);">{{ sr.note }}</span></sc-if>
                         </span>
-                        <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; font-size: 20px; line-height: 1;">{{ sr.emoji }}</span>
+                        <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; color: var(--text-muted);">{{ sr.icon }}</span>
                       </div>
                     </sc-for>
                   </div>
@@ -204,7 +265,7 @@
           <span><b style="color: var(--text);">Tap</b> sur la ligne → profil du membre. <b style="color: var(--text);">Appui long</b> (≈450 ms) → popover. <b style="color: var(--text);">Tap</b> sur l'icône <i>SmilePlus</i> → popover. Zone tactile 44 pt (le bouton dessiné fait 32, la cible déborde sur le padding de ligne).</span>
           <span>Pas d'icône sur <b style="color: var(--text);">ma ligne</b> ni sur une ligne <b style="color: var(--text);">« — »</b> (aucun prono) ; ma ligne affiche quand même les réactions reçues.</span>
           <span>Les puces vivent sous le pseudo, décalées de 42 px (avatar + gouttière) : elles occupent toute la largeur utile et tiennent 4 réactions à 3 chiffres sur 360 pt.</span>
-          <span>Emoji système aujourd'hui, dans un <b style="color: var(--text);">emplacement carré fixe</b> : 15 px sur la puce, 28 px dans le popover, 24 px dans la sheet. Un picto maison s'y glisse sans toucher la mise en page.</span>
+          <span>Pictos maison (trait 2 px, grille 24) dans un <b style="color: var(--text);">emplacement carré fixe</b> : 15 px sur la puce, 28 px dans le popover, 24 px dans la sheet. Aucun emoji système : rendu identique sur iOS et Android.</span>
         </div>
         <div style="height: 1px; background: var(--border);"></div>
         <span style="font-family: var(--font-display); font-size: 17px; color: var(--text);">Couleurs</span>
@@ -230,7 +291,7 @@
               <div style="flex: none; display: flex; gap: 2px; padding: 5px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-pill); box-shadow: var(--shadow-lg); opacity: {{ st.opacity }}; transform: {{ st.transform }};">
                 <sc-for list="{{ st.items }}" as="it" hint-placeholder-count="4">
                   <span style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: {{ it.ring }}; background: {{ it.bg }}; border-radius: var(--radius-pill); transform: {{ it.scale }};">
-                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; font-size: 25px; line-height: 1;">{{ it.emoji }}</span>
+                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; color: var(--text);">{{ it.icon }}</span>
                   </span>
                 </sc-for>
               </div>
@@ -257,7 +318,7 @@
               <div style="display: flex; align-items: center; gap: 14px;">
                 <span style="flex: none; width: 104px; font-size: 12px; font-weight: 700; color: var(--text);">{{ sa.name }}</span>
                 <span style="display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px 0 6px; border-radius: var(--radius-pill); background: {{ sa.bg }}; border: {{ sa.border }};">
-                  <span style="display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; font-size: 13px; line-height: 1;">{{ sa.emoji }}</span>
+                  <span style="display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; color: {{ sa.color }};">{{ sa.icon }}</span>
                   <span style="font-size: 11px; font-weight: {{ sa.weight }}; color: {{ sa.color }}; font-variant-numeric: tabular-nums;">{{ sa.count }}</span>
                 </span>
                 <span style="flex: 1; font-size: 11.5px; color: var(--text-muted); text-wrap: pretty;">{{ sa.note }}</span>
@@ -283,7 +344,7 @@
             <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-left: 42px;">
               <sc-for list="{{ cs.loaded }}" as="lc" hint-placeholder-count="4">
                 <span style="display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px 0 6px; border-radius: var(--radius-pill); background: {{ lc.bg }}; border: {{ lc.border }};">
-                  <span style="display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; font-size: 13px; line-height: 1;">{{ lc.emoji }}</span>
+                  <span style="display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; color: {{ lc.color }};">{{ lc.icon }}</span>
                   <span style="font-size: 11px; font-weight: {{ lc.weight }}; color: {{ lc.color }}; font-variant-numeric: tabular-nums;">{{ lc.count }}</span>
                 </span>
               </sc-for>
@@ -310,19 +371,20 @@
       </sc-for>
     </div>
     <div style="padding: 12px 14px; background: var(--surface-sunken); border-radius: var(--radius-sm); font-size: 12.5px; color: var(--text-muted); line-height: 1.55; text-wrap: pretty;">
-      <b style="color: var(--text);">Réduire les animations</b> — popover et sheet apparaissent sans translation ni échelle (opacité seule, 1 image), la puce n'a pas de rebond, l'agrandissement au survol devient un changement de fond. Les durées tombent à 0 ms ; aucun état n'est perdu. <b style="color: var(--text);">Pictos animés (phase suivante)</b> — l'emplacement carré reste identique ; le picto joue sa boucle une seule fois à la sélection, puis reste statique sur la puce. Aucune animation en boucle dans une liste.
+      <b style="color: var(--text);">Réduire les animations</b> — popover et sheet apparaissent sans translation ni échelle (opacité seule, 1 image), la puce n'a pas de rebond, l'agrandissement au survol devient un changement de fond. Les durées tombent à 0 ms ; aucun état n'est perdu. <b style="color: var(--text);">Pictos animés</b> — l’animation ne joue qu’une fois : au survol ou à l’appui dans le popover, et une fois à la sélection. Sur la puce et dans la sheet, le picto reste statique — aucune animation en boucle dans une liste. Avec « réduire les animations », les pictos sont figés.
     </div>
   </div>
 
 </div>
 
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:1000}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1600,&quot;height&quot;:1000},&quot;iconSet&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;custom&quot;,&quot;system&quot;],&quot;default&quot;:&quot;custom&quot;,&quot;tsType&quot;:&quot;'custom' | 'system'&quot;,&quot;section&quot;:&quot;Pictos&quot;,&quot;label&quot;:&quot;Jeu d'icônes&quot;}}">
 class Component extends DCLogic {
   state = {
     picked: { s_light: { r2: null, r4: 'culotte', me: null, r5: null, r6: null }, s_dark: { r2: 'bravo', r4: 'culotte', me: null, r5: null, r6: null } },
     open: { s_light: 'r2', s_dark: 'r1' },
     sheet: { s_sheet_l: 'r2', s_sheet_d: 'r2' },
+    play: { key: null, n: 0 },
     filter: { s_sheet_d: 'visio' },
   };
 
@@ -348,14 +410,91 @@ class Component extends DCLogic {
 
   setSheet(sid, rid) { this.setState((s) => ({ sheet: { ...s.sheet, [sid]: rid } })); }
   setFilter(sid, f) { this.setState((s) => ({ filter: { ...s.filter, [sid]: f } })); }
+  playIcon(key) { this.setState((s) => ({ play: { key, n: s.play.n + 1 } })); }
 
   renderVals() {
     const KINDS = [
-      { id: 'bravo', emoji: '\u{1F44F}', label: 'Bravo' },
-      { id: 'visio', emoji: '\u{1F340}', label: 'Chanceux' },
-      { id: 'culotte', emoji: '\u{1F632}', label: 'Culotté' },
-      { id: 'mdr', emoji: '\u{1F602}', label: 'Mort de rire' },
+      { id: 'bravo', label: 'Bravo' },
+      { id: 'visio', label: 'Chanceux' },
+      { id: 'culotte', label: 'Culotté' },
+      { id: 'mdr', label: 'Mort de rire' },
     ];
+
+    const E = React.createElement;
+    const ICO = {
+      bravo: () => {
+        const PALM = 'M-3.3 -13.9a1.1 1.1 0 0 1 2.2 0a1.1 1.1 0 0 1 2.2 0a1.1 1.1 0 0 1 2.2 0v4.6a1.75 1.75 0 0 1 1.35 3l-1.35 1.5v1.8a2.6 2.6 0 0 1-2.6 2.6h-1.4a2.6 2.6 0 0 1-2.6-2.6z';
+        const CUFF = 'M-2.9 -2.3h6.1';
+        const T = 'translate(7.1 19.3) rotate(-15)';
+        const hand = () => [
+          E('path', { key: 1, className: 'tint', transform: T, d: PALM }),
+          E('path', { key: 2, transform: T, d: CUFF }),
+        ];
+        return [
+          E('g', { key: 'g', transform: 'translate(12 20.2) scale(0.9) translate(-12 -20.2)' }, [
+            E('g', { key: 'l', className: 'cl' }, hand()),
+            E('g', { key: 'rw', transform: 'translate(24 0) scale(-1 1)' },
+              E('g', { className: 'cr' }, hand())),
+          ]),
+          E('g', { key: 's', className: 'sp' }, [
+            E('path', { key: 1, d: 'M12 1.5v2.6' }),
+            E('path', { key: 2, d: 'M9.6 2.6L8.6 4.5' }),
+            E('path', { key: 3, d: 'M14.4 2.6L15.4 4.5' }),
+          ]),
+        ];
+      },
+      visio: () => [
+        E('g', { key: 'a', className: 'cv' },
+          E('circle', { key: 1, className: 'tint', cx: 8.8, cy: 8.6, r: 3.2 }),
+          E('circle', { key: 2, className: 'tint', cx: 15.2, cy: 8.6, r: 3.2 }),
+          E('circle', { key: 3, className: 'tint', cx: 8.8, cy: 15, r: 3.2 }),
+          E('circle', { key: 4, className: 'tint', cx: 15.2, cy: 15, r: 3.2 }),
+          E('path', { key: 5, d: 'M12 16.2c0 2.6.9 3.9 2.8 4.8' })),
+      ],
+      culotte: () => [
+        E('g', { key: 'a', className: 'sf' },
+          E('circle', { key: 1, className: 'tint', cx: 12, cy: 12, r: 9 }),
+          E('path', { key: 2, d: 'M7.6 7.9c.8-.8 1.9-1 2.9-.6' }),
+          E('path', { key: 3, d: 'M16.4 7.9c-.8-.8-1.9-1-2.9-.6' })),
+        E('g', { key: 'b', className: 'se' },
+          E('circle', { key: 1, cx: 9.2, cy: 11.2, r: 0.9, fill: 'currentColor', stroke: 'none' }),
+          E('circle', { key: 2, cx: 14.8, cy: 11.2, r: 0.9, fill: 'currentColor', stroke: 'none' })),
+        E('ellipse', { key: 'c', className: 'sm', cx: 12, cy: 15.9, rx: 2, ry: 2.7 }),
+      ],
+      mdr: () => [
+        E('g', { key: 'a', className: 'fa' },
+          E('circle', { key: 1, className: 'tint', cx: 12, cy: 12, r: 9 }),
+          E('path', { key: 2, d: 'M7.9 10.5c.6-1 1.9-1 2.5 0' }),
+          E('path', { key: 3, d: 'M13.6 10.5c.6-1 1.9-1 2.5 0' }),
+          E('path', { key: 4, d: 'M7.8 14.2h8.4a4.2 4.2 0 0 1-8.4 0z' })),
+        E('path', { key: 'b', className: 'tr tint', d: 'M20 7.4c.8 1.1 1.2 1.8 1.2 2.3a1.2 1.2 0 0 1-2.4 0c0-.5.4-1.2 1.2-2.3z' }),
+        E('path', { key: 'c', className: 'tr tr2 tint', d: 'M4 7.4c-.8 1.1-1.2 1.8-1.2 2.3a1.2 1.2 0 0 0 2.4 0c0-.5-.4-1.2-1.2-2.3z' }),
+      ],
+    };
+    const iconSet = this.props.iconSet ?? 'custom';
+    const SYS_EMOJI = { bravo: '👏', visio: '🍀', culotte: '😳', mdr: '😂' };
+    const ico = (id, size, play, key) => iconSet === 'system'
+      ? E('span', {
+          key: (key || id) + (play ? '-p' + this.state.play.n : ''),
+          className: 'tc-ico tc-ico-sys tc-ico-' + id + (play ? ' tc-play' : ''),
+          'aria-hidden': 'true',
+          style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: size, height: size, fontSize: Math.round(size * 0.92) + 'px', lineHeight: 1 },
+        }, SYS_EMOJI[id])
+      : E('svg', {
+      key: (key || id) + (play ? '-p' + this.state.play.n : ''),
+      width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor',
+      strokeWidth: size <= 16 ? 2.2 : 2, strokeLinecap: 'round', strokeLinejoin: 'round',
+      className: 'tc-ico tc-ico-' + id + (play ? ' tc-play' : ''), 'aria-hidden': 'true',
+    }, ICO[id]());
+
+    const SMILEY = E('svg', { width: 19, height: 19, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': 'true' }, [
+      E('path', { key: 1, d: 'M22 11v1a10 10 0 1 1-5.93-9.14' }),
+      E('path', { key: 2, d: 'M8 14s1.5 2 4 2 4-2 4-2' }),
+      E('line', { key: 3, x1: 9, y1: 9, x2: 9.01, y2: 9 }),
+      E('line', { key: 4, x1: 15, y1: 9, x2: 15.01, y2: 9 }),
+      E('path', { key: 5, d: 'M16 5h6' }),
+      E('path', { key: 6, d: 'M19 2v6' }),
+    ]);
 
     const restBg = 'var(--surface-sunken)';
     const restBorder = '1px solid transparent';
@@ -387,7 +526,7 @@ class Component extends DCLogic {
       { id: 's_light', theme: 'light', label: 'Pronos · clair · popover au-dessus', dot: 'var(--sand-050)' },
       { id: 's_dark', theme: 'dark', label: 'Sombre · 1re ligne, popover en dessous', dot: 'var(--green-800)' },
       { id: 's_sheet_l', theme: 'light', label: 'Sheet « Réactions » · clair · Toutes', dot: 'var(--sand-050)' },
-      { id: 's_sheet_d', theme: 'dark', label: 'Sheet · sombre · filtre 🍀 + membre parti', dot: 'var(--green-800)' },
+      { id: 's_sheet_d', theme: 'dark', label: 'Sheet · sombre · filtre trèfle + membre parti', dot: 'var(--green-800)' },
     ];
 
     const screens = screenDefs.map((sd) => {
@@ -402,10 +541,14 @@ class Component extends DCLogic {
         if (mine) counts[mine] = (counts[mine] || 0) + 1;
         const chips = KINDS.filter((k) => counts[k.id] > 0).map((k) => {
           const st = chipStyle(mine === k.id);
-          return { emoji: k.emoji, label: k.label + ' · ' + counts[k.id], count: counts[k.id], ...st };
+          return { icon: ico(k.id, 15, false, 'c' + sd.id + m.id + k.id), label: k.label + ' · ' + counts[k.id], count: counts[k.id], ...st };
         });
         const canReact = hasProno && !m.isMe;
         const open = openRow === m.id;
+        const pastilles = KINDS.filter((k) => counts[k.id] > 0).map((k) => ({
+          icon: ico(k.id, 15, false, 'pa' + sd.id + m.id + k.id), label: k.label + ' · ' + counts[k.id],
+        }));
+        const total = KINDS.reduce((a, k) => a + (counts[k.id] || 0), 0);
         const badges = [];
         if (m.exact) badges.push({ text: 'Score exact', bg: 'var(--accent)', color: 'var(--on-accent)', border: 'none' });
         if (m.joker) badges.push({ text: 'Joker ×2', bg: 'color-mix(in srgb, var(--brand) 16%, transparent)', color: sd.theme === 'dark' ? 'var(--green-400)' : 'var(--brand)', border: 'none' });
@@ -429,13 +572,21 @@ class Component extends DCLogic {
           chips,
           showSmile: canReact,
           noSmile: !canReact,
-          smileBg: open ? 'var(--surface-sunken)' : 'transparent',
-          smileColor: open ? 'var(--text)' : 'var(--text-faint)',
+          showReactBar: canReact || pastilles.length > 0,
+          pastilles,
+          total: String(total),
+          totalLabel: total > 1 ? total + ' réactions' : total + ' réaction',
+          triggerIcon: mine ? ico(mine, 20, false, 't' + sd.id + m.id + mine) : SMILEY,
+          triggerBg: mine ? 'var(--surface-sunken)' : 'transparent',
+          triggerRing: mine
+            ? '1.5px solid color-mix(in srgb, var(--text) 38%, transparent)'
+            : '1.5px dashed ' + (open ? 'var(--border-strong)' : 'var(--border)'),
+          triggerColor: mine ? 'var(--text)' : 'var(--text-faint)',
           open,
           popUp: open && idx > 0,
           popDown: open && idx === 0,
           picker: KINDS.map((k) => ({
-            emoji: k.emoji,
+            icon: ico(k.id, 28, false, 'p' + sd.id + m.id + k.id),
             label: k.label,
             selected: mine === k.id,
             bg: mine === k.id ? 'var(--surface-sunken)' : 'transparent',
@@ -459,8 +610,8 @@ class Component extends DCLogic {
         const total = Object.keys(counts).reduce((a, k) => a + counts[k], 0);
         sheetSub = sheetMember.name + ' · ' + total + (total > 1 ? ' réactions' : ' réaction');
         const cur = this.state.filter[sd.id] || 'all';
-        filters = [{ id: 'all', text: 'Toutes', hasEmoji: false, emoji: '', aria: 'Toutes les réactions' }].concat(
-          KINDS.filter((k) => counts[k.id] > 0).map((k) => ({ id: k.id, text: String(counts[k.id]), hasEmoji: true, emoji: k.emoji, aria: k.label + ', ' + counts[k.id] }))
+        filters = [{ id: 'all', text: 'Toutes', hasEmoji: false, icon: null, aria: 'Toutes les réactions' }].concat(
+          KINDS.filter((k) => counts[k.id] > 0).map((k) => ({ id: k.id, text: String(counts[k.id]), hasEmoji: true, icon: ico(k.id, 16, false, 'f' + sd.id + k.id), aria: k.label + ', ' + counts[k.id] }))
         ).map((f) => {
           const active = f.id === cur;
           return {
@@ -479,7 +630,7 @@ class Component extends DCLogic {
           if (!n) return;
           const names = (REACTORS[k.id] || []).slice(0, n - (mine === k.id ? 1 : 0));
           if (mine === k.id) names.unshift('Antoine Mercier');
-          names.forEach((nm) => list.push({ kind: k.id, emoji: k.emoji, name: nm }));
+          names.forEach((nm) => list.push({ kind: k.id, name: nm }));
         });
         sheetRows = list
           .filter((it) => cur === 'all' || it.kind === cur)
@@ -496,7 +647,7 @@ class Component extends DCLogic {
               weight: isMe ? 700 : 500,
               hasNote: gone,
               note: 'A quitté la ligue',
-              emoji: it.emoji,
+              icon: ico(it.kind, 24, false, 's' + sd.id + it.kind + it.name),
             };
           });
       }
@@ -516,7 +667,7 @@ class Component extends DCLogic {
     const specState = (name, opacity, transform, hi, hovered) => ({
       name, opacity, transform,
       items: KINDS.map((k, i) => ({
-        emoji: k.emoji,
+        icon: ico(k.id, 28, false, 'x' + name + k.id),
         bg: hi === i ? 'var(--surface-sunken)' : 'transparent',
         ring: hi === i ? '1.5px solid color-mix(in srgb, var(--text) 38%, transparent)' : '1.5px solid transparent',
         scale: hovered === i ? 'scale(1.14)' : 'none',
@@ -534,15 +685,15 @@ class Component extends DCLogic {
     ];
 
     const samples = [
-      { name: 'Au repos', emoji: KINDS[0].emoji, count: '3', ...chipStyle(false), note: 'surface-sunken, compteur text-muted' },
-      { name: 'Contient ma réaction', emoji: KINDS[1].emoji, count: '5', ...chipStyle(true), note: 'contour encre 38 %, compteur gras' },
-      { name: 'Gros compteur', emoji: KINDS[3].emoji, count: '128', ...chipStyle(false), note: 'tabular-nums, la puce s\u2019allonge' },
+      { name: 'Au repos', icon: ico('bravo', 15, false, 'sa1'), count: '3', ...chipStyle(false), note: 'surface-sunken, compteur text-muted' },
+      { name: 'Contient ma réaction', icon: ico('visio', 15, false, 'sa2'), count: '5', ...chipStyle(true), note: 'contour encre 38 %, compteur gras' },
+      { name: 'Gros compteur', icon: ico('mdr', 15, false, 'sa3'), count: '128', ...chipStyle(false), note: 'tabular-nums, la puce s\u2019allonge' },
     ];
     const loaded = [
-      { emoji: KINDS[0].emoji, count: '112', ...chipStyle(false) },
-      { emoji: KINDS[1].emoji, count: '87', ...chipStyle(true) },
-      { emoji: KINDS[2].emoji, count: '24', ...chipStyle(false) },
-      { emoji: KINDS[3].emoji, count: '9', ...chipStyle(false) },
+      { icon: ico('bravo', 15, false, 'lc1'), count: '112', ...chipStyle(false) },
+      { icon: ico('visio', 15, false, 'lc2'), count: '87', ...chipStyle(true) },
+      { icon: ico('culotte', 15, false, 'lc3'), count: '24', ...chipStyle(false) },
+      { icon: ico('mdr', 15, false, 'lc4'), count: '9', ...chipStyle(false) },
     ];
     const chipSpecs = [
       { theme: 'light', label: 'Clair', samples, loaded, jokerColor: 'var(--brand)' },
@@ -554,11 +705,30 @@ class Component extends DCLogic {
       { name: 'Fermeture', timing: '120 ms · ease-out', detail: 'Retour inverse, plus court : l’objet disparaît vite pour rendre la ligne.' },
       { name: 'Appui sur une réaction', timing: '120 ms', detail: 'Le bouton passe à 0,94 pendant l’appui, revient à 1 au relâchement. Retour haptique léger sur mobile.' },
       { name: 'Sélection → puce', timing: '220 ms', detail: 'Le popover se ferme, la puce apparaît en 0,6→1,12→1 et le compteur s’incrémente. Pas de confettis.' },
-      { name: 'Changement de réaction', timing: '160 ms', detail: 'Ancienne puce décrémentée et retirée en fondu, nouvelle puce en rebond. Les puces se réordonnent dans l’ordre fixe 👏 🍀 😲 😂.' },
+      { name: 'Changement de réaction', timing: '160 ms', detail: 'Ancienne puce décrémentée et retirée en fondu, nouvelle puce en rebond. Les puces se réordonnent dans l’ordre fixe mains · trèfle · surprise · rire.' },
+      { name: 'Picto « Bravo »', timing: '620 ms', detail: 'Les deux mains se rapprochent de 2,4 px en pivotant de ±9°, puis rebondissent ; les trois éclats pulsent de 0,5 à 1.' },
+      { name: 'Picto « Chanceux »', timing: '560 ms', detail: 'Le trèfle bascule à −15° puis +10° en gonflant de 9 % : un petit coup de vent, pas une rotation complète.' },
+      { name: 'Picto « Culotté »', timing: '620 ms', detail: 'Les pupilles gonflent de 30 %, la bouche s’étire de 35 % en hauteur et la tête sursaute de −5°.' },
+      { name: 'Picto « Mort de rire »', timing: '640 ms', detail: 'La tête part en arrière (−8°) puis revient ; les deux larmes glissent de 4,5 px, la gauche décalée de 90 ms.' },
       { name: 'Ouverture de la sheet', timing: '240 ms · ease-out', detail: 'Translation depuis le bas + voile à 42 %. Fermeture par glissé, tap sur le voile ou Échap.' },
     ];
 
-    return { screens, popSpecs, chipSpecs, motion };
+    const ICO_NOTES = {
+      bravo: 'Les deux mains se rapprochent en cadence, les éclats pulsent. 620 ms.',
+      visio: 'Le trèfle bascule à gauche puis à droite en gonflant. 560 ms.',
+      culotte: 'Les yeux s\u2019écarquillent, la bouche s\u2019étire, la tête sursaute. 620 ms.',
+      mdr: 'La tête part en arrière, les deux larmes tombent en décalé. 640 ms.',
+    };
+    const iconBoards = [{ theme: 'light', label: 'Clair' }, { theme: 'dark', label: 'Sombre' }].map((b) => ({
+      theme: b.theme,
+      label: b.label,
+      items: KINDS.map((k) => {
+        const pk = b.theme + '|' + k.id;
+        return { label: k.label, note: ICO_NOTES[k.id], big: ico(k.id, 40, this.state.play.key === pk, 'big' + pk), onPlay: () => this.playIcon(pk) };
+      }),
+    }));
+
+    return { screens, popSpecs, chipSpecs, motion, iconBoards };
   }
 }
 
