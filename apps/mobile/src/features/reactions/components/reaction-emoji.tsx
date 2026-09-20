@@ -1,6 +1,6 @@
 import { Text, View } from '@/tw';
 
-type ReactionEmojiSize = 'chip' | 'filter' | 'sheet' | 'picker';
+type ReactionEmojiSize = 'chip' | 'filter' | 'trigger' | 'sheet' | 'picker';
 
 type ReactionEmojiProps = {
     emoji: string;
@@ -9,9 +9,15 @@ type ReactionEmojiProps = {
 
 /**
  * Emplacement carré, de taille fixe par usage (maquette « TryCast
- * Reactions ») : 15 px sur la puce, 16 dans les filtres, 24 dans la sheet,
- * 28 dans le popover. Aujourd'hui un emoji système ; demain un picto maison,
- * qui prendra sa place ICI sans rien changer aux mises en page.
+ * Reactions ») : 15 px sur la pastille, 16 dans les filtres, 20 sur le bouton
+ * qui porte ma réaction, 24 dans la sheet, 28 dans le popover. Aujourd'hui un
+ * emoji système ; demain un picto maison, qui prendra sa place ICI sans rien
+ * changer aux mises en page.
+ *
+ * ⚠️ **La taille de police n'est pas la taille du glyphe** : mesuré au
+ * simulateur le 2026-09-20, un emoji Apple est dessiné à ~1,2 fois sa taille
+ * de police (13 pt de police → 16 pt à l'écran). La police se déduit donc de
+ * la taille voulue, sinon les emoji débordent des cercles de la maquette.
  *
  * Le carré porte la mise en page, pas le glyphe : sur Android, l'emoji Noto
  * est plus large que sa taille de police et un Text borné au carré le rognait
@@ -23,15 +29,20 @@ type ReactionEmojiProps = {
  * insensible à la taille de police système : un emoji agrandi déborderait
  * de son carré.
  */
-const SIZES: Record<ReactionEmojiSize, { box: number; font: number }> = {
-    chip: { box: 15, font: 13 },
-    filter: { box: 16, font: 14 },
-    sheet: { box: 24, font: 20 },
-    picker: { box: 28, font: 25 },
+const BOXES: Record<ReactionEmojiSize, number> = {
+    chip: 15,
+    filter: 16,
+    trigger: 20,
+    sheet: 24,
+    picker: 28,
 };
 
+/** Rapport mesuré entre le glyphe dessiné et la taille de police. */
+const GLYPH_RATIO = 1.2;
+
 export function ReactionEmoji({ emoji, size }: ReactionEmojiProps) {
-    const { box, font } = SIZES[size];
+    const box = BOXES[size];
+    const font = Math.round(box / GLYPH_RATIO);
     // Marge de débordement : de quoi loger le glyphe le plus large
     const bleed = Math.ceil(box / 2);
 

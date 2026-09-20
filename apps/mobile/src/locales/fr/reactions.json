@@ -12,7 +12,8 @@
     },
     "summary": {
         "open": "Voir les réactions au prono de {{username}}",
-        "chip": "{{label}} : {{value}}"
+        "count_one": "{{count}} réaction",
+        "count_other": "{{count}} réactions"
     },
     "sheet": {
         "title": "Réactions",
@@ -32,5 +33,6 @@
         "noPrediction": "Ce membre n’a pas pronostiqué ce match.",
         "notMember": "Ce prono n’est plus dans ta ligue.",
         "failed": "Ta réaction n’a pas pu être enregistrée. Réessaie."
-    }
+    },
+    "triggerMine": "Réaction au prono de {{username}} : {{label}}. Touche pour en changer"
 }

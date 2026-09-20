@@ -146,24 +146,28 @@ export function MemberPredictionRow({
                             </Text>
                         </View>
                     ) : null}
-                    {canReact ? (
-                        <ReactionTrigger
-                            onPress={openPicker}
-                            open={anchor !== null}
-                            username={entry.username}
-                        />
-                    ) : onReact ? (
-                        // Réserve la place de l'icône : les pills restent alignées
-                        <View className="w-7" />
-                    ) : null}
                 </View>
-                {chips.length > 0 && onOpenReactions ? (
-                    <View className="pl-[42px]">
-                        <ReactionSummary
-                            chips={chips}
-                            onPress={onOpenReactions}
-                            username={entry.username}
-                        />
+                {/* Barre de réaction : mon bouton à gauche, le résumé à droite
+                    (maquette « TryCast Reactions »). Absente quand il n'y a ni
+                    l'un ni l'autre — ma ligne garde le résumé, sans bouton. */}
+                {canReact || (chips.length > 0 && onOpenReactions) ? (
+                    <View className="min-h-8 flex-row items-center gap-2.5 pl-[42px]">
+                        {canReact ? (
+                            <ReactionTrigger
+                                myReaction={myReaction}
+                                onPress={openPicker}
+                                open={anchor !== null}
+                                username={entry.username}
+                            />
+                        ) : null}
+                        <View className="flex-1" />
+                        {chips.length > 0 && onOpenReactions ? (
+                            <ReactionSummary
+                                chips={chips}
+                                onPress={onOpenReactions}
+                                username={entry.username}
+                            />
+                        ) : null}
                     </View>
                 ) : null}
             </View>
