@@ -3,7 +3,7 @@ import { initialsOf } from '@/features/leagues/initials';
 import { Text, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
-type LeagueIconSize = 'md' | 'lg';
+type LeagueIconSize = 'sm' | 'md' | 'lg';
 
 type LeagueIconProps = {
     name: string;
@@ -13,6 +13,8 @@ type LeagueIconProps = {
 };
 
 const sizeClasses: Record<LeagueIconSize, { box: string; text: string }> = {
+    // sm : titre compact de la barre native (header replié)
+    sm: { box: 'h-[26px] w-[26px] rounded-[8px]', text: 'text-[13px]' },
     md: { box: 'h-[58px] w-[58px]', text: 'text-[26px]' },
     lg: { box: 'h-[76px] w-[76px]', text: 'text-[32px]' },
 };

@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import {
     ArrowLeftRight,
     ChevronRight,
@@ -11,12 +11,15 @@ import {
 } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
+import { CollapsingHeaderTitle } from '@/components/collapsing-header-title';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Screen } from '@/components/ui/screen';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSession } from '@/features/auth/session-context';
@@ -44,7 +47,8 @@ import type { MatchWithTeams } from '@/features/matches/types';
 import { useMatches } from '@/features/matches/use-matches';
 import { useOpenPlayerProfile } from '@/features/profile/use-open-player-profile';
 import { i18n } from '@/lib/i18n';
-import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
+import { useCollapseProgress } from '@/components/use-collapse-progress';
+import { Pressable, Text, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
 type DetailTab = 'standings' | 'results' | 'settings';
@@ -71,6 +75,19 @@ export default function LeagueScreen() {
     const leaderboard = useLeagueLeaderboard(id);
     const league = leagues.data?.find((row) => row.id === id);
     const isOwner = !!league && league.owner_id === userId;
+
+    // Header repliable (DS 2026-09-21) : l'identité s'estompe entre 8 et 53 px
+    // de défilement, la pastille + le nom prennent place dans la barre native,
+    // les onglets restent épinglés.
+    const collapse = useCollapseProgress({ start: 8, distance: 45, reach: 90 });
+    const borderColor = useThemeColor('border');
+    const identityStyle = useAnimatedStyle(() => ({
+        opacity: Math.max(0, 1 - collapse.progress.value * 1.8),
+        transform: [{ scale: 1 - collapse.progress.value * 0.06 }],
+    }));
+    const tabsBorderStyle = useAnimatedStyle(() => ({
+        opacity: collapse.progress.value > 0.02 ? collapse.progress.value : 0,
+    }));
 
     if (leagues.isPending || leaderboard.isPending) {
         return (
@@ -102,68 +119,128 @@ export default function LeagueScreen() {
     const members = leaderboard.data;
 
     return (
-        <ScrollView
-            className="flex-1 bg-bg"
-            contentContainerClassName="w-full max-w-[800px] gap-4 self-center px-5">
-            {/* Identité */}
-            <View className="flex-row items-center gap-3.5">
-                <LeagueIcon color={league.color} name={league.name} />
-                <View className="min-w-0 flex-1">
-                    <Text
-                        className="font-display text-[28px] leading-[29px] text-text"
-                        numberOfLines={1}>
-                        {league.name}
-                    </Text>
-                    <View className="flex-row flex-wrap items-center gap-2">
-                        <MembersLine count={members.length} />
-                        <Badge tone={isOwner ? 'brand' : 'neutral'} variant="soft">
-                            {isOwner
-                                ? t('leagues:detail.badges.admin')
-                                : t('leagues:detail.badges.member')}
-                        </Badge>
-                    </View>
-                </View>
-            </View>
-
-            <SegmentedControl
-                onChange={setTab}
-                options={[
-                    { value: 'standings', label: t('leagues:detail.tabs.standings') },
-                    { value: 'results', label: t('leagues:detail.tabs.results') },
-                    { value: 'settings', label: t('leagues:detail.tabs.settings') },
-                ]}
-                value={tab}
+        <>
+            <Stack.Screen
+                options={{
+                    headerTitleAlign: 'center',
+                    headerTitle: () => (
+                        <CollapsingHeaderTitle
+                            compact={
+                                <>
+                                    <LeagueIcon color={league.color} name={league.name} size="sm" />
+                                    <Text
+                                        className="shrink font-display text-[19px] leading-[20px] text-text"
+                                        numberOfLines={1}>
+                                        {league.name}
+                                    </Text>
+                                </>
+                            }
+                            compactFrom={0.3}
+                            progress={collapse.progress}
+                            title={t('leagues:detail.screenTitle')}
+                            titleFade={2.2}
+                        />
+                    ),
+                }}
             />
+            <Screen
+                contentClassName="gap-0 pb-10"
+                contentContainerStyle={{ minHeight: collapse.minContentHeight }}
+                onLayout={collapse.onLayout}
+                scrollRef={collapse.scrollRef}
+                // Index 1 = les onglets (0 = l'identité) : épinglés sous la barre
+                stickyHeaderIndices={[1]}
+                top="none">
+                {/* Identité */}
+                <Animated.View
+                    style={[
+                        {
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 14,
+                            paddingTop: 6,
+                            paddingBottom: 14,
+                            transformOrigin: 'left',
+                        },
+                        identityStyle,
+                    ]}>
+                    <LeagueIcon color={league.color} name={league.name} />
+                    <View className="min-w-0 flex-1">
+                        <Text
+                            className="font-display text-[28px] leading-[29px] text-text"
+                            numberOfLines={1}>
+                            {league.name}
+                        </Text>
+                        <View className="flex-row flex-wrap items-center gap-2">
+                            <MembersLine count={members.length} />
+                            <Badge tone={isOwner ? 'brand' : 'neutral'} variant="soft">
+                                {isOwner
+                                    ? t('leagues:detail.badges.admin')
+                                    : t('leagues:detail.badges.member')}
+                            </Badge>
+                        </View>
+                    </View>
+                </Animated.View>
 
-            {tab === 'standings' ? (
-                <StandingsTab
-                    inviteCode={league.invite_code}
-                    members={members}
-                    onInvite={() => setTab('settings')}
-                    userId={userId}
-                />
-            ) : null}
-            {tab === 'results' ? (
-                <ResultsTab
-                    competitionId={league.competition_id}
-                    leagueId={league.id}
-                    userId={userId}
-                />
-            ) : null}
-            {tab === 'settings' ? (
-                <SettingsTab
-                    isOwner={isOwner}
-                    league={league}
-                    members={members}
-                    // Ouvert par deep link, l'écran n'a pas de pile derrière lui :
-                    // repli sur l'onglet Classement plutôt qu'un GO_BACK dans le vide
-                    onLeft={() =>
-                        router.canGoBack() ? router.back() : router.replace('/leaderboard')
-                    }
-                    userId={userId}
-                />
-            ) : null}
-        </ScrollView>
+                {/* Onglets épinglés : fond opaque, filet en fondu une fois replié */}
+                <View className="bg-bg pb-3.5">
+                    <SegmentedControl
+                        onChange={setTab}
+                        options={[
+                            { value: 'standings', label: t('leagues:detail.tabs.standings') },
+                            { value: 'results', label: t('leagues:detail.tabs.results') },
+                            { value: 'settings', label: t('leagues:detail.tabs.settings') },
+                        ]}
+                        value={tab}
+                    />
+                    <Animated.View
+                        pointerEvents="none"
+                        style={[
+                            {
+                                position: 'absolute',
+                                left: -20,
+                                right: -20,
+                                bottom: 0,
+                                height: 1,
+                                backgroundColor: borderColor,
+                            },
+                            tabsBorderStyle,
+                        ]}
+                    />
+                </View>
+
+                <View className="gap-4 pt-1">
+                    {tab === 'standings' ? (
+                        <StandingsTab
+                            inviteCode={league.invite_code}
+                            members={members}
+                            onInvite={() => setTab('settings')}
+                            userId={userId}
+                        />
+                    ) : null}
+                    {tab === 'results' ? (
+                        <ResultsTab
+                            competitionId={league.competition_id}
+                            leagueId={league.id}
+                            userId={userId}
+                        />
+                    ) : null}
+                    {tab === 'settings' ? (
+                        <SettingsTab
+                            isOwner={isOwner}
+                            league={league}
+                            members={members}
+                            // Ouvert par deep link, l'écran n'a pas de pile derrière lui :
+                            // repli sur l'onglet Classement plutôt qu'un GO_BACK dans le vide
+                            onLeft={() =>
+                                router.canGoBack() ? router.back() : router.replace('/leaderboard')
+                            }
+                            userId={userId}
+                        />
+                    ) : null}
+                </View>
+            </Screen>
+        </>
     );
 }
 
