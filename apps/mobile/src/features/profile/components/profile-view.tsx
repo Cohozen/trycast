@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { ChevronLeft, ChevronRight, Settings, Trophy, Users } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Settings, Users } from 'lucide-react-native';
 import { type ReactNode, useDeferredValue, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -11,7 +11,6 @@ import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { IconButton } from '@/components/ui/icon-button';
 import { SegmentedControl } from '@/components/ui/segmented-control';
-import { Select } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMyLeagues } from '@/features/leagues/use-my-leagues';
 import { useMyRank } from '@/features/leagues/use-my-rank';
@@ -21,6 +20,7 @@ import { useMatches } from '@/features/matches/use-matches';
 import { ResultCard } from '@/features/predictions/components/result-card';
 import { useCommunityDistributions } from '@/features/predictions/use-community-distributions';
 import { useUserPredictions } from '@/features/predictions/use-user-predictions';
+import { CompetitionChips } from '@/features/profile/components/competition-chips';
 import { ProfileStatsPanel } from '@/features/profile/components/profile-stats';
 import { computePointsByRound } from '@/features/profile/compute-points-by-round';
 import { computeProfileStats } from '@/features/profile/compute-profile-stats';
@@ -44,7 +44,7 @@ type ProfileViewProps = {
 /**
  * Corps du Profil, partagé entre mon profil (onglet) et le profil public d'un
  * autre joueur (écran poussé) : identité + chiffres clés, sélecteur de
- * compétition (contexte de tout l'écran), onglets Stats / Pronos (+ Ligues
+ * compétition en puces (contexte de tout l'écran), onglets Stats / Pronos (+ Ligues
  * pour moi seul). Les pronos passent toujours par la RPC get_user_predictions,
  * qui ne rend que les matchs déjà commencés.
  */
@@ -77,7 +77,6 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
     const myLeagues = useMyLeagues();
 
     const textColor = useThemeColor('text');
-    const brandColor = useThemeColor('brand');
     const accentColor = useThemeColor('accent');
     const faintColor = useThemeColor('text-faint');
     const screenInsets = useScreenInsets();
@@ -226,6 +225,15 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                     ) : null}
                 </View>
 
+                {/* Compétition : au-dessus des chiffres qu'elle filtre */}
+                {competitionList.length > 0 && competitionId ? (
+                    <CompetitionChips
+                        competitions={competitionList}
+                        onChange={setSelectedCompetitionId}
+                        value={competitionId}
+                    />
+                ) : null}
+
                 {/* Chiffres clés */}
                 <Card className="flex-row overflow-hidden p-0">
                     {figures.map((figure, index) => (
@@ -241,23 +249,6 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                         </View>
                     ))}
                 </Card>
-
-                {/* Sélecteur de compétition */}
-                {competitionList.length > 0 && competitionId ? (
-                    <Select
-                        icon={<Trophy color={brandColor} size={18} strokeWidth={1.9} />}
-                        onChange={setSelectedCompetitionId}
-                        options={competitionList.map((competition) => ({
-                            value: competition.id,
-                            label: competition.name,
-                            badge: competition.is_active
-                                ? t('profile:competition.current')
-                                : undefined,
-                        }))}
-                        overline={t('profile:competition.overline')}
-                        value={competitionId}
-                    />
-                ) : null}
 
                 <SegmentedControl
                     onChange={setTab}

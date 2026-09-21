@@ -7,7 +7,6 @@
         "precision": "Accuracy"
     },
     "competition": {
-        "overline": "Competition",
         "current": "Ongoing"
     },
     "tabs": {
