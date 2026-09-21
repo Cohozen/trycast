@@ -1,5 +1,8 @@
-import type { ComponentProps } from 'react';
+import type { ComponentProps, Ref } from 'react';
 import { Platform } from 'react-native';
+import type { KeyboardAwareScrollViewRef } from 'react-native-keyboard-controller';
+import type Animated from 'react-native-reanimated';
+import type { AnimatedRef } from 'react-native-reanimated';
 
 import { KeyboardAwareScrollView } from '@/tw';
 import { useScreenInsets } from '@/tw/use-screen-insets';
@@ -18,6 +21,11 @@ type ScreenProps = ComponentProps<typeof KeyboardAwareScrollView> & {
      * 'tabBar' = dégagement pour la tab bar flottante des onglets.
      */
     bottom?: 'content' | 'tabBar';
+    /**
+     * Ref animée de la ScrollView (header repliable : `useCollapseProgress`).
+     * KeyboardAwareScrollView la relaie à sa Reanimated.ScrollView interne.
+     */
+    scrollRef?: AnimatedRef<Animated.ScrollView>;
 };
 
 /**
@@ -35,6 +43,7 @@ export function Screen({
     contentContainerStyle,
     top = 'safe',
     bottom = 'content',
+    scrollRef,
     ...props
 }: ScreenProps) {
     const screenInsets = useScreenInsets();
@@ -45,6 +54,7 @@ export function Screen({
             keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
             keyboardShouldPersistTaps="handled"
             {...props}
+            ref={scrollRef as unknown as Ref<KeyboardAwareScrollViewRef> | undefined}
             className={cn('flex-1 bg-bg', className)}
             contentContainerClassName={cn(
                 'w-full max-w-[800px] self-center px-5 pb-10 gap-4',
