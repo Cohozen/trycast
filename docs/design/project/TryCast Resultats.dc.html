@@ -35,7 +35,10 @@
       --glass-hairline: color-mix(in srgb, var(--border-strong) 92%, transparent);
     }
     .tc-scroll::-webkit-scrollbar { width: 0; height: 0; }
-    .tc-strip::-webkit-scrollbar { width: 0; height: 0; }
+    .tc-strip { scrollbar-width: thin; overscroll-behavior-x: contain; }
+    .tc-strip::-webkit-scrollbar { height: 5px; }
+    .tc-strip::-webkit-scrollbar-track { background: transparent; }
+    .tc-strip::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 999px; }
     @keyframes tc-live { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
     @keyframes tc-sheet-up { from { transform: translateY(102%); } to { transform: translateY(0); } }
     @keyframes tc-fade { from { opacity: 0; } to { opacity: 1; } }
@@ -157,11 +160,17 @@
           <!-- Date strip -->
           <div class="tc-strip" style="flex: none; display: flex; gap: 10px; overflow-x: auto; padding: 4px 16px 10px; border-bottom: 1px solid var(--border);">
             <sc-for list="{{ f.days }}" as="d" hint-placeholder-count="7">
-              <button type="button" disabled="{{ d.disabled }}" onClick="{{ d.onSelect }}" style="flex: 0 0 auto; width: 48px; min-height: 74px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; padding: 9px 0; border-radius: var(--radius-pill); background: {{ d.bg }}; color: {{ d.color }}; border: {{ d.border }}; box-shadow: {{ d.boxShadow }}; opacity: {{ d.opacity }}; cursor: {{ d.cursor }}; -webkit-tap-highlight-color: transparent; transition: background var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);">
-                <span style="font-family: var(--font-body); font-weight: 700; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{ d.wdColor }};">{{ d.weekday }}</span>
-                <span style="font-family: var(--font-body); font-weight: {{ d.dayWeight }}; font-size: 15px; font-variant-numeric: tabular-nums; line-height: 1;">{{ d.day }}</span>
-                <span style="width: 5px; height: 5px; border-radius: 50%; background: {{ d.dotColor }};"></span>
-              </button>
+              <div style="flex: 0 0 auto; display: flex; align-items: center; gap: 10px;">
+                <sc-if value="{{ d.showSep }}" hint-placeholder-val="{{ false }}">
+                  <div style="flex: none; width: 1px; height: 46px; background: var(--border);"></div>
+                </sc-if>
+                <button type="button" disabled="{{ d.disabled }}" onClick="{{ d.onSelect }}" style="flex: 0 0 auto; width: 48px; min-height: 84px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 8px 0; border-radius: var(--radius-pill); background: {{ d.bg }}; color: {{ d.color }}; border: {{ d.border }}; box-shadow: {{ d.boxShadow }}; opacity: {{ d.opacity }}; cursor: {{ d.cursor }}; -webkit-tap-highlight-color: transparent; transition: background var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);">
+                  <span style="height: 11px; font-family: var(--font-body); font-weight: 700; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: {{ d.monthColor }};">{{ d.monthLabel }}</span>
+                  <span style="font-family: var(--font-body); font-weight: 700; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: {{ d.wdColor }};">{{ d.weekday }}</span>
+                  <span style="font-family: var(--font-body); font-weight: {{ d.dayWeight }}; font-size: 15px; font-variant-numeric: tabular-nums; line-height: 1;">{{ d.day }}</span>
+                  <span style="width: 5px; height: 5px; border-radius: 50%; background: {{ d.dotColor }};"></span>
+                </button>
+              </div>
             </sc-for>
           </div>
 
@@ -451,6 +460,12 @@ class Component extends DCLogic {
           { label: 'Score exact', ok: false, pts: 0 },
         ] },
       ],
+      '2027-10-02': [
+        { id: 'm02_1', home: T.FRA, away: T.ARG, hs: 24, as: 20, time: '21h00', type: 'partial', prono: { h: 26, a: 18 }, bonus: [], rows: [
+          { label: 'Bon vainqueur · FRA', ok: true, pts: 5 },
+          { label: 'Écart exact', ok: false, pts: 0 },
+        ] },
+      ],
       '2027-09-25': [
         { id: 'm25_1', home: T.FRA, away: T.URU, hs: 27, as: 15, time: '14h00', type: 'exact', prono: { h: 27, a: 15 }, bonus: ['FRA'], rows: [
           { label: 'Bon vainqueur · FRA', ok: true, pts: 5 },
@@ -481,12 +496,16 @@ class Component extends DCLogic {
       { iso: '2027-09-24', weekday: 'ven', day: 24, hasMatch: false },
       { iso: '2027-09-25', weekday: 'sam', day: 25, hasMatch: true },
       { iso: '2027-09-26', weekday: 'dim', day: 26, hasMatch: false },
+      { iso: '2027-10-01', weekday: 'ven', day: 1, hasMatch: false },
+      { iso: '2027-10-02', weekday: 'sam', day: 2, hasMatch: true },
     ];
+    const MONTHS_ABBR = ['janv', 'févr', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
     const today = '2027-09-25';
     const dayTitles = {
       '2027-09-21': 'mardi 21 septembre',
       '2027-09-23': 'jeudi 23 septembre',
       '2027-09-25': 'samedi 25 septembre',
+      '2027-10-02': 'samedi 2 octobre',
     };
 
     const verdictOf = (m) => {
@@ -604,7 +623,12 @@ class Component extends DCLogic {
       const isEmpty = !isLoading && matchesRaw.length === 0;
       const isList = !isLoading && !isEmpty;
 
+      let prevMonth = null;
       const days = week.map((d) => {
+        const month = Number(d.iso.slice(5, 7)) - 1;
+        const newMonth = month !== prevMonth;
+        const showSep = newMonth && prevMonth !== null;
+        prevMonth = month;
         const isSel = d.iso === selected;
         const isToday = d.iso === today;
         const disabled = !d.hasMatch;
@@ -613,6 +637,9 @@ class Component extends DCLogic {
         else if (isToday) { bg = 'var(--surface)'; border = '1.5px solid var(--border-strong)'; }
         return {
           weekday: d.weekday, day: d.day,
+          showSep,
+          monthLabel: newMonth ? MONTHS_ABBR[month] : '',
+          monthColor: isSel ? 'var(--on-accent)' : 'var(--accent)',
           bg, color, border, boxShadow,
           wdColor: isSel ? 'var(--on-accent)' : 'var(--text-faint)',
           dayWeight: (isSel || isToday) ? 700 : 600,

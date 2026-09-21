@@ -115,6 +115,26 @@
                 </div>
               </div>
 
+              <!-- une seule compétition : contexte statique, pas de sélecteur -->
+              <sc-if value="{{ f.compSolo }}" hint-placeholder-val="{{ false }}">
+                <div style="display: flex; align-items: center; gap: 7px; margin: 14px 0 0;">
+                  <span style="flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--accent);"></span>
+                  <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted);">{{ f.compSoloLabel }}</span>
+                </div>
+              </sc-if>
+
+              <!-- competition chips (slot A : au-dessus des chiffres qu'elles filtrent) -->
+              <sc-if value="{{ f.compTop }}" hint-placeholder-val="{{ true }}">
+                <div class="tc-scroll" style="display: flex; gap: 7px; overflow-x: auto; margin: 14px -20px 0; padding: 0 20px 2px;">
+                  <sc-for list="{{ f.compChips }}" as="c" hint-placeholder-count="3">
+                    <button type="button" aria-pressed="{{ c.active }}" onClick="{{ c.onSelect }}" style="flex: none; display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px; border-radius: var(--radius-pill); background: {{ c.bg }}; border: 1px solid {{ c.bd }}; color: {{ c.fg }}; font-family: var(--font-body); font-size: 13px; font-weight: {{ c.weight }}; letter-spacing: 0.01em; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .14s ease, border-color .14s ease;">
+                      <sc-if value="{{ c.current }}" hint-placeholder-val="{{ false }}"><span style="flex: none; width: 6px; height: 6px; border-radius: 50%; background: {{ c.dot }};"></span></sc-if>
+                      {{ c.label }}
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-if>
+
               <!-- key figures (Anton) -->
               <div style="display: flex; margin-top: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;">
                 <sc-for list="{{ f.figures }}" as="g" hint-placeholder-count="3">
@@ -124,32 +144,6 @@
                   </div>
                 </sc-for>
               </div>
-            </div>
-
-            <!-- competition selector (sticky, above tabs — profile-wide context) -->
-            <div style="flex: none; position: relative; z-index: 30; padding: 0 20px 12px;">
-              <button type="button" onClick="{{ f.onCompToggle }}" aria-haspopup="listbox" aria-expanded="{{ f.compOpen }}" style="width: 100%; display: flex; align-items: center; gap: 11px; padding: 11px 14px; background: var(--surface); border: 1px solid {{ f.compTriggerBorder }}; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; color: var(--text); font-family: var(--font-body);">
-                <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--brand) 12%, transparent); color: var(--brand);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v3a6 6 0 0 1-12 0z"></path><path d="M6 6H4a2 2 0 0 0 2 2M18 6h2a2 2 0 0 1-2 2"></path><path d="M9 15h6M10 15v4M14 15v4M8 21h8"></path></svg></span>
-                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;">
-                  <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">Compétition</span>
-                  <span style="font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ f.compLabel }}</span>
-                </span>
-                <sc-if value="{{ f.compIsCurrent }}" hint-placeholder-val="{{ true }}"><span style="flex: none; display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: var(--radius-pill); background: var(--surface-sunken); font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted);">En cours</span></sc-if>
-                <span style="flex: none; color: var(--text-faint); transform: {{ f.compChevron }}; transition: transform .15s ease;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"></path></svg></span>
-              </button>
-              <sc-if value="{{ f.compOpen }}" hint-placeholder-val="{{ false }}">
-                <div role="listbox" style="position: absolute; left: 20px; right: 20px; top: calc(100% - 6px); z-index: 40; padding: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; gap: 2px; animation: tc-fade .14s ease;">
-                  <sc-for list="{{ f.compMenu }}" as="opt" hint-placeholder-count="3">
-                    <button type="button" role="option" aria-selected="{{ opt.active }}" onClick="{{ opt.onSelect }}" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px; border: none; background: {{ opt.rowBg }}; border-radius: var(--radius-sm); cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; font-family: var(--font-body);">
-                      <span style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 14px; font-weight: {{ opt.weight }}; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ opt.label }}</span>
-                        <sc-if value="{{ opt.current }}" hint-placeholder-val="{{ false }}"><span style="flex: none; display: inline-flex; align-items: center; height: 17px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--surface-sunken); font-size: 9px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted);">En cours</span></sc-if>
-                      </span>
-                      <sc-if value="{{ opt.active }}" hint-placeholder-val="{{ false }}"><span style="flex: none; color: var(--accent);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg></span></sc-if>
-                    </button>
-                  </sc-for>
-                </div>
-              </sc-if>
             </div>
 
             <!-- tabs -->
@@ -373,18 +367,15 @@
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:4840,&quot;height&quot;:1000},&quot;defaultCompetition&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;6n&quot;,&quot;options&quot;:[&quot;all&quot;,&quot;6n&quot;,&quot;cdm&quot;],&quot;tsType&quot;:&quot;'all' | '6n' | 'cdm'&quot;,&quot;section&quot;:&quot;Stats&quot;},&quot;showRankPercentile&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Stats&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:4840,&quot;height&quot;:1000},&quot;defaultCompetition&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;6n&quot;,&quot;options&quot;:[&quot;all&quot;,&quot;6n&quot;,&quot;cdm&quot;],&quot;tsType&quot;:&quot;'all' | '6n' | 'cdm'&quot;,&quot;section&quot;:&quot;Stats&quot;},&quot;showRankPercentile&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Stats&quot;},&quot;singleCompetition&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Compétition&quot;}}">
 class Component extends DCLogic {
-  state = { tab: {}, comp: {}, compOpen: {} };
+  state = { tab: {}, comp: {} };
 
   setTab(fid, v) {
-    this.setState((s) => ({ tab: { ...s.tab, [fid]: v }, compOpen: { ...s.compOpen, [fid]: false } }));
+    this.setState((s) => ({ tab: { ...s.tab, [fid]: v } }));
   }
   setComp(fid, v) {
-    this.setState((s) => ({ comp: { ...s.comp, [fid]: v }, compOpen: { ...s.compOpen, [fid]: false } }));
-  }
-  toggleComp(fid) {
-    this.setState((s) => ({ compOpen: { ...s.compOpen, [fid]: !s.compOpen[fid] } }));
+    this.setState((s) => ({ comp: { ...s.comp, [fid]: v } }));
   }
 
   renderVals() {
@@ -407,9 +398,9 @@ class Component extends DCLogic {
 
     // ---- competitions ----
     const comps = [
-      { value: 'all', label: 'Toutes compétitions' },
-      { value: '6n', label: '6 Nations 2027', current: true },
-      { value: 'cdm', label: 'Coupe du monde 2027' },
+      { value: 'all', label: 'Toutes compétitions', chip: 'Toutes' },
+      { value: '6n', label: '6 Nations 2027', current: true, chip: '6 Nations 2027' },
+      { value: 'cdm', label: 'Coupe du monde 2027', chip: 'Coupe du monde 2027' },
     ];
 
     const meStats = {
@@ -575,7 +566,7 @@ class Component extends DCLogic {
     const frameDefs = [
       { id: 'ms_l', kind: 'me', theme: 'light', tab: 'stats', label: 'Mon profil · Stats · clair', dot: 'var(--sand-050)' },
       { id: 'ms_d', kind: 'me', theme: 'dark', tab: 'stats', label: 'Mon profil · Stats · sombre', dot: 'var(--green-800)' },
-      { id: 'ms_open', kind: 'me', theme: 'light', tab: 'stats', open: true, label: 'Stats · sélecteur de compétition', dot: 'var(--grenat-500)' },
+      { id: 'ms_solo', kind: 'me', theme: 'light', tab: 'stats', single: true, label: 'Une seule compétition (pas de sélecteur)', dot: 'var(--grenat-500)' },
       { id: 'pub_l', kind: 'pub', theme: 'light', tab: 'stats', label: 'Profil public · Stats · clair', dot: 'var(--grenat-500)' },
       { id: 'pub_d', kind: 'pub', theme: 'dark', tab: 'stats', label: 'Profil public · Stats · sombre', dot: 'var(--green-800)' },
       { id: 'mp', kind: 'me', theme: 'light', tab: 'pronos', label: 'Mon profil · Pronos · clair', dot: 'var(--sand-050)' },
@@ -597,9 +588,9 @@ class Component extends DCLogic {
       const tabPronos = tab === 'pronos';
       const tabLigues = tab === 'ligues' && isMe;
 
-      const compVal = this.state.comp[fd.id] || defComp;
-      const compMeta = comps.find((c) => c.value === compVal) || comps[1];
-      const compOpen = isLoading ? false : (this.state.compOpen[fd.id] !== undefined ? this.state.compOpen[fd.id] : !!fd.open);
+      const soloComp = fd.single !== undefined ? !!fd.single : this.props.singleCompetition === true;
+      const compList = soloComp ? comps.filter((c) => c.current) : comps;
+      const compVal = soloComp ? compList[0].value : (this.state.comp[fd.id] || defComp);
       const data = prof.stats[compVal] || prof.stats['6n'];
       const stat = buildStat(data);
 
@@ -610,12 +601,15 @@ class Component extends DCLogic {
         { label: 'Précision', value: data.pronos > 0 ? (stat.goodPct + '%') : '—', color: 'var(--text)', edge: '1px solid var(--border)' },
       ];
 
-      const compMenu = comps.map((c) => {
+      const compChips = compList.map((c) => {
         const active = c.value === compVal;
         return {
-          label: c.label, current: !!c.current, active,
-          weight: active ? 700 : 500,
-          rowBg: active ? 'color-mix(in srgb, var(--accent) 8%, transparent)' : 'transparent',
+          label: c.chip, current: !!c.current, active,
+          weight: active ? 700 : 600,
+          bg: active ? 'var(--accent)' : 'var(--surface)',
+          bd: active ? 'var(--accent)' : 'var(--border)',
+          fg: active ? 'var(--on-accent)' : 'var(--text-muted)',
+          dot: active ? 'color-mix(in srgb, var(--on-accent) 75%, transparent)' : 'var(--accent)',
           onSelect: () => this.setComp(fd.id, c.value),
         };
       });
@@ -637,13 +631,11 @@ class Component extends DCLogic {
 
         figures,
 
-        // competition selector
-        compLabel: compMeta.label,
-        compIsCurrent: !!compMeta.current,
-        compOpen, compMenu,
-        compChevron: compOpen ? 'rotate(180deg)' : 'none',
-        compTriggerBorder: compOpen ? 'var(--accent)' : 'var(--border)',
-        onCompToggle: () => this.toggleComp(fd.id),
+        // competition chips
+        compChips,
+        compTop: !soloComp,
+        compSolo: soloComp,
+        compSoloLabel: compList[0].label,
 
         cards: stat.cards,
         rank: stat.rank,

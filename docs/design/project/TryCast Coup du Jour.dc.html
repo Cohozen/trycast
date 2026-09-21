@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/styles.css">
+  <script src="_ds/trycast-design-system-a0f4ea97-0d6d-4fdd-ac49-400152185bc0/_ds_bundle.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    [data-theme="light"] {
+      --bg: var(--sand-050); --surface: var(--sand-100); --surface-sunken: var(--sand-150);
+      --border: var(--sand-200); --border-strong: var(--sand-300);
+      --text: var(--ink-900); --text-muted: var(--ink-600); --text-faint: var(--ink-400);
+      --brand: var(--green-800); --on-brand: var(--sand-050);
+      --accent: var(--grenat-500); --accent-hover: var(--grenat-400); --accent-press: var(--grenat-600); --on-accent: #FFFFFF;
+      --focus-ring: var(--grenat-500);
+      --glass-hairline: color-mix(in srgb, var(--border-strong) 85%, transparent);
+      --glass-pill: color-mix(in srgb, var(--surface) 82%, transparent);
+      --glass-pill-border: color-mix(in srgb, var(--border-strong) 90%, transparent);
+      --shadow-sm: 0 1px 2px rgba(22,19,14,0.06); --shadow-md: 0 4px 14px rgba(22,19,14,0.08); --shadow-lg: 0 12px 32px rgba(22,19,14,0.12);
+    }
+    [data-theme="dark"] { --glass-hairline: color-mix(in srgb, var(--border-strong) 92%, transparent); }
+    .tc-scroll::-webkit-scrollbar { width: 0; height: 0; }
+    .tc-strip::-webkit-scrollbar { width: 0; height: 0; }
+    @keyframes tc-cdj-in { from { opacity: 0; transform: translateY(8px) scale(0.985); } to { opacity: 1; transform: none; } }
+    @keyframes tc-cdj-ring { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 34%, transparent); } 70% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--accent) 0%, transparent); } 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent); } }
+    .tc-arrive { animation: tc-cdj-in 340ms var(--ease-out) both; border-radius: var(--radius-lg); }
+    .tc-arrive-ring { animation: tc-cdj-ring 1200ms var(--ease-out) 260ms 1 both; border-radius: var(--radius-lg); }
+    @media (prefers-reduced-motion: reduce) { .tc-arrive, .tc-arrive-ring { animation: none !important; } }
+  </style>
+</helmet>
+<div style="width: max-content; min-height: 100vh; padding: 48px; background: #7C776E; font-family: var(--font-body); display: flex; flex-direction: column; gap: 46px;">
+
+  <div style="display: flex; flex-direction: column; gap: 6px; color: var(--sand-050); max-width: 880px;">
+    <span style="font-family: var(--font-display); font-size: 34px; letter-spacing: 0.01em;">TryCast — Coup de la journée</span>
+    <span style="font-size: 14px; color: rgba(255,255,255,0.72); line-height: 1.5;">Détail de ligue → onglet Résultats. Sous les pilules « J n », au-dessus du classement de la journée. Rien ne s'affiche quand aucun coup ne le mérite.</span>
+  </div>
+
+  <!-- ===== 1 lauréat · variantes ===== -->
+  <div style="display: flex; flex-direction: column; gap: 18px;">
+    <span style="font-family: var(--font-display); font-size: 22px; color: var(--sand-050); letter-spacing: 0.02em;">1 · Un lauréat — variantes de titre</span>
+    <div style="display: flex; gap: 34px; align-items: flex-start;">
+      <sc-for list="{{ variants }}" as="v" hint-placeholder-count="6">
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 350px;">
+          <div style="display: flex; flex-direction: column; gap: 3px; color: var(--sand-050);">
+            <span style="font-size: 13px; font-weight: 700;">{{ v.label }}</span>
+            <span style="font-size: 12px; color: rgba(255,255,255,0.66); line-height: 1.4;">{{ v.note }}</span>
+          </div>
+          <div data-theme="light" data-screen-label="{{ v.label }} · clair" style="padding: 16px; background: var(--bg); border-radius: var(--radius-xl);">
+            <dc-import name="CoupDuJour" data="{{ v.data }}" hint-size="100%,340px"></dc-import>
+          </div>
+          <div data-theme="dark" data-screen-label="{{ v.label }} · sombre" style="padding: 16px; background: var(--bg); border-radius: var(--radius-xl);">
+            <dc-import name="CoupDuJour" data="{{ v.data }}" hint-size="100%,340px"></dc-import>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ===== ex æquo ===== -->
+  <div style="display: flex; flex-direction: column; gap: 18px;">
+    <span style="font-family: var(--font-display); font-size: 22px; color: var(--sand-050); letter-spacing: 0.02em;">2 · Ex æquo — 2 et 3 lauréats</span>
+    <div style="display: flex; gap: 34px; align-items: flex-start;">
+      <sc-for list="{{ exaequo }}" as="v" hint-placeholder-count="3">
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 350px;">
+          <div style="display: flex; flex-direction: column; gap: 3px; color: var(--sand-050);">
+            <span style="font-size: 13px; font-weight: 700;">{{ v.label }}</span>
+            <span style="font-size: 12px; color: rgba(255,255,255,0.66); line-height: 1.4;">{{ v.note }}</span>
+          </div>
+          <div data-theme="light" data-screen-label="{{ v.label }} · clair" style="padding: 16px; background: var(--bg); border-radius: var(--radius-xl);">
+            <dc-import name="CoupDuJour" data="{{ v.data }}" hint-size="100%,340px"></dc-import>
+          </div>
+          <div data-theme="dark" data-screen-label="{{ v.label }} · sombre" style="padding: 16px; background: var(--bg); border-radius: var(--radius-xl);">
+            <dc-import name="CoupDuJour" data="{{ v.data }}" hint-size="100%,340px"></dc-import>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ===== écrans ===== -->
+  <div style="display: flex; flex-direction: column; gap: 18px;">
+    <span style="font-family: var(--font-display); font-size: 22px; color: var(--sand-050); letter-spacing: 0.02em;">3 · Écran Résultats en place · et l'arrivée depuis la notification</span>
+    <div style="display: flex; gap: 40px; align-items: flex-start;">
+      <sc-for list="{{ screens }}" as="s" hint-placeholder-count="4">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: inline-flex; align-items: center; gap: 8px; color: var(--sand-050); font-size: 13px; font-weight: 600; padding: 0 4px; max-width: 390px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: {{ s.dot }}; flex: none;"></span>{{ s.label }}
+          </div>
+
+          <div data-theme="{{ s.theme }}" data-screen-label="{{ s.label }}" style="position: relative; width: 390px; height: 844px; font-family: var(--font-body); background: var(--bg); color: var(--text); border-radius: 46px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column;">
+
+            <div style="flex: none; display: flex; justify-content: space-between; align-items: center; padding: 14px 30px 8px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums;">
+              <span>9:41</span>
+              <span style="display: flex; gap: 7px; align-items: center;">
+                <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"></rect><rect x="4.5" y="4.5" width="3" height="6.5" rx="1"></rect><rect x="9" y="2" width="3" height="9" rx="1"></rect><rect x="13.5" y="0" width="3" height="11" rx="1"></rect></svg>
+                <svg width="26" height="12" viewBox="0 0 26 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3" stroke="currentColor" opacity="0.4"></rect><rect x="2" y="2" width="17" height="8" rx="1.5" fill="currentColor"></rect><rect x="23" y="4" width="2" height="4" rx="1" fill="currentColor" opacity="0.4"></rect></svg>
+              </span>
+            </div>
+
+            <div style="flex: none; display: flex; align-items: center; gap: 12px; padding: 6px 20px 12px;">
+              <button type="button" onClick="{{ noop }}" style="flex: none; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-family: var(--font-display); font-size: 24px; line-height: 1; letter-spacing: 0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Les Potes du Stade</span>
+                <span style="font-size: 12px; color: var(--text-muted);">9 membres · Coupe du monde 2027</span>
+              </div>
+            </div>
+
+            <div style="flex: none; display: flex; gap: 4px; margin: 0 20px 12px; padding: 4px; background: var(--surface-sunken); border-radius: var(--radius-pill);">
+              <span style="flex: 1; text-align: center; padding: 8px 0; border-radius: var(--radius-pill); font-size: 13px; font-weight: 600; color: var(--text-muted);">Classement</span>
+              <span style="flex: 1; text-align: center; padding: 8px 0; border-radius: var(--radius-pill); background: var(--surface); box-shadow: var(--shadow-sm); font-size: 13px; font-weight: 700; color: var(--text);">Résultats</span>
+              <span style="flex: 1; text-align: center; padding: 8px 0; border-radius: var(--radius-pill); font-size: 13px; font-weight: 600; color: var(--text-muted);">Réglages</span>
+            </div>
+
+            <div class="tc-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 4px 20px 120px; display: flex; flex-direction: column; gap: 16px;">
+
+              <div style="display: flex; flex-direction: column; gap: 9px;">
+                <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); padding: 0 2px;">Journée</span>
+                <div class="tc-strip" style="display: flex; gap: 9px; overflow-x: auto; padding: 2px 0 4px;">
+                  <sc-for list="{{ s.journees }}" as="j" hint-placeholder-count="5">
+                    <button type="button" onClick="{{ noop }}" style="flex: 0 0 auto; width: 54px; min-height: 66px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 8px 0; border-radius: var(--radius-pill); background: {{ j.bg }}; color: {{ j.color }}; border: {{ j.border }}; box-shadow: {{ j.boxShadow }}; opacity: {{ j.opacity }}; cursor: pointer; -webkit-tap-highlight-color: transparent;">
+                      <span style="font-weight: 700; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: {{ j.overlineColor }};">J</span>
+                      <span style="font-family: var(--font-display); font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums;">{{ j.num }}</span>
+                      <span style="width: 5px; height: 5px; border-radius: 50%; background: {{ j.dotColor }};"></span>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+
+              <sc-if value="{{ s.hasCard }}" hint-placeholder-val="{{ true }}">
+                <div class="{{ s.cardClass }}">
+                  <div class="{{ s.ringClass }}">
+                    <dc-import name="CoupDuJour" data="{{ s.data }}" hint-size="100%,330px"></dc-import>
+                  </div>
+                </div>
+              </sc-if>
+
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 0 2px;">
+                  <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text);">Journée 3</span>
+                  <span style="flex: none; font-size: 11px; font-weight: 600; color: var(--text-faint); white-space: nowrap;">4 matchs · 9 membres</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <sc-for list="{{ s.journeeRows }}" as="r" hint-placeholder-count="6">
+                    <div style="display: flex; align-items: center; gap: 11px; padding: 10px 12px; background: {{ r.rowBg }}; border-left: {{ r.rowEdge }}; border-radius: var(--radius-sm);">
+                      <span style="flex: none; min-width: 22px; text-align: center; font-family: var(--font-display); font-size: 17px; line-height: 1; color: {{ r.rankColor }}; font-variant-numeric: tabular-nums;">{{ r.rank }}</span>
+                      <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ r.name }}" size="sm" ring="{{ r.isMe }}" hint-size="32px,32px"></x-import>
+                      <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
+                        <span style="font-size: 14px; font-weight: {{ r.nameWeight }}; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ r.displayName }}</span>
+                        <span style="font-size: 11px; font-weight: 600; color: {{ r.exactColor }};">{{ r.exactStr }}</span>
+                      </span>
+                      <span style="flex: none; display: inline-flex; align-items: baseline; gap: 2px;"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; color: {{ r.ptsColor }}; font-variant-numeric: tabular-nums;">{{ r.ptsStr }}</span><span style="font-size: 10px; font-weight: 700; color: var(--text-faint);">pts</span></span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+
+            <sc-if value="{{ s.notif }}" hint-placeholder-val="{{ false }}">
+              <div style="position: absolute; top: 14px; left: 14px; right: 14px; z-index: 9; display: flex; gap: 11px; padding: 12px 14px; border-radius: var(--radius-md); background: color-mix(in srgb, var(--surface) 92%, transparent); border: 1px solid var(--border-strong); box-shadow: var(--shadow-lg); backdrop-filter: blur(12px);">
+                <span style="flex: none; width: 34px; height: 34px; border-radius: 9px; background: var(--brand); color: var(--on-brand); display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 15px;">TC</span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-size: 12.5px; font-weight: 700; color: var(--text);">TryCast</span>
+                  <span style="font-size: 12.5px; color: var(--text-muted); line-height: 1.35; text-wrap: pretty;">Le coup de la journée dans Les Potes du Stade.</span>
+                </span>
+                <span style="flex: none; font-size: 11px; color: var(--text-faint);">maint.</span>
+              </div>
+            </sc-if>
+
+            <div style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;">
+              <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TabBar" items="{{ tabItems }}" active="classement" on-change="{{ noop }}" hint-size="100%,88px"></x-import>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ===== copy ===== -->
+  <div data-theme="light" style="align-self: flex-start; max-width: 860px; display: flex; flex-direction: column; gap: 18px; padding: 26px 28px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-md); color: var(--text);">
+    <div style="display: flex; flex-direction: column; gap: 5px;">
+      <span style="font-family: var(--font-display); font-size: 24px; letter-spacing: 0.01em;">4 · Titres et accroches</span>
+      <span style="font-size: 13px; color: var(--text-muted); line-height: 1.5; text-wrap: pretty;">Hiérarchie : score exact &gt; nul osé &gt; outsider &gt; joker &gt; contre la ligue. Un seul titre sort, les autres cas deviennent badges. Tutoiement uniquement quand c'est toi le lauréat.</span>
+    </div>
+    <div style="display: flex; flex-direction: column;">
+      <sc-for list="{{ copyRows }}" as="c" hint-placeholder-count="10">
+        <div style="display: grid; grid-template-columns: 62px 200px 190px 1fr; gap: 14px; align-items: baseline; padding: 11px 0; border-bottom: 1px solid var(--border);">
+          <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent);">{{ c.v }}</span>
+          <span style="font-size: 13px; color: var(--text-muted); line-height: 1.4;">{{ c.cas }}</span>
+          <span style="font-family: var(--font-display); font-size: 17px; letter-spacing: 0.01em; color: var(--text);">{{ c.titre }}</span>
+          <span style="font-size: 13px; color: var(--text); line-height: 1.45; text-wrap: pretty;">{{ c.accroche }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:2400,&quot;height&quot;:1200}}">
+class Component extends DCLogic {
+  renderVals() {
+    const IRLFRA = { homeAbbr: 'IRL', homeName: 'Irlande', homeColor: '#159B5E', awayAbbr: 'FRA', awayName: 'France', awayColor: '#2C5697', hs: 19, as: 22 };
+    const AUSGEO = { homeAbbr: 'AUS', homeName: 'Australie', homeColor: '#0E7C4A', awayAbbr: 'GEO', awayName: 'Géorgie', awayColor: '#9B2D2D', hs: 22, as: 25 };
+    const GALITA = { homeAbbr: 'GAL', homeName: 'Galles', homeColor: '#B7202E', awayAbbr: 'ITA', awayName: 'Italie', awayColor: '#2C7A3F', hs: 24, as: 24 };
+    const J = 'Journée 3';
+
+    const variants = [
+      {
+        label: 'Variante 1 · contre la ligue, favori des cotes',
+        note: 'La ligue s\u2019est trompée, lui a suivi la logique. Aucun badge : l\u2019histoire suffit.',
+        data: {
+          journeeLabel: J, title: 'Seul contre la ligue',
+          accroche: 'Huit sur neuf misaient sur l\u2019Irlande. Lui a lu les cotes, et le terrain a suivi.',
+          badges: [], match: IRLFRA,
+          entries: [{ name: 'Marceau Laborde-Vidal', subline: 'Prono 17 – 24', pts: 21 }],
+          storyText: '7 sur 9 voyaient l\u2019Irlande gagner.', story: { majority: 7, mine: 2 },
+        },
+      },
+      {
+        label: 'Variante 2 · contre la ligue ET outsider',
+        note: 'Le vrai coup de poker. Le badge dit ce que le titre ne dit pas.',
+        data: {
+          journeeLabel: J, title: 'Le coup de poker',
+          accroche: 'Les cotes disaient non. La ligue aussi. Il a signé quand même.',
+          badges: [{ label: 'Outsider des cotes' }], match: AUSGEO,
+          entries: [{ name: 'Yanis', subline: 'Prono 20 – 24', pts: 27 }],
+          storyText: '9 sur 10 voyaient l\u2019Australie gagner.', story: { majority: 9, mine: 1 },
+        },
+      },
+      {
+        label: 'Variante 2 + 3 · outsider avec joker ×2',
+        note: 'Le joker ne prend jamais le titre à l\u2019outsider : il passe en badge vert et dans l\u2019accroche.',
+        data: {
+          journeeLabel: J, title: 'Le coup de poker',
+          accroche: 'Les cotes disaient non, la ligue non plus — et il avait posé son joker dessus.',
+          badges: [{ label: 'Joker', joker: true }, { label: 'Outsider des cotes' }], match: AUSGEO,
+          entries: [{ name: 'Yanis', subline: 'Prono 20 – 24', pts: 54, joker: true }],
+          storyText: '9 sur 10 voyaient l\u2019Australie gagner.', story: { majority: 9, mine: 1 },
+        },
+      },
+      {
+        label: 'Variante 4 · match nul pronostiqué',
+        note: 'Cas le plus rare : le nul passe devant l\u2019outsider dans la hiérarchie des titres.',
+        data: {
+          journeeLabel: J, title: 'Il a osé le nul',
+          accroche: 'Un nul, au rugby. Personne ne l\u2019écrit. Lui l\u2019avait écrit avant le coup d\u2019envoi.',
+          badges: [{ label: 'Match nul' }], match: GALITA,
+          entries: [{ name: 'Sofia', subline: 'Prono 24 – 24', pts: 31 }],
+          storyText: 'Aucun autre membre n\u2019avait mis le nul.', story: { majority: 9, mine: 1 },
+        },
+      },
+      {
+        label: 'Variante 5 · score exact en plus',
+        note: 'Le coup parfait : le titre le plus haut de la hiérarchie.',
+        data: {
+          journeeLabel: J, title: 'Le coup parfait',
+          accroche: 'Score exact, contre toute la ligue. On peut rentrer au vestiaire.',
+          badges: [{ label: 'Score exact' }, { label: 'Outsider des cotes' }], match: AUSGEO,
+          entries: [{ name: 'Camille D.', subline: 'Prono 22 – 25', pts: 38 }],
+          storyText: '9 sur 10 voyaient l\u2019Australie gagner.', story: { majority: 9, mine: 1 },
+        },
+      },
+      {
+        label: 'Variante 6 · le lauréat, c\u2019est moi',
+        note: 'Même carte, 2e personne. Avatar cerclé, accroche et CTA retournés vers toi.',
+        data: {
+          journeeLabel: J, overline: 'Ton coup de la journée', title: 'Tu as tenu ton idée',
+          accroche: 'Toute la ligue voyait l\u2019Irlande. Toi, tu n\u2019as pas bougé d\u2019une ligne.',
+          badges: [], match: IRLFRA,
+          entries: [{ name: 'Moi', subline: 'Ton prono 17 – 24', pts: 21, isMe: true }],
+          storyText: '7 sur 9 voyaient l\u2019Irlande gagner. Pas toi.', story: { majority: 7, mine: 2 },
+          ctaText: 'Tes potes réagissent — va voir',
+        },
+      },
+    ];
+
+    const exaequo = [
+      {
+        label: '2 lauréats · même match',
+        note: 'Une seule histoire, deux visages. Le match reste en tête, les lignes lauréats s\u2019empilent.',
+        data: {
+          journeeLabel: J, title: 'Deux à contre-courant',
+          accroche: 'Même match, même total : la ligue voyait l\u2019Irlande, eux non.',
+          badges: [{ label: 'Ex æquo' }], match: IRLFRA,
+          entries: [
+            { name: 'Marceau Laborde-Vidal', subline: 'Prono 17 – 24', pts: 21 },
+            { name: 'Sofia', subline: 'Prono 18 – 25', pts: 21 },
+          ],
+          storyText: '7 sur 9 voyaient l\u2019Irlande gagner.', story: { majority: 7, mine: 2 },
+          ctaText: 'Va réagir sur le détail du match',
+        },
+      },
+      {
+        label: '2 lauréats · matchs différents',
+        note: 'Pas de bandeau match : chaque ligne porte son propre match, en version compacte.',
+        data: {
+          journeeLabel: J, title: 'Deux coups, deux matchs',
+          accroche: 'Chacun son terrain, le même total au bout. La ligue n\u2019avait ni l\u2019un ni l\u2019autre.',
+          badges: [{ label: 'Ex æquo' }],
+          entries: [
+            { name: 'Yanis', subline: 'AUS 22 – 25 GEO · prono 20 – 24', pts: 27 },
+            { name: 'Camille D.', subline: 'GAL 24 – 24 ITA · prono 24 – 24', pts: 27 },
+          ],
+          storyText: 'Deux pronos contre la majorité de la ligue.', story: { majority: 8, mine: 2 },
+        },
+      },
+      {
+        label: '3 lauréats · même match',
+        note: 'Plafond de la carte : au-delà de 3, pas de carte du tout. Reste compacte (≈300 px).',
+        data: {
+          journeeLabel: J, title: 'Trois contre la ligue',
+          accroche: 'Trois à ne pas suivre le troupeau, trois au même total.',
+          badges: [{ label: 'Ex æquo' }, { label: 'Joker', joker: true }], match: AUSGEO,
+          entries: [
+            { name: 'Yanis', subline: 'Prono 20 – 24', pts: 27, joker: true },
+            { name: 'Marceau Laborde-Vidal', subline: 'Prono 19 – 23', pts: 27 },
+            { name: 'Sofia', subline: 'Prono 21 – 26', pts: 27 },
+          ],
+          storyText: '7 sur 10 voyaient l\u2019Australie gagner.', story: { majority: 7, mine: 3 },
+        },
+      },
+    ];
+
+    const rowsRaw = [
+      { rank: 1, name: 'Marceau Laborde-Vidal', pts: 21, exact: '1 score exact', me: false },
+      { rank: 2, name: 'Sofia', pts: 18, exact: '', me: false },
+      { rank: 3, name: 'Moi', pts: 16, exact: '', me: true },
+      { rank: 4, name: 'Yanis', pts: 12, exact: '', me: false },
+      { rank: 5, name: 'Camille D.', pts: 9, exact: '', me: false },
+      { rank: 6, name: 'Thibaut', pts: 4, exact: '', me: false },
+    ];
+    const journeeRows = rowsRaw.map((r) => ({
+      rank: r.rank, name: r.name, displayName: r.name, isMe: r.me,
+      rowBg: r.me ? 'color-mix(in srgb, var(--accent) 7%, transparent)' : 'transparent',
+      rowEdge: r.me ? '2px solid var(--accent)' : '2px solid transparent',
+      rankColor: r.rank === 1 ? 'var(--accent)' : 'var(--text-faint)',
+      nameWeight: r.me ? 700 : 600,
+      exactStr: r.exact, exactColor: 'var(--text-faint)',
+      ptsStr: '+' + r.pts, ptsColor: 'var(--text)',
+    }));
+
+    const journees = [1, 2, 3, 4, 5].map((n) => {
+      const sel = n === 3, played = n <= 3;
+      return {
+        num: n,
+        bg: sel ? 'var(--accent)' : 'transparent',
+        color: sel ? 'var(--on-accent)' : 'var(--text)',
+        border: sel ? '1.5px solid transparent' : '1.5px solid var(--border-strong)',
+        boxShadow: sel ? 'var(--glow-accent)' : 'none',
+        opacity: played ? 1 : 0.45,
+        overlineColor: sel ? 'var(--on-accent)' : 'var(--text-faint)',
+        dotColor: played ? (sel ? 'var(--on-accent)' : 'var(--accent)') : 'transparent',
+      };
+    });
+
+    const cardData = variants[0].data;
+    const screens = [
+      { id: 's1', label: 'Résultats · avec la carte · clair', theme: 'light', dot: 'var(--grenat-500)', hasCard: true, arrive: false, data: cardData },
+      { id: 's2', label: 'Résultats · aucun coup ce jour-là · clair', theme: 'light', dot: 'var(--ink-400)', hasCard: false, arrive: false, data: cardData },
+      { id: 's3', label: 'Résultats · avec la carte · sombre', theme: 'dark', dot: 'var(--green-800)', hasCard: true, arrive: false, data: cardData },
+      { id: 's4', label: 'Arrivée depuis la notification push', theme: 'light', dot: 'var(--sand-050)', hasCard: true, arrive: true, data: variants[2].data, notif: true },
+    ].map((s) => ({ ...s, journees, journeeRows, cardClass: s.arrive ? 'tc-arrive' : '', ringClass: s.arrive ? 'tc-arrive-ring' : '' }));
+
+    const copyRows = [
+      { v: '1', cas: 'Contre la ligue, favori des cotes', titre: 'Seul contre la ligue', accroche: 'Huit sur neuf misaient sur l\u2019Irlande. Lui a lu les cotes, et le terrain a suivi.' },
+      { v: '2', cas: 'Contre la ligue + outsider des cotes', titre: 'Le coup de poker', accroche: 'Les cotes disaient non. La ligue aussi. Il a signé quand même.' },
+      { v: '3', cas: 'Joker ×2 posé (cumulé avec 1)', titre: 'Le joker bien placé', accroche: 'Joker posé, ligue à contre-pied : il n\u2019a pas tremblé.' },
+      { v: '2+3', cas: 'Outsider + joker ×2', titre: 'Le coup de poker', accroche: 'Les cotes disaient non, la ligue non plus — et il avait posé son joker dessus.' },
+      { v: '4', cas: 'Nul pronostiqué et réalisé', titre: 'Il a osé le nul', accroche: 'Un nul, au rugby. Personne ne l\u2019écrit. Lui l\u2019avait écrit avant le coup d\u2019envoi.' },
+      { v: '5', cas: 'Score exact en plus', titre: 'Le coup parfait', accroche: 'Score exact, contre toute la ligue. On peut rentrer au vestiaire.' },
+      { v: '6', cas: 'C\u2019est moi (2e personne)', titre: 'Tu as tenu ton idée', accroche: 'Toute la ligue voyait l\u2019Irlande. Toi, tu n\u2019as pas bougé d\u2019une ligne.' },
+      { v: 'Ex æquo 2', cas: 'Même match', titre: 'Deux à contre-courant', accroche: 'Même match, même total : la ligue voyait l\u2019Irlande, eux non.' },
+      { v: 'Ex æquo 2', cas: 'Matchs différents', titre: 'Deux coups, deux matchs', accroche: 'Chacun son terrain, le même total au bout. La ligue n\u2019avait ni l\u2019un ni l\u2019autre.' },
+      { v: 'Ex æquo 3', cas: 'Trois lauréats', titre: 'Trois contre la ligue', accroche: 'Trois à ne pas suivre le troupeau, trois au même total.' },
+    ];
+
+    const E = React.createElement;
+    const mk = (children) => (active) => E('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: active ? 2.4 : 1.9, strokeLinecap: 'round', strokeLinejoin: 'round' }, children);
+    const tabItems = [
+      { key: 'matchs', label: 'Matchs', icon: mk([E('path', { key: 1, d: 'M4 7h16' }), E('path', { key: 2, d: 'M4 12h16' }), E('path', { key: 3, d: 'M4 17h10' })]) },
+      { key: 'resultats', label: 'Résultats', icon: mk([E('circle', { key: 1, cx: 12, cy: 12, r: 9 }), E('path', { key: 2, d: 'M8.4 12.4l2.4 2.4 4.8-5.2' })]) },
+      { key: 'classement', label: 'Ligues', icon: mk([E('path', { key: 1, d: 'M6 20V11' }), E('path', { key: 2, d: 'M12 20V4' }), E('path', { key: 3, d: 'M18 20v-6' })]) },
+      { key: 'profil', label: 'Profil', icon: mk([E('circle', { key: 1, cx: 12, cy: 8, r: 3.6 }), E('path', { key: 2, d: 'M4.5 20c0-3.4 3.4-5.8 7.5-5.8s7.5 2.4 7.5 5.8' })]) },
+    ];
+
+    return { variants, exaequo, screens, copyRows, tabItems, noop: () => {} };
+  }
+}
+
+</script>
+</body>
+</html>

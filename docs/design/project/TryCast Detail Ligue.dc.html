@@ -32,11 +32,22 @@
     }
     [data-theme="dark"] { --danger: #F0685A; --danger-press: #D8564A; --on-danger: #2A0F0C; }
     .tc-scroll::-webkit-scrollbar { width: 0; height: 0; }
-    .tc-strip::-webkit-scrollbar { width: 0; height: 0; }
+    /* strip journées/phases : scroll horizontal visible (barre fine, tokens) */
+    .tc-strip { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; scroll-snap-type: x proximity; overscroll-behavior-x: contain; }
+    .tc-strip::-webkit-scrollbar { height: 5px; }
+    .tc-strip::-webkit-scrollbar-track { background: transparent; }
+    .tc-strip::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 999px; }
+    .tc-strip > * { scroll-snap-align: start; }
     @keyframes tc-fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
     @keyframes tc-pop { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
     @keyframes tc-slideup { from { transform: translateY(100%); } to { transform: translateY(0); } }
     @keyframes tc-shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+    /* Coup de la journée : mise en avant brève à l'arrivée (depuis la notif push). */
+    @keyframes tc-cdj-in { from { opacity: 0; transform: translateY(8px) scale(0.985); } to { opacity: 1; transform: none; } }
+    @keyframes tc-cdj-ring { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 34%, transparent); } 70% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--accent) 0%, transparent); } 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent); } }
+    .tc-arrive { animation: tc-cdj-in 340ms var(--ease-out) both; border-radius: var(--radius-lg); }
+    .tc-arrive-ring { animation: tc-cdj-ring 1200ms var(--ease-out) 260ms 1 both; border-radius: var(--radius-lg); }
+    @media (prefers-reduced-motion: reduce) { .tc-arrive, .tc-arrive-ring { animation: none !important; } }
     .tc-shim { background: linear-gradient(90deg, color-mix(in srgb, var(--text) 7%, transparent) 25%, color-mix(in srgb, var(--text) 15%, transparent) 37%, color-mix(in srgb, var(--text) 7%, transparent) 63%); background-size: 400% 100%; animation: tc-shimmer 1.4s ease infinite; border-radius: var(--radius-xs); }
   </style>
 </helmet>
@@ -69,14 +80,20 @@
           </div>
 
           <!-- NAV: back + overflow -->
-          <div style="flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 12px 6px;">
+          <div style="flex: none; position: relative; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 12px 6px; background: var(--bg);">
             <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.IconButton" variant="ghost" ariaLabel="Retour" onClick="{{ f.noop }}" hint-size="44px,44px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></x-import>
-            <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint);">Ma ligue</span>
+            <span style="position: relative; flex: 1; min-width: 0; height: 34px; display: flex; align-items: center; justify-content: center;">
+              <span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); opacity: {{ f.navTitleOpacity }};">Ma ligue</span>
+              <span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 8px; opacity: {{ f.compactOpacity }}; transform: {{ f.compactShift }}; pointer-events: none;">
+                <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 8px; background: var(--brand); color: var(--on-brand); font-family: var(--font-display); font-size: 13px; letter-spacing: 0.02em;">{{ f.leagueInitials }}</span>
+                <span style="min-width: 0; font-family: var(--font-display); font-size: 19px; line-height: 1; letter-spacing: 0.01em; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ f.leagueName }}</span>
+              </span>
+            </span>
             <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.IconButton" variant="ghost" ariaLabel="Options" onClick="{{ f.noop }}" hint-size="44px,44px"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></x-import>
           </div>
 
           <!-- LEAGUE IDENTITY -->
-          <div style="flex: none; display: flex; align-items: center; gap: 14px; padding: 6px 20px 14px;">
+          <div style="flex: none; display: flex; align-items: center; gap: 14px; padding: 6px 20px 14px; height: {{ f.idHeight }}; overflow: hidden; opacity: {{ f.idOpacity }}; transform: {{ f.idTransform }}; transform-origin: left center;">
             <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 58px; height: 58px; border-radius: var(--radius-md); background: var(--brand); color: var(--on-brand); font-family: var(--font-display); font-size: 26px; letter-spacing: 0.02em; box-shadow: var(--shadow-sm);">{{ f.leagueInitials }}</span>
             <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px;">
               <span style="font-family: var(--font-display); font-size: 28px; line-height: 0.98; letter-spacing: 0.01em; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ f.leagueName }}</span>
@@ -93,12 +110,12 @@
           </div>
 
           <!-- TABS -->
-          <div style="flex: none; padding: 0 20px 14px;">
+          <div style="flex: none; padding: 0 20px 14px; border-bottom: {{ f.barBorder }};">
             <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.SegmentedControl" options="{{ f.tabOptions }}" value="{{ f.tabValue }}" onChange="{{ f.setTab }}" hint-size="100%,40px"></x-import>
           </div>
 
           <!-- SCROLL REGION -->
-          <div class="tc-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 2px 20px 32px;">
+          <div class="tc-scroll" onScroll="{{ f.onScroll }}" style="flex: 1; min-height: 0; overflow-y: auto; padding: 2px 20px 32px;">
 
             <!-- ===================== LOADING (per-tab skeleton) ===================== -->
             <sc-if value="{{ f.isLoading }}" hint-placeholder-val="{{ false }}">
@@ -231,24 +248,37 @@
 
                 <!-- journée strip -->
                 <div style="display: flex; flex-direction: column; gap: 9px;">
-                  <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); padding: 0 2px;">Journée</span>
-                  <div class="tc-strip" style="display: flex; gap: 9px; overflow-x: auto; padding: 2px 0 4px;">
+                  <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); padding: 0 2px;">Journées &amp; phases finales</span>
+                  <div class="tc-strip" style="display: flex; gap: 9px; overflow-x: auto; padding: 2px 0 7px;">
                     <sc-for list="{{ f.journees }}" as="j" hint-placeholder-count="5">
-                      <button type="button" onClick="{{ j.onSelect }}" style="flex: 0 0 auto; width: 54px; min-height: 66px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 8px 0; border-radius: var(--radius-pill); background: {{ j.bg }}; color: {{ j.color }}; border: {{ j.border }}; box-shadow: {{ j.boxShadow }}; opacity: {{ j.opacity }}; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);">
-                        <span style="font-weight: 700; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: {{ j.overlineColor }};">J</span>
-                        <span style="font-family: var(--font-display); font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums;">{{ j.num }}</span>
-                        <span style="width: 5px; height: 5px; border-radius: 50%; background: {{ j.dotColor }};"></span>
-                      </button>
+                      <div style="flex: 0 0 auto; display: flex; align-items: stretch; gap: 9px;">
+                        <span style="display: {{ j.sepDisplay }}; flex: none; width: 1px; margin: 8px 0; background: var(--border-strong); opacity: 0.7;"></span>
+                        <button type="button" onClick="{{ j.onSelect }}" style="flex: 0 0 auto; width: {{ j.width }}; min-height: 66px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 8px {{ j.padX }}; border-radius: var(--radius-pill); background: {{ j.bg }}; color: {{ j.color }}; border: {{ j.border }}; box-shadow: {{ j.boxShadow }}; opacity: {{ j.opacity }}; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out);">
+                          <span style="font-weight: 700; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: {{ j.overlineColor }};">{{ j.overline }}</span>
+                          <span style="display: {{ j.textDisplay }}; font-family: var(--font-display); font-size: {{ j.mainSize }}; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums;">{{ j.main }}</span>
+                          <svg style="display: {{ j.iconDisplay }};" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v5a4 4 0 0 1-8 0V4z"></path><path d="M8 5H5.5a2.5 2.5 0 0 0 2.7 3.9"></path><path d="M16 5h2.5a2.5 2.5 0 0 1-2.7 3.9"></path><path d="M12 13v3"></path><path d="M9 20h6"></path><path d="M10.5 16h3l.5 4h-4l.5-4z"></path></svg>
+                          <span style="width: 5px; height: 5px; border-radius: 50%; background: {{ j.dotColor }};"></span>
+                        </button>
+                      </div>
                     </sc-for>
                   </div>
                 </div>
+
+                <!-- COUP DE LA JOURNÉE · rien ne s'affiche quand aucun coup ne le mérite -->
+                <sc-if value="{{ f.coup }}" hint-placeholder-val="{{ false }}">
+                  <div class="{{ f.coupClass }}">
+                    <div class="{{ f.coupRingClass }}">
+                      <dc-import name="CoupDuJour" data="{{ f.coup }}" hint-size="100%,330px"></dc-import>
+                    </div>
+                  </div>
+                </sc-if>
 
                 <!-- RÉSULTATS · empty (journée pas jouée) -->
                 <sc-if value="{{ f.resEmpty }}" hint-placeholder-val="{{ false }}">
                   <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 13px; padding: 40px 16px 20px;">
                     <span style="display: inline-flex; align-items: center; justify-content: center; width: 62px; height: 62px; border-radius: 50%; background: var(--surface-sunken); color: var(--text-faint);"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span>
-                    <span style="font-family: var(--font-display); font-size: 22px; letter-spacing: 0.01em; color: var(--text);">Journée pas encore jouée</span>
-                    <span style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5; max-width: 260px; text-wrap: pretty;">Les points de la <b style="color: var(--text); font-weight: 700;">journée {{ f.selectedNum }}</b> s'afficheront ici une fois les matchs terminés et les pronos réconciliés.</span>
+                    <span style="font-family: var(--font-display); font-size: 22px; letter-spacing: 0.01em; color: var(--text);">{{ f.emptyTitle }}</span>
+                    <span style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5; max-width: 260px; text-wrap: pretty;">Les points de <b style="color: var(--text); font-weight: 700;">{{ f.selPhrase }}</b> s'afficheront ici une fois les matchs terminés et les pronos réconciliés.</span>
                     <button type="button" onClick="{{ f.onBackToLastJournee }}" style="margin-top: 4px; display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: var(--radius-pill); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font-family: var(--font-body); font-weight: 600; font-size: 13px; cursor: pointer; -webkit-tap-highlight-color: transparent;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>Voir la journée {{ f.lastPlayedNum }}</button>
                   </div>
                 </sc-if>
@@ -257,7 +287,7 @@
                 <sc-if value="{{ f.resList }}" hint-placeholder-val="{{ true }}">
                   <div style="display: flex; flex-direction: column; gap: 10px;">
                     <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 0 2px;">
-                      <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text);">Journée {{ f.selectedNum }}</span>
+                      <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text);">{{ f.selTitle }}</span>
                       <span style="flex: none; font-size: 11px; font-weight: 600; color: var(--text-faint); white-space: nowrap;">{{ f.journeeMeta }}</span>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 6px;">
@@ -275,7 +305,7 @@
                     </div>
                     <div style="display: flex; align-items: flex-start; gap: 7px; padding: 6px 4px 0; color: var(--text-muted);">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 12h1v4h1"></path></svg>
-                      <span style="font-size: 12px; line-height: 1.4; text-wrap: pretty;">Points de cette journée uniquement — pas le cumul de la saison.</span>
+                      <span style="font-size: 12px; line-height: 1.4; text-wrap: pretty;">{{ f.scopeNote }}</span>
                     </div>
                   </div>
                 </sc-if>
@@ -449,9 +479,16 @@
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:6640,&quot;height&quot;:1000}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:7010,&quot;height&quot;:1000}}">
 class Component extends DCLogic {
-  state = { tab: {}, journee: {}, rm: {} };
+  state = { tab: {}, journee: {}, rm: {}, scrollT: {} };
+
+  onScroll(fid, el) {
+    const raw = (el.scrollTop - 8) / 45;
+    const t = Math.round(Math.max(0, Math.min(1, raw)) * 40) / 40;
+    if ((this.state.scrollT[fid] || 0) === t) return;
+    this.setState((s) => ({ scrollT: { ...s.scrollT, [fid]: t } }));
+  }
 
   setTab(fid, v) { this.setState((s) => ({ tab: { ...s.tab, [fid]: v } })); }
   selectJournee(fid, key) { this.setState((s) => ({ journee: { ...s.journee, [fid]: key } })); }
@@ -507,11 +544,15 @@ class Component extends DCLogic {
       { key: 'j3', num: 3, played: true },
       { key: 'j4', num: 4, played: false },
       { key: 'j5', num: 5, played: false },
+      { key: 'qf', ko: true, main: '1/4', title: 'Quarts de finale', phrase: 'les quarts de finale', played: false },
+      { key: 'sf', ko: true, main: '1/2', title: 'Demi-finales', phrase: 'les demi-finales', played: false },
+      { key: 'fin', ko: true, icon: true, main: 'F', title: 'Finale', phrase: 'la finale', played: false },
     ];
     const lastPlayed = 'j3';
     const lastPlayedNum = 3;
     const journeeMeta = {
       j1: 'sam. 1 févr.', j2: 'sam. 8 févr.', j3: 'sam. 22 févr.', j4: 'sam. 8 mars', j5: 'sam. 15 mars',
+      qf: 'sam. 28 mars · 2 matchs', sf: 'sam. 4 avr. · 2 matchs', fin: 'sam. 11 avr. · 1 match',
     };
     const journeeStandings = {
       j1: [
@@ -541,6 +582,26 @@ class Component extends DCLogic {
     };
     const exactDayFmt = (n) => n === 0 ? 'aucun score exact' : (n + (n > 1 ? ' scores exacts' : ' score exact'));
 
+    // ---- Coup de la journée (une journée sans coup n'affiche rien) ----
+    const IRLFRA = { homeAbbr: 'IRL', homeName: 'Irlande', homeColor: '#159B5E', awayAbbr: 'FRA', awayName: 'France', awayColor: '#2C5697', hs: 19, as: 22 };
+    const ECOANG = { homeAbbr: 'ECO', homeName: 'Écosse', homeColor: '#2A5C8A', awayAbbr: 'ANG', awayName: 'Angleterre', awayColor: '#16233F', hs: 27, as: 25 };
+    const coupByJournee = {
+      j2: {
+        journeeLabel: 'Journée 2', title: 'Le coup de poker',
+        accroche: 'Les cotes disaient non, la ligue non plus — et il avait posé son joker dessus.',
+        badges: [{ label: 'Joker', joker: true }, { label: 'Outsider des cotes' }], match: ECOANG,
+        entries: [{ name: 'Karim Mensah', subline: 'Prono 26 – 22', pts: 44, joker: true }],
+        storyText: '5 sur 6 voyaient l’Angleterre gagner.', story: { majority: 5, mine: 1 },
+      },
+      j3: {
+        journeeLabel: 'Journée 3', title: 'Seul contre la ligue',
+        accroche: 'Cinq sur six misaient sur l’Irlande. Lui a lu les cotes, et le terrain a suivi.',
+        badges: [], match: IRLFRA,
+        entries: [{ name: 'Hugo Delaunay', subline: 'Prono 17 – 24', pts: 31 }],
+        storyText: '5 sur 6 voyaient l’Irlande gagner.', story: { majority: 5, mine: 1 },
+      },
+    };
+
     // ---- Tabs ----
     const tabOptions = [
       { value: 'classement', label: 'Classement' },
@@ -551,8 +612,11 @@ class Component extends DCLogic {
     const frameDefs = [
       { id: 'cl_admin_l', view: 'admin', tab: 'classement', theme: 'light', label: 'Classement · vue admin · clair', dot: 'var(--grenat-500)' },
       { id: 'cl_member_d', view: 'member', tab: 'classement', theme: 'dark', label: 'Classement · vue membre · sombre', dot: 'var(--green-800)' },
-      { id: 'res_admin_l', view: 'admin', tab: 'resultats', theme: 'light', label: 'Résultats · classement de la journée · clair', dot: 'var(--ink-400)' },
+      { id: 'res_admin_l', view: 'admin', tab: 'resultats', theme: 'light', label: 'Résultats · coup de la journée · clair', dot: 'var(--grenat-500)' },
+      { id: 'res_nocoup_l', view: 'admin', tab: 'resultats', journee: 'j1', theme: 'light', label: 'Résultats · aucun coup ce jour-là', dot: 'var(--ink-400)' },
+      { id: 'res_notif_l', view: 'member', tab: 'resultats', theme: 'light', arrive: true, label: 'Résultats · arrivée depuis la notif push', dot: 'var(--sand-050)' },
       { id: 'res_empty_l', view: 'admin', tab: 'resultats', journee: 'j4', theme: 'light', label: 'Résultats · journée pas encore jouée', dot: 'var(--ink-400)' },
+      { id: 'res_ko_l', view: 'admin', tab: 'resultats', journee: 'qf', theme: 'light', label: 'Résultats · phases finales (quarts à venir)', dot: 'var(--ink-400)' },
       { id: 'res_member_d', view: 'member', tab: 'resultats', theme: 'dark', label: 'Résultats · vue membre · sombre', dot: 'var(--green-800)' },
       { id: 'set_member_l', view: 'member', tab: 'reglages', theme: 'light', label: 'Réglages · vue membre · clair', dot: 'var(--sand-050)' },
       { id: 'set_admin_l', view: 'admin', tab: 'reglages', theme: 'light', label: 'Réglages · vue admin · clair', dot: 'var(--sand-050)' },
@@ -568,6 +632,7 @@ class Component extends DCLogic {
     ];
 
     const frames = frameDefs.map((fd) => {
+      const st = this.state.scrollT[fd.id] || 0;
       const isAdmin = fd.view === 'admin';
       const isMember = !isAdmin;
       const isOneMember = fd.variant === 'onemember';
@@ -578,13 +643,20 @@ class Component extends DCLogic {
       const selKey = this.state.journee[fd.id] || fd.journee || lastPlayed;
       const selDef = journeeDefs.find((j) => j.key === selKey) || journeeDefs[2];
       const selPlayed = selDef.played;
-      const journees = journeeDefs.map((j) => {
+      const journees = journeeDefs.map((j, ji) => {
         const isSel = j.key === selKey;
         let bg = 'transparent', color = 'var(--text)', border = '1.5px solid transparent', boxShadow = 'none';
         if (isSel) { bg = 'var(--accent)'; color = 'var(--on-accent)'; boxShadow = 'var(--glow-accent)'; }
         else if (j.key === lastPlayed) { bg = 'var(--surface)'; border = '1.5px solid var(--border-strong)'; }
         return {
-          num: j.num,
+          main: j.ko ? j.main : String(j.num),
+          textDisplay: j.icon ? 'none' : 'block',
+          iconDisplay: j.icon ? 'block' : 'none',
+          overline: j.ko ? 'PF' : 'J',
+          mainSize: j.ko ? '19px' : '22px',
+          width: '54px',
+          padX: '0',
+          sepDisplay: (j.ko && !journeeDefs[ji - 1].ko) ? 'block' : 'none',
           bg, color, border, boxShadow,
           overlineColor: isSel ? 'var(--on-accent)' : 'var(--text-faint)',
           dotColor: j.played ? (isSel ? 'var(--on-accent)' : 'var(--accent)') : 'transparent',
@@ -633,6 +705,14 @@ class Component extends DCLogic {
       return {
         id: fd.id, label: fd.label, theme: fd.theme, dot: fd.dot,
         noop: () => {},
+        onScroll: (e) => this.onScroll(fd.id, e.currentTarget),
+        idHeight: (st >= 0.85 ? 0 : Math.round(78 * (1 - st / 0.85))) + 'px',
+        idOpacity: Math.max(0, 1 - st * 1.8).toFixed(2),
+        idTransform: 'scale(' + (1 - st * 0.06).toFixed(3) + ')',
+        navTitleOpacity: (1 - Math.min(1, st * 2.2)).toFixed(2),
+        compactOpacity: Math.min(1, Math.max(0, (st - 0.3) / 0.45)).toFixed(2),
+        compactShift: 'translateY(' + ((1 - st) * 7).toFixed(1) + 'px)',
+        barBorder: st > 0.02 ? '1px solid color-mix(in srgb, var(--border) ' + Math.round(st * 100) + '%, transparent)' : '1px solid transparent',
 
         leagueName, leagueInitials, leagueCode,
         membersLine: isOneMember ? '1 membre' : memberFmt(memberCount),
@@ -659,9 +739,18 @@ class Component extends DCLogic {
         showResultats: !isLoading && tab === 'resultats',
         journees,
         selectedNum: selDef.num,
+        selTitle: selDef.ko ? selDef.title.toUpperCase() : 'Journée ' + selDef.num,
+        selPhrase: selDef.ko ? selDef.phrase : 'la journée ' + selDef.num,
+        emptyTitle: selDef.ko ? selDef.title + ' à venir' : 'Journée pas encore jouée',
+        scopeNote: selDef.ko
+          ? 'Points de cette phase finale uniquement — pas le cumul de la saison.'
+          : 'Points de cette journée uniquement — pas le cumul de la saison.',
         lastPlayedNum,
         resEmpty: !selPlayed,
         resList: selPlayed,
+        coup: selPlayed ? (coupByJournee[selKey] || null) : null,
+        coupClass: fd.arrive ? 'tc-arrive' : '',
+        coupRingClass: fd.arrive ? 'tc-arrive-ring' : '',
         journeeRows,
         journeeMeta: journeeMeta[selKey] || '',
         onBackToLastJournee: () => this.selectJournee(fd.id, lastPlayed),
