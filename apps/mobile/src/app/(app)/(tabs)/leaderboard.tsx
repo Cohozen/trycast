@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Globe, Settings2, Users } from 'lucide-react-native';
+import { ChevronRight, Globe, Users } from 'lucide-react-native';
 import { useDeferredValue, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -177,22 +177,22 @@ export default function LeaderboardScreen() {
                             }
                             value={currentLeagueId}
                         />
-                        <View className="flex-row items-center gap-1.5 self-end">
-                            <Button
-                                size="sm"
-                                onPress={() =>
-                                    router.push({
-                                        pathname: '/league/[id]',
-                                        params: { id: currentLeagueId },
-                                    })
-                                }
-                                title={t('leagues:leaderboard.manage')}
-                                variant="secondary"
-                                leadingIcon={
-                                    <Settings2 color={textMuted} size={18} strokeWidth={1.9} />
-                                }
-                            />
-                        </View>
+                        {/* Accès au détail : lien discret sous le sélecteur (DS du 2026-09-21) */}
+                        <Pressable
+                            accessibilityRole="link"
+                            className="flex-row items-center gap-0.5 self-end px-0.5"
+                            hitSlop={8}
+                            onPress={() =>
+                                router.push({
+                                    pathname: '/league/[id]',
+                                    params: { id: currentLeagueId },
+                                })
+                            }>
+                            <Text className="font-body-semibold text-[12px] text-text-muted">
+                                {t('leagues:leaderboard.viewDetail')}
+                            </Text>
+                            <ChevronRight color={textMuted} size={13} strokeWidth={2.4} />
+                        </Pressable>
                     </View>
                 ) : null}
 

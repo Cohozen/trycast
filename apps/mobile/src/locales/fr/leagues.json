@@ -1,7 +1,8 @@
 {
     "actions": {
         "create": "Créer une ligue",
-        "join": "Rejoindre une ligue"
+        "join": "Rejoindre une ligue",
+        "joinShort": "Rejoindre"
     },
     "hero": {
         "title": "Rejoins la partie",
@@ -16,7 +17,6 @@
         },
         "empty": "Le classement apparaîtra après les premiers matchs scorés.",
         "loadMore": "Charger plus",
-        "manage": "Paramètres de la ligue",
         "select": {
             "overline": "Ligue affichée"
         },
@@ -39,7 +39,8 @@
             "exacts_one": "{{count}} score exact",
             "exacts_other": "{{count}} scores exacts",
             "openProfile": "Voir le profil de {{username}}"
-        }
+        },
+        "viewDetail": "Voir le détail"
     },
     "new": {
         "screenTitle": "Ligues",

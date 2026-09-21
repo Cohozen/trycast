@@ -1,7 +1,8 @@
 {
     "actions": {
         "create": "Create a league",
-        "join": "Join a league"
+        "join": "Join a league",
+        "joinShort": "Join"
     },
     "hero": {
         "title": "Join the game",
@@ -16,7 +17,6 @@
         },
         "empty": "The leaderboard will appear after the first scored matches.",
         "loadMore": "Load more",
-        "manage": "League settings",
         "select": {
             "overline": "League shown"
         },
@@ -39,7 +39,8 @@
             "exacts_one": "{{count}} exact score",
             "exacts_other": "{{count}} exact scores",
             "openProfile": "View {{username}}'s profile"
-        }
+        },
+        "viewDetail": "View details"
     },
     "new": {
         "screenTitle": "Leagues",
