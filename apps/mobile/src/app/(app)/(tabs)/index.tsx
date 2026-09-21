@@ -10,6 +10,7 @@ import { Screen } from '@/components/ui/screen';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { useSession } from '@/features/auth/session-context';
+import { LeagueActionsCard } from '@/features/leagues/components/league-actions-card';
 import { useGlobalLeaderboard } from '@/features/leagues/use-global-leaderboard';
 import { useMyLeagues } from '@/features/leagues/use-my-leagues';
 import { useMyStanding } from '@/features/leagues/use-my-standing';
@@ -241,26 +242,7 @@ export default function MatchesScreen() {
     }
 
     if (hasLeagues) {
-        listChildren.push(
-            // Actions de ligue — empilées : côte à côte, les libellés complets
-            // ne tiennent pas dans une demi-largeur d'écran
-            <View className="gap-2.5" key="league-actions">
-                <Button
-                    fullWidth
-                    onPress={() => router.push('/league/new')}
-                    title={t('leagues:actions.create')}
-                    variant="secondary"
-                />
-                <Button
-                    fullWidth
-                    onPress={() =>
-                        router.push({ pathname: '/league/new', params: { tab: 'join' } })
-                    }
-                    title={t('leagues:actions.join')}
-                    variant="ghost"
-                />
-            </View>,
-        );
+        listChildren.push(<LeagueActionsCard key="league-actions" />);
     } else {
         listChildren.push(
             // Aucune ligue : les CTA deviennent le héros
