@@ -46,6 +46,44 @@ export type Database = {
                     },
                 ];
             };
+            competition_stages: {
+                Row: {
+                    competition_id: string;
+                    ends_at: string;
+                    id: string;
+                    key: string;
+                    kind: string;
+                    sort: number;
+                    starts_at: string;
+                };
+                Insert: {
+                    competition_id: string;
+                    ends_at: string;
+                    id?: string;
+                    key: string;
+                    kind: string;
+                    sort?: number;
+                    starts_at: string;
+                };
+                Update: {
+                    competition_id?: string;
+                    ends_at?: string;
+                    id?: string;
+                    key?: string;
+                    kind?: string;
+                    sort?: number;
+                    starts_at?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'competition_stages_competition_id_fkey';
+                        columns: ['competition_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'competitions';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             competitions: {
                 Row: {
                     api_league_id: number;
@@ -929,6 +967,8 @@ export type Database = {
                     first_kickoff: string;
                     points: number;
                     round: string;
+                    stage_key: string;
+                    stage_kind: string;
                     user_id: string;
                     username: string;
                 }[];

@@ -54,3 +54,21 @@ on conflict (competition_id, key) do update set
   starts_at = excluded.starts_at,
   ends_at = excluded.ends_at,
   sort = excluded.sort;
+
+-- Étapes à élimination directe (phases finales, 2026-09-21) : fenêtres de
+-- dates [starts_at, ends_at), indépendantes des phases du joker. Les matchs
+-- d'une étape sont regroupés par étape dans l'onglet Résultats d'une ligue.
+-- ⚠️ À seeder AVANT le premier match à élimination directe de la compétition.
+-- NC 2026 : week-end de finales de classement (27-29 novembre) → kind
+-- « finals », pas « final ». Six Nations : pas d'étape.
+insert into public.competition_stages (competition_id, key, kind, starts_at, ends_at, sort)
+select c.id, v.key, v.kind, v.starts_at::timestamptz, v.ends_at::timestamptz, v.sort
+from public.competitions c
+join (values
+  ('nc-2026', 'finals', 'finals', '2026-11-25', '2026-12-20', 1)
+) as v (slug, key, kind, starts_at, ends_at, sort) on v.slug = c.slug
+on conflict (competition_id, key) do update set
+  kind = excluded.kind,
+  starts_at = excluded.starts_at,
+  ends_at = excluded.ends_at,
+  sort = excluded.sort;

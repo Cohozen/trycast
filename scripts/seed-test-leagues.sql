@@ -36,3 +36,22 @@ where api_game_id = -102;
 update public.predictions
 set points_awarded = 8, scored_at = now()
 where match_id = (select id from public.matches where api_game_id = -102);
+
+-- Phases finales (2026-09-21) : get_league_round_points regroupe par étape les
+-- matchs dont le kickoff tombe dans une fenêtre de competition_stages. Étape
+-- « final » en 2000 (loin de tout match du seed, dont les kickoffs sont
+-- relatifs à now()) et un match terminé dedans, sans prono : la journée E2E
+-- garde ses 8 pts, l'étape ressort à 0 pt. Rejouable : nettoie puis recrée.
+delete from public.matches where api_game_id = -103;
+delete from public.competition_stages
+where competition_id = (select id from public.competitions where slug = 'e2e-test');
+
+insert into public.competition_stages (competition_id, key, kind, starts_at, ends_at, sort)
+select c.id, 'final', 'final', '2000-01-01T00:00:00Z', '2000-01-02T00:00:00Z', 1
+from public.competitions c
+where c.slug = 'e2e-test';
+
+insert into public.matches (competition_id, api_game_id, kickoff_at, round, status, home_score, away_score)
+select c.id, -103, '2000-01-01T15:00:00Z', '99', 'finished', 20, 3
+from public.competitions c
+where c.slug = 'e2e-test';

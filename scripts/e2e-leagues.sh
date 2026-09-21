@@ -311,19 +311,23 @@ RES=$(curl -s -X POST "$URL/rest/v1/rpc/get_league_round_points" \
 RES=$(curl -s -X POST "$URL/rest/v1/rpc/get_league_round_points" \
   -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
   -H "Content-Type: application/json" -d "{\"p_league_id\":\"$LID\"}")
-# À ce stade user2 a été exclu : 1 membre × 1 journée entamée (E2E, match -102
-# terminé 10-5 par le seed = score exact du prono de user1, 8 pts seedés)
+# À ce stade user2 a été exclu : 1 membre × 2 groupes entamés — l'étape
+# « final » (match -103 de 2000, sans prono : 0 pt, round masqué par l'étape)
+# puis la journée E2E (match -102 terminé 10-5 par le seed = score exact du
+# prono de user1, 8 pts seedés)
 echo "$RES" | python3 -c "
 import json, sys
 rows = json.load(sys.stdin)
-assert len(rows) == 1, f'attendu 1 ligne (1 membre, 1 journée), obtenu {len(rows)}'
-row = rows[0]
-assert row['round'] == 'E2E', row
-assert row['user_id'] == '$U1', row
-assert row['points'] == 8, row
-assert row['exact_scores'] == 1, row
+assert len(rows) == 2, f'attendu 2 lignes (1 membre, 1 étape + 1 journée), obtenu {len(rows)}'
+stage, day = rows
+assert stage['round'] is None and stage['stage_key'] == 'final', stage
+assert stage['stage_kind'] == 'final' and stage['points'] == 0, stage
+assert day['round'] == 'E2E' and day['stage_key'] is None, day
+assert day['user_id'] == '$U1', day
+assert day['points'] == 8, day
+assert day['exact_scores'] == 1, day
 " || fail "round points pour l'owner ($RES)"
-ok "round points : 0 ligne hors ligue, agrégat exact par journée pour un membre"
+ok "round points : 0 ligne hors ligue, agrégat par journée et par étape pour un membre"
 
 # Leaderboards : accès anonyme refusé
 RES=$(curl -s -X POST "$URL/rest/v1/rpc/get_global_leaderboard" \
