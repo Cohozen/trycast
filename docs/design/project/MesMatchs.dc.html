@@ -96,9 +96,16 @@
         </div>
 
         <!-- League actions -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="secondary" full-width="{{ true }}" hint-size="100%,48px">Créer une ligue</x-import>
-          <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="ghost" full-width="{{ true }}" hint-size="100%,48px">Rejoindre une ligue</x-import>
+        <div style="display: grid; grid-template-columns: 1fr 1px 1fr; align-items: stretch; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;">
+          <button type="button" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 12px 14px; border: none; background: transparent; color: var(--text); font-family: var(--font-body); font-size: 14px; font-weight: 700; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-hover="background: color-mix(in srgb, var(--accent) 7%, transparent);">
+            <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg></span>
+            <span>Créer une ligue</span>
+          </button>
+          <span style="background: var(--border);"></span>
+          <button type="button" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 12px 14px; border: none; background: transparent; color: var(--text); font-family: var(--font-body); font-size: 14px; font-weight: 700; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-hover="background: color-mix(in srgb, var(--accent) 7%, transparent);">
+            <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--brand) 12%, transparent); color: var(--brand);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path></svg></span>
+            <span>Rejoindre</span>
+          </button>
         </div>
 
         <!-- To-predict counter -->
@@ -310,9 +317,16 @@
             <div style="display: flex; flex-direction: column; gap: 1px;"><span style="font-family: var(--font-display); font-size: 22px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">1 245ᵉ</span><span style="font-size: 12px; color: var(--text-muted);">au général</span></div>
           </div>
         </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-          <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="secondary" full-width="{{ true }}" hint-size="100%,48px">Créer une ligue</x-import>
-          <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Button" variant="ghost" full-width="{{ true }}" hint-size="100%,48px">Rejoindre une ligue</x-import>
+        <div style="display: grid; grid-template-columns: 1fr 1px 1fr; align-items: stretch; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;">
+          <button type="button" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 12px 14px; border: none; background: transparent; color: var(--text); font-family: var(--font-body); font-size: 14px; font-weight: 700; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-hover="background: color-mix(in srgb, var(--accent) 7%, transparent);">
+            <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg></span>
+            <span>Créer une ligue</span>
+          </button>
+          <span style="background: var(--border);"></span>
+          <button type="button" style="display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 12px 14px; border: none; background: transparent; color: var(--text); font-family: var(--font-body); font-size: 14px; font-weight: 700; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-hover="background: color-mix(in srgb, var(--accent) 7%, transparent);">
+            <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--brand) 12%, transparent); color: var(--brand);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><path d="M10 17l5-5-5-5"></path><path d="M15 12H3"></path></svg></span>
+            <span>Rejoindre</span>
+          </button>
         </div>
         <div style="margin-top: 8px; padding: 12px; border: 1px dashed var(--border-strong); border-radius: var(--radius-lg);">
           <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.EmptyState" title="Aucun match à venir" message="Tu es à jour ! Reviens à l'ouverture de la prochaine journée du Tournoi des 6 Nations." hint-size="100%,180px"></x-import>
