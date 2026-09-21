@@ -115,7 +115,47 @@
             "notPlayedMessage": "Les points de la journée {{round}} s'afficheront ici une fois les matchs terminés et les pronos réconciliés.",
             "backToPlayed": "Voir la journée {{round}}",
             "dayNote": "Points de cette journée uniquement — pas le cumul de la saison.",
-            "empty": "Les résultats par journée arrivent après les premiers matchs terminés."
+            "empty": "Les résultats par journée arrivent après les premiers matchs terminés.",
+            "roundOverlineStages": "Journées & phases finales",
+            "stageShort": "PF",
+            "stageNotPlayedTitle": "{{stage}} à venir",
+            "stageNotPlayedMessage": "Les points {{ofPhrase}} s'afficheront ici une fois les matchs terminés et les pronos réconciliés.",
+            "backToPlayedStage": "Voir {{phrase}}",
+            "stageNote": "Points de cette phase finale uniquement — pas le cumul de la saison.",
+            "matchCount_one": "{{count}} match",
+            "matchCount_other": "{{count}} matchs",
+            "stages": {
+                "r16": {
+                    "short": "1/8",
+                    "title": "Huitièmes de finale",
+                    "phrase": "les huitièmes de finale",
+                    "ofPhrase": "des huitièmes de finale"
+                },
+                "qf": {
+                    "short": "1/4",
+                    "title": "Quarts de finale",
+                    "phrase": "les quarts de finale",
+                    "ofPhrase": "des quarts de finale"
+                },
+                "sf": {
+                    "short": "1/2",
+                    "title": "Demi-finales",
+                    "phrase": "les demi-finales",
+                    "ofPhrase": "des demi-finales"
+                },
+                "final": {
+                    "short": "F",
+                    "title": "Finale",
+                    "phrase": "la finale",
+                    "ofPhrase": "de la finale"
+                },
+                "finals": {
+                    "short": "F",
+                    "title": "Finales",
+                    "phrase": "les finales",
+                    "ofPhrase": "des finales"
+                }
+            }
         },
         "settings": {
             "inviteOverline": "Inviter des amis",

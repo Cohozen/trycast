@@ -1,5 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
+import { findCompetitionStage } from '@/features/leagues/round-strip-items';
+import type { StageKind } from '@/features/leagues/types';
+import { useCompetitionStages } from '@/features/leagues/use-competition-stages';
 import { MatchStatusChip } from '@/features/matches/components/match-status-chip';
 import { TeamFlag } from '@/features/matches/components/team-flag';
 import { formatKickoffTime, teamName } from '@/features/matches/format-match';
@@ -64,7 +67,9 @@ function TeamColumn({
  * base — le score live vient des colonnes live_* écrites par l'EF sync-live.
  */
 export function MatchHero({ match }: MatchHeroProps) {
-    const { t } = useTranslation(['matches']);
+    const { t } = useTranslation(['matches', 'leagues']);
+    const stages = useCompetitionStages(match.competition_id);
+    const stage = findCompetitionStage(stages.data ?? [], match.kickoff_at);
 
     const isLive = match.status === 'in_play';
     const finalScore =
@@ -111,7 +116,13 @@ export function MatchHero({ match }: MatchHeroProps) {
 
     const competitionLine = [
         match.competition?.name,
-        match.round ? t('matches:results.number_day', { count: match.round }) : null,
+        // Match d'une étape à élimination directe : son titre (« Quarts de
+        // finale »), jamais le round brut de Highlightly
+        stage
+            ? t(`leagues:detail.results.stages.${stage.kind as StageKind}.title`)
+            : match.round
+              ? t('matches:results.number_day', { count: match.round })
+              : null,
     ]
         .filter(Boolean)
         .join(' · ');

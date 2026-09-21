@@ -1,20 +1,30 @@
-import type { LeagueRoundPointsRow } from './types';
+import type { LeagueRoundPointsRow, StageKind } from './types';
 
 /**
  * Le typegen Supabase ne connaît pas la nullabilité des colonnes d'un
- * RETURNS TABLE (tout sort `string`) : round et avatar_url sont pourtant
- * nullables en base. On élargit ici — LeagueRoundPointsRow y reste assignable.
+ * RETURNS TABLE (tout sort `string`) : round, stage_key, stage_kind et
+ * avatar_url sont pourtant nullables en base. On élargit ici —
+ * LeagueRoundPointsRow y reste assignable.
  */
-export type RoundPointsInputRow = Omit<LeagueRoundPointsRow, 'round' | 'avatar_url'> & {
+export type RoundPointsInputRow = Omit<
+    LeagueRoundPointsRow,
+    'round' | 'stage_key' | 'stage_kind' | 'avatar_url'
+> & {
     round: string | null;
+    stage_key?: string | null;
+    stage_kind?: string | null;
     avatar_url: string | null;
 };
 
-/** Une journée entamée : ses membres classés (points > exacts, ex æquo). */
+/** Une journée (ou étape à élimination directe) entamée : ses membres classés. */
 export type LeagueRound = {
-    /** Libellé brut du round (`matches.round`), null si non renseigné. */
+    /** Clé du groupe, partagée avec la bande (roundGroupKey). */
+    key: string;
+    /** Libellé brut du round (`matches.round`), null si non renseigné ou étape. */
     round: string | null;
-    /** Premier kickoff de la journée (ordre chronologique, ISO). */
+    /** Nature de l'étape, null pour une journée de poule. */
+    stageKind: StageKind | null;
+    /** Premier kickoff du groupe (ordre chronologique, ISO). */
     firstKickoff: string;
     entries: LeagueRoundEntry[];
 };
@@ -30,19 +40,35 @@ export type LeagueRoundEntry = {
 };
 
 /**
- * Regroupe les lignes plates de get_league_round_points en journées classées,
- * dans l'ordre chronologique (first_kickoff — jamais alphabétique : « 10 » <
- * « 2 »). Le rang réplique la logique des leaderboards : points desc puis
- * scores exacts desc, égalité complète = même rang.
+ * Clé d'un groupe de matchs de l'onglet Résultats : l'étape à élimination
+ * directe si le match en relève (competition_stages), sinon le round brut.
+ */
+export function roundGroupKey(round: string | null, stageKey?: string | null): string {
+    if (stageKey) return `stage:${stageKey}`;
+    return round ?? 'sans-round';
+}
+
+/**
+ * Regroupe les lignes plates de get_league_round_points en journées/étapes
+ * classées, dans l'ordre chronologique (first_kickoff — jamais alphabétique :
+ * « 10 » < « 2 »). Le rang réplique la logique des leaderboards : points desc
+ * puis scores exacts desc, égalité complète = même rang.
  */
 export function groupRoundPoints(rows: readonly RoundPointsInputRow[]): LeagueRound[] {
-    const byRound = new Map<string | null, LeagueRound>();
+    const byKey = new Map<string, LeagueRound>();
 
     for (const row of rows) {
-        let round = byRound.get(row.round);
+        const key = roundGroupKey(row.round, row.stage_key);
+        let round = byKey.get(key);
         if (!round) {
-            round = { round: row.round, firstKickoff: row.first_kickoff, entries: [] };
-            byRound.set(row.round, round);
+            round = {
+                key,
+                round: row.stage_key ? null : row.round,
+                stageKind: row.stage_key ? ((row.stage_kind as StageKind | null) ?? null) : null,
+                firstKickoff: row.first_kickoff,
+                entries: [],
+            };
+            byKey.set(key, round);
         }
         round.entries.push({
             rank: 0,
@@ -54,9 +80,7 @@ export function groupRoundPoints(rows: readonly RoundPointsInputRow[]): LeagueRo
         });
     }
 
-    const rounds = [...byRound.values()].sort((a, b) =>
-        a.firstKickoff.localeCompare(b.firstKickoff),
-    );
+    const rounds = [...byKey.values()].sort((a, b) => a.firstKickoff.localeCompare(b.firstKickoff));
     for (const round of rounds) {
         round.entries.sort(
             (a, b) =>

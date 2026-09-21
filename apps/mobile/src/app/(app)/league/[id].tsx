@@ -31,11 +31,13 @@ import { LeaveLeagueModal } from '@/features/leagues/components/leave-league-mod
 import { Podium } from '@/features/leagues/components/podium';
 import { RemoveMemberModal } from '@/features/leagues/components/remove-member-modal';
 import { RoundStandingRow } from '@/features/leagues/components/round-standing-row';
-import { RoundStrip, type RoundStripItem } from '@/features/leagues/components/round-strip';
+import { RoundStrip } from '@/features/leagues/components/round-strip';
 import { TransferOwnershipModal } from '@/features/leagues/components/transfer-ownership-modal';
 import { markTies } from '@/features/leagues/ranking';
 import { groupRoundPoints } from '@/features/leagues/round-points';
-import type { LeaderboardEntry } from '@/features/leagues/types';
+import { buildRoundStrip } from '@/features/leagues/round-strip-items';
+import type { LeaderboardEntry, RoundStripItem } from '@/features/leagues/types';
+import { useCompetitionStages } from '@/features/leagues/use-competition-stages';
 import { useDeleteLeague } from '@/features/leagues/use-delete-league';
 import { useKickMember } from '@/features/leagues/use-kick-member';
 import { useLeagueLeaderboard } from '@/features/leagues/use-league-leaderboard';
@@ -43,7 +45,6 @@ import { useLeagueRoundPoints } from '@/features/leagues/use-league-round-points
 import { useLeaveLeague } from '@/features/leagues/use-leave-league';
 import { useMyLeagues } from '@/features/leagues/use-my-leagues';
 import { useTransferOwnership } from '@/features/leagues/use-transfer-ownership';
-import type { MatchWithTeams } from '@/features/matches/types';
 import { useMatches } from '@/features/matches/use-matches';
 import { useOpenPlayerProfile } from '@/features/profile/use-open-player-profile';
 import { i18n } from '@/lib/i18n';
@@ -52,9 +53,6 @@ import { Pressable, Text, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
 type DetailTab = 'standings' | 'results' | 'settings';
-
-/** Clé de strip pour un round nullable (aligné sur le graphe du Profil). */
-const roundKeyOf = (round: string | null) => round ?? 'sans-round';
 
 /**
  * Détail d'une ligue (maquette « Détail Ligue ») : identité + trois onglets —
@@ -381,18 +379,19 @@ function ResultsTab({
 }) {
     const { t } = useTranslation(['leagues']);
     const matches = useMatches(competitionId);
+    const stages = useCompetitionStages(competitionId);
     const roundPoints = useLeagueRoundPoints(leagueId);
     const faintColor = useThemeColor('text-faint');
     const mutedColor = useThemeColor('text-muted');
     const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
-    const { stripItems, lastPlayed } = useMemo(
-        () => buildStrip(matches.data ?? []),
-        [matches.data],
+    const { items: stripItems, lastPlayed } = useMemo(
+        () => buildRoundStrip(matches.data ?? [], stages.data ?? []),
+        [matches.data, stages.data],
     );
     const rounds = useMemo(() => groupRoundPoints(roundPoints.data ?? []), [roundPoints.data]);
 
-    if (matches.isPending || roundPoints.isPending) {
+    if (matches.isPending || stages.isPending || roundPoints.isPending) {
         return (
             <View className="gap-2.5 pt-1">
                 <Skeleton className="h-[66px]" variant="block" />
@@ -413,27 +412,65 @@ function ResultsTab({
 
     const selected = selectedKey ?? lastPlayed.key;
     const selectedItem = stripItems.find((item) => item.key === selected) ?? lastPlayed;
-    const selectedRound = rounds.find((round) => roundKeyOf(round.round) === selected);
-    const meta = selectedRound
-        ? new Intl.DateTimeFormat(i18n.language, {
-              weekday: 'short',
-              day: 'numeric',
-              month: 'short',
-          }).format(new Date(selectedRound.firstKickoff))
-        : '';
+    const selectedRound = rounds.find((round) => round.key === selectedItem.key);
+    const hasStages = stripItems.some((item) => item.kind !== 'round');
+    const dateLabel = new Intl.DateTimeFormat(i18n.language, {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+    }).format(new Date(selectedRound?.firstKickoff ?? selectedItem.firstKickoff));
+    // Étape : la date et le nombre de matchs (« sam. 28 mars · 2 matchs »)
+    const meta =
+        selectedItem.kind === 'round'
+            ? dateLabel
+            : `${dateLabel} · ${t('leagues:detail.results.matchCount', { count: selectedItem.matchCount })}`;
+
+    /** Libellés d'un groupe : journée « n » ou étape (titre, tournure). */
+    const labelsOf = (item: RoundStripItem) =>
+        item.kind === 'round'
+            ? {
+                  title: t('leagues:detail.results.roundTitle', { round: item.label }),
+                  notPlayedTitle: t('leagues:detail.results.notPlayedTitle'),
+                  notPlayedMessage: t('leagues:detail.results.notPlayedMessage', {
+                      round: item.label,
+                  }),
+                  backTo: t('leagues:detail.results.backToPlayed', { round: item.label }),
+                  note: t('leagues:detail.results.dayNote'),
+              }
+            : {
+                  title: t(`leagues:detail.results.stages.${item.kind}.title`),
+                  notPlayedTitle: t('leagues:detail.results.stageNotPlayedTitle', {
+                      stage: t(`leagues:detail.results.stages.${item.kind}.title`),
+                  }),
+                  notPlayedMessage: t('leagues:detail.results.stageNotPlayedMessage', {
+                      // Tournure contractée : « des demi-finales », « de la finale »
+                      ofPhrase: t(`leagues:detail.results.stages.${item.kind}.ofPhrase`),
+                  }),
+                  backTo: t('leagues:detail.results.backToPlayedStage', {
+                      phrase: t(`leagues:detail.results.stages.${item.kind}.phrase`),
+                  }),
+                  note: t('leagues:detail.results.stageNote'),
+              };
+    const selectedLabels = labelsOf(selectedItem);
 
     return (
         <View className="gap-4 pt-1">
             <View className="gap-2">
-                <SectionOverline label={t('leagues:detail.results.roundOverline')} />
+                <SectionOverline
+                    label={
+                        hasStages
+                            ? t('leagues:detail.results.roundOverlineStages')
+                            : t('leagues:detail.results.roundOverline')
+                    }
+                />
                 <RoundStrip items={stripItems} onSelect={setSelectedKey} selected={selected} />
             </View>
 
             {selectedRound ? (
                 <View className="gap-2.5">
                     <View className="flex-row items-baseline justify-between gap-2 px-0.5">
-                        <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
-                            {t('leagues:detail.results.roundTitle', { round: selectedItem.label })}
+                        <Text className="shrink font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
+                            {selectedLabels.title}
                         </Text>
                         <Text className="font-body-semibold text-[11px] text-text-faint">
                             {meta}
@@ -451,7 +488,7 @@ function ResultsTab({
                     <View className="flex-row items-start gap-2 px-1 pt-1">
                         <Info color={mutedColor} size={14} strokeWidth={1.8} />
                         <Text className="flex-1 font-body text-[12px] leading-[17px] text-text-muted">
-                            {t('leagues:detail.results.dayNote')}
+                            {selectedLabels.note}
                         </Text>
                     </View>
                 </View>
@@ -461,60 +498,21 @@ function ResultsTab({
                         <Clock color={faintColor} size={30} strokeWidth={1.6} />
                     </View>
                     <Text className="text-center font-display text-[22px] leading-[24px] text-text">
-                        {t('leagues:detail.results.notPlayedTitle')}
+                        {selectedLabels.notPlayedTitle}
                     </Text>
                     <Text className="max-w-[260px] text-center font-body text-[13.5px] leading-[20px] text-text-muted">
-                        {t('leagues:detail.results.notPlayedMessage', {
-                            round: selectedItem.label,
-                        })}
+                        {selectedLabels.notPlayedMessage}
                     </Text>
                     <Button
                         onPress={() => setSelectedKey(lastPlayed.key)}
                         size="sm"
-                        title={t('leagues:detail.results.backToPlayed', {
-                            round: lastPlayed.label,
-                        })}
+                        title={labelsOf(lastPlayed).backTo}
                         variant="secondary"
                     />
                 </View>
             )}
         </View>
     );
-}
-
-/** Journées de la compétition, ordre chronologique (premier kickoff). */
-function buildStrip(matches: readonly MatchWithTeams[]): {
-    stripItems: RoundStripItem[];
-    lastPlayed: RoundStripItem | null;
-} {
-    type Bucket = { round: string | null; firstKickoff: string; played: boolean };
-    const buckets = new Map<string | null, Bucket>();
-    for (const match of matches) {
-        let bucket = buckets.get(match.round);
-        if (!bucket) {
-            bucket = { round: match.round, firstKickoff: match.kickoff_at, played: false };
-            buckets.set(match.round, bucket);
-        }
-        if (match.kickoff_at < bucket.firstKickoff) bucket.firstKickoff = match.kickoff_at;
-        if (match.status === 'finished') bucket.played = true;
-    }
-    const ordered = [...buckets.values()].sort((a, b) =>
-        a.firstKickoff.localeCompare(b.firstKickoff),
-    );
-    const played = ordered.filter((bucket) => bucket.played);
-    const lastPlayedBucket = played[played.length - 1] ?? null;
-    const stripItems = ordered.map((bucket) => ({
-        key: roundKeyOf(bucket.round),
-        label: bucket.round ?? '—',
-        played: bucket.played,
-        emphasized: bucket === lastPlayedBucket,
-    }));
-    return {
-        stripItems,
-        lastPlayed: lastPlayedBucket
-            ? (stripItems.find((item) => item.key === roundKeyOf(lastPlayedBucket.round)) ?? null)
-            : null,
-    };
 }
 
 /* ===================== Onglet Réglages ===================== */

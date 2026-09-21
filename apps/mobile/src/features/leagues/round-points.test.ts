@@ -61,4 +61,19 @@ describe('groupRoundPoints', () => {
     it('rend une liste vide sans données', () => {
         expect(groupRoundPoints([])).toEqual([]);
     });
+
+    it('regroupe les lignes d’une étape par étape, pas par round', () => {
+        const rounds = groupRoundPoints([
+            row({ round: '1', first_kickoff: '2026-07-04T14:00:00+00:00' }),
+            row({
+                round: null,
+                stage_key: 'finals',
+                stage_kind: 'finals',
+                first_kickoff: '2026-11-27T14:00:00+00:00',
+            }),
+        ]);
+        expect(rounds.map((r) => r.key)).toEqual(['1', 'stage:finals']);
+        expect(rounds[1]).toMatchObject({ round: null, stageKind: 'finals' });
+        expect(rounds[0].stageKind).toBeNull();
+    });
 });

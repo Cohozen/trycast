@@ -115,7 +115,47 @@
             "notPlayedMessage": "Round {{round}} points will show here once the matches are done and predictions reconciled.",
             "backToPlayed": "See round {{round}}",
             "dayNote": "Points for this round only — not the season total.",
-            "empty": "Per-round results arrive after the first finished matches."
+            "empty": "Per-round results arrive after the first finished matches.",
+            "roundOverlineStages": "Rounds & knockouts",
+            "stageShort": "KO",
+            "stageNotPlayedTitle": "{{stage}} coming up",
+            "stageNotPlayedMessage": "Points for {{ofPhrase}} will show up here once the matches are over and predictions are settled.",
+            "backToPlayedStage": "See {{phrase}}",
+            "stageNote": "Points from this knockout stage only — not the season total.",
+            "matchCount_one": "{{count}} match",
+            "matchCount_other": "{{count}} matches",
+            "stages": {
+                "r16": {
+                    "short": "1/8",
+                    "title": "Round of 16",
+                    "phrase": "the round of 16",
+                    "ofPhrase": "the round of 16"
+                },
+                "qf": {
+                    "short": "1/4",
+                    "title": "Quarter-finals",
+                    "phrase": "the quarter-finals",
+                    "ofPhrase": "the quarter-finals"
+                },
+                "sf": {
+                    "short": "1/2",
+                    "title": "Semi-finals",
+                    "phrase": "the semi-finals",
+                    "ofPhrase": "the semi-finals"
+                },
+                "final": {
+                    "short": "F",
+                    "title": "Final",
+                    "phrase": "the final",
+                    "ofPhrase": "the final"
+                },
+                "finals": {
+                    "short": "F",
+                    "title": "Finals",
+                    "phrase": "the finals",
+                    "ofPhrase": "the finals"
+                }
+            }
         },
         "settings": {
             "inviteOverline": "Invite friends",
