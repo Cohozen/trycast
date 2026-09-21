@@ -4,6 +4,8 @@ import { Pressable, Text, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
 type DayStripPillProps = {
+    /** Mois abrégé, sur le premier jour de chaque mois ; ligne réservée sinon. */
+    month: string | null;
     weekday: string;
     dayNumber: number;
     isToday: boolean;
@@ -19,6 +21,7 @@ type DayStripPillProps = {
 
 /** Pilule jour/numéro de la bande Résultats (une par jour à matchs). */
 export function DayStripPill({
+    month,
     weekday,
     dayNumber,
     isToday,
@@ -31,12 +34,21 @@ export function DayStripPill({
         <Pressable
             accessibilityRole={active ? undefined : 'button'}
             className={cn(
-                'w-12 items-center justify-center gap-1.5 rounded-pill border-[1.5px] border-transparent py-2.5',
+                'w-12 items-center justify-center gap-[5px] rounded-pill border-[1.5px] border-transparent py-2',
                 !active && isToday && 'border-border-strong',
             )}
             disabled={active || !onPress}
             onLayout={onLayout}
             onPress={onPress}>
+            {/* Ligne du mois toujours réservée : toutes les pilules gardent la
+                même hauteur, qu'elles portent un mois ou non (DS 2026-09-21) */}
+            <Text
+                className={cn(
+                    'h-[11px] font-body-bold text-[9px] uppercase leading-[11px] tracking-[0.9px]',
+                    active ? 'text-on-accent' : 'text-accent',
+                )}>
+                {month ?? ''}
+            </Text>
             <Text
                 className={cn(
                     'font-body-bold text-[11px] uppercase tracking-[0.88px]',

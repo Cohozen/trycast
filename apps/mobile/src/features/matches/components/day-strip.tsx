@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import Animated, {
+    Extrapolation,
+    interpolate,
     scrollTo,
     type SharedValue,
     useAnimatedReaction,
@@ -11,8 +13,9 @@ import Animated, {
 
 import { DayStripPill } from '@/features/matches/components/day-strip-pill';
 import type { StripDay } from '@/features/matches/day-range';
+import { dayStripMarks, dayStripOffsets } from '@/features/matches/day-strip-layout';
 import { i18n } from '@/lib/i18n';
-import { useThemeColor } from '@/tw';
+import { useThemeColor, View } from '@/tw';
 
 type DayStripProps = {
     days: StripDay[];
@@ -29,6 +32,8 @@ type DayStripProps = {
 // vaut pas 48 dans ce projet, et une valeur en dur fait dériver l'indicateur.
 const ITEM_GAP = 10;
 const EDGE_PADDING = 16;
+// Séparateur de mois (DS 2026-09-21) : 1 × 46 px, entre deux pilules
+const SEPARATOR_WIDTH = 1;
 
 /**
  * Bande de sélection de jour liée au carrousel Résultats : un indicateur grenat
@@ -39,26 +44,44 @@ const EDGE_PADDING = 16;
  */
 export function DayStrip({ days, scrollX, pageWidth, onSelect }: DayStripProps) {
     const weekdayFormatter = new Intl.DateTimeFormat(i18n.language, { weekday: 'short' });
+    // Mois sur le premier jour de chaque mois, séparateur entre deux mois
+    const marks = useMemo(() => {
+        const monthFormatter = new Intl.DateTimeFormat(i18n.language, { month: 'short' });
+        return dayStripMarks(
+            days.map((day) => day.date),
+            (date) => monthFormatter.format(date).replace('.', ''),
+        );
+    }, [days]);
     const stripRef = useAnimatedRef<Animated.ScrollView>();
     const borderColor = useThemeColor('border');
     const accentColor = useThemeColor('accent');
     // Géométrie réelle de la première pilule (mesurée au rendu) : origine, pas,
     // largeur et hauteur de l'indicateur en découlent.
     const [pill, setPill] = useState({ x: 0, y: 0, width: 0, height: 0 });
-    const step = pill.width + ITEM_GAP;
+    // Position de chaque pilule par rapport à la première : le pas n'est plus
+    // constant (séparateurs de mois), l'index fractionnaire s'interpole dessus.
+    const offsets = dayStripOffsets(marks, pill.width, ITEM_GAP, SEPARATOR_WIDTH);
+    const indices = offsets.map((_, index) => index);
 
     const fracIndex = useDerivedValue(() => (pageWidth > 0 ? scrollX.value / pageWidth : 0));
+    // Décalage courant de l'indicateur. Le worklet ne capture que des nombres
+    // (sérialiser `days`, qui contient des Date, casse le worklet). Une seule
+    // pilule : interpolate exige au moins deux points.
+    const slideX = useDerivedValue(() =>
+        indices.length < 2
+            ? 0
+            : interpolate(fracIndex.value, indices, offsets, Extrapolation.CLAMP),
+    );
 
-    // Décalage max précalculé en JS : le worklet ne capture que des nombres
-    // (sérialiser `days`, qui contient des Date, casse le worklet).
-    const contentWidth = 2 * EDGE_PADDING + days.length * pill.width + (days.length - 1) * ITEM_GAP;
+    // Décalage max précalculé en JS.
+    const contentWidth = 2 * EDGE_PADDING + (offsets[offsets.length - 1] ?? 0) + pill.width;
     const maxOffset = Math.max(0, contentWidth - pageWidth);
 
     // Recentrage continu : garde le jour courant au milieu de la bande.
     useAnimatedReaction(
-        () => fracIndex.value,
-        (frac) => {
-            const itemStart = pill.x + frac * step;
+        () => slideX.value,
+        (x) => {
+            const itemStart = pill.x + x;
             const centered = itemStart - (pageWidth - pill.width) / 2;
             scrollTo(stripRef, Math.min(maxOffset, Math.max(0, centered)), 0, false);
         },
@@ -66,11 +89,11 @@ export function DayStrip({ days, scrollX, pageWidth, onSelect }: DayStripProps) 
 
     // Indicateur grenat et fenêtre de révélation partagent la même position.
     const slideStyle = useAnimatedStyle(() => ({
-        transform: [{ translateX: pill.x + fracIndex.value * step }],
+        transform: [{ translateX: pill.x + slideX.value }],
     }));
     // Le duplicata contre-défile pour que la pilule visée s'aligne sur la base.
     const revealInnerStyle = useAnimatedStyle(() => ({
-        transform: [{ translateX: -(fracIndex.value * step) }],
+        transform: [{ translateX: -slideX.value }],
     }));
 
     const measureFirstPill = (event: LayoutChangeEvent) => {
@@ -125,15 +148,27 @@ export function DayStrip({ days, scrollX, pageWidth, onSelect }: DayStripProps) 
 
             {/* Couche de base : pilules estompées, tapables, mesurées */}
             {days.map((day, index) => (
-                <DayStripPill
-                    dayNumber={day.date.getDate()}
-                    isToday={day.isToday}
-                    key={day.key}
-                    onLayout={index === 0 ? measureFirstPill : undefined}
-                    onPress={() => onSelect(index)}
-                    variant="idle"
-                    weekday={weekdayFormatter.format(day.date).replace('.', '')}
-                />
+                <Fragment key={day.key}>
+                    {marks[index].separatorBefore ? (
+                        <View
+                            style={{
+                                width: SEPARATOR_WIDTH,
+                                height: 46,
+                                alignSelf: 'center',
+                                backgroundColor: borderColor,
+                            }}
+                        />
+                    ) : null}
+                    <DayStripPill
+                        dayNumber={day.date.getDate()}
+                        isToday={day.isToday}
+                        month={marks[index].monthLabel}
+                        onLayout={index === 0 ? measureFirstPill : undefined}
+                        onPress={() => onSelect(index)}
+                        variant="idle"
+                        weekday={weekdayFormatter.format(day.date).replace('.', '')}
+                    />
+                </Fragment>
             ))}
 
             {/* Fenêtre de révélation : duplicata blanc clippé à une pilule */}
@@ -147,18 +182,28 @@ export function DayStrip({ days, scrollX, pageWidth, onSelect }: DayStripProps) 
                         width: pill.width,
                         height: pill.height,
                         overflow: 'hidden',
+                        // Fond grenat opaque : masque la couche de base (dont
+                        // les séparateurs de mois) sous l'indicateur en mouvement
+                        borderRadius: 999,
+                        backgroundColor: accentColor,
                     },
                     slideStyle,
                 ]}>
                 <Animated.View style={[{ flexDirection: 'row', gap: ITEM_GAP }, revealInnerStyle]}>
-                    {days.map((day) => (
-                        <DayStripPill
-                            dayNumber={day.date.getDate()}
-                            isToday={day.isToday}
-                            key={day.key}
-                            variant="active"
-                            weekday={weekdayFormatter.format(day.date).replace('.', '')}
-                        />
+                    {days.map((day, index) => (
+                        <Fragment key={day.key}>
+                            {/* Espaceur invisible : même géométrie que la base */}
+                            {marks[index].separatorBefore ? (
+                                <View style={{ width: SEPARATOR_WIDTH }} />
+                            ) : null}
+                            <DayStripPill
+                                dayNumber={day.date.getDate()}
+                                isToday={day.isToday}
+                                month={marks[index].monthLabel}
+                                variant="active"
+                                weekday={weekdayFormatter.format(day.date).replace('.', '')}
+                            />
+                        </Fragment>
                     ))}
                 </Animated.View>
             </Animated.View>
