@@ -1,8 +1,11 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { CircleHelp, Users } from 'lucide-react-native';
 import { useDeferredValue, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
+import { CollapsingHeaderTitle } from '@/components/collapsing-header-title';
+import { HeaderHairline } from '@/components/header-hairline';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Screen } from '@/components/ui/screen';
@@ -16,6 +19,7 @@ import { LeaderboardRow } from '@/features/leagues/components/leaderboard-row';
 import { markTies } from '@/features/leagues/ranking';
 import { useLeagueLeaderboard } from '@/features/leagues/use-league-leaderboard';
 import { useMyLeagues } from '@/features/leagues/use-my-leagues';
+import { CompactScore } from '@/features/matches/components/compact-score';
 import { MatchHero } from '@/features/matches/components/match-hero';
 import { matchPhase } from '@/features/matches/match-phase';
 import { useMatch } from '@/features/matches/use-match';
@@ -34,6 +38,7 @@ import { toReactionMessageKey } from '@/features/reactions/errors';
 import { parseReactionCounts } from '@/features/reactions/reactions';
 import type { ReactionsTarget } from '@/features/reactions/types';
 import { useSetReaction } from '@/features/reactions/use-set-reaction';
+import { useCollapseProgress } from '@/components/use-collapse-progress';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 
 type LeagueView = 'predictions' | 'leaderboard';
@@ -95,6 +100,14 @@ export default function MatchScreen() {
     // Prono dont la sheet des réactions est ouverte (une seule sheet pour la liste)
     const [reactionsTarget, setReactionsTarget] = useState<ReactionsTarget | null>(null);
 
+    // Header repliable (DS 2026-09-21) : le hero s'estompe entre 20 et 110 px
+    // de défilement, le score compact prend place dans la barre native.
+    const collapse = useCollapseProgress({ start: 20, distance: 90 });
+    const heroStyle = useAnimatedStyle(() => ({
+        opacity: 1 - collapse.progress.value * 0.92,
+        transform: [{ scale: 1 - collapse.progress.value * 0.05 }],
+    }));
+
     const refreshControl = usePullToRefresh(() =>
         Promise.all([
             match.refetch(),
@@ -147,21 +160,35 @@ export default function MatchScreen() {
     const distribution = distributions.data?.get(currentMatch.id);
     const boardEntries = markTies(leagueBoard.data ?? []);
 
-    // Le hero (score/live + cotes) reste épinglé pendant le scroll :
-    // stickyHeaderIndices={[0]} → MatchHero, enfant direct d'index 0 du
-    // ScrollView de Screen, avec un fond opaque (cf. MatchHero).
     const reactionsEntry = leaguePredictions.data?.find(
         (entry) => entry.user_id === reactionsTarget?.userId,
     );
 
     return (
         <>
+            <Stack.Screen
+                options={{
+                    headerTitleAlign: 'center',
+                    headerTitle: () => (
+                        <CollapsingHeaderTitle
+                            compact={<CompactScore match={currentMatch} />}
+                            progress={collapse.progress}
+                            title={t('matches:detail.screenTitle')}
+                        />
+                    ),
+                }}
+            />
+            <HeaderHairline progress={collapse.progress} />
             <Screen
                 contentClassName="gap-5 px-6"
+                contentContainerStyle={{ minHeight: collapse.minContentHeight }}
+                onLayout={collapse.onLayout}
+                scrollRef={collapse.scrollRef}
                 refreshControl={refreshControl}
-                stickyHeaderIndices={[0]}
                 top="none">
-                <MatchHero match={currentMatch} />
+                <Animated.View style={[{ transformOrigin: 'top' }, heroStyle]}>
+                    <MatchHero match={currentMatch} />
+                </Animated.View>
 
                 {/* Mon prono, selon la phase */}
                 <View className="gap-3">

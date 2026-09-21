@@ -116,10 +116,10 @@ export function MatchHero({ match }: MatchHeroProps) {
         .filter(Boolean)
         .join(' · ');
 
-    // bg-bg : le hero est épinglé (sticky) sur la page de détail, fond opaque
-    // obligatoire pour masquer le contenu défilant dessous.
+    // Le hero défile avec la page : au scroll, il s'estompe et sa version
+    // compacte (CompactScore) prend place dans la barre native.
     return (
-        <View className="gap-3 border-b border-border bg-bg pb-4">
+        <View className="gap-3 pb-1">
             <MatchStatusChip match={match} />
 
             <View className="flex-row items-start gap-1.5">
