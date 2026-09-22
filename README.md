@@ -85,6 +85,41 @@ Depuis **`apps/mobile`** :
 | `npm run env:preview` / `env:prod` | Variables EAS de l'environnement, à vérifier avant un build |
 | `npm run release`                 | Prépare une version (voir « Numéro de version »)                               |
 
+## Tests
+
+Quatre niveaux, du plus rapide au plus proche du réel. Seul le premier tourne en CI.
+
+### 1. Vérification du dépôt — `npm run verify` (racine)
+
+Formatage Biome, tests Vitest des Edge Functions (`supabase/functions/**/*.test.ts`, dont le barème partagé avec l'app), puis typecheck, lint (`--max-warnings 0`) et tests Vitest de l'app (`*.test.ts` colocalisés dans `apps/mobile/src/features/<domaine>/`). Ce sont des tests de **modules purs** : la logique vit hors des composants pour être testable sans rendu. La CI (`.github/workflows/ci.yml`) joue exactement la même commande. Le verdict se lit au **code de sortie**, pas à la dernière ligne affichée.
+
+Le site a sa propre vérification : `cd apps/web && npm run check && npm run build` (CI `web.yml`).
+
+### 2. Sécurité côté serveur — scripts E2E (racine, projet **dev**)
+
+Des scripts bash qui tapent l'API Supabase avec de vrais JWT, pour prouver que les règles tiennent **côté serveur** (RLS, RPC verrouillées, deadline au coup d'envoi), pas seulement dans l'UI : `e2e-auth.sh`, `e2e-predictions.sh`, `e2e-scoring.sh`, `e2e-leagues.sh`, `e2e-jokers.sh`, `e2e-reactions.sh`, `e2e-notifications.sh`, `e2e-privacy.sh`, `e2e-avatars.sh`, plus des vérifications SQL (`e2e-scoring.sql`, `e2e-round-highlights.sql`, `e2e-waitlist.sql`).
+
+```bash
+EMAIL1=e2e.user1@trycast.local EMAIL2=e2e.user2@trycast.local PASSWORD=motdepasse123 \
+  bash scripts/e2e-leagues.sh
+```
+
+⚠️ Chaque script a **son seed**, à rejouer juste avant lui : les seeds ne se cumulent pas, et `e2e-auth.sh` passe en dernier (il supprime un des deux comptes). Ordre, prérequis et pièges : [`scripts/README.md`](scripts/README.md#vérifications-e2e).
+
+### 3. Parcours dans l'app — données de démo + émulateur / simulateur
+
+```bash
+node --no-warnings scripts/seed-demo.mjs
+```
+
+Seize joueurs, cinq ligues et des matchs dans tous leurs états (terminé, bonus en attente, en direct, coup d'envoi imminent, reporté, annulé), coups de la journée, jokers, réactions et notifications. Les points sont calculés par le vrai pipeline de scoring. **À rejouer juste avant chaque session** : les matchs fictifs sont calés sur l'heure d'exécution. Connexion en `hugo@demo.trycast.local` / `motdepasse123`. Le script imprime le **deep link de chaque cas**, qui sert d'index pour une passe visuelle — et servira d'entrée à une future automatisation. Détails : [`scripts/README.md`](scripts/README.md#données-de-démonstration).
+
+La passe se fait sur un **dev build local**, jamais Expo Go : skills `trycast-android-emulator` (`npm run android`) et `trycast-ios-simulator`. Les mêmes données servent aux captures des stores.
+
+### 4. Ce qui exige un vrai téléphone
+
+Les **notifications push** n'arrivent ni sur le simulateur ni sur l'émulateur : elles se vérifient sur le build distribué du test interne Play (`seed-test-notifications.sql` puis `trigger-notify.sql`, cf. [`scripts/README.md`](scripts/README.md#notifications-push-sur-un-vrai-téléphone)). Les e-mails d'auth, de même, se jugent dans une vraie boîte (`e2e-email.sh`, `e2e-password-reset.sh` — ils envoient de vrais e-mails).
+
 ## Structure
 
 ```
