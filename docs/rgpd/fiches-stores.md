@@ -200,6 +200,9 @@ l'app**, pas un contenu rédigé. Rien de nouveau à cocher, mais deux libellés
 - **Apple, « Product Interaction » (liée)** : même ajout, **App Functionality**.
 - La mesure d'usage gagne l'événement `reaction_changed` (action et clé seulement) : la
   ligne « Interactions / Analytics », non liée, ne change pas.
+- Le coup de la journée (v1.1.0) ne collecte rien de nouveau : il se calcule sur les pronos
+  déjà visibles dans la ligue, sa notification passe par le traitement existant (§3 du
+  registre) et l'événement `round_highlight_opened` ne porte que sa provenance.
 
 ---
 

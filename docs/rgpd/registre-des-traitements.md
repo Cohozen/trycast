@@ -52,10 +52,10 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 
 | | |
 |---|---|
-| **Finalité** | Envoyer les rappels avant un match et les résultats une fois les points calculés |
+| **Finalité** | Envoyer les rappels avant un match, les résultats une fois les points calculés, et le coup de la journée d'une ligue (v1.1.0) |
 | **Base légale** | Consentement — art. 6.1.a (activation explicite dans les réglages, retirable à tout moment) |
 | **Personnes concernées** | Utilisateurs ayant activé les notifications |
-| **Catégories de données** | Jeton de notification de l'appareil, plateforme (iOS/Android), préférences par type de notification, journal des envois (destinataire, match, type, statut) |
+| **Catégories de données** | Jeton de notification de l'appareil, plateforme (iOS/Android), préférences par type de notification, journal des envois (destinataire, match, ligue pour le coup de la journée, type, statut) |
 | **Où** | `public.push_tokens`, `public.notification_prefs`, `public.notification_sends` |
 | **Destinataires** | Supabase, **Expo Push Service**, puis **Google (FCM)** ou **Apple (APNs)** selon la plateforme — passage imposé par les systèmes d'exploitation mobiles |
 | **Transferts hors UE** | Oui, vers Expo, Google et Apple (États-Unis) — encadrés par les clauses contractuelles types et/ou le Data Privacy Framework |
@@ -111,7 +111,7 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 | **Finalité** | Savoir quelles fonctionnalités sont utilisées, pour décider quoi améliorer |
 | **Base légale** | Intérêt légitime — art. 6.1.f. Mesure d'audience anonyme, sans identifiant ni traceur : impact nul sur la vie privée, et désactivable à tout moment dans l'application |
 | **Personnes concernées** | Utilisateurs de l'application n'ayant pas coupé la mesure |
-| **Catégories de données** | 11 événements de parcours nommés (compte créé, pronostic enregistré, point double posé / déplacé / retiré, ligue créée ou rejointe, classement consulté, notifications activées, export demandé, compte supprimé, guide d'accueil fermé), la version de l'app et le système d'exploitation. **Aucun identifiant utilisateur, aucun identifiant d'appareil** |
+| **Catégories de données** | 15 événements de parcours nommés (compte créé, connexion, pronostic enregistré, point double posé / déplacé / retiré, ligue créée ou rejointe, invitation partagée, classement consulté, notifications activées, export demandé, compte supprimé, guide d'accueil fermé, signalement envoyé, réaction changée, coup de la journée ouvert), la version de l'app et le système d'exploitation. **Aucun identifiant utilisateur, aucun identifiant d'appareil** |
 | **Où** | Aptabase, région UE. Rien n'est stocké dans notre base |
 | **Destinataires** | Aptabase |
 | **Transferts hors UE** | Aucun |
