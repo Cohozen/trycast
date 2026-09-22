@@ -156,6 +156,72 @@
                     "phrase": "les finales",
                     "ofPhrase": "des finales"
                 }
+            },
+            "highlight": {
+                "overline": "Coup de la journée",
+                "overlineMe": "Ton coup de la journée",
+                "title": {
+                    "other": {
+                        "exact": "Le coup parfait",
+                        "draw": "Le nul osé",
+                        "outsider": "Le coup de poker",
+                        "joker": "Le joker bien placé",
+                        "league": "Contre toute la ligue"
+                    },
+                    "me": {
+                        "exact": "Ton coup parfait",
+                        "draw": "Tu as osé le nul",
+                        "outsider": "Ton coup de poker",
+                        "joker": "Ton joker bien placé",
+                        "league": "Tu as tenu ton idée"
+                    },
+                    "duo": "Deux à contre-courant",
+                    "duoSplit": "Deux coups, deux matchs",
+                    "trio": "Trois contre la ligue"
+                },
+                "accroche": {
+                    "other": {
+                        "exact": "Score exact, contre toute la ligue. {{name}} peut rentrer au vestiaire.",
+                        "draw": "Un nul, au rugby. Personne ne l'écrit. {{name}} l'avait écrit avant le coup d'envoi.",
+                        "outsider": "Les cotes disaient non. La ligue aussi. {{name}} a signé quand même.",
+                        "outsiderJoker": "Les cotes disaient non, la ligue non plus, et {{name}} avait posé son joker dessus.",
+                        "joker": "Joker posé, ligue à contre-pied : {{name}} n'a pas tremblé.",
+                        "league": "La ligue voyait l'autre camp. {{name}} n'a pas bougé, et le terrain a suivi."
+                    },
+                    "me": {
+                        "exact": "Score exact, contre toute la ligue. Tu peux rentrer au vestiaire.",
+                        "draw": "Un nul, au rugby. Personne ne l'écrit. Toi, tu l'avais écrit avant le coup d'envoi.",
+                        "outsider": "Les cotes disaient non. La ligue aussi. Tu as signé quand même.",
+                        "outsiderJoker": "Les cotes disaient non, la ligue non plus, et tu avais posé ton joker dessus.",
+                        "joker": "Joker posé, ligue à contre-pied : tu n'as pas tremblé.",
+                        "league": "Toute la ligue voyait l'autre camp. Toi, tu n'as pas bougé d'une ligne."
+                    },
+                    "duo": "Même match, même total, et la ligue à contre-pied.",
+                    "duoSplit": "Chacun son terrain, le même total au bout. La ligue n'avait vu venir aucun des deux.",
+                    "trio": "Trois à ne pas suivre le troupeau, trois au même total."
+                },
+                "badge": {
+                    "tie": "Ex æquo",
+                    "joker": "Joker",
+                    "exact": "Score exact",
+                    "draw": "Match nul",
+                    "outsider": "Outsider des cotes"
+                },
+                "story": {
+                    "win": "{{crowd}} sur {{total}} voyaient {{team}} gagner.",
+                    "crowdDraw": "{{crowd}} sur {{total}} voyaient un match nul.",
+                    "draw_one": "Aucun autre membre n'avait mis le nul.",
+                    "draw_other": "{{count}} sur {{total}} seulement avaient mis le nul.",
+                    "split": "{{winners}} pronos contre la majorité de la ligue.",
+                    "notYou": "Pas toi."
+                },
+                "prediction": "Prono {{home}} – {{away}}",
+                "myPrediction": "Ton prono {{home}} – {{away}}",
+                "splitLine": "{{match}} · prono {{home}} – {{away}}",
+                "cta": "Va réagir sur le détail du match",
+                "ctaMe": "Tes potes réagissent, va voir",
+                "points": "pts",
+                "a11y": "Coup de la journée : {{title}}. Ouvrir le détail du match."
             }
         },
         "settings": {

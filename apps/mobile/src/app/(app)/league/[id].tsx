@@ -30,10 +30,12 @@ import { LeagueIcon } from '@/features/leagues/components/league-icon';
 import { LeaveLeagueModal } from '@/features/leagues/components/leave-league-modal';
 import { Podium } from '@/features/leagues/components/podium';
 import { RemoveMemberModal } from '@/features/leagues/components/remove-member-modal';
+import { RoundHighlightCard } from '@/features/leagues/components/round-highlight-card';
 import { RoundStandingRow } from '@/features/leagues/components/round-standing-row';
 import { RoundStrip } from '@/features/leagues/components/round-strip';
 import { TransferOwnershipModal } from '@/features/leagues/components/transfer-ownership-modal';
 import { markTies } from '@/features/leagues/ranking';
+import { buildRoundHighlights } from '@/features/leagues/round-highlight';
 import { groupRoundPoints } from '@/features/leagues/round-points';
 import { buildRoundStrip } from '@/features/leagues/round-strip-items';
 import type { LeaderboardEntry, RoundStripItem } from '@/features/leagues/types';
@@ -41,12 +43,14 @@ import { useCompetitionStages } from '@/features/leagues/use-competition-stages'
 import { useDeleteLeague } from '@/features/leagues/use-delete-league';
 import { useKickMember } from '@/features/leagues/use-kick-member';
 import { useLeagueLeaderboard } from '@/features/leagues/use-league-leaderboard';
+import { useLeagueRoundHighlights } from '@/features/leagues/use-league-round-highlights';
 import { useLeagueRoundPoints } from '@/features/leagues/use-league-round-points';
 import { useLeaveLeague } from '@/features/leagues/use-leave-league';
 import { useMyLeagues } from '@/features/leagues/use-my-leagues';
 import { useTransferOwnership } from '@/features/leagues/use-transfer-ownership';
 import { useMatches } from '@/features/matches/use-matches';
 import { useOpenPlayerProfile } from '@/features/profile/use-open-player-profile';
+import { trackEvent } from '@/lib/analytics';
 import { i18n } from '@/lib/i18n';
 import { useCollapseProgress } from '@/components/use-collapse-progress';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
@@ -62,12 +66,23 @@ type DetailTab = 'standings' | 'results' | 'settings';
  */
 export default function LeagueScreen() {
     const { t } = useTranslation(['leagues', 'common']);
-    const { id } = useLocalSearchParams<{ id: string }>();
+    // tab/round : deep link de la notification du coup de la journée
+    const {
+        id,
+        tab: tabParam,
+        round: roundParam,
+    } = useLocalSearchParams<{
+        id: string;
+        tab?: string;
+        round?: string;
+    }>();
     const router = useRouter();
     const { session } = useSession();
     const userId = session?.user.id;
 
-    const [tab, setTab] = useState<DetailTab>('standings');
+    const [tab, setTab] = useState<DetailTab>(
+        tabParam === 'results' || tabParam === 'settings' ? tabParam : 'standings',
+    );
 
     const leagues = useMyLeagues();
     const leaderboard = useLeagueLeaderboard(id);
@@ -219,6 +234,7 @@ export default function LeagueScreen() {
                     {tab === 'results' ? (
                         <ResultsTab
                             competitionId={league.competition_id}
+                            initialRound={roundParam}
                             leagueId={league.id}
                             userId={userId}
                         />
@@ -372,24 +388,43 @@ function ResultsTab({
     leagueId,
     competitionId,
     userId,
+    initialRound,
 }: {
     leagueId: string;
     competitionId: string;
     userId: string | undefined;
+    /** Journée ouverte par la notification : présélectionnée, carte « à l'arrivée ». */
+    initialRound?: string;
 }) {
     const { t } = useTranslation(['leagues']);
+    const router = useRouter();
     const matches = useMatches(competitionId);
     const stages = useCompetitionStages(competitionId);
     const roundPoints = useLeagueRoundPoints(leagueId);
+    const roundHighlights = useLeagueRoundHighlights(leagueId);
     const faintColor = useThemeColor('text-faint');
     const mutedColor = useThemeColor('text-muted');
-    const [selectedKey, setSelectedKey] = useState<string | null>(null);
+    const [selectedKey, setSelectedKey] = useState<string | null>(initialRound ?? null);
+    // L'arrivée ne se joue qu'une fois : changer de journée l'éteint
+    const [arrivalKey, setArrivalKey] = useState(initialRound);
+    const selectRound = (key: string) => {
+        setArrivalKey(undefined);
+        setSelectedKey(key);
+    };
 
     const { items: stripItems, lastPlayed } = useMemo(
         () => buildRoundStrip(matches.data ?? [], stages.data ?? []),
         [matches.data, stages.data],
     );
     const rounds = useMemo(() => groupRoundPoints(roundPoints.data ?? []), [roundPoints.data]);
+    const highlights = useMemo(
+        () => buildRoundHighlights(roundHighlights.data ?? [], userId),
+        [roundHighlights.data, userId],
+    );
+    const matchesById = useMemo(
+        () => new Map((matches.data ?? []).map((match) => [match.id, match])),
+        [matches.data],
+    );
 
     if (matches.isPending || stages.isPending || roundPoints.isPending) {
         return (
@@ -452,6 +487,8 @@ function ResultsTab({
                   note: t('leagues:detail.results.stageNote'),
               };
     const selectedLabels = labelsOf(selectedItem);
+    // Pas de coup, pas de carte : ni état vide ni place réservée
+    const highlight = highlights.get(selectedItem.key);
 
     return (
         <View className="gap-4 pt-1">
@@ -463,7 +500,7 @@ function ResultsTab({
                             : t('leagues:detail.results.roundOverline')
                     }
                 />
-                <RoundStrip items={stripItems} onSelect={setSelectedKey} selected={selected} />
+                <RoundStrip items={stripItems} onSelect={selectRound} selected={selected} />
             </View>
 
             {selectedRound ? (
@@ -476,6 +513,29 @@ function ResultsTab({
                             {meta}
                         </Text>
                     </View>
+                    {highlight ? (
+                        <RoundHighlightCard
+                            arriving={highlight.key === arrivalKey}
+                            highlight={highlight}
+                            key={highlight.key}
+                            matchesById={matchesById}
+                            onOpen={(laureate) => {
+                                trackEvent({
+                                    name: 'round_highlight_opened',
+                                    props: { from: highlight.key === arrivalKey ? 'push' : 'card' },
+                                });
+                                router.push({
+                                    pathname: '/match/[id]',
+                                    params: {
+                                        id: laureate.matchId,
+                                        league: leagueId,
+                                        member: laureate.userId,
+                                    },
+                                });
+                            }}
+                            roundLabel={selectedLabels.title}
+                        />
+                    ) : null}
                     <View className="gap-1.5">
                         {selectedRound.entries.map((entry) => (
                             <RoundStandingRow
@@ -504,7 +564,7 @@ function ResultsTab({
                         {selectedLabels.notPlayedMessage}
                     </Text>
                     <Button
-                        onPress={() => setSelectedKey(lastPlayed.key)}
+                        onPress={() => selectRound(lastPlayed.key)}
                         size="sm"
                         title={labelsOf(lastPlayed).backTo}
                         variant="secondary"

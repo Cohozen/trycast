@@ -13,6 +13,10 @@ export type LeaguePreview = Database['public']['Functions']['preview_league']['R
 export type LeagueRoundPointsRow =
     Database['public']['Functions']['get_league_round_points']['Returns'][number];
 
+/** Lauréat d'un coup de la journée (RPC get_league_round_highlights). */
+export type RoundHighlightRow =
+    Database['public']['Functions']['get_league_round_highlights']['Returns'][number];
+
 /** Étape à élimination directe d'une compétition (fenêtre de dates). */
 export type CompetitionStage = Database['public']['Tables']['competition_stages']['Row'];
 

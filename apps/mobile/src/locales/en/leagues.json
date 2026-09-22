@@ -156,6 +156,72 @@
                     "phrase": "the finals",
                     "ofPhrase": "the finals"
                 }
+            },
+            "highlight": {
+                "overline": "Call of the round",
+                "overlineMe": "Your call of the round",
+                "title": {
+                    "other": {
+                        "exact": "The perfect call",
+                        "draw": "The bold draw",
+                        "outsider": "The long shot",
+                        "joker": "The well-placed joker",
+                        "league": "Against the whole league"
+                    },
+                    "me": {
+                        "exact": "Your perfect call",
+                        "draw": "You dared the draw",
+                        "outsider": "Your long shot",
+                        "joker": "Your well-placed joker",
+                        "league": "You stuck to your guns"
+                    },
+                    "duo": "Two against the tide",
+                    "duoSplit": "Two calls, two matches",
+                    "trio": "Three against the league"
+                },
+                "accroche": {
+                    "other": {
+                        "exact": "Exact score, against the whole league. {{name}} can head for the showers.",
+                        "draw": "A draw, in rugby. Nobody writes that down. {{name}} did, before kickoff.",
+                        "outsider": "The odds said no. So did the league. {{name}} went for it anyway.",
+                        "outsiderJoker": "The odds said no, so did the league, and {{name}} had the joker on it.",
+                        "joker": "Joker down, league wrong-footed: {{name}} never flinched.",
+                        "league": "The league backed the other side. {{name}} held firm, and the pitch agreed."
+                    },
+                    "me": {
+                        "exact": "Exact score, against the whole league. You can head for the showers.",
+                        "draw": "A draw, in rugby. Nobody writes that down. You did, before kickoff.",
+                        "outsider": "The odds said no. So did the league. You went for it anyway.",
+                        "outsiderJoker": "The odds said no, so did the league, and you had your joker on it.",
+                        "joker": "Joker down, league wrong-footed: you never flinched.",
+                        "league": "The whole league backed the other side. You didn't budge an inch."
+                    },
+                    "duo": "Same match, same total, and the league wrong-footed.",
+                    "duoSplit": "Different matches, same total. The league saw neither coming.",
+                    "trio": "Three who didn't follow the herd, three on the same total."
+                },
+                "badge": {
+                    "tie": "Tied",
+                    "joker": "Joker",
+                    "exact": "Exact score",
+                    "draw": "Draw",
+                    "outsider": "Long shot"
+                },
+                "story": {
+                    "win": "{{crowd}} of {{total}} backed {{team}} to win.",
+                    "crowdDraw": "{{crowd}} of {{total}} backed a draw.",
+                    "draw_one": "No other member called the draw.",
+                    "draw_other": "Only {{count}} of {{total}} called the draw.",
+                    "split": "{{winners}} calls against the league's majority.",
+                    "notYou": "Not you."
+                },
+                "prediction": "Called {{home}} – {{away}}",
+                "myPrediction": "Your call {{home}} – {{away}}",
+                "splitLine": "{{match}} · called {{home}} – {{away}}",
+                "cta": "React on the match details",
+                "ctaMe": "Your mates are reacting, take a look",
+                "points": "pts",
+                "a11y": "Call of the round: {{title}}. Open the match details."
             }
         },
         "settings": {

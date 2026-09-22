@@ -56,6 +56,12 @@ export type AnalyticsEvent =
               reaction: 'bravo' | 'lucky' | 'bold' | 'laugh';
           };
       }
+    /**
+     * La carte du coup de la journée a été ouverte vers le match. `from` dit si
+     * l'utilisateur arrivait de la notification (`push`) ou l'a trouvée en
+     * parcourant l'onglet Résultats (`card`). Jamais la ligue ni le lauréat.
+     */
+    | { name: 'round_highlight_opened'; props: { from: 'card' | 'push' } }
     /** Une ligue a été créée. */
     | { name: 'league_created' }
     /**
