@@ -23,6 +23,8 @@ type MemberPredictionRowProps = {
     entry: MemberPrediction;
     /** Met en évidence la ligne de l'utilisateur connecté. */
     isMe: boolean;
+    /** Ligne visée à l'arrivée (coup de la journée) : contour grenat bref. */
+    highlighted?: boolean;
     match: MatchWithTeams;
     /** Ouvre le profil public du membre. Absent sur ma propre ligne. */
     onPress?: () => void;
@@ -54,6 +56,7 @@ const POPOVER_OFFSET_X = 44;
 export function MemberPredictionRow({
     entry,
     isMe,
+    highlighted = false,
     match,
     onPress,
     onReact,
@@ -96,6 +99,7 @@ export function MemberPredictionRow({
                 className={cn(
                     'gap-[7px] rounded-md border bg-surface px-3.5 py-2.5',
                     isMe ? 'border-accent/40 bg-accent/10' : 'border-border',
+                    highlighted && 'border-accent',
                 )}>
                 <View className="flex-row items-center gap-3">
                     <Avatar name={entry.username} ring={isMe} size="sm" uri={entry.avatar_url} />

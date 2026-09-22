@@ -1,8 +1,10 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { CircleHelp, Users } from 'lucide-react-native';
-import { useDeferredValue, useState } from 'react';
+import { useDeferredValue, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { View as RNView } from 'react-native';
+import Animated, { scrollTo, useAnimatedStyle } from 'react-native-reanimated';
+import { scheduleOnUI } from 'react-native-worklets';
 
 import { CollapsingHeaderTitle } from '@/components/collapsing-header-title';
 import { HeaderHairline } from '@/components/header-hairline';
@@ -59,7 +61,13 @@ export default function MatchScreen() {
         'reactions',
         'common',
     ]);
-    const { id } = useLocalSearchParams<{ id: string }>();
+    // league/member : ouverture depuis la carte du coup de la journée, sur la
+    // ligne du lauréat (là où vit sa barre de réaction)
+    const {
+        id,
+        league: leagueParam,
+        member: memberParam,
+    } = useLocalSearchParams<{ id: string; league?: string; member?: string }>();
     const router = useRouter();
     const { session } = useSession();
     const userId = session?.user.id;
@@ -77,7 +85,8 @@ export default function MatchScreen() {
     const distributions = useCommunityDistributions(competitionId);
     const myLeagues = useMyLeagues();
 
-    const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(null);
+    const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(leagueParam ?? null);
+    const [focusedMember, setFocusedMember] = useState(memberParam);
     const [view, setView] = useState<LeagueView>('predictions');
     // La pastille suit `view` (bascule immédiate au tap) ; le sélecteur de
     // contenu (liste des pronos ↔ classement de la ligue) est piloté par la
@@ -103,6 +112,25 @@ export default function MatchScreen() {
     // Header repliable (DS 2026-09-21) : le hero s'estompe entre 20 et 110 px
     // de défilement, le score compact prend place dans la barre native.
     const collapse = useCollapseProgress({ start: 20, distance: 90 });
+    // Défilement jusqu'à la ligne du lauréat, une seule fois : sa position se
+    // mesure dans la fenêtre, relativement au hero (en haut du contenu)
+    const heroRef = useRef<Animated.View>(null);
+    const focusDone = useRef(false);
+    const scrollRef = collapse.scrollRef;
+    const focusRow = (row: RNView | null) => {
+        if (!row || focusDone.current) return;
+        focusDone.current = true;
+        heroRef.current?.measureInWindow((_heroX, heroY) => {
+            row.measureInWindow((_x, rowY) => {
+                const target = Math.max(0, rowY - heroY - 24);
+                scheduleOnUI(() => {
+                    'worklet';
+                    scrollTo(scrollRef, 0, target, true);
+                });
+            });
+        });
+        setTimeout(() => setFocusedMember(undefined), 2400);
+    };
     const heroStyle = useAnimatedStyle(() => ({
         opacity: 1 - collapse.progress.value * 0.92,
         transform: [{ scale: 1 - collapse.progress.value * 0.05 }],
@@ -186,7 +214,7 @@ export default function MatchScreen() {
                 scrollRef={collapse.scrollRef}
                 refreshControl={refreshControl}
                 top="none">
-                <Animated.View style={[{ transformOrigin: 'top' }, heroStyle]}>
+                <Animated.View ref={heroRef} style={[{ transformOrigin: 'top' }, heroStyle]}>
                     <MatchHero match={currentMatch} />
                 </Animated.View>
 
@@ -352,31 +380,43 @@ export default function MatchScreen() {
                             ) : (
                                 <View className="gap-2">
                                     {leaguePredictions.data.map((entry) => (
-                                        <MemberPredictionRow
-                                            entry={entry}
-                                            isMe={entry.user_id === userId}
+                                        <RNView
+                                            collapsable={false}
                                             key={entry.user_id}
-                                            match={currentMatch}
-                                            onOpenReactions={() =>
-                                                setReactionsTarget({
-                                                    userId: entry.user_id,
-                                                    username: entry.username,
-                                                })
-                                            }
-                                            onPress={openPlayerProfile(entry.user_id)}
-                                            onReact={(next) =>
-                                                setReaction.mutate(
-                                                    { targetUserId: entry.user_id, next },
-                                                    {
-                                                        onError: (error) =>
-                                                            toast.show(
-                                                                t(toReactionMessageKey(error)),
-                                                                'neutral',
-                                                            ),
-                                                    },
-                                                )
-                                            }
-                                        />
+                                            onLayout={
+                                                entry.user_id === memberParam
+                                                    ? (event) =>
+                                                          focusRow(
+                                                              event.currentTarget as unknown as RNView,
+                                                          )
+                                                    : undefined
+                                            }>
+                                            <MemberPredictionRow
+                                                entry={entry}
+                                                highlighted={entry.user_id === focusedMember}
+                                                isMe={entry.user_id === userId}
+                                                match={currentMatch}
+                                                onOpenReactions={() =>
+                                                    setReactionsTarget({
+                                                        userId: entry.user_id,
+                                                        username: entry.username,
+                                                    })
+                                                }
+                                                onPress={openPlayerProfile(entry.user_id)}
+                                                onReact={(next) =>
+                                                    setReaction.mutate(
+                                                        { targetUserId: entry.user_id, next },
+                                                        {
+                                                            onError: (error) =>
+                                                                toast.show(
+                                                                    t(toReactionMessageKey(error)),
+                                                                    'neutral',
+                                                                ),
+                                                        },
+                                                    )
+                                                }
+                                            />
+                                        </RNView>
                                     ))}
                                     <Text className="mt-1.5 text-center font-body text-[11px] text-text-faint">
                                         {t('reactions:footer')}
