@@ -9,10 +9,19 @@ export type NotificationContent = {
 };
 
 // Cibles des deep links portées par le payload `data.url` de chaque message.
-// L'app n'accepte que ces routes (allowlist dans use-notification-observer) :
+// L'app n'accepte que ces routes (allowlist dans features/notifications/notification-href.ts) :
 // toute nouvelle URL ici doit y être ajoutée.
 export const REMINDER_URL = '/(app)/(tabs)/';
 export const RESULT_URL = '/(app)/(tabs)/results';
+
+/**
+ * Coup de la journée : onglet Résultats de la ligue, sur la journée du coup.
+ * `roundKey` est la clé de roundGroupKey (round brut ou « stage:<clé> »),
+ * calculée par la RPC. L'app valide ce motif dans use-notification-deep-link.
+ */
+export function roundHighlightUrl(leagueId: string, roundKey: string): string {
+    return `/league/${leagueId}?tab=results&round=${encodeURIComponent(roundKey)}`;
+}
 
 // Catégories d'actions (boutons de la barre de notification), enregistrées par
 // l'app dans src/features/notifications/notification-categories.ts — les deux
@@ -59,6 +68,8 @@ type ResultParams = {
     points: number;
 };
 
+type RoundHighlightParams = { leagueName: string; isLaureate: boolean };
+
 type LocaleMessages = {
     reminderTitle: string;
     reminderBody: (params: { homeTeam: string; awayTeam: string }) => string;
@@ -70,6 +81,9 @@ type LocaleMessages = {
         awayScore: number;
         points: number;
     }) => string;
+    roundHighlightTitle: string;
+    roundHighlightBody: (params: { league: string }) => string;
+    roundHighlightLaureateBody: (params: { league: string }) => string;
     teamNames: Record<string, string>;
 };
 
@@ -81,6 +95,10 @@ const MESSAGES: Record<string, LocaleMessages> = {
         resultTitle: 'Résultats & points',
         resultBody: ({ homeTeam, awayTeam, homeScore, awayScore, points }) =>
             `${homeTeam} ${homeScore} – ${awayScore} ${awayTeam} : tu marques ${formatPointsFr(points)}.`,
+        roundHighlightTitle: 'Coup de la journée',
+        roundHighlightBody: ({ league }) => `Le coup de la journée dans ${league}.`,
+        roundHighlightLaureateBody: ({ league }) =>
+            `C'est toi, le coup de la journée dans ${league} !`,
         teamNames: TEAM_NAMES_FR,
     },
     en: {
@@ -90,6 +108,9 @@ const MESSAGES: Record<string, LocaleMessages> = {
         resultTitle: 'Results & points',
         resultBody: ({ homeTeam, awayTeam, homeScore, awayScore, points }) =>
             `${homeTeam} ${homeScore} – ${awayScore} ${awayTeam}: you score ${formatPointsEn(points)}.`,
+        roundHighlightTitle: 'Call of the round',
+        roundHighlightBody: ({ league }) => `The call of the round is in for ${league}.`,
+        roundHighlightLaureateBody: ({ league }) => `You made the call of the round in ${league}!`,
         teamNames: TEAM_NAMES_EN,
     },
 };
@@ -142,4 +163,15 @@ export function buildResultMessage(
             points: params.points,
         }),
     };
+}
+
+export function buildRoundHighlightMessage(
+    locale: string | null,
+    params: RoundHighlightParams,
+): NotificationContent {
+    const messages = resolveMessages(locale);
+    const body = params.isLaureate
+        ? messages.roundHighlightLaureateBody
+        : messages.roundHighlightBody;
+    return { title: messages.roundHighlightTitle, body: body({ league: params.leagueName }) };
 }

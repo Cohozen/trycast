@@ -1,5 +1,6 @@
-// Notifications push (Lot 6) : rappels de prono à H-1 et résultats après la
-// passe 1 du scoring. Appelée par pg_cron toutes les 10 minutes (décalée de
+// Notifications push (Lot 6) : rappels de prono à H-1, résultats après la
+// passe 1 du scoring et coup de la journée (v1.1.0) quand une journée se
+// solde avec un coup dans une ligue. Appelée par pg_cron toutes les 10 minutes (décalée de
 // 3 min après sync-results pour suivre le scoring de près). Même gabarit que
 // sync-results : early-exit sans écriture si aucun travail, accès protégé par
 // x-sync-secret, écritures via la service_role key.
@@ -25,13 +26,18 @@ import {
     reminderMessages,
     type ResultTargetRow,
     resultMessages,
+    type RoundHighlightRpcRow,
+    type RoundHighlightTargetRow,
+    roundHighlightMessages,
+    sendKey,
     type TargetGroup,
+    toRoundHighlightTargets,
 } from './transform.ts';
 
 // Les receipts Expo sont disponibles ~15 min après l'envoi
 const RECEIPT_DELAY_MS = 15 * 60 * 1000;
 
-type SendType = 'reminder' | 'result';
+type SendType = 'reminder' | 'result' | 'round_highlight';
 
 type PendingReceiptRow = { id: string; ticket_ids: TicketPair[] | null };
 
@@ -41,6 +47,7 @@ type InboxContent = { title: string; body: string; url: string };
 type RunState = {
     remindersSent: number;
     resultsSent: number;
+    roundHighlightsSent: number;
     tokensPruned: number;
     receiptsChecked: number;
     errors: string[];
@@ -59,12 +66,18 @@ Deno.serve(async (req: Request) => {
         Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
-    const [pendingReceipts, reminderRows, resultRows] = await Promise.all([
+    const [pendingReceipts, reminderRows, resultRows, highlightRows] = await Promise.all([
         selectPendingReceipts(admin),
         selectTargets<ReminderTargetRow>(admin, 'notify_reminder_targets'),
         selectTargets<ResultTargetRow>(admin, 'notify_result_targets'),
+        selectTargets<RoundHighlightRpcRow>(admin, 'notify_round_highlight_targets'),
     ]);
-    if (pendingReceipts.length === 0 && reminderRows.length === 0 && resultRows.length === 0) {
+    if (
+        pendingReceipts.length === 0 &&
+        reminderRows.length === 0 &&
+        resultRows.length === 0 &&
+        highlightRows.length === 0
+    ) {
         return json({ skipped: true }, 200);
     }
 
@@ -81,6 +94,7 @@ Deno.serve(async (req: Request) => {
     const state: RunState = {
         remindersSent: 0,
         resultsSent: 0,
+        roundHighlightsSent: 0,
         tokensPruned: 0,
         receiptsChecked: 0,
         errors: [],
@@ -92,6 +106,12 @@ Deno.serve(async (req: Request) => {
         await processReceipts(admin, pendingReceipts, state);
         await processTargets(admin, 'reminder', groupTargets(reminderRows), state);
         await processTargets(admin, 'result', groupTargets(resultRows), state);
+        await processTargets(
+            admin,
+            'round_highlight',
+            groupTargets(toRoundHighlightTargets(highlightRows)),
+            state,
+        );
 
         await finishRun(admin, run.id, state.errors.length === 0 ? 'success' : 'error', state);
         return json({ success: true }, 200);
@@ -120,7 +140,7 @@ async function selectPendingReceipts(admin: SupabaseClient): Promise<PendingRece
 
 async function selectTargets<Row>(
     admin: SupabaseClient,
-    rpc: 'notify_reminder_targets' | 'notify_result_targets',
+    rpc: 'notify_reminder_targets' | 'notify_result_targets' | 'notify_round_highlight_targets',
 ): Promise<Row[]> {
     const { data, error } = await admin.rpc(rpc);
     if (error) {
@@ -186,18 +206,24 @@ async function processTargets<Row extends { user_id: string; match_id: string; t
                     user_id: group.userId,
                     match_id: group.matchId,
                     type,
+                    league_id: group.leagueId,
                 })),
-                { onConflict: 'user_id,match_id,type', ignoreDuplicates: true },
+                // Unicité « nulls not distinct » : league_id null pour rappels
+                // et résultats (migration 20260922000100_round_highlights.sql)
+                { onConflict: 'user_id,match_id,type,league_id', ignoreDuplicates: true },
             )
-            .select('id, user_id, match_id');
+            .select('id, user_id, match_id, league_id');
         if (claimError) {
             throw new Error(`claim ${type}: ${claimError.message}`);
         }
         const claimIdByKey = new Map(
-            (claims ?? []).map((claim) => [`${claim.user_id}:${claim.match_id}`, claim.id]),
+            (claims ?? []).map((claim) => [
+                sendKey(claim.user_id, claim.match_id, claim.league_id),
+                claim.id,
+            ]),
         );
         const claimedGroups = groups.filter((group) =>
-            claimIdByKey.has(`${group.userId}:${group.matchId}`),
+            claimIdByKey.has(sendKey(group.userId, group.matchId, group.leagueId)),
         );
         if (claimedGroups.length === 0) {
             return;
@@ -218,14 +244,19 @@ async function processTargets<Row extends { user_id: string; match_id: string; t
         // Contenu envoyé, par claim : recopié en base pour la boîte de réception
         const contentBySend = new Map<string, InboxContent>();
         for (const group of claimedGroups) {
-            const sendId = claimIdByKey.get(`${group.userId}:${group.matchId}`)!;
+            const sendId = claimIdByKey.get(sendKey(group.userId, group.matchId, group.leagueId))!;
             const badge = (unreadByUser.get(group.userId) ?? 0) + 1;
             unreadByUser.set(group.userId, badge);
             const context = { sendId, badge };
             const groupMessages =
                 type === 'reminder'
                     ? reminderMessages(group as unknown as TargetGroup<ReminderTargetRow>, context)
-                    : resultMessages(group as unknown as TargetGroup<ResultTargetRow>, context);
+                    : type === 'result'
+                      ? resultMessages(group as unknown as TargetGroup<ResultTargetRow>, context)
+                      : roundHighlightMessages(
+                            group as unknown as TargetGroup<RoundHighlightTargetRow>,
+                            context,
+                        );
             // Contenu identique dans un groupe (un groupe = un user = une locale)
             const [first] = groupMessages;
             if (first) {
@@ -287,8 +318,10 @@ async function processTargets<Row extends { user_id: string; match_id: string; t
             if (pairs) {
                 if (type === 'reminder') {
                     state.remindersSent += 1;
-                } else {
+                } else if (type === 'result') {
                     state.resultsSent += 1;
+                } else {
+                    state.roundHighlightsSent += 1;
                 }
             }
         }
@@ -357,6 +390,7 @@ async function finishRun(
             detail: {
                 reminders_sent: state.remindersSent,
                 results_sent: state.resultsSent,
+                round_highlights_sent: state.roundHighlightsSent,
                 tokens_pruned: state.tokensPruned,
                 receipts_checked: state.receiptsChecked,
                 ...(state.errors.length > 0 ? { errors: state.errors } : {}),

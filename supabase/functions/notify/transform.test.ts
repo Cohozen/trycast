@@ -5,6 +5,8 @@ import {
     reminderMessages,
     type ResultTargetRow,
     resultMessages,
+    roundHighlightMessages,
+    toRoundHighlightTargets,
 } from './transform.ts';
 
 function reminderRow(overrides: Partial<ReminderTargetRow>): ReminderTargetRow {
@@ -115,5 +117,61 @@ describe('resultMessages', () => {
         expect(resultMessages(group, { sendId: 'send-3', badge: 1 })[0].body).toContain(
             'tu marques 0 pt.',
         );
+    });
+});
+
+describe('coup de la journée', () => {
+    const rpcRow = {
+        league_id: 'league-1',
+        league_name: 'Les Potes',
+        anchor_match_id: 'match-9',
+        round_key: 'stage:final',
+        user_id: 'user-1',
+        is_laureate: false,
+        token: 'tok-1',
+        locale: 'fr',
+    };
+
+    it('sépare deux ligues sur la même ancre et regroupe les tokens', () => {
+        const groups = groupTargets(
+            toRoundHighlightTargets([
+                rpcRow,
+                { ...rpcRow, token: 'tok-2' },
+                { ...rpcRow, league_id: 'league-2' },
+            ]),
+        );
+        expect(groups).toHaveLength(2);
+        expect(groups[0]).toMatchObject({
+            matchId: 'match-9',
+            leagueId: 'league-1',
+            tokens: ['tok-1', 'tok-2'],
+        });
+        expect(groups[1]).toMatchObject({ leagueId: 'league-2' });
+    });
+
+    it('rappels et résultats gardent une ligue nulle', () => {
+        const [group] = groupTargets([reminderRow({})]);
+        expect(group.leagueId).toBeNull();
+    });
+
+    it('ouvre la journée de la ligue, sans catégorie d’actions', () => {
+        const [group] = groupTargets(toRoundHighlightTargets([rpcRow]));
+        const [message] = roundHighlightMessages(group, { sendId: 'send-1', badge: 2 });
+        expect(message).toMatchObject({
+            to: 'tok-1',
+            title: 'Coup de la journée',
+            body: 'Le coup de la journée dans Les Potes.',
+            data: { url: '/league/league-1?tab=results&round=stage%3Afinal', id: 'send-1' },
+            badge: 2,
+        });
+        expect(message.categoryId).toBeUndefined();
+    });
+
+    it('interpelle le lauréat', () => {
+        const [group] = groupTargets(
+            toRoundHighlightTargets([{ ...rpcRow, is_laureate: true, locale: 'en' }]),
+        );
+        const [message] = roundHighlightMessages(group, { sendId: 'send-1', badge: 1 });
+        expect(message.body).toBe('You made the call of the round in Les Potes!');
     });
 });
