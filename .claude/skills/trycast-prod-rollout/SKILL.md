@@ -33,7 +33,8 @@ Avant de rédiger, établir **exactement** ce qui part :
 4. **Edge Functions** : celles modifiées depuis le dernier déploiement prod
    (`git diff --stat <dernier tag ou commit déployé> -- supabase/functions/`). Une modification de
    `_shared/` concerne toutes les fonctions qui l'importent.
-5. **Config EF** : une EF appelée par pg_cron doit être en `verify_jwt = false` dans
+5. **Contrainte visée par une EF** : si une migration change une contrainte d'unicité qu'une EF utilise en `onConflict`, l'EF en place casse dès le push. Donner le deploy **juste après** le push, entre deux ticks du cron concerné, et le signaler en tête (cf. skill `trycast-supabase-migration`).
+6. **Config EF** : une EF appelée par pg_cron doit être en `verify_jwt = false` dans
    `supabase/config.toml` avant son premier deploy (cf. skill `trycast-supabase-migration`).
 
 Puis donner la procédure ci-dessous, **une commande par bloc `bash`**, en retirant les étapes sans

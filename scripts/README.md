@@ -129,6 +129,8 @@ seed-test-users.sql  →  seed-test-reactions.sql (compétition e2e-reactions à
 
 `seed-competitions.sql` est indépendant et **idempotent** (upsert sur le slug) : les compétitions réelles du pipeline, **et leurs phases** (fenêtres de dates du joker, upsert sur `competition_id, key`).
 
+`seed-demo-round-highlight.sql` touche les **données de démonstration** du dev, pas les tests : dans la ligue « Les Potes » (`DEMERCT2`, compétition `nc-2026`), il pose un coup de la journée en journée 3 (Sacha seul contre la ligue, joker, score exact, outsider) et en journée 2 (Cohozen et Margot ex æquo), et marque ces matchs scorés. Rejouable, sans notification (matchs de juillet, hors de la borne de 7 jours). Il sert aux passes visuelles et aux captures de la carte.
+
 ---
 
 ## Notifications push sur un vrai téléphone

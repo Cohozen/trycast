@@ -25,6 +25,10 @@ Schéma **uniquement par migrations** dans `supabase/migrations/`. Jamais d'édi
 - **Piège récursion RLS** : une policy de `league_members` qui interroge `league_members`/`leagues` boucle (« infinite recursion detected in policy »). Utiliser des helpers `security definer` (`is_league_member` / `is_league_owner`) pour casser le cycle — toujours passer par eux dans les policies de ces tables.
 - Contraintes miroir côté client : quand tu ajoutes un `check` (ex. nom 3-40, format code), mets à jour `validation.ts` du domaine.
 
+## Piège : changer une contrainte d'unicité qu'une EF vise en `onConflict`
+
+Vécu le 2026-09-22 (`notification_sends`, passée de `(user_id, match_id, type)` à `(user_id, match_id, type, league_id)` **nulls not distinct**). Un upsert PostgREST `onConflict: 'a,b,c'` exige une contrainte sur **exactement** ces colonnes. Dès le `db push`, l'EF déjà déployée échoue donc à chaque appel (42P10), et une EF déployée avant la migration échoue pareil. Il faut enchaîner **migration puis deploy immédiat**, en le disant dans la procédure de prod. Un index unique **partiel** est inutilisable ici, faute de pouvoir passer le prédicat par PostgREST. `nulls not distinct` (PG 15+) permet d'ajouter une colonne nullable à la clé sans casser la déduplication des lignes où elle vaut null.
+
 ## Vues
 
 Une vue destinée aux **clients** n'est presque jamais la bonne réponse : préférer une **RPC** (une vue `security definer` déclenche l'advisor ERROR `security_definer_view`, cf. `get_prediction_distributions`).
@@ -52,6 +56,8 @@ Chaque script re-seede son état avant exécution. Ordre de seed cumulatif : use
 - Scoring : `bash scripts/e2e-scoring.sh` + `scripts/e2e-scoring.sql` côté serveur (rejouer `seed-test-scoring.sql` avant **chaque** run du `.sql`)
 - Leagues : `bash scripts/e2e-leagues.sh` (rejouer `seed-test-leagues.sql` avant chaque run)
 - Notifications : `bash scripts/e2e-notifications.sh` (seuls les users de test sont requis ; filtres PostgREST sur un token Expo → crochets à URL-encoder, cf. `TOKEN_ENC` dans le script)
+
+- Coup de la journée : `supabase db query --linked -f scripts/e2e-round-highlights.sql`, **sans seed**. Modèle à reprendre pour un calcul SQL : tout dans une transaction terminée par `rollback`, données créées sur place (users dans `auth.users`, compétition, ligue, matchs), petites fonctions `pg_temp.*` pour les assertions (`raise exception` qui nomme le cas), et une ligne « OK » en sortie. La garde d'appartenance d'une RPC se teste dans la même transaction : `set_config('request.jwt.claims', …, true)` puis `set local role authenticated`, et `reset role` avant d'asserter (les fonctions `pg_temp` ne sont pas exécutables par `authenticated`). Faire tourner une copie **faussée** au moins une fois : un script qui ne sait pas échouer ne prouve rien.
 
 Les scripts lisent `.env` (`EXPO_PUBLIC_SUPABASE_URL` / `_KEY`, clé publishable uniquement) et acceptent `EMAIL1/EMAIL2/PASSWORD` en override.
 

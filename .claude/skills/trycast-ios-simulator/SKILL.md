@@ -111,6 +111,8 @@ Après chaque interaction : `sleep 1-2` puis vérifier (screenshot ou describe-u
   (vérifié le 2026-09-11 : code pré-rempli et aperçu de la ligue affiché). Choisir un code qui existe
   dans la base de dev, sinon « Code d'invitation invalide » est la bonne réponse.
 
+- **Les deep links successifs empilent les écrans** (vécu le 2026-09-22) : un `openurl` vers un écran déjà ouvert ne recharge pas toujours le bundle, et la pile garde les écrans précédents. Un `router.push` vers la même route peut alors **réutiliser** une instance déjà consommée (focus déjà fait, état figé) : le comportement observé ne dit rien d'une ouverture fraîche. Pour une mesure qui compte, repartir d'une pile propre (`terminate` puis `openurl`, cf. le piège du launcher), et tester aussi le chemin « retour puis réouverture ».
+- **L'overlay de célébration peut s'ouvrir après un seed** : des points posés en base sur un prono de l'utilisateur connecté le déclenchent au lancement suivant. Il se ferme par « Fermer » en bas de l'écran. Un breakdown sans `winnerCorrect` y affiche « Raté » à côté de points positifs : c'est le seed qui est incohérent, pas l'app.
 - **Clavier AZERTY** : si `axe type "TESTAXE1"` produit `TESTQXE&`, le clavier iOS actif est le français (AZERTY) — les keycodes HID d'AXe sont interprétés comme des positions QWERTY. ⚠️ Le correctif ne persiste **pas** de façon fiable (constaté le 10/07/2026 : AZERTY revenu sur le simulateur de référence) — **vérifier la première saisie de chaque session** (screenshot après `axe type`) et rejouer le correctif au besoin :
   ```bash
   xcrun simctl spawn booted defaults write .GlobalPreferences AppleKeyboards -array "en_US@sw=QWERTY;hw=Automatic" "emoji@sw=Emoji"
