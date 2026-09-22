@@ -208,8 +208,8 @@
                     "outsider": "Outsider des cotes"
                 },
                 "story": {
-                    "win": "{{crowd}} sur {{total}} voyaient {{team}} gagner.",
-                    "crowdDraw": "{{crowd}} sur {{total}} voyaient un match nul.",
+                    "win": "{{crowd}} sur {{total}} misaient sur une victoire {{team}}.",
+                    "crowdDraw": "{{crowd}} sur {{total}} misaient sur un match nul.",
                     "draw_one": "Aucun autre membre n'avait mis le nul.",
                     "draw_other": "{{count}} sur {{total}} seulement avaient mis le nul.",
                     "split": "{{winners}} pronos contre la majorité de la ligue.",

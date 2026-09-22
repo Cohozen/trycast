@@ -208,7 +208,7 @@
                     "outsider": "Long shot"
                 },
                 "story": {
-                    "win": "{{crowd}} of {{total}} backed {{team}} to win.",
+                    "win": "{{crowd}} of {{total}} backed a {{team}} win.",
                     "crowdDraw": "{{crowd}} of {{total}} backed a draw.",
                     "draw_one": "No other member called the draw.",
                     "draw_other": "Only {{count}} of {{total}} called the draw.",

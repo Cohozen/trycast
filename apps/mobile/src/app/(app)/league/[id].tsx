@@ -80,9 +80,16 @@ export default function LeagueScreen() {
     const { session } = useSession();
     const userId = session?.user.id;
 
-    const [tab, setTab] = useState<DetailTab>(
-        tabParam === 'results' || tabParam === 'settings' ? tabParam : 'standings',
-    );
+    const tabFromParam = (value: string | undefined): DetailTab =>
+        value === 'results' || value === 'settings' ? value : 'standings';
+    const [tab, setTab] = useState<DetailTab>(tabFromParam(tabParam));
+    // Écran déjà ouvert quand la notification arrive : Expo Router lui passe les
+    // nouveaux params sans le remonter, l'onglet doit suivre
+    const [seenTabParam, setSeenTabParam] = useState(tabParam);
+    if (tabParam !== seenTabParam) {
+        setSeenTabParam(tabParam);
+        if (tabParam) setTab(tabFromParam(tabParam));
+    }
 
     const leagues = useMyLeagues();
     const leaderboard = useLeagueLeaderboard(id);
@@ -407,6 +414,15 @@ function ResultsTab({
     const [selectedKey, setSelectedKey] = useState<string | null>(initialRound ?? null);
     // L'arrivée ne se joue qu'une fois : changer de journée l'éteint
     const [arrivalKey, setArrivalKey] = useState(initialRound);
+    // Même cas que l'onglet : une nouvelle journée arrive par les params
+    const [seenRound, setSeenRound] = useState(initialRound);
+    if (initialRound !== seenRound) {
+        setSeenRound(initialRound);
+        if (initialRound) {
+            setSelectedKey(initialRound);
+            setArrivalKey(initialRound);
+        }
+    }
     const selectRound = (key: string) => {
         setArrivalKey(undefined);
         setSelectedKey(key);
