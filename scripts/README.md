@@ -129,7 +129,37 @@ seed-test-users.sql  →  seed-test-reactions.sql (compétition e2e-reactions à
 
 `seed-competitions.sql` est indépendant et **idempotent** (upsert sur le slug) : les compétitions réelles du pipeline, **et leurs phases** (fenêtres de dates du joker, upsert sur `competition_id, key`).
 
-`seed-demo-round-highlight.sql` touche les **données de démonstration** du dev, pas les tests : dans la ligue « Les Potes » (`DEMERCT2`, compétition `nc-2026`), il pose un coup de la journée en journée 3 (Sacha seul contre la ligue, joker, score exact, outsider) et en journée 2 (Cohozen et Margot ex æquo), et marque ces matchs scorés. Rejouable, sans notification (matchs de juillet, hors de la borne de 7 jours). Il sert aux passes visuelles et aux captures de la carte.
+---
+
+## Données de démonstration
+
+`seed-demo.mjs` peuple le dev de **16 faux joueurs qui jouent vraiment**, pour les passes visuelles, les parcours de test et les captures des stores. Ce ne sont **pas** des comptes `is_demo` (ceux du relecteur Play, `seed-demo-account.mjs`) : ils figurent au classement général.
+
+```bash
+node --no-warnings scripts/seed-demo.mjs           # purge puis sème — rejouable
+node --no-warnings scripts/seed-demo.mjs --purge   # retire tout
+```
+
+**Rejouer juste avant chaque session** : les journées fictives sont calées sur l'heure d'exécution (le direct passe en `needs_review` au bout de 48 h). Connexion : `hugo@demo.trycast.local` / `motdepasse123` (le héros, pensé pour les captures) ; les autres joueurs suivent la forme `<pseudo en minuscules>@demo.trycast.local`. Le script imprime en fin de run le classement, les coups de la journée et **les deep links de chaque cas** — c'est l'index des passes visuelles, et l'entrée d'une future automatisation.
+
+| Couvre | Où |
+|---|---|
+| Journées 1-3 réelles (juillet), pronos variés par style de joueur, jokers | nc-2026, vrais scores et essais |
+| Terminé, **bonus offensif en attente**, **en direct**, coup d'envoi dans 45 min sans prono du héros, joker posé à venir | J4 fictive, autour de maintenant |
+| Match **reporté**, match **annulé** | J5 fictive, à une semaine |
+| **Coup de la journée** : J3 « coup parfait » (Titou64), J2 ex æquo avec le héros | ligue vitrine « Les Potes du Samedi » (`RUGBY226`, 12 membres) |
+| Ligue dont le héros est **propriétaire** ; duo ; ligue solo ; ligue à **rejoindre** par code | `BUREAU26`, `DUETTE28`, `SEVENS29`, `RUCKXV26` |
+| Réactions, boîte de réception du héros (2 non lues) | ligue vitrine |
+
+Ce qu'il faut savoir :
+
+- **Les points viennent du vrai pipeline** : `buildScoringPayload` (code de l'EF `sync-results`, importé tel quel — Node 24 retire les types) puis la RPC `apply_match_scores`. Un changement de barème se reflète au rejeu ; si le tirage ne produit plus les coups de la journée attendus, le script sort en erreur — revoir `SCENARIOS`.
+- **Déterministe** : PRNG à graine fixe par (joueur, match). Ajouter un joueur ne change pas les pronos des autres.
+- **Phase de joker `demo_gap`** : hors de toute phase de nc-2026 (l'intersaison), le script en crée une qui comble le trou entre les deux voisines, et la retire à la purge.
+- **Garde** : il refuse de semer si de vrais matchs de nc-2026 tombent dans la fenêtre fictive (T−2 j..T+9 j) — en novembre, les journées fictives doublonneraient le calendrier réel. Il faudra alors décaler le scénario.
+- Il lève `needs_review` sur les matchs de juillet terminés : sur le dev, la borne de 48 h de `sync-results` les avait marqués avant qu'on complète leurs résultats, et `apply_match_scores` refuse un match en revue.
+- Il remplace `seed-demo-round-highlight.sql`, `seed-screenshot-matches.mjs` et `seed-upcoming-matches.sql`, et purge leurs restes (plages `-701..-706`, `-9001..-9006`, ligues `TRYCAST2`/`DEMERCT2`, comptes `demo*@trycast.fr` du dev). `-601`/`-602` (notifications) ne sont pas touchés.
+- Dev uniquement : aucune option ne vise un autre projet.
 
 ---
 

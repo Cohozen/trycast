@@ -66,6 +66,7 @@ Depuis la **racine** :
 | `npm run emails:build` / `emails:check` / `emails:push` | Templates d'e-mails d'auth (voir `scripts/README.md`) |
 | `npm run deps:check`              | Ce qui est en retard, rangé par famille — ne modifie rien (voir `docs/dependances.md`) |
 | `node scripts/seed-demo-account.mjs` | Compte de démonstration exigé par les stores |
+| `node scripts/seed-demo.mjs`      | Données de démonstration du dev : joueurs, ligues, matchs dans tous leurs états (voir `scripts/README.md`) |
 | `bash scripts/e2e-auth.sh`        | Vérification E2E auth + RLS contre le projet Supabase (voir en-tête du script) |
 | `bash scripts/e2e-predictions.sh` | Vérification E2E RLS des pronostics (deadline kickoff, colonnes de points)     |
 | `bash scripts/e2e-scoring.sh`     | Vérification E2E du scoring côté client (barème lisible, RPC verrouillée)      |
