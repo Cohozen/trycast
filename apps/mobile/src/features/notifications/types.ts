@@ -7,12 +7,14 @@ export type NotificationPrefs = {
     master: boolean;
     reminderEnabled: boolean;
     resultsEnabled: boolean;
+    roundHighlightEnabled: boolean;
 };
 
 export const DEFAULT_NOTIFICATION_PREFS: NotificationPrefs = {
     master: true,
     reminderEnabled: true,
     resultsEnabled: true,
+    roundHighlightEnabled: true,
 };
 
 type NotificationSendRow = Database['public']['Tables']['notification_sends']['Row'];

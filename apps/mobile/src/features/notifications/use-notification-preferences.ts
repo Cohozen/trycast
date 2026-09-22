@@ -12,7 +12,7 @@ export function useNotificationPreferences(userId: string) {
         queryFn: async (): Promise<NotificationPrefs> => {
             const { data, error } = await supabase
                 .from('notification_prefs')
-                .select('master, reminder_enabled, results_enabled')
+                .select('master, reminder_enabled, results_enabled, round_highlight_enabled')
                 .eq('user_id', userId)
                 .maybeSingle();
             if (error) throw error;
@@ -21,6 +21,7 @@ export function useNotificationPreferences(userId: string) {
                 master: data.master,
                 reminderEnabled: data.reminder_enabled,
                 resultsEnabled: data.results_enabled,
+                roundHighlightEnabled: data.round_highlight_enabled,
             };
         },
     });
@@ -40,6 +41,7 @@ export function useUpdateNotificationPreferences(userId: string) {
                     master: prefs.master,
                     reminder_enabled: prefs.reminderEnabled,
                     results_enabled: prefs.resultsEnabled,
+                    round_highlight_enabled: prefs.roundHighlightEnabled,
                 },
                 { onConflict: 'user_id' },
             );

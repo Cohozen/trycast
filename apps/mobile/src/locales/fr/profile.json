@@ -155,6 +155,10 @@
                 "label": "Résultats & points",
                 "description": "Quand un match est terminé et tes points calculés."
             },
+            "roundHighlight": {
+                "label": "Coup de la journée",
+                "description": "Quand une journée se termine sur un coup contre toute la ligue."
+            },
             "blockedBanner": "Les notifications sont bloquées dans les réglages {{os}}. Active-les pour recevoir tes rappels.",
             "openSettings": "Ouvrir les réglages système"
         },

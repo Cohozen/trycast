@@ -78,6 +78,17 @@ export function NotificationSettings({ userId }: { userId: string }) {
             checked: prefs.resultsEnabled,
             onToggle: () => updatePrefs.mutate({ ...prefs, resultsEnabled: !prefs.resultsEnabled }),
         },
+        {
+            key: 'roundHighlight',
+            label: t('profile:settings.notifications.roundHighlight.label'),
+            description: t('profile:settings.notifications.roundHighlight.description'),
+            checked: prefs.roundHighlightEnabled,
+            onToggle: () =>
+                updatePrefs.mutate({
+                    ...prefs,
+                    roundHighlightEnabled: !prefs.roundHighlightEnabled,
+                }),
+        },
     ];
 
     return (

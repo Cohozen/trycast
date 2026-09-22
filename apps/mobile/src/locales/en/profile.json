@@ -155,6 +155,10 @@
                 "label": "Results & points",
                 "description": "When a match ends and your points are calculated."
             },
+            "roundHighlight": {
+                "label": "Call of the round",
+                "description": "When a round ends with a call against the whole league."
+            },
             "blockedBanner": "Notifications are blocked in your {{os}} settings. Turn them on to get your reminders.",
             "openSettings": "Open system settings"
         },

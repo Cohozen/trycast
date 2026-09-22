@@ -6,7 +6,7 @@
     "markAllRead": "Mark all as read",
     "empty": {
         "title": "No notifications",
-        "message": "Prediction reminders and your match results will show up here."
+        "message": "Prediction reminders, your match results and your leagues' calls of the round will show up here."
     },
     "time": {
         "minutes": "{{value}} min ago",

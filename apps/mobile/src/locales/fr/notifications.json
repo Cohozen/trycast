@@ -6,7 +6,7 @@
     "markAllRead": "Tout marquer comme lu",
     "empty": {
         "title": "Aucune notification",
-        "message": "Les rappels de prono et tes résultats de match apparaîtront ici."
+        "message": "Les rappels de prono, tes résultats de match et les coups de la journée de tes ligues apparaîtront ici."
     },
     "time": {
         "minutes": "il y a {{value}} min",

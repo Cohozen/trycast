@@ -1,4 +1,4 @@
-import { CalendarClock, Trophy } from 'lucide-react-native';
+import { CalendarClock, Star, Trophy } from 'lucide-react-native';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -23,7 +23,12 @@ export function NotificationRow({ notification, onPress }: NotificationRowProps)
     const [pressed, setPressed] = useState(false);
     const iconColor = useThemeColor('text-muted');
     const isRead = !!notification.read_at;
-    const Icon = notification.type === 'result' ? Trophy : CalendarClock;
+    const Icon =
+        notification.type === 'result'
+            ? Trophy
+            : notification.type === 'round_highlight'
+              ? Star
+              : CalendarClock;
 
     const time = notificationTime(notification.created_at);
     const timeLabel =
