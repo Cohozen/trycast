@@ -106,7 +106,9 @@ RES=$(curl -s -X POST "$URL/rest/v1/notification_prefs" \
   -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
   -H "Content-Type: application/json" \
   -H "Prefer: resolution=merge-duplicates,return=representation" \
-  -d "{\"user_id\":\"$U1\",\"master\":true,\"reminder_enabled\":false,\"results_enabled\":true}")
+  -d "{\"user_id\":\"$U1\",\"master\":true,\"reminder_enabled\":false,\"results_enabled\":true,\"round_highlight_enabled\":false}")
+echo "$RES" | grep -q '"round_highlight_enabled"\s*:\s*false\|"round_highlight_enabled":false' ||
+  fail "upsert prefs round_highlight_enabled ($RES)"
 echo "$RES" | grep -q '"reminder_enabled"\s*:\s*false\|"reminder_enabled": false\|"reminder_enabled":false' ||
   fail "upsert prefs user1 ($RES)"
 RES=$(curl -s "$URL/rest/v1/notification_prefs?select=user_id" \
@@ -121,7 +123,7 @@ echo "$RES" | grep -q '42501' || fail "prefs pour autrui (attendu 42501, obtenu 
 curl -s -X POST "$URL/rest/v1/notification_prefs" \
   -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
   -H "Content-Type: application/json" -H "Prefer: resolution=merge-duplicates" \
-  -d "{\"user_id\":\"$U1\",\"master\":true,\"reminder_enabled\":true,\"results_enabled\":true}" > /dev/null
+  -d "{\"user_id\":\"$U1\",\"master\":true,\"reminder_enabled\":true,\"results_enabled\":true,\"round_highlight_enabled\":true}" > /dev/null
 ok "préférences : upsert own, isolées, pas d'écriture pour autrui"
 
 # Boîte de réception : notification_sends est lisible en lecture seule sur ses
@@ -191,6 +193,14 @@ RES=$(curl -s -X POST "$URL/rest/v1/rpc/notify_result_targets" \
   -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
   -H "Content-Type: application/json" -d '{}')
 echo "$RES" | grep -q '42501' || fail "notify_result_targets authenticated (attendu 42501, obtenu $RES)"
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/notify_round_highlight_targets" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" -d '{}')
+echo "$RES" | grep -q '42501' || fail "notify_round_highlight_targets authenticated (attendu 42501, obtenu $RES)"
+RES=$(curl -s -X POST "$URL/rest/v1/rpc/league_round_highlights" \
+  -H "apikey: $KEY" -H "Authorization: Bearer $T1" \
+  -H "Content-Type: application/json" -d '{"p_league_id":"00000000-0000-0000-0000-000000000000"}')
+echo "$RES" | grep -q '42501' || fail "league_round_highlights authenticated (attendu 42501, obtenu $RES)"
 ok "RPC de ciblage refusées aux clients"
 
 # Anonyme : tout refusé

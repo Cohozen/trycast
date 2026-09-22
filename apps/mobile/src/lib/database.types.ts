@@ -363,6 +363,7 @@ export type Database = {
                     master: boolean;
                     reminder_enabled: boolean;
                     results_enabled: boolean;
+                    round_highlight_enabled: boolean;
                     updated_at: string;
                     user_id: string;
                 };
@@ -370,6 +371,7 @@ export type Database = {
                     master?: boolean;
                     reminder_enabled?: boolean;
                     results_enabled?: boolean;
+                    round_highlight_enabled?: boolean;
                     updated_at?: string;
                     user_id: string;
                 };
@@ -377,6 +379,7 @@ export type Database = {
                     master?: boolean;
                     reminder_enabled?: boolean;
                     results_enabled?: boolean;
+                    round_highlight_enabled?: boolean;
                     updated_at?: string;
                     user_id?: string;
                 };
@@ -395,6 +398,7 @@ export type Database = {
                     body: string | null;
                     created_at: string;
                     id: string;
+                    league_id: string | null;
                     match_id: string;
                     read_at: string | null;
                     receipt_checked_at: string | null;
@@ -409,6 +413,7 @@ export type Database = {
                     body?: string | null;
                     created_at?: string;
                     id?: string;
+                    league_id?: string | null;
                     match_id: string;
                     read_at?: string | null;
                     receipt_checked_at?: string | null;
@@ -423,6 +428,7 @@ export type Database = {
                     body?: string | null;
                     created_at?: string;
                     id?: string;
+                    league_id?: string | null;
                     match_id?: string;
                     read_at?: string | null;
                     receipt_checked_at?: string | null;
@@ -434,6 +440,13 @@ export type Database = {
                     user_id?: string;
                 };
                 Relationships: [
+                    {
+                        foreignKeyName: 'notification_sends_league_id_fkey';
+                        columns: ['league_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'leagues';
+                        referencedColumns: ['id'];
+                    },
                     {
                         foreignKeyName: 'notification_sends_match_id_fkey';
                         columns: ['match_id'];
@@ -959,6 +972,30 @@ export type Database = {
                     username: string;
                 }[];
             };
+            get_league_round_highlights: {
+                Args: { p_league_id: string };
+                Returns: {
+                    avatar_url: string;
+                    crowd_count: number;
+                    crowd_outcome: string;
+                    is_draw: boolean;
+                    is_exact: boolean;
+                    is_joker: boolean;
+                    is_outsider: boolean;
+                    match_id: string;
+                    points: number;
+                    predicted_away_score: number;
+                    predicted_home_score: number;
+                    predictions_count: number;
+                    round: string;
+                    round_key: string;
+                    stage_key: string;
+                    stage_kind: string;
+                    user_id: string;
+                    username: string;
+                    winners_count: number;
+                }[];
+            };
             get_league_round_points: {
                 Args: { p_league_id: string };
                 Returns: {
@@ -1057,6 +1094,33 @@ export type Database = {
                 };
             };
             join_waitlist: { Args: { email: string }; Returns: undefined };
+            league_round_highlights: {
+                Args: { p_league_id: string };
+                Returns: {
+                    anchor_match_id: string;
+                    avatar_url: string;
+                    crowd_count: number;
+                    crowd_outcome: string;
+                    is_draw: boolean;
+                    is_exact: boolean;
+                    is_joker: boolean;
+                    is_outsider: boolean;
+                    last_kickoff: string;
+                    last_scored_at: string;
+                    match_id: string;
+                    points: number;
+                    predicted_away_score: number;
+                    predicted_home_score: number;
+                    predictions_count: number;
+                    round: string;
+                    round_key: string;
+                    stage_key: string;
+                    stage_kind: string;
+                    user_id: string;
+                    username: string;
+                    winners_count: number;
+                }[];
+            };
             match_phase_id: { Args: { p_match_id: string }; Returns: string };
             notify_reminder_targets: {
                 Args: never;
@@ -1084,6 +1148,19 @@ export type Database = {
                     locale: string;
                     match_id: string;
                     points_awarded: number;
+                    token: string;
+                    user_id: string;
+                }[];
+            };
+            notify_round_highlight_targets: {
+                Args: never;
+                Returns: {
+                    anchor_match_id: string;
+                    is_laureate: boolean;
+                    league_id: string;
+                    league_name: string;
+                    locale: string;
+                    round_key: string;
                     token: string;
                     user_id: string;
                 }[];
