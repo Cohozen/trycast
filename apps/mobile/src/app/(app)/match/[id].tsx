@@ -86,7 +86,8 @@ export default function MatchScreen() {
     const myLeagues = useMyLeagues();
 
     const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(leagueParam ?? null);
-    const [focusedMember, setFocusedMember] = useState(memberParam);
+    // Contour bref de la ligne visée, allumé quand elle est mesurée
+    const [focusing, setFocusing] = useState(false);
     const [view, setView] = useState<LeagueView>('predictions');
     // La pastille suit `view` (bascule immédiate au tap) ; le sélecteur de
     // contenu (liste des pronos ↔ classement de la ligue) est piloté par la
@@ -114,22 +115,28 @@ export default function MatchScreen() {
     const collapse = useCollapseProgress({ start: 20, distance: 90 });
     // Défilement jusqu'à la ligne du lauréat, une seule fois : sa position se
     // mesure dans la fenêtre, relativement au hero (en haut du contenu)
-    const heroRef = useRef<Animated.View>(null);
-    const focusDone = useRef(false);
+    const heroRef = useRef<RNView>(null);
+    const focusedFor = useRef<string | undefined>(undefined);
     const scrollRef = collapse.scrollRef;
     const focusRow = (row: RNView | null) => {
-        if (!row || focusDone.current) return;
-        focusDone.current = true;
-        heroRef.current?.measureInWindow((_heroX, heroY) => {
-            row.measureInWindow((_x, rowY) => {
-                const target = Math.max(0, rowY - heroY - 24);
-                scheduleOnUI(() => {
-                    'worklet';
-                    scrollTo(scrollRef, 0, target, true);
+        if (!row || !memberParam || focusedFor.current === memberParam) return;
+        focusedFor.current = memberParam;
+        // Données en cache : la ligne se pose pendant l'animation d'entrée de
+        // l'écran, où le défilement est ignoré. ponytail: délai fixe calé sur
+        // la transition native, un listener transitionEnd si ça ne suffit pas
+        setTimeout(() => {
+            heroRef.current?.measureInWindow((_heroX, heroY) => {
+                row.measureInWindow((_x, rowY) => {
+                    const target = Math.max(0, rowY - heroY - 24);
+                    scheduleOnUI(() => {
+                        'worklet';
+                        scrollTo(scrollRef, 0, target, true);
+                    });
                 });
             });
-        });
-        setTimeout(() => setFocusedMember(undefined), 2400);
+            setFocusing(true);
+            setTimeout(() => setFocusing(false), 2400);
+        }, 450);
     };
     const heroStyle = useAnimatedStyle(() => ({
         opacity: 1 - collapse.progress.value * 0.92,
@@ -214,9 +221,12 @@ export default function MatchScreen() {
                 scrollRef={collapse.scrollRef}
                 refreshControl={refreshControl}
                 top="none">
-                <Animated.View ref={heroRef} style={[{ transformOrigin: 'top' }, heroStyle]}>
-                    <MatchHero match={currentMatch} />
-                </Animated.View>
+                {/* Vue hôte : repère mesurable du haut du contenu (focusRow) */}
+                <RNView collapsable={false} ref={heroRef}>
+                    <Animated.View style={[{ transformOrigin: 'top' }, heroStyle]}>
+                        <MatchHero match={currentMatch} />
+                    </Animated.View>
+                </RNView>
 
                 {/* Mon prono, selon la phase */}
                 <View className="gap-3">
@@ -393,7 +403,9 @@ export default function MatchScreen() {
                                             }>
                                             <MemberPredictionRow
                                                 entry={entry}
-                                                highlighted={entry.user_id === focusedMember}
+                                                highlighted={
+                                                    focusing && entry.user_id === memberParam
+                                                }
                                                 isMe={entry.user_id === userId}
                                                 match={currentMatch}
                                                 onOpenReactions={() =>
