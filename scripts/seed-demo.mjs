@@ -640,7 +640,9 @@ console.log(`${termines.length} matchs scorés (barème v${regle.version}).`);
 // 7) Ligues, réactions, notifications
 // ---------------------------------------------------------------------------
 const ligues = {};
-for (const l of LIGUES) {
+// Dates échelonnées dans l'ordre de LIGUES : l'app prend la plus ancienne comme
+// ligue affichée par défaut (Classement, détail d'un match) — la vitrine.
+for (const [i, l] of LIGUES.entries()) {
     const [ligue] = await post(
         'leagues',
         {
@@ -649,7 +651,7 @@ for (const l of LIGUES) {
             color: l.color,
             owner_id: id[l.owner],
             competition_id: C,
-            created_at: '2026-06-27T18:00:00Z',
+            created_at: new Date(Date.UTC(2026, 5, 20 + i, 18)).toISOString(),
         },
         'return=representation',
     );
