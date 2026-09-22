@@ -178,7 +178,18 @@ La sortie Metro reçoit aussi les logs JS, mais `logcat` est le seul à voir le 
 adb shell am start -a android.intent.action.VIEW -d "trycast://league/join"
 ```
 
-Mêmes limites qu'en iOS : pas de pile de navigation derrière l'écran ouvert. Repartir propre :
+⚠️ **Un lien à plusieurs paramètres se passe en UNE chaîne quotée** (vécu le 2026-09-22) :
+`adb shell` recolle ses arguments en une commande pour le shell de l'appareil, où `&` met la suite
+en arrière-plan. `?tab=results&round=3` arrive alors en `?tab=results` — l'écran s'ouvre, le
+paramètre manque, et on croit à un bug de l'app. Quoter pour le shell distant :
+
+```bash
+adb shell "am start -a android.intent.action.VIEW -d 'trycast://league/<id>?tab=results&round=3' com.cohozen.trycast"
+```
+
+Mêmes limites qu'en iOS : pas de pile de navigation derrière l'écran ouvert — le bouton retour
+**sort de l'app** (vers le lanceur, voire une page Google par-dessus, à ne pas toucher). Naviguer
+d'un écran à l'autre par deep link plutôt que par retour. Repartir propre :
 
 ```bash
 adb shell am force-stop com.cohozen.trycast
@@ -202,6 +213,15 @@ adb shell input keyevent 4                         # 4 = bouton retour Android
 
 `input text` n'accepte **ni espaces ni accents** directement : échapper les espaces (`%s`) et éviter
 les accents. Après chaque interaction, vérifier (screenshot ou dump) — ne jamais enchaîner à l'aveugle.
+
+## Données de démonstration
+
+Pour une passe visuelle ou des captures, rejouer d'abord `node --no-warnings scripts/seed-demo.mjs`
+(à la racine) : les matchs fictifs sont calés sur l'heure d'exécution, et le script imprime le deep
+link de chaque cas. Corentin se connecte en `hugo@demo.trycast.local` — un agent ne saisit pas le
+mot de passe. Le rejeu **garde** les comptes (la session reste valide) mais recrée ligues et matchs
+fictifs sous de nouveaux ids : reprendre les liens de la dernière sortie, et s'attendre au récap
+« Depuis ta dernière visite » à l'ouverture suivante (le fermer par « Fermer »).
 
 ## Pièges connus
 

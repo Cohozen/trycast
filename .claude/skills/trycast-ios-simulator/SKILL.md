@@ -82,6 +82,15 @@ axe help <sous-commande>                 # aide détaillée
 
 Après chaque interaction : `sleep 1-2` puis vérifier (screenshot ou describe-ui). Ne jamais enchaîner à l'aveugle.
 
+## Données de démonstration
+
+Pour une passe visuelle ou des captures, rejouer d'abord `node --no-warnings scripts/seed-demo.mjs`
+(à la racine) : les matchs fictifs sont calés sur l'heure d'exécution, et le script imprime le deep
+link de chaque cas. Corentin se connecte en `hugo@demo.trycast.local` — un agent ne saisit pas le
+mot de passe. Le rejeu **garde** les comptes (la session reste valide) mais recrée ligues et matchs
+fictifs sous de nouveaux ids : reprendre les liens de la dernière sortie, et s'attendre au récap
+« Depuis ta dernière visite » à l'ouverture suivante (le fermer par « Fermer »).
+
 ## Pièges connus (vécus)
 
 - **Outil simulateur intégré, limites constatées le 2026-09-19** : son `screenshot` peut
