@@ -1,17 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 /**
- * État local « pronos déjà célébrés » (device-only, pas de sync serveur).
- * `initialized` distingue le tout premier lancement de la feature : on y
- * absorbe l'historique sans rien afficher (anti-rétroactif), sinon un
- * utilisateur existant verrait remonter tous ses anciens gains d'un coup.
+ * État local « pronos déjà célébrés » (device-only, pas de sync serveur), PAR
+ * COMPTE : deux comptes sur un même appareil ne partagent ni leurs matchs
+ * célébrés ni leur initialisation. `initialized` distingue la première visite
+ * d'un compte sur l'appareil : on y absorbe l'historique sans rien afficher
+ * (anti-rétroactif), sinon il verrait remonter tous ses anciens gains d'un coup.
  */
 export type CelebratedState = {
     initialized: boolean;
     matchIds: string[];
 };
 
-const STORAGE_KEY = 'trycast.celebrated-matches';
+// Clé d'avant la séparation par compte (partagée par tous les comptes de
+// l'appareil) : reprise par le premier compte qui ouvre l'app, puis supprimée.
+const LEGACY_KEY = 'trycast.celebrated-matches';
 const EMPTY: CelebratedState = { initialized: false, matchIds: [] };
 
 /** Parse tolérant du blob persisté (repli sur l'état vide si absent/corrompu). */
@@ -46,10 +49,40 @@ export function withCelebrated(state: CelebratedState, matchIds: string[]): Cele
     };
 }
 
-export async function loadCelebratedState(): Promise<CelebratedState> {
-    return parseCelebratedState(await AsyncStorage.getItem(STORAGE_KEY));
+export function celebratedStorageKey(userId: string): string {
+    return `${LEGACY_KEY}.${userId}`;
 }
 
-export async function saveCelebratedState(state: CelebratedState): Promise<void> {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+/**
+ * État d'un compte : le sien s'il existe, sinon la clé héritée (migration :
+ * le cas courant d'un seul compte par appareil ne perd aucun récap en attente),
+ * sinon l'état vide non initialisé.
+ */
+export function resolveCelebratedState(
+    own: string | null,
+    legacy: string | null,
+): { state: CelebratedState; fromLegacy: boolean } {
+    if (own !== null) {
+        return { state: parseCelebratedState(own), fromLegacy: false };
+    }
+    return { state: parseCelebratedState(legacy), fromLegacy: legacy !== null };
+}
+
+export async function loadCelebratedState(userId: string): Promise<CelebratedState> {
+    const [own, legacy] = await Promise.all([
+        AsyncStorage.getItem(celebratedStorageKey(userId)),
+        AsyncStorage.getItem(LEGACY_KEY),
+    ]);
+    const { state, fromLegacy } = resolveCelebratedState(own, legacy);
+    if (fromLegacy) {
+        await saveCelebratedState(userId, state);
+    }
+    if (legacy !== null) {
+        await AsyncStorage.removeItem(LEGACY_KEY);
+    }
+    return state;
+}
+
+export async function saveCelebratedState(userId: string, state: CelebratedState): Promise<void> {
+    await AsyncStorage.setItem(celebratedStorageKey(userId), JSON.stringify(state));
 }

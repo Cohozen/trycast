@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseCelebratedState, withCelebrated } from './celebrated-matches-store';
+import {
+    celebratedStorageKey,
+    parseCelebratedState,
+    resolveCelebratedState,
+    withCelebrated,
+} from './celebrated-matches-store';
 
 describe('parseCelebratedState', () => {
     it('repli sur état vide non initialisé si absent', () => {
@@ -34,6 +39,39 @@ describe('withCelebrated', () => {
         expect(withCelebrated({ initialized: false, matchIds: [] }, [])).toEqual({
             initialized: true,
             matchIds: [],
+        });
+    });
+});
+
+describe('celebratedStorageKey', () => {
+    it('range chaque compte sous sa propre clé', () => {
+        expect(celebratedStorageKey('cohozen')).not.toBe(celebratedStorageKey('hugo'));
+    });
+});
+
+describe('resolveCelebratedState', () => {
+    const cohozen = '{"initialized":true,"matchIds":["rsa-sco"]}';
+
+    it('un compte neuf sur un appareil déjà initialisé repart non initialisé', () => {
+        // Hugo après Cohozen : ni ses gains masqués par la liste de Cohozen, ni
+        // tout son historique d'un coup (absorbé à la première visite)
+        expect(resolveCelebratedState(null, null)).toEqual({
+            state: { initialized: false, matchIds: [] },
+            fromLegacy: false,
+        });
+    });
+
+    it('lit l’état propre au compte, sans toucher à la clé héritée', () => {
+        expect(resolveCelebratedState(cohozen, '{"initialized":true,"matchIds":["x"]}')).toEqual({
+            state: { initialized: true, matchIds: ['rsa-sco'] },
+            fromLegacy: false,
+        });
+    });
+
+    it('reprend la clé héritée quand le compte n’a pas encore la sienne', () => {
+        expect(resolveCelebratedState(null, cohozen)).toEqual({
+            state: { initialized: true, matchIds: ['rsa-sco'] },
+            fromLegacy: true,
         });
     });
 });

@@ -1,6 +1,7 @@
 import { useRootNavigationState } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { useSession } from '@/features/auth/session-context';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
 import { useMatches } from '@/features/matches/use-matches';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
@@ -29,6 +30,8 @@ export type Celebration = {
  * pleine navigation ne fait pas surgir l'overlay — il attend le prochain
  * lancement, ce qui colle à « à la première connexion ». L'état « déjà vu »
  * vit dans une ref (jamais rendu) : dismiss lit/écrit directement le store.
+ * Tout est rangé par compte : `evaluated` retient le compte évalué, pour qu'un
+ * changement de compte relance l'évaluation sur le store du nouveau.
  */
 export function useCelebration(): Celebration {
     const competition = useActiveCompetition();
@@ -36,9 +39,10 @@ export function useCelebration(): Celebration {
     const predictions = useMyPredictions(competitionId);
     const matches = useMatches(competitionId);
     const navigationReady = !!useRootNavigationState()?.key;
+    const userId = useSession().session?.user.id;
 
     const storedRef = useRef<CelebratedState | null>(null);
-    const evaluated = useRef(false);
+    const evaluated = useRef<string | null>(null);
     const [items, setItems] = useState<CelebrationItem[]>([]);
     const [visible, setVisible] = useState(false);
 
@@ -48,17 +52,18 @@ export function useCelebration(): Celebration {
     useEffect(() => {
         if (
             !navigationReady ||
+            !userId ||
             predictionsData === undefined ||
             matchesData === undefined ||
-            evaluated.current
+            evaluated.current === userId
         ) {
             return;
         }
-        evaluated.current = true;
+        evaluated.current = userId;
         let cancelled = false;
 
         void (async () => {
-            const state = await loadCelebratedState();
+            const state = await loadCelebratedState(userId);
             if (cancelled) {
                 return;
             }
@@ -70,13 +75,14 @@ export function useCelebration(): Celebration {
             );
 
             if (!state.initialized) {
-                // Premier lancement : on absorbe l'historique sans rien afficher.
+                // Première visite du compte sur l'appareil : on absorbe
+                // l'historique sans rien afficher.
                 const baseline = withCelebrated(
                     state,
                     pending.map((item) => item.matchId),
                 );
                 storedRef.current = baseline;
-                await saveCelebratedState(baseline);
+                await saveCelebratedState(userId, baseline);
                 return;
             }
             if (pending.length === 0) {
@@ -89,19 +95,22 @@ export function useCelebration(): Celebration {
         return () => {
             cancelled = true;
         };
-    }, [navigationReady, predictionsData, matchesData]);
+    }, [navigationReady, userId, predictionsData, matchesData]);
 
     const totalPoints = useMemo(() => items.reduce((sum, item) => sum + item.points, 0), [items]);
 
     function dismiss() {
         setVisible(false);
+        if (!userId) {
+            return;
+        }
         const base = storedRef.current ?? { initialized: true, matchIds: [] };
         const next = withCelebrated(
             base,
             items.map((item) => item.matchId),
         );
         storedRef.current = next;
-        void saveCelebratedState(next);
+        void saveCelebratedState(userId, next);
     }
 
     return { visible, items, totalPoints, dismiss };
