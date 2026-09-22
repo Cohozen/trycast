@@ -214,6 +214,24 @@ adb shell input keyevent 4                         # 4 = bouton retour Android
 `input text` n'accepte **ni espaces ni accents** directement : échapper les espaces (`%s`) et éviter
 les accents. Après chaque interaction, vérifier (screenshot ou dump) — ne jamais enchaîner à l'aveugle.
 
+## Lire l'état local AsyncStorage
+
+Le backend Android d'AsyncStorage est une base SQLite (`databases/RKStorage`, table
+`catalystLocalStorage`) dans le dossier privé de l'app. Un dev build est `DEBUGGABLE`, donc
+`run-as` y donne accès sans root — copier la base **et son WAL**, sinon les écritures récentes
+manquent, puis l'interroger en local (vécu le 2026-09-22, pour prouver la migration de la clé du
+récap) :
+
+```bash
+adb shell "run-as com.cohozen.trycast cat databases/RKStorage" > <scratchpad>/rk.db
+adb shell "run-as com.cohozen.trycast cat databases/RKStorage-wal" > <scratchpad>/rk.db-wal
+sqlite3 <scratchpad>/rk.db "select key, substr(value,1,80) from catalystLocalStorage where key like 'trycast.%'"
+```
+
+La session Supabase n'y est pas (elle vit dans `expo-secure-store`). Attention : la mise à jour à
+chaud peut avoir déjà exécuté le nouveau code avant la première lecture — pour un avant/après,
+lire la base **avant** d'éditer le code.
+
 ## Données de démonstration
 
 Pour une passe visuelle ou des captures, rejouer d'abord `node --no-warnings scripts/seed-demo.mjs`

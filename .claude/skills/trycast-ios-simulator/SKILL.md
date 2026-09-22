@@ -57,7 +57,7 @@ for r in json.load(sys.stdin): walk(r)
 
 ## Manipuler l'état local AsyncStorage (forcer un état pour tester)
 
-Certaines features dépendent d'un flag device-local (`@react-native-async-storage/async-storage`) qu'on ne peut pas atteindre par l'UI — ex. l'overlay de célébration (`trycast.celebrated-matches`), qui n'apparaît qu'avec un « déjà vu » dans un état précis. On peut **éditer le stockage à la main** pour reproduire le cas (vécu 2026-07-18) :
+Certaines features dépendent d'un flag device-local (`@react-native-async-storage/async-storage`) qu'on ne peut pas atteindre par l'UI — ex. l'overlay de célébration (`trycast.celebrated-matches.<userId>`, **une clé par compte** depuis le 2026-09-22), qui n'apparaît qu'avec un « déjà vu » dans un état précis. On peut **éditer le stockage à la main** pour reproduire le cas (vécu 2026-07-18) :
 
 ```bash
 DATA=$(xcrun simctl get_app_container booted com.cohozen.trycast data)
