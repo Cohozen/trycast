@@ -158,7 +158,7 @@ Ce qu'il faut savoir :
 - **Phase de joker `demo_gap`** : hors de toute phase de nc-2026 (l'intersaison), le script en crée une qui comble le trou entre les deux voisines, et la retire à la purge.
 - **Garde** : il refuse de semer si de vrais matchs de nc-2026 tombent dans la fenêtre fictive (T−2 j..T+9 j) — en novembre, les journées fictives doublonneraient le calendrier réel. Il faudra alors décaler le scénario.
 - Il lève `needs_review` sur les matchs de juillet terminés : sur le dev, la borne de 48 h de `sync-results` les avait marqués avant qu'on complète leurs résultats, et `apply_match_scores` refuse un match en revue.
-- Il remplace `seed-demo-round-highlight.sql`, `seed-screenshot-matches.mjs` et `seed-upcoming-matches.sql`, et purge leurs restes (plages `-701..-706`, `-9001..-9006`, ligues `TRYCAST2`/`DEMERCT2`, comptes `demo*@trycast.fr` du dev). `-601`/`-602` (notifications) ne sont pas touchés.
+- Il remplace `seed-demo-round-highlight.sql`, `seed-screenshot-matches.mjs` et `seed-upcoming-matches.sql`, et purge leurs restes (plages `-701..-706`, `-9001..-9006`, ligues `TRYCAST2`/`DEMERCT2`, comptes `demo*@trycast.fr` du dev). Il retire aussi `-601`/`-602` de `seed-test-notifications.sql`, dont la journée « Test notifications » s'affichait dans la frise des journées : rejouer ce seed juste avant un test de push, puis `seed-demo.mjs` après.
 - Dev uniquement : aucune option ne vise un autre projet.
 
 ---

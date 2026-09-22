@@ -274,11 +274,14 @@ const NIVEAU = {
 const LEGACY_EMAILS = ['demo@trycast.fr', 'demo.pote1@trycast.fr', 'demo.pote2@trycast.fr'];
 const LEGACY_LIGUES = ['TRYCAST2', 'DEMERCT2'];
 // Plages de matchs fictifs : ce script, puis seed-upcoming-matches.sql et
-// seed-screenshot-matches.mjs, qu'il remplace
+// seed-screenshot-matches.mjs, qu'il remplace, et les matchs de
+// seed-test-notifications.sql — leur journée « Test notifications » s'affiche
+// dans la frise des journées. Ce seed se rejoue juste avant un test de push.
 const PLAGES = [
     [-8099, -8001],
     [-706, -701],
     [-9006, -9001],
+    [-602, -601],
 ];
 
 // ---------------------------------------------------------------------------
@@ -335,16 +338,41 @@ const entre = (rnd, min, max) => min + Math.floor(rnd() * (max - min + 1));
 // ---------------------------------------------------------------------------
 // 1) Purge
 // ---------------------------------------------------------------------------
+// Au rejeu, les comptes de démo sont CONSERVÉS et vidés de leurs données : les
+// supprimer changerait leur id et déconnecterait tout appareil ouvert en Hugo.
+// Seul --purge les supprime (la cascade emporte alors le reste).
+const emailDe = (pseudo) => `${pseudo.toLowerCase()}@${DOMAIN}`;
 const { users } = await api('/auth/v1/admin/users?per_page=1000');
-const anciens = users.filter(
-    (u) => u.email?.endsWith(`@${DOMAIN}`) || LEGACY_EMAILS.includes(u.email),
+const gardes = purge ? new Set() : new Set(JOUEURS.map(([p]) => emailDe(p)));
+const aSupprimer = users.filter(
+    (u) =>
+        (u.email?.endsWith(`@${DOMAIN}`) && !gardes.has(u.email)) ||
+        LEGACY_EMAILS.includes(u.email),
 );
-for (const u of anciens) await api(`/auth/v1/admin/users/${u.id}`, { method: 'DELETE' });
+for (const u of aSupprimer) await api(`/auth/v1/admin/users/${u.id}`, { method: 'DELETE' });
+const existants = users.filter((u) => gardes.has(u.email));
+if (existants.length > 0) {
+    const ids = `in.(${existants.map((u) => u.id).join(',')})`;
+    // Ligues possédées d'abord : la cascade emporte adhésions, réactions et notifications de ligue
+    for (const chemin of [
+        `leagues?owner_id=${ids}`,
+        `league_members?user_id=${ids}`,
+        `prediction_reactions?reactor_id=${ids}`,
+        `notification_sends?user_id=${ids}`,
+        `phase_jokers?user_id=${ids}`,
+        `predictions?user_id=${ids}`,
+        `standings?user_id=${ids}`,
+    ]) {
+        await rest(chemin, { method: 'DELETE' });
+    }
+}
 await rest(`leagues?invite_code=in.(${LEGACY_LIGUES.join(',')})`, { method: 'DELETE' });
 const plages = PLAGES.map(([a, b]) => `and(api_game_id.gte.${a},api_game_id.lte.${b})`).join(',');
 await rest(`matches?or=(${plages})`, { method: 'DELETE' });
 await rest('competition_phases?key=eq.demo_gap', { method: 'DELETE' });
-console.log(`Purge : ${anciens.length} compte(s), matchs fictifs et phase demo_gap retirés.`);
+console.log(
+    `Purge : ${aSupprimer.length} compte(s) supprimé(s), ${existants.length} vidé(s), matchs fictifs et phase demo_gap retirés.`,
+);
 if (purge) process.exit(0);
 
 // ---------------------------------------------------------------------------
@@ -400,12 +428,14 @@ if (!dansPhase(new Date(T))) {
 // ---------------------------------------------------------------------------
 // 3) Joueurs
 // ---------------------------------------------------------------------------
-const id = {};
-for (const [pseudo] of JOUEURS) {
+const id = Object.fromEntries(
+    existants.map((u) => [JOUEURS.find(([p]) => emailDe(p) === u.email)[0], u.id]),
+);
+for (const [pseudo] of JOUEURS.filter(([p]) => !id[p])) {
     const u = await api('/auth/v1/admin/users', {
         method: 'POST',
         body: JSON.stringify({
-            email: `${pseudo.toLowerCase()}@${DOMAIN}`,
+            email: emailDe(pseudo),
             password: PASSWORD,
             email_confirm: true,
             user_metadata: { username: pseudo },
@@ -417,7 +447,7 @@ await rest(`profiles?id=in.(${Object.values(id).join(',')})`, {
     method: 'PATCH',
     body: JSON.stringify({ username_chosen: true, locale: 'fr', is_demo: false }),
 });
-console.log(`${JOUEURS.length} joueurs créés (mot de passe ${PASSWORD}).`);
+console.log(`${JOUEURS.length} joueurs prêts (mot de passe ${PASSWORD}).`);
 
 // ---------------------------------------------------------------------------
 // 4) Matchs
