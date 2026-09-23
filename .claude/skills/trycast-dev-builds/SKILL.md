@@ -233,4 +233,4 @@ Le seul point commun à retenir : **ne jamais écrire de `versionCode` / `buildN
 
 ## Réflexe de fin de session
 
-Si la session a ajouté un déclencheur de rebuild (liste ci-dessus) : le rappeler dans le message final + l'inscrire dans les « actions Corentin en attente » du `DASHBOARD.md`.
+Si la session a ajouté un déclencheur de rebuild (liste ci-dessus) : le rappeler dans le message final + l'inscrire dans « Ce qu'il reste à faire » du `DASHBOARD.md`.

@@ -155,4 +155,4 @@ irreproductible, qui ne touche que certains testeurs.
 
 Une release publiée s'inscrit au `DASHBOARD.md` : version, canal, et si l'empreinte a bougé — la
 prochaine session doit savoir si les binaires en circulation peuvent encore recevoir une mise à
-jour. C'est aussi ce qui permet de retrouver, dans six mois, pourquoi une version existe.
+jour. Le pourquoi d'une version, lui, vit dans `CHANGELOG.md` et le tag.

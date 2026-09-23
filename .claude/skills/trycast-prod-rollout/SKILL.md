@@ -15,7 +15,7 @@ procédure et la lui donne ; il n'exécute rien contre la prod. Le `git push` au
 | `trycast-prod` | `bmdzadvugtkclnqjpndr` | vrais comptes, touché par Corentin seulement |
 | dev | `axxutfngespcdiqtrdao` | celui du `.env`, des scripts et des agents |
 
-Source : `DASHBOARD.md` (Lot 9, phase 3 ; le ref prod est l'ancien projet de dev, renommé). Le ref dev
+Source : « Décisions clés » de `DASHBOARD.md` (le ref prod est l'ancien projet de dev, renommé). Le ref dev
 se relit dans `apps/mobile/.env` (`EXPO_PUBLIC_SUPABASE_URL`). **Jamais de ref en dur dans une
 migration ou un script** (règle d'AGENTS.md) : ce tableau ne sert qu'aux commandes données à la main.
 
