@@ -5,25 +5,24 @@ type FormatKickoffOptions = {
     timeZone?: string;
 };
 
-/** Coup d'envoi en date/heure locale, ex. « sam. 8 août, 09:05 ». */
-export function formatKickoff(iso: string, options: FormatKickoffOptions = {}): string {
-    return new Intl.DateTimeFormat(options.locale ?? 'fr-FR', {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-        ...(options.timeZone ? { timeZone: options.timeZone } : {}),
-    }).format(new Date(iso));
-}
-
-/** Heure locale du coup d'envoi, ex. « 09:05 » (bande de jours déjà datée). */
+/**
+ * Heure locale du coup d'envoi : « 9h05 », « 21h45 » en français, l'usage
+ * de la locale ailleurs (« 9:05 AM » en anglais). Intl ne connaît pas le
+ * « h » français : on le reconstruit à partir des parts.
+ */
 export function formatKickoffTime(iso: string, options: FormatKickoffOptions = {}): string {
-    return new Intl.DateTimeFormat(options.locale ?? 'fr-FR', {
-        hour: '2-digit',
+    const locale = options.locale ?? 'fr-FR';
+    const formatter = new Intl.DateTimeFormat(locale, {
+        hour: 'numeric',
         minute: '2-digit',
         ...(options.timeZone ? { timeZone: options.timeZone } : {}),
-    }).format(new Date(iso));
+    });
+    const date = new Date(iso);
+    if (!locale.startsWith('fr')) return formatter.format(date);
+    const parts = formatter.formatToParts(date);
+    const hour = parts.find((part) => part.type === 'hour')?.value ?? '';
+    const minute = parts.find((part) => part.type === 'minute')?.value ?? '';
+    return `${hour}h${minute}`;
 }
 
 /** Clé i18n d'un statut de match, à passer à t() côté écran. */

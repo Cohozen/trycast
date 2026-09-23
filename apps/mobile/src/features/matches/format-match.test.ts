@@ -1,20 +1,29 @@
 import { describe, expect, it } from 'vitest';
-import { formatKickoff, statusLabel } from './format-match';
+import { formatKickoffTime, statusLabel } from './format-match';
 
-describe('formatKickoff', () => {
+describe('formatKickoffTime', () => {
     // timeZone figée : le résultat ne dépend pas de la machine (CI vs local)
-    it('formate le coup d’envoi en date/heure locale française', () => {
-        const label = formatKickoff('2026-08-08T07:05:00+00:00', { timeZone: 'Europe/Paris' });
-        expect(label).toContain('8');
-        expect(label).toContain('août');
-        expect(label).toContain('09:05');
+    it('écrit l’heure à la française, sans zéro devant l’heure', () => {
+        expect(formatKickoffTime('2026-08-08T07:05:00Z', { timeZone: 'Europe/Paris' })).toBe(
+            '9h05',
+        );
+        expect(
+            formatKickoffTime('2026-08-08T19:45:00Z', { locale: 'fr', timeZone: 'Europe/Paris' }),
+        ).toBe('21h45');
+    });
+
+    it('garde AM/PM en anglais', () => {
+        const label = formatKickoffTime('2026-08-08T19:45:00Z', {
+            locale: 'en',
+            timeZone: 'Europe/Paris',
+        });
+        expect(label).toMatch(/^9:45\sPM$/);
     });
 
     it('respecte le fuseau demandé', () => {
-        const paris = formatKickoff('2026-08-08T07:05:00Z', { timeZone: 'Europe/Paris' });
-        const sydney = formatKickoff('2026-08-08T07:05:00Z', { timeZone: 'Australia/Sydney' });
-        expect(paris).toContain('09:05');
-        expect(sydney).toContain('17:05');
+        expect(formatKickoffTime('2026-08-08T07:05:00Z', { timeZone: 'Australia/Sydney' })).toBe(
+            '17h05',
+        );
     });
 });
 

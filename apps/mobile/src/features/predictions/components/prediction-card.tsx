@@ -9,7 +9,7 @@ import { toJokerMessageKey } from '@/features/jokers/errors';
 import type { JokerCardState } from '@/features/jokers/types';
 import { useToggleJoker } from '@/features/jokers/use-toggle-joker';
 import { TeamFlag } from '@/features/matches/components/team-flag';
-import { formatKickoff, teamName } from '@/features/matches/format-match';
+import { formatKickoffTime, teamName } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
 import { BonusToggle } from '@/features/predictions/components/bonus-toggle';
 import { CommunityDistribution } from '@/features/predictions/components/community-distribution';
@@ -226,7 +226,9 @@ export function PredictionCard({
             {/* Coup d'envoi + ×2 + statut */}
             <View className="flex-row items-center justify-between gap-2">
                 <Text className="font-body-semibold text-[11px] uppercase tracking-[0.77px] text-text-faint">
-                    {formatKickoff(match.kickoff_at, { locale: i18n.language })}
+                    {t('matches:kickoffAt', {
+                        time: formatKickoffTime(match.kickoff_at, { locale: i18n.language }),
+                    })}
                 </Text>
                 <View className="flex-row items-center gap-1.5">
                     {joker ? (
