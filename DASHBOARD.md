@@ -4,9 +4,8 @@
 > Mis à jour à la fin de chaque lot. **Pas de journal** : l'historique se lit dans `git log`
 > (et l'ancien journal des sessions par `git show 8418902:DASHBOARD.md`).
 >
-> État au **2026-09-23** : `main` en avance sur `origin/main` (sous-agents, priorité d'`AGENTS.md`
-> sur les plugins, retours front du DS du 2026-09-23 et leurs retouches), **à pousser**. Serveur de la v1.1.0 en prod
-> sauf le **coup de la journée** et le **rang d'avant journée** (procédure prête ci-dessous) ; l'app
+> État au **2026-09-23** : `main` poussé, à jour avec `origin/main`. Serveur de la v1.1.0 **entièrement
+> en prod** (coup de la journée et rang d'avant journée compris, passés le 2026-09-23) ; l'app
 > suivra avec le build 1.1.0.
 
 ## Avancement des lots
@@ -30,10 +29,10 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
 - ✅ **Réactions emoji** — serveur en prod. Pictos maison animés plus tard (sans migration) ;
   notifications de réaction reportées au lancement public.
 - ✅ **DS du 2026-09-21** — headers repliables, phases finales dans la bande des journées, etc. Migration en prod.
-- ✅ **Coup de la journée** — livré sur le dev, **prod à faire** (ci-dessous).
+- ✅ **Coup de la journée** — serveur en prod (2026-09-23).
 - ✅ **DS du 2026-09-23** — carte « Tes points » de l'accueil (tendance de rang par journée),
-  points provisoires en live dans le détail de match, heure du coup d'envoi « 21h45 ». Migration
-  `get_my_previous_rank` livrée sur le dev, **prod à faire** (ci-dessous).
+  points provisoires en live dans le détail de match, heure du coup d'envoi « 21h45 », profil
+  public en barre native. Migration `get_my_previous_rank` en prod (2026-09-23).
 - ✅ **Signaler un problème** (Sentry User Feedback) — reste à vérifier la réception dans Sentry et brancher l'alerte e-mail.
 - A priori aucune lib native ; le build est de toute façon imposé par le SDK 57.
 - **Version 1.1.0** → `npm run release -- --minor`. ⚠️ Calendrier serré, préparation du compte Apple comprise.
@@ -63,22 +62,12 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
 
 ## Ce qu'il reste à faire
 
-### 🔜 Coup de la journée et rang d'avant journée — passage en prod (préparé le 2026-09-23)
-Deux migrations, sans secret Vault ni seed : `20260922000100_round_highlights.sql` et
-`20260923000100_my_previous_rank.sql`, plus l'EF `notify`. La seconde n'ajoute qu'une RPC en
-lecture ; tant qu'elle manque, la carte « Tes points » du build 1.1.0 affiche « À X pts du Nᵉ »
-au lieu des places gagnées ou perdues.
-⚠️ **Ordre imposé** : la migration change la clé d'unicité de `notification_sends`, et la `notify`
-en place passe encore l'ancien `onConflict`. Déployer `notify` **juste après** le push, entre deux
-ticks (le cron tourne à xx:03, xx:13…) ; un tick entre les deux échoue au claim sans rien envoyer
-et se rattrape au suivant. La notification part dès la mise en prod ; son lien n'ouvre la journée
-qu'avec le build 1.1.0 (l'ancienne app l'ignore sans planter).
-1. `supabase link --project-ref bmdzadvugtkclnqjpndr`
-2. `supabase db push --dry-run` → **exactement** `20260922000100_round_highlights.sql` et `20260923000100_my_previous_rank.sql`
-3. `supabase db push`
-4. `supabase functions deploy notify --project-ref bmdzadvugtkclnqjpndr`
-5. `supabase link --project-ref axxutfngespcdiqtrdao` puis `cat supabase/.temp/project-ref`
-6. Contrôle prod : `select status_code, content from net._http_response order by created desc limit 3` après le tick suivant (attendu : 200, `skipped` ou `success`), et `select count(*) from pg_proc where proname = 'get_my_previous_rank'` (attendu : 1).
+### 🔎 Contrôle après le passage en prod du 2026-09-23
+Migrations `20260922000100_round_highlights.sql` et `20260923000100_my_previous_rank.sql` en prod.
+Confirmer que l'EF `notify` a bien été redéployée juste après (la clé d'unicité de
+`notification_sends` a changé) : dans le SQL editor prod,
+`select status_code, content from net._http_response order by created desc limit 3` doit montrer
+des 200 (`skipped` ou `success`) après un tick, pas d'erreur 42P10.
 
 ### 🔶 Beta fermée (Lot 9, phase 7)
 - **Recruter 12 testeurs** qui restent inscrits 14 jours. ⚠️ La waitlist est **vide** : lui envoyer du trafic bien avant novembre.
