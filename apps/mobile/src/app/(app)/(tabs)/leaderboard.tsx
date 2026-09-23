@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ChevronRight, Globe, Users } from 'lucide-react-native';
 import { useDeferredValue, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,6 +47,19 @@ export default function LeaderboardScreen() {
     const openPlayerProfile = useOpenPlayerProfile(userId);
 
     const [scope, setScope] = useState<Scope>('leagues');
+    // `scope` en paramètre (carte « Tes points » → Général). L'onglet reste
+    // monté : la demande s'applique au rendu (une fois par arrivée du
+    // paramètre), puis l'effet l'efface pour qu'un nouveau passage par le
+    // même lien rebascule même après un retour sur Ligues.
+    const { scope: requestedScope } = useLocalSearchParams<{ scope?: Scope }>();
+    const [appliedScope, setAppliedScope] = useState<Scope | undefined>(undefined);
+    if (requestedScope !== appliedScope) {
+        setAppliedScope(requestedScope);
+        if (requestedScope === 'global' || requestedScope === 'leagues') setScope(requestedScope);
+    }
+    useEffect(() => {
+        if (requestedScope) router.setParams({ scope: undefined });
+    }, [requestedScope, router]);
     const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(null);
     const [limit, setLimit] = useState(PAGE_SIZE);
     const textMuted = useThemeColor('text-muted');

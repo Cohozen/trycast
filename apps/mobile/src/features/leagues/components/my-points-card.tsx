@@ -158,7 +158,9 @@ export function MyPointsCard({
                     accessibilityRole="button"
                     className="ml-auto flex-row items-center gap-0.5"
                     hitSlop={8}
-                    onPress={() => router.push('/leaderboard')}>
+                    onPress={() =>
+                        router.push({ pathname: '/leaderboard', params: { scope: 'global' } })
+                    }>
                     <Text className="font-body-bold text-[12px] text-sand-050">
                         {t('predictions:dashboard.leaderboard')}
                     </Text>
