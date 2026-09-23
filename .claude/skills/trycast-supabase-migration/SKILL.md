@@ -1,6 +1,6 @@
 ---
 name: trycast-supabase-migration
-description: Faire évoluer le schéma Supabase de TryCast — écrire une migration SQL (tables, RLS, RPC security definer, grants), db push, régénérer les types, et vérifier en E2E. À utiliser dès qu'on touche à supabase/migrations/, une policy RLS, une RPC/fonction SQL, ou qu'on doit relancer typegen / un script e2e.
+description: Faire évoluer le schéma Supabase de TryCast — écrire une migration SQL (tables, RLS, RPC security definer, grants), db push, régénérer les types, et vérifier en E2E. À utiliser dès qu'on touche à supabase/migrations/, une policy RLS, une RPC/fonction SQL, ou qu'on doit relancer typegen / un script e2e. Couvre aussi l'import des essais (EF sync-tries, Wikipedia, saisie admin) et le piège des content_path de config.toml.
 ---
 
 # TryCast — migration Supabase & RLS
@@ -84,3 +84,26 @@ Dans `supabase/functions/`, déploiement `supabase functions deploy <name>`.
 ⚠️ **Toute EF appelée par pg_cron doit être déclarée `verify_jwt = false` dans `supabase/config.toml`** (bloc `[functions.<name>]`) **avant son premier deploy**. Par défaut la passerelle exige un JWT dans `Authorization` — or le cron n'envoie que le header `x-sync-secret` → chaque tick prend un 401 `UNAUTHORIZED_NO_AUTH_HEADER` **avant** d'atteindre le code de la fonction (vécu au Lot 6 sur `notify`, 2026-07-11 ; la protection réelle est le secret partagé vérifié dans la fonction). Diagnostic : `select status_code, content from net._http_response order by created desc` — c'est là que pg_net loge les réponses des ticks. Un deploy parti sans le bloc se corrige par un simple redeploy après ajout du bloc.
 
 Ordre de mise en route d'une EF cron (en-têtes des migrations `20260707000300`/`20260711000300`) : `supabase secrets set <NAME>_SECRET` → bloc config.toml → `supabase functions deploy <name>` → `vault.create_secret` (même valeur) → `supabase db push` de la migration cron (jamais avant le deploy : 404 au premier tick). Les commandes `secrets set`/`functions deploy` sont bloquées par le classifieur en mode auto → les préparer et les faire exécuter par Corentin.
+
+## Essais : import Wikipedia, saisie admin en repli
+
+Aucun fournisseur ne publie les essais. Le cron `sync-tries-30min` (EF `sync-tries`) lit les
+encadrés `{{rugbybox}}` des pages listées dans `competitions.wikipedia_pages` et **n'écrit que si
+le décompte reconstitue le score Highlightly** — ne jamais assouplir ce contrôle, c'est lui qui
+rend une source tenue par des bénévoles exploitable. Écriture par la même RPC que la saisie
+manuelle.
+
+- Une nouvelle compétition passe d'abord par le mode `audit` de l'EF (le format des pages varie :
+  la RWC 2023 n'a pas de `{{rugbybox}}`).
+- Scraper L'Équipe/Flashscore a été écarté (CGU, droit des bases de données) — ne pas le reproposer.
+- Repli : vue `admin_matches_pending_tries` pour voir ce qui reste à faire et RPC
+  `admin_set_match_tries(api_game_id, domicile, extérieur)` pour saisir — réservées à
+  `service_role`, depuis le SQL editor Supabase (`scripts/admin-set-tries.sql`, dont la requête des
+  rejets de l'import).
+
+## Piège `db push` : les `content_path` de `config.toml`
+
+Dans `supabase/config.toml`, les `content_path` de `[auth.email.template.*]` sont relatifs à la
+**racine du projet** (`./supabase/templates/…`) alors que ceux de `[auth.email.notification.*]` le
+sont au **dossier `supabase/`** (`./templates/…`). Aligner les deux blocs sur la même forme fait
+échouer `supabase db push` à la validation de la config, avant toute écriture.

@@ -156,3 +156,25 @@ irreproductible, qui ne touche que certains testeurs.
 Une release publiée s'inscrit au `DASHBOARD.md` : version, canal, et si l'empreinte a bougé — la
 prochaine session doit savoir si les binaires en circulation peuvent encore recevoir une mise à
 jour. Le pourquoi d'une version, lui, vit dans `CHANGELOG.md` et le tag.
+
+## Profils EAS, environnements et canaux
+
+| Profil | Sortie | Projet Supabase | Canal OTA |
+|---|---|---|---|
+| `development` | APK dev client | bundle servi par Metro, donc `.env` local | — |
+| `preview` | release | **dev** | `preview` |
+| `production` | **AAB** pour la Play Console | **prod** | `production` |
+
+Commandes : `npm run build:dev|build:preview|build:prod`, `npm run env:preview|env:prod`, depuis
+`apps/mobile`. ⚠️ Un build `preview`/`production` inline les `EXPO_PUBLIC_*` au bundling **sur les
+serveurs EAS** : une variable absente disparaît en silence (piège détaillé dans
+`trycast-dev-builds`) — `npm run env:prod` avant de lancer.
+
+Réglages affiche `nativeApplicationVersion (nativeBuildVersion)` et, dessous, le **canal** et
+l'identifiant court de la mise à jour chargée : c'est la seule façon de savoir quel JS tourne chez
+un testeur, le numéro de build ne bougeant pas d'une OTA à l'autre.
+
+**Comptes de démonstration des stores** : `scripts/seed-demo-account.mjs` (mot de passe en
+argument, jamais dans le dépôt ; `--project` exigé pour viser la prod). Ils portent
+`profiles.is_demo`, qui les **exclut du classement général** tout en les classant dans leur ligue
+— la colonne n'a aucun `grant`, personne ne peut se marquer soi-même.
