@@ -216,6 +216,15 @@ export default function MatchScreen() {
                 options={{
                     headerTitleAlign: 'center',
                     headerRight: () => <MatchStatusChip match={currentMatch} />,
+                    // iOS 26 enveloppe headerRight d'une capsule en verre : le chip
+                    // porte déjà son fond, on masque celui du système
+                    unstable_headerRightItems: () => [
+                        {
+                            type: 'custom',
+                            element: <MatchStatusChip match={currentMatch} />,
+                            hidesSharedBackground: true,
+                        },
+                    ],
                     headerTitle: () => (
                         <CollapsingHeaderTitle
                             compact={<CompactScore match={currentMatch} />}
