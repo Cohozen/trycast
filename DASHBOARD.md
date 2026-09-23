@@ -5,9 +5,9 @@
 > (et l'ancien journal des sessions par `git show 8418902:DASHBOARD.md`).
 >
 > État au **2026-09-23** : serveur de la v1.1.0 **entièrement en prod** (coup de la journée et rang
-> d'avant journée compris). **Release 1.1.0 préparée** (commit `chore(release): 1.1.0`, tag `v1.1.0`) :
-> reste `git push --follow-tags` puis `npm run build:prod`. L'empreinte a changé : le build 5 (1.0.0)
-> en circulation ne recevra plus aucune OTA, seul le build 1.1.0 les recevra.
+> d'avant journée compris). **Release 1.1.0 publiée** (tag `v1.1.0`, GitHub Release) et
+> **build de production 7** terminé (canal `production`, empreinte `cd8204a1`, identique à `main`) :
+> reste à le téléverser sur la Play Console. Le build 5 (1.0.0) ne reçoit plus aucune OTA.
 
 ## Avancement des lots
 
@@ -36,7 +36,7 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
   public en barre native. Migration `get_my_previous_rank` en prod (2026-09-23).
 - ✅ **Signaler un problème** (Sentry User Feedback) — reste à vérifier la réception dans Sentry et brancher l'alerte e-mail.
 - A priori aucune lib native ; le build est de toute façon imposé par le SDK 57.
-- **Version 1.1.0** → `npm run release -- --minor`. ⚠️ Calendrier serré, préparation du compte Apple comprise.
+- ✅ **Version 1.1.0** — taguée et buildée le 2026-09-23 (build 7). Reste la Play Console ; préparation du compte Apple à suivre.
 
 ### Lancement public — 6 Nations 2027 (février)
 - **Pronos de tournoi** avant le premier match : vainqueur, Grand Chelem, cuillère de bois, résolus
@@ -65,8 +65,9 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
 
 ### 🔶 Beta fermée (Lot 9, phase 7)
 - **Recruter 12 testeurs** qui restent inscrits 14 jours. ⚠️ La waitlist est **vide** : lui envoyer du trafic bien avant novembre.
-- **Build de production 1.1.0** : aucune OTA d'ici là (le build en circulation, version code 5,
-  ne partage plus l'empreinte de `main`). Comparer l'empreinte avant toute publication (skill `trycast-release`).
+- **Build 1.1.0 (version code 7) sur la Play Console** : le téléverser en test, et coller le champ
+  « Nouveautés » depuis la section 1.1.0 du `CHANGELOG` (moins de 500 caractères). Les OTA sur le canal
+  `production` atteindront ce build tant que l'empreinte de `main` reste `cd8204a1` (skill `trycast-release`).
 - `SENTRY_AUTH_TOKEN` en secret EAS — un **jeton d'organisation**, pas personnel. Sans lui, pas de
   source maps : plantages en JS minifié.
 - `submit.production.android` d'`eas.json` attend le compte de service Google Play.
