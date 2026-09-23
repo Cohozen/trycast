@@ -19,12 +19,12 @@ type LockedPredictionCardProps = {
 };
 
 /**
- * Carte « Prono verrouillé » de la page de détail (maquette Match Detail,
- * états live/verrouillé) : score courant en lecture seule, rappel du prono
- * et points potentiels. PredictionCard n'est pas réutilisable ici — tout son
- * corps est construit autour de la saisie (états locaux, debounce, inputs).
- * Pas de projection contre le score live (décision live-match-card) : le
- * badge affiche les points potentiels pondérés par la cote.
+ * Carte « Prono verrouillé » de la page de détail : coup d'envoi passé sans
+ * score live encore reçu (lag de sync), ou match reporté/annulé. Score en
+ * lecture seule, rappel du prono et points potentiels pondérés par la cote.
+ * En live, c'est PointsEarnedCard (points provisoires) qui prend le relais.
+ * PredictionCard n'est pas réutilisable ici — tout son corps est construit
+ * autour de la saisie (états locaux, debounce, inputs).
  */
 export function LockedPredictionCard({
     match,
