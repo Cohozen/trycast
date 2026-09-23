@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { findCompetitionStage } from '@/features/leagues/round-strip-items';
 import type { StageKind } from '@/features/leagues/types';
 import { useCompetitionStages } from '@/features/leagues/use-competition-stages';
-import { MatchStatusChip } from '@/features/matches/components/match-status-chip';
 import { TeamFlag } from '@/features/matches/components/team-flag';
 import { formatKickoffTime, teamName } from '@/features/matches/format-match';
+import { livePeriodKey } from '@/features/matches/live-period';
 import type { MatchDetail, TeamRow } from '@/features/matches/types';
 import { winnerPointsByOutcome } from '@/features/scoring/potential-by-outcome';
 import type { MatchOutcome } from '@/features/scoring/types';
@@ -62,7 +62,7 @@ function TeamColumn({
 
 /**
  * Hero de la page de détail (maquette Match Detail, sans la timeline) :
- * équipes, gros score (live ou final) ou coup d'envoi, chip statut, ligne
+ * équipes, gros score (live ou final) ou coup d'envoi, ligne
  * compétition + journée et points potentiels 1/N/2. Ne lit que des colonnes déjà en
  * base — le score live vient des colonnes live_* écrites par l'EF sync-live.
  */
@@ -72,6 +72,7 @@ export function MatchHero({ match }: MatchHeroProps) {
     const stage = findCompetitionStage(stages.data ?? [], match.kickoff_at);
 
     const isLive = match.status === 'in_play';
+    const periodKey = isLive ? livePeriodKey(match.live_period) : null;
     const finalScore =
         match.status === 'finished' && match.home_score !== null && match.away_score !== null;
     const showScore = isLive || finalScore;
@@ -131,8 +132,6 @@ export function MatchHero({ match }: MatchHeroProps) {
     // compacte (CompactScore) prend place dans la barre native.
     return (
         <View className="gap-3 pb-1">
-            <MatchStatusChip match={match} />
-
             <View className="flex-row items-start gap-1.5">
                 <TeamColumn
                     muted={homeWins === false}
@@ -141,16 +140,24 @@ export function MatchHero({ match }: MatchHeroProps) {
                 />
                 <View className="items-center px-1 pt-2">
                     {showScore ? (
-                        <View className="flex-row items-baseline gap-2">
-                            <Text className="font-display text-[46px] leading-[47px] text-text">
-                                {home ?? '–'}
-                            </Text>
-                            <Text className="font-display text-[28px] leading-[47px] text-text-faint">
-                                –
-                            </Text>
-                            <Text className="font-display text-[46px] leading-[47px] text-text">
-                                {away ?? '–'}
-                            </Text>
+                        <View className="items-center gap-1">
+                            <View className="flex-row items-baseline gap-2">
+                                <Text className="font-display text-[46px] leading-[47px] text-text">
+                                    {home ?? '–'}
+                                </Text>
+                                <Text className="font-display text-[46px] leading-[47px] text-text">
+                                    –
+                                </Text>
+                                <Text className="font-display text-[46px] leading-[47px] text-text">
+                                    {away ?? '–'}
+                                </Text>
+                            </View>
+                            {/* Période du direct : le chip de la barre ne dit que « En direct » */}
+                            {periodKey ? (
+                                <Text className="font-body text-[12px] text-text-muted">
+                                    {t(periodKey)}
+                                </Text>
+                            ) : null}
                         </View>
                     ) : (
                         <View className="items-center gap-0.5">

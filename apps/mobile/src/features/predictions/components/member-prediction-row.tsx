@@ -37,9 +37,8 @@ type MemberPredictionRowProps = {
     onOpenReactions?: () => void;
 };
 
-// Le popover s'aligne sur la fin de l'avatar (padding de ligne + avatar sm),
-// les puces sur le début du pseudo (+ la gouttière gap-3, 10,5 px en natif).
-const POPOVER_OFFSET_X = 44;
+// Le popover s'aligne sur la fin de l'avatar (padding de ligne 14 + avatar md 40).
+const POPOVER_OFFSET_X = 54;
 
 /**
  * Ligne d'un membre de la ligue sur la page de détail (vue Pronos, après
@@ -97,83 +96,89 @@ export function MemberPredictionRow({
         <RNView collapsable={false} ref={rowRef}>
             <View
                 className={cn(
-                    'gap-[7px] rounded-md border bg-surface px-3.5 py-2.5',
+                    'flex-row items-center gap-3 rounded-md border bg-surface px-3.5 py-2.5',
                     isMe ? 'border-accent/40 bg-accent/10' : 'border-border',
                     highlighted && 'border-accent',
                 )}>
-                <View className="flex-row items-center gap-3">
-                    <Avatar name={entry.username} ring={isMe} size="sm" uri={entry.avatar_url} />
-                    <View className="min-w-0 flex-1 gap-1">
-                        <Text
-                            className={cn(
-                                'text-[14px]',
-                                isMe ? 'font-body-bold text-text' : 'font-body-semibold text-text',
-                            )}
-                            numberOfLines={1}>
-                            {entry.username}
-                        </Text>
-                        {exact ? (
-                            <View className="self-start rounded-pill bg-accent/15 px-2 py-px">
-                                <Text className="font-body-bold text-[10px] text-accent">
-                                    {t('predictions:verdict.exact')}
+                {/* Avatar centré sur toute la hauteur, barre de réaction comprise
+                    (maquette Reactions, DS 2026-09-23) */}
+                <Avatar name={entry.username} ring={isMe} size="md" uri={entry.avatar_url} />
+                <View className="min-w-0 flex-1 gap-[7px]">
+                    <View className="flex-row items-center gap-3">
+                        <View className="min-w-0 flex-1 gap-1">
+                            <Text
+                                className={cn(
+                                    'text-[14px]',
+                                    isMe
+                                        ? 'font-body-bold text-text'
+                                        : 'font-body-semibold text-text',
+                                )}
+                                numberOfLines={1}>
+                                {entry.username}
+                            </Text>
+                            {exact ? (
+                                <View className="self-start rounded-pill bg-accent/15 px-2 py-px">
+                                    <Text className="font-body-bold text-[10px] text-accent">
+                                        {t('predictions:verdict.exact')}
+                                    </Text>
+                                </View>
+                            ) : null}
+                        </View>
+                        {entry.is_joker ? <JokerBadge /> : null}
+                        <View className="rounded-pill bg-surface-sunken px-2.5 py-0.5">
+                            <Text className="font-body-bold text-[13px] text-text-muted">
+                                {hasPrediction
+                                    ? `${entry.predicted_home_score} – ${entry.predicted_away_score}`
+                                    : '—'}
+                            </Text>
+                        </View>
+                        {scored ? (
+                            <View className="min-w-[46px] flex-row items-baseline justify-end gap-0.5">
+                                <Text
+                                    className={cn(
+                                        'font-display text-[20px] leading-[21px]',
+                                        (entry.points_awarded ?? 0) > 0
+                                            ? 'text-accent'
+                                            : 'text-text-faint',
+                                    )}>
+                                    +{entry.points_awarded}
+                                </Text>
+                                <Text
+                                    className={cn(
+                                        'font-body-bold text-[10px]',
+                                        (entry.points_awarded ?? 0) > 0
+                                            ? 'text-accent'
+                                            : 'text-text-faint',
+                                    )}>
+                                    pts
                                 </Text>
                             </View>
                         ) : null}
                     </View>
-                    {entry.is_joker ? <JokerBadge /> : null}
-                    <View className="rounded-pill bg-surface-sunken px-2.5 py-0.5">
-                        <Text className="font-body-bold text-[13px] text-text-muted">
-                            {hasPrediction
-                                ? `${entry.predicted_home_score} – ${entry.predicted_away_score}`
-                                : '—'}
-                        </Text>
-                    </View>
-                    {scored ? (
-                        <View className="min-w-[46px] flex-row items-baseline justify-end gap-0.5">
-                            <Text
-                                className={cn(
-                                    'font-display text-[20px] leading-[21px]',
-                                    (entry.points_awarded ?? 0) > 0
-                                        ? 'text-accent'
-                                        : 'text-text-faint',
-                                )}>
-                                +{entry.points_awarded}
-                            </Text>
-                            <Text
-                                className={cn(
-                                    'font-body-bold text-[10px]',
-                                    (entry.points_awarded ?? 0) > 0
-                                        ? 'text-accent'
-                                        : 'text-text-faint',
-                                )}>
-                                pts
-                            </Text>
+                    {/* Barre de réaction : mon bouton à gauche, le résumé à droite
+                    (maquette « TryCast Reactions »). Absente quand il n'y a ni
+                    l'un ni l'autre — ma ligne garde le résumé, sans bouton. */}
+                    {canReact || (chips.length > 0 && onOpenReactions) ? (
+                        <View className="min-h-8 flex-row items-center gap-2.5">
+                            {canReact ? (
+                                <ReactionTrigger
+                                    myReaction={myReaction}
+                                    onPress={openPicker}
+                                    open={anchor !== null}
+                                    username={entry.username}
+                                />
+                            ) : null}
+                            <View className="flex-1" />
+                            {chips.length > 0 && onOpenReactions ? (
+                                <ReactionSummary
+                                    chips={chips}
+                                    onPress={onOpenReactions}
+                                    username={entry.username}
+                                />
+                            ) : null}
                         </View>
                     ) : null}
                 </View>
-                {/* Barre de réaction : mon bouton à gauche, le résumé à droite
-                    (maquette « TryCast Reactions »). Absente quand il n'y a ni
-                    l'un ni l'autre — ma ligne garde le résumé, sans bouton. */}
-                {canReact || (chips.length > 0 && onOpenReactions) ? (
-                    <View className="min-h-8 flex-row items-center gap-2.5 pl-[42px]">
-                        {canReact ? (
-                            <ReactionTrigger
-                                myReaction={myReaction}
-                                onPress={openPicker}
-                                open={anchor !== null}
-                                username={entry.username}
-                            />
-                        ) : null}
-                        <View className="flex-1" />
-                        {chips.length > 0 && onOpenReactions ? (
-                            <ReactionSummary
-                                chips={chips}
-                                onPress={onOpenReactions}
-                                username={entry.username}
-                            />
-                        ) : null}
-                    </View>
-                ) : null}
             </View>
         </RNView>
     );

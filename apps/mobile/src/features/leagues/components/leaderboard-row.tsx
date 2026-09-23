@@ -1,8 +1,9 @@
+import { Target } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Avatar } from '@/components/ui/avatar';
 import type { LeaderboardEntry } from '@/features/leagues/types';
-import { Pressable, Text, View } from '@/tw';
+import { Pressable, Text, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
 type LeaderboardRowProps = {
@@ -25,14 +26,7 @@ type LeaderboardRowProps = {
  */
 export function LeaderboardRow({ entry, isMe, tie = false, onPress }: LeaderboardRowProps) {
     const { t } = useTranslation(['leagues']);
-    const sub = [
-        t('leagues:leaderboard.row.predictions', { count: entry.predictions_scored }),
-        entry.exact_scores > 0
-            ? t('leagues:leaderboard.row.exacts', { count: entry.exact_scores })
-            : null,
-    ]
-        .filter(Boolean)
-        .join(' · ');
+    const accentColor = useThemeColor('accent');
 
     const content = (
         <View
@@ -55,7 +49,7 @@ export function LeaderboardRow({ entry, isMe, tie = false, onPress }: Leaderboar
                 ) : null}
             </View>
             <Avatar name={entry.username} ring={isMe} size="sm" uri={entry.avatar_url} />
-            <View className="min-w-0 flex-1 gap-px">
+            <View className="min-w-0 flex-1 gap-0.75">
                 <Text
                     className={cn(
                         'text-[15px]',
@@ -64,7 +58,25 @@ export function LeaderboardRow({ entry, isMe, tie = false, onPress }: Leaderboar
                     numberOfLines={1}>
                     {entry.username}
                 </Text>
-                <Text className="font-body text-[12px] text-text-faint">{sub}</Text>
+                {/* Scores exacts en pastille cible (maquettes Classement et
+                    Match Detail) : c'est le premier départage à égalité */}
+                <View className="flex-row flex-wrap items-center gap-1.75">
+                    <Text className="font-body-semibold text-[11px] text-text-faint">
+                        {t('leagues:leaderboard.row.predictions', {
+                            count: entry.predictions_scored,
+                        })}
+                    </Text>
+                    {entry.exact_scores > 0 ? (
+                        <View className="flex-row items-center gap-0.75 rounded-pill bg-accent/12 py-px pl-1.25 pr-1.75">
+                            <Target color={accentColor} size={10} strokeWidth={2.4} />
+                            <Text className="font-body-bold text-[10px] text-accent">
+                                {t('leagues:leaderboard.row.exacts', {
+                                    count: entry.exact_scores,
+                                })}
+                            </Text>
+                        </View>
+                    ) : null}
+                </View>
             </View>
             <View className="flex-row items-baseline gap-1">
                 <Text className="font-display text-[20px] leading-[21px] text-text">

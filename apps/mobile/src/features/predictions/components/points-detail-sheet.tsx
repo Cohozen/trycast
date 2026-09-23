@@ -2,14 +2,14 @@ import { useRouter } from 'expo-router';
 import { CircleHelp } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Badge } from '@/components/ui/badge';
 import { BottomSheet } from '@/components/ui/bottom-sheet';
 import { Button } from '@/components/ui/button';
 import { teamName } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
 import type { PredictionRow } from '@/features/predictions/types';
+import { buildBreakdownRows } from '@/features/predictions/breakdown-rows';
+import { BreakdownRowItem } from '@/features/predictions/components/breakdown-row-item';
 import { parseBreakdown, verdictOf } from '@/features/predictions/verdict';
-import type { OffensiveSideBreakdown } from '@/features/scoring/types';
 import { useActiveScoringRules } from '@/features/scoring/use-active-scoring-rules';
 import { winnerPointsByOutcome } from '@/features/scoring/potential-by-outcome';
 import { i18n } from '@/lib/i18n';
@@ -23,15 +23,6 @@ type PointsDetailSheetProps = {
     prediction: PredictionRow;
     visible: boolean;
     onClose: () => void;
-};
-
-type Row = {
-    key: string;
-    label: string;
-    mark: 'ok' | 'ko' | 'info' | 'malus' | 'joker';
-    points: number | null;
-    /** Badge optionnel affiché après le libellé (ex. bonus défensif). */
-    badge?: string;
 };
 
 /**
@@ -65,115 +56,16 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
         { key: 'N', outcome: 'draw' },
         { key: '2', outcome: 'away' },
     ];
-    const winnerCode =
-        breakdown.predictedOutcome === 'home'
-            ? (match.home_team?.code ?? match.home_team?.name ?? '?')
-            : (match.away_team?.code ?? match.away_team?.name ?? '?');
-
-    // La cote utilisée est portée par la ligne vainqueur (c'est elle qui
-    // explique le nombre de points) — pas de ligne « pondération » séparée.
-    const oddsLabel = oddsFormatter.format(breakdown.oddsUsed);
-    const rows: Row[] = [
-        {
-            key: 'winner',
-            label:
-                breakdown.predictedOutcome === 'draw'
-                    ? t('predictions:breakdown.winnerDraw', { odds: oddsLabel })
-                    : t('predictions:breakdown.winner', {
-                          code: winnerCode,
-                          odds: oddsLabel,
-                      }),
-            mark: breakdown.winnerCorrect ? 'ok' : 'ko',
-            points: breakdown.winnerPoints,
-        },
-        {
-            key: 'exact',
-            label: t('predictions:breakdown.exactScore'),
-            mark: breakdown.exactScorePoints > 0 ? 'ok' : 'ko',
-            points: breakdown.exactScorePoints,
-        },
-    ];
-    if (breakdown.gapPoints > 0) {
-        rows.push({
-            key: 'gap',
-            label: t('predictions:breakdown.gap'),
-            mark: 'ok',
-            points: breakdown.gapPoints,
-        });
-    }
-    // Toujours affichée, même non obtenue : la ligne porte la règle du volet.
-    rows.push({
-        key: 'defensive',
-        label: t('predictions:breakdown.defensive'),
-        mark: breakdown.defensiveBonusPoints > 0 ? 'ok' : 'ko',
-        points: breakdown.defensiveBonusPoints,
-        badge: t('predictions:breakdown.defensiveGap', {
-            gap: rules.defensiveBonusMaxGap,
-        }),
+    const rows = buildBreakdownRows({
+        breakdown,
+        total: prediction.points_awarded ?? 0,
+        predictedHome: prediction.predicted_home_score,
+        predictedAway: prediction.predicted_away_score,
+        homeCode,
+        awayCode,
+        rules,
+        formatOdds: (odds) => oddsFormatter.format(odds),
     });
-    // Une ligne par équipe cochée (bonus ou malus), tolère un breakdown v1
-    // (offensiveHome/Away absents ⇒ non coché).
-    const offensiveSides: {
-        key: string;
-        side?: OffensiveSideBreakdown;
-        code: string;
-    }[] = [
-        { key: 'offensive-home', side: breakdown.offensiveHome, code: homeCode },
-        { key: 'offensive-away', side: breakdown.offensiveAway, code: awayCode },
-    ];
-    for (const { key, side, code } of offensiveSides) {
-        if (!side?.checked) continue;
-        if (side.pending) {
-            rows.push({
-                key,
-                label: t('predictions:breakdown.offensivePendingTeam', { code }),
-                mark: 'info',
-                points: null,
-            });
-        } else if (side.points > 0) {
-            rows.push({
-                key,
-                label: t('predictions:breakdown.offensiveScored', {
-                    code,
-                    tries: side.tries ?? 0,
-                    odds: oddsFormatter.format(side.oddsUsed),
-                }),
-                mark: 'ok',
-                points: side.points,
-            });
-        } else if (side.points < 0) {
-            rows.push({
-                key,
-                label: t('predictions:breakdown.offensiveMissed', {
-                    code,
-                    tries: side.tries ?? 0,
-                }),
-                mark: 'malus',
-                points: side.points,
-            });
-        } else {
-            rows.push({
-                key,
-                label: t('predictions:breakdown.offensiveScored', {
-                    code,
-                    tries: side.tries ?? 0,
-                    odds: oddsFormatter.format(side.oddsUsed),
-                }),
-                mark: 'ko',
-                points: 0,
-            });
-        }
-    }
-    // Joker de la phase : le total est doublé — la ligne rapporte la seconde
-    // moitié (= total de base), le total reste celui écrit par le scoring.
-    if (breakdown.jokerMultiplier === 2) {
-        rows.push({
-            key: 'joker',
-            label: t('predictions:breakdown.joker'),
-            mark: 'joker',
-            points: (prediction.points_awarded ?? 0) / 2,
-        });
-    }
     const bonusTags: string[] = [];
     if (prediction.predicted_bonus_off_home) {
         bonusTags.push(match.home_team?.code ?? match.home_team?.name ?? '?');
@@ -275,63 +167,7 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
 
             <View>
                 {rows.map((row) => (
-                    <View
-                        className="flex-row items-center gap-3 border-b border-border py-2.5"
-                        key={row.key}>
-                        <View
-                            className={cn(
-                                'h-[22px] w-[22px] items-center justify-center rounded-pill',
-                                row.mark === 'ok' && 'bg-success/15',
-                                row.mark === 'ko' && 'bg-text/10',
-                                row.mark === 'malus' && 'bg-danger/15',
-                                row.mark === 'info' && 'border border-border-strong',
-                                row.mark === 'joker' && 'w-auto min-w-[22px] bg-brand px-1',
-                            )}>
-                            <Text
-                                className={cn(
-                                    'font-body-bold text-[12px]',
-                                    row.mark === 'ok' && 'text-success',
-                                    row.mark === 'ko' && 'text-text-faint',
-                                    row.mark === 'malus' && 'text-danger',
-                                    row.mark === 'info' && 'text-text-faint',
-                                    row.mark === 'joker' && 'font-display text-on-brand',
-                                )}>
-                                {row.mark === 'ok'
-                                    ? '✓'
-                                    : row.mark === 'info'
-                                      ? 'i'
-                                      : row.mark === 'joker'
-                                        ? '×2'
-                                        : '✗'}
-                            </Text>
-                        </View>
-                        <View className="flex-1 flex-row items-center gap-2">
-                            <Text className="shrink font-body text-[14px] text-text">
-                                {row.label}
-                            </Text>
-                            {row.badge ? (
-                                <Badge tone="info" variant="soft">
-                                    {row.badge}
-                                </Badge>
-                            ) : null}
-                        </View>
-                        {row.points !== null ? (
-                            <Text
-                                className={cn(
-                                    'font-body-bold text-[14px]',
-                                    row.points > 0 &&
-                                        (row.mark === 'joker' ? 'text-brand' : 'text-text'),
-                                    row.points < 0 && 'text-danger',
-                                    row.points === 0 && 'text-text-faint',
-                                )}>
-                                {row.points > 0
-                                    ? `+${row.points}`
-                                    : row.points < 0
-                                      ? `${row.points}`
-                                      : '0'}
-                            </Text>
-                        ) : null}
-                    </View>
+                    <BreakdownRowItem key={row.key} row={row} />
                 ))}
             </View>
 

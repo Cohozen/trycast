@@ -11,9 +11,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { useSession } from '@/features/auth/session-context';
 import { LeagueActionsCard } from '@/features/leagues/components/league-actions-card';
-import { useGlobalLeaderboard } from '@/features/leagues/use-global-leaderboard';
+import { MyPointsCard } from '@/features/leagues/components/my-points-card';
+import { summarizeRound } from '@/features/leagues/round-summary';
+import { useCompetitionStages } from '@/features/leagues/use-competition-stages';
 import { useMyLeagues } from '@/features/leagues/use-my-leagues';
+import { useMyPreviousRank } from '@/features/leagues/use-my-previous-rank';
+import { useMyRank } from '@/features/leagues/use-my-rank';
 import { useMyStanding } from '@/features/leagues/use-my-standing';
+import { LiveDot } from '@/features/matches/components/live-dot';
 import { LiveMatchCard } from '@/features/matches/components/live-match-card';
 import type { MatchWithTeams } from '@/features/matches/types';
 import { useActiveCompetition } from '@/features/matches/use-active-competition';
@@ -21,7 +26,6 @@ import { useLiveMatches } from '@/features/matches/use-live-matches';
 import { useMatches } from '@/features/matches/use-matches';
 import { PredictionCard } from '@/features/predictions/components/prediction-card';
 import { splitMatches } from '@/features/predictions/split-matches';
-import { JokerPhasePill } from '@/features/jokers/components/joker-phase-pill';
 import { findCompetitionPhase, jokerCardState } from '@/features/jokers/find-competition-phase';
 import { useCompetitionPhases } from '@/features/jokers/use-competition-phases';
 import type { JokersByPhase } from '@/features/jokers/types';
@@ -89,7 +93,13 @@ export default function MatchesScreen() {
     const jokers = useMyJokers(competition.data?.id);
     const myLeagues = useMyLeagues();
     const standing = useMyStanding(competition.data?.id, userId);
-    const leaderboard = useGlobalLeaderboard(competition.data?.id);
+    const myRank = useMyRank(competition.data?.id, standing.data);
+    const stages = useCompetitionStages(competition.data?.id);
+    const summary =
+        matches.data && predictions.data
+            ? summarizeRound(matches.data, predictions.data, stages.data ?? [], new Date())
+            : null;
+    const previousRank = useMyPreviousRank(competition.data?.id, summary?.round?.firstKickoff);
     const screenInsets = useScreenInsets();
 
     const refreshControl = usePullToRefresh(() =>
@@ -100,7 +110,8 @@ export default function MatchesScreen() {
             distributions.refetch(),
             jokers.refetch(),
             standing.refetch(),
-            leaderboard.refetch(),
+            myRank.refetch(),
+            previousRank.refetch(),
             myLeagues.refetch(),
         ]),
     );
@@ -161,83 +172,28 @@ export default function MatchesScreen() {
     const groups = groupByDate(upcoming, t);
     const toPredict = upcoming.filter((m) => !predictions.data?.get(m.id)).length;
 
-    // Joker de la phase en cours = celle du prochain match à venir. La
-    // pastille d'en-tête dit s'il est libre ou sur quel match il est posé.
     const jokerMap: JokersByPhase = jokers.data ?? new Map();
-    const currentPhase = upcoming[0]
-        ? findCompetitionPhase(phases.data ?? [], upcoming[0].kickoff_at)
-        : null;
-    const currentJoker = currentPhase ? jokerMap.get(currentPhase.id) : undefined;
-    const jokerMatch = currentJoker
-        ? matches.data.find((m) => m.id === currentJoker.matchId)
-        : undefined;
-    const jokerPlacedOn = jokerMatch
-        ? `${jokerMatch.home_team?.code ?? '?'}–${jokerMatch.away_team?.code ?? '?'}`
-        : null;
     const hasLeagues = (myLeagues.data?.length ?? 0) > 0;
-    const myRank = leaderboard.data?.find((row) => row.user_id === userId)?.rank ?? null;
-    const totalPoints = standing.data?.total_points ?? 0;
-    const played = standing.data?.predictions_scored ?? 0;
 
     // Contenu défilant aplati : stickyHeaderIndices exige que les en-têtes de
     // date soient des enfants directs du ScrollView.
     const listChildren: ReactNode[] = [];
     const stickyIndices: number[] = [];
 
-    // Mini-dashboard (points / joués / rang) : premier bloc du scroll, il
-    // disparaît en défilant — seuls les 2 titres restent épinglés en haut.
-    if (hasLeagues) {
+    // Carte « Tes points » : premier bloc du scroll, elle disparaît en
+    // défilant — seul le titre reste épinglé en haut.
+    if (hasLeagues && summary) {
         listChildren.push(
-            <View
-                className="flex-row items-stretch justify-between gap-4 rounded-md border border-border bg-surface p-4.5 tc-shadow-sm"
-                key="dashboard">
-                <View className="gap-0.5">
-                    <View className="flex-row items-center gap-1.5">
-                        <View className="h-1.75 w-1.75 rounded-pill bg-accent" />
-                        <Text className="font-body-bold text-[11px] uppercase tracking-[1.1px] text-text-faint">
-                            {t('predictions:dashboard.points')}
-                        </Text>
-                    </View>
-                    <Text className="font-display text-[52px] leading-12.5 text-text">
-                        {totalPoints}
-                    </Text>
-                </View>
-                <View className="w-px bg-border" />
-                <View className="min-w-29 justify-center gap-3.5">
-                    <View className="gap-px">
-                        <Text className="font-display text-[22px] leading-5.5 text-text">
-                            {played}
-                        </Text>
-                        <Text className="font-body text-[12px] text-text-muted">
-                            {t('predictions:dashboard.played')}
-                        </Text>
-                    </View>
-                    {myRank !== null ? (
-                        <View className="gap-px">
-                            <Text className="font-display text-[22px] leading-5.5 text-text">
-                                {myRank === 1 ? '1ᵉʳ' : `${myRank}ᵉ`}
-                            </Text>
-                            <Text className="font-body text-[12px] text-text-muted">
-                                {t('predictions:dashboard.globalRank')}
-                            </Text>
-                        </View>
-                    ) : null}
-                </View>
-            </View>,
-        );
-    }
-
-    // Carte(s) LIVE en tête (vide tant que sync-live n'est pas activé),
-    // pressables vers la page de détail — seule entrée du lot (décision
-    // 2026-07-13), surface read-only sans risque de mis-tap.
-    for (const match of liveMatches.data ?? []) {
-        listChildren.push(
-            <Pressable
-                accessibilityRole="button"
-                key={`live-${match.id}`}
-                onPress={() => router.push({ pathname: '/match/[id]', params: { id: match.id } })}>
-                <LiveMatchCard match={match} prediction={predictions.data?.get(match.id)} />
-            </Pressable>,
+            <MyPointsCard
+                gapToAbove={myRank.data?.gapToAbove ?? null}
+                key="dashboard"
+                // Échec de la RPC (migration pas encore en prod) : la carte
+                // retombe sur l'écart avec le joueur du dessus
+                previousRank={previousRank.data ?? null}
+                rank={myRank.data?.rank ?? null}
+                summary={summary}
+                totalPoints={standing.data?.total_points ?? 0}
+            />,
         );
     }
 
@@ -300,6 +256,35 @@ export default function MatchesScreen() {
         );
     }
 
+    // Matchs en cours, entre le compteur et les matchs à venir (DS
+    // 2026-09-23), pressables vers la page de détail — surface read-only
+    // sans risque de mis-tap.
+    const live = liveMatches.data ?? [];
+    if (live.length > 0) {
+        listChildren.push(
+            <View className="flex-row items-center gap-2 px-1 py-0.5" key="live-header">
+                <LiveDot />
+                <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
+                    {t('matches:status.inPlay')}
+                </Text>
+            </View>,
+        );
+    }
+    for (const match of live) {
+        listChildren.push(
+            <Pressable
+                accessibilityRole="button"
+                key={`live-${match.id}`}
+                onPress={() => router.push({ pathname: '/match/[id]', params: { id: match.id } })}>
+                <LiveMatchCard
+                    jokerOn={[...jokerMap.values()].some((joker) => joker.matchId === match.id)}
+                    match={match}
+                    prediction={predictions.data?.get(match.id)}
+                />
+            </Pressable>,
+        );
+    }
+
     // Matchs à venir groupés par date ; chaque en-tête de jour est sticky
     // jusqu'à être poussé par le suivant (fond opaque bg-bg obligatoire).
     if (upcoming.length === 0) {
@@ -359,7 +344,6 @@ export default function MatchesScreen() {
                     <Text className="font-display text-[27px] leading-7 tracking-[0.27px] text-text">
                         {competition.data.name}
                     </Text>
-                    {currentPhase ? <JokerPhasePill placedOn={jokerPlacedOn} /> : null}
                 </View>
                 <HeaderActions />
             </View>

@@ -32,10 +32,14 @@ export function NotificationsBell() {
                 <Bell color={textColor} size={20} strokeWidth={1.9} />
             </IconButton>
             {unread > 0 ? (
+                // 22 px dont 2 px d'anneau : 18 px utiles comme la maquette —
+                // à 18 px bordure comprise, le chiffre était écrasé
                 <View
-                    className="absolute -right-0.5 -top-0.5 h-4.5 min-w-4.5 items-center justify-center rounded-pill border-2 border-bg bg-accent px-1"
+                    className="absolute -right-1 -top-1 h-5.5 min-w-5.5 items-center justify-center rounded-pill border-2 border-bg bg-accent px-1.25"
                     pointerEvents="none">
-                    <Text className="font-body-bold text-[10px] leading-3 text-on-accent">
+                    <Text
+                        className="font-body-bold text-[10px] leading-[12px] text-on-accent"
+                        style={{ includeFontPadding: false }}>
                         {unread > 9 ? '9+' : unread}
                     </Text>
                 </View>

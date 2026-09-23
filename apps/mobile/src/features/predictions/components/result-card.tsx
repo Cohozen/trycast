@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { JokerBadge } from '@/features/jokers/components/joker-badge';
 import { JokerMark } from '@/features/jokers/components/joker-mark';
+import { LiveDot } from '@/features/matches/components/live-dot';
 import { TeamFlag } from '@/features/matches/components/team-flag';
 import { formatKickoffTime, statusLabel, teamName } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
@@ -139,7 +140,16 @@ export function ResultCard({
                         {verdict ? <VerdictPill verdict={verdict} /> : null}
                         <View className="flex-row items-center gap-1.5">
                             {jokerScored ? <JokerBadge /> : null}
-                            {statusKey ? (
+                            {isLive ? (
+                                // Match en cours mis en évidence, comme la section
+                                // « En cours » de l'accueil
+                                <View className="flex-row items-center gap-1.5">
+                                    <LiveDot />
+                                    <Text className="font-body-bold text-[10.5px] uppercase tracking-[0.84px] text-accent">
+                                        {t('matches:status.inPlay')}
+                                    </Text>
+                                </View>
+                            ) : statusKey ? (
                                 <Text className="font-body-semibold text-[10.5px] uppercase tracking-[0.84px] text-text-faint">
                                     {t(statusKey)}
                                 </Text>

@@ -15,10 +15,6 @@
     "badge": {
         "label": "Point double joué sur ce match"
     },
-    "pill": {
-        "available": "disponible",
-        "placed": "{{match}}"
-    },
     "errors": {
         "matchStarted": "Le match a commencé : le point double ne bouge plus.",
         "locked": "Ton point double de la phase est déjà joué sur un match commencé.",

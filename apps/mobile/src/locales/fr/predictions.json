@@ -1,8 +1,21 @@
 {
     "dashboard": {
-        "points": "Points cumulés",
-        "played": "pronos joués",
-        "globalRank": "au général"
+        "header": "Tes points · {{round}}",
+        "headerNoRound": "Tes points",
+        "placesUp_one": "+{{count}} place",
+        "placesUp_other": "+{{count}} places",
+        "placesDown_one": "−{{count}} place",
+        "placesDown_other": "−{{count}} places",
+        "placesLabel": "Évolution au général sur la journée",
+        "gap": "À {{gap}} pts du {{rank}}ᵉ",
+        "roundPoints": "+{{points}} cette journée",
+        "form": "Forme",
+        "good_one": "bon prono",
+        "good_other": "bons pronos",
+        "rankValue_one": "{{rank}}ᵉʳ",
+        "rankValue_other": "{{rank}}ᵉ",
+        "rankLabel": "au général",
+        "leaderboard": "Classement"
     },
     "toPredict": {
         "label_one": "match à pronostiquer",
@@ -51,7 +64,9 @@
         "seeDetails": "Voir le détail des points",
         "bonusTag": "{{code}} bonus",
         "theirProno": "Son prono",
-        "notPredictedOther": "Pas de prono sur ce match."
+        "notPredictedOther": "Pas de prono sur ce match.",
+        "provisionalPoints": "Points provisoires",
+        "provisionalNote": "Calculés sur le score en direct, définitifs au coup de sifflet final."
     },
     "breakdown": {
         "basePoints": "Points de base",

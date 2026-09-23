@@ -15,10 +15,6 @@
     "badge": {
         "label": "Double points played on this match"
     },
-    "pill": {
-        "available": "available",
-        "placed": "{{match}}"
-    },
     "errors": {
         "matchStarted": "The match has started: your double points can't move anymore.",
         "locked": "Your double points for this phase are already on a match that has started.",

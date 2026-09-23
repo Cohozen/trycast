@@ -1,8 +1,21 @@
 {
     "dashboard": {
-        "points": "Total points",
-        "played": "predictions made",
-        "globalRank": "overall"
+        "header": "Your points · {{round}}",
+        "headerNoRound": "Your points",
+        "placesUp_one": "+{{count}} place",
+        "placesUp_other": "+{{count}} places",
+        "placesDown_one": "−{{count}} place",
+        "placesDown_other": "−{{count}} places",
+        "placesLabel": "Overall ranking change this round",
+        "gap": "{{gap}} pts behind #{{rank}}",
+        "roundPoints": "+{{points}} this round",
+        "form": "Form",
+        "good_one": "correct pick",
+        "good_other": "correct picks",
+        "rankValue_one": "#{{rank}}",
+        "rankValue_other": "#{{rank}}",
+        "rankLabel": "overall",
+        "leaderboard": "Leaderboard"
     },
     "toPredict": {
         "label_one": "match to predict",
@@ -51,7 +64,9 @@
         "seeDetails": "See points breakdown",
         "bonusTag": "{{code}} bonus",
         "theirProno": "Their prediction",
-        "notPredictedOther": "No prediction on this match."
+        "notPredictedOther": "No prediction on this match.",
+        "provisionalPoints": "Provisional points",
+        "provisionalNote": "Based on the live score, final at the whistle."
     },
     "breakdown": {
         "basePoints": "Base points",

@@ -23,16 +23,19 @@ import { useLeagueLeaderboard } from '@/features/leagues/use-league-leaderboard'
 import { useMyLeagues } from '@/features/leagues/use-my-leagues';
 import { CompactScore } from '@/features/matches/components/compact-score';
 import { MatchHero } from '@/features/matches/components/match-hero';
+import { MatchStatusChip } from '@/features/matches/components/match-status-chip';
 import { matchPhase } from '@/features/matches/match-phase';
 import { useMatch } from '@/features/matches/use-match';
 import { LockedPredictionCard } from '@/features/predictions/components/locked-prediction-card';
 import { MaskedPredictions } from '@/features/predictions/components/masked-predictions';
 import { MemberPredictionRow } from '@/features/predictions/components/member-prediction-row';
 import { PredictionCard } from '@/features/predictions/components/prediction-card';
-import { ResultCard } from '@/features/predictions/components/result-card';
+import { PointsEarnedCard } from '@/features/predictions/components/points-earned-card';
 import { useCommunityDistributions } from '@/features/predictions/use-community-distributions';
 import { useMatchLeaguePredictions } from '@/features/predictions/use-match-league-predictions';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
+import { findCompetitionPhase, jokerCardState } from '@/features/jokers/find-competition-phase';
+import { useCompetitionPhases } from '@/features/jokers/use-competition-phases';
 import { useMyJokers } from '@/features/jokers/use-my-jokers';
 import { useOpenPlayerProfile } from '@/features/profile/use-open-player-profile';
 import { ReactionsSheet } from '@/features/reactions/components/reactions-sheet';
@@ -78,10 +81,13 @@ export default function MatchScreen() {
     const match = useMatch(id);
     const competitionId = match.data?.competition_id;
     const phase = match.data ? matchPhase(match.data, new Date()) : null;
-    const kickoffPassed = phase !== null && phase !== 'upcoming';
+    // Reporté ou annulé : le match n'a pas eu lieu, les pronos restent masqués
+    const calledOff = match.data?.status === 'postponed' || match.data?.status === 'cancelled';
+    const kickoffPassed = phase !== null && phase !== 'upcoming' && !calledOff;
 
     const myPredictions = useMyPredictions(competitionId);
     const myJokers = useMyJokers(competitionId);
+    const phases = useCompetitionPhases(competitionId);
     const distributions = useCommunityDistributions(competitionId);
     const myLeagues = useMyLeagues();
 
@@ -194,6 +200,11 @@ export default function MatchScreen() {
     const prediction = myPredictions.data?.get(currentMatch.id);
     const distribution = distributions.data?.get(currentMatch.id);
     const boardEntries = markTies(leagueBoard.data ?? []);
+    // Joker : même carte que l'accueil avant le match, total doublé ensuite
+    const jokerMap = myJokers.data ?? new Map();
+    const jokerOn = [...jokerMap.values()].some((joker) => joker.matchId === currentMatch.id);
+    const matchPhaseWindow = findCompetitionPhase(phases.data ?? [], currentMatch.kickoff_at);
+    const jokerState = jokerCardState(currentMatch.id, matchPhaseWindow, jokerMap);
 
     const reactionsEntry = leaguePredictions.data?.find(
         (entry) => entry.user_id === reactionsTarget?.userId,
@@ -204,6 +215,7 @@ export default function MatchScreen() {
             <Stack.Screen
                 options={{
                     headerTitleAlign: 'center',
+                    headerRight: () => <MatchStatusChip match={currentMatch} />,
                     headerTitle: () => (
                         <CollapsingHeaderTitle
                             compact={<CompactScore match={currentMatch} />}
@@ -228,34 +240,45 @@ export default function MatchScreen() {
                     </Animated.View>
                 </RNView>
 
-                {/* Mon prono, selon la phase */}
+                {/* Mon prono, selon la phase : saisie avant le match, points
+                    (provisoires en live) ensuite, lecture seule si reporté/annulé */}
                 <View className="gap-3">
-                    <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
-                        {t('predictions:reconciliation.yourProno')}
-                    </Text>
                     {phase === 'upcoming' && userId ? (
-                        <View className="gap-2.5">
-                            <PredictionCard
-                                distribution={distribution}
+                        <>
+                            <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
+                                {t('predictions:reconciliation.yourProno')}
+                            </Text>
+                            <View className="gap-2.5">
+                                <PredictionCard
+                                    distribution={distribution}
+                                    joker={
+                                        matchPhaseWindow && jokerState !== 'none'
+                                            ? { phaseId: matchPhaseWindow.id, state: jokerState }
+                                            : undefined
+                                    }
+                                    match={currentMatch}
+                                    prediction={prediction}
+                                    userId={userId}
+                                />
+                                <Text className="text-center font-body text-[12px] text-text-muted">
+                                    {t('predictions:toPredict.autoSave')}
+                                </Text>
+                            </View>
+                        </>
+                    ) : calledOff || phase === 'locked' ? (
+                        <>
+                            <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
+                                {t('predictions:reconciliation.yourProno')}
+                            </Text>
+                            <LockedPredictionCard
+                                jokerOn={jokerOn}
                                 match={currentMatch}
                                 prediction={prediction}
-                                userId={userId}
                             />
-                            <Text className="text-center font-body text-[12px] text-text-muted">
-                                {t('predictions:toPredict.autoSave')}
-                            </Text>
-                        </View>
-                    ) : phase === 'finished' ? (
-                        <ResultCard
-                            distribution={distribution}
-                            match={currentMatch}
-                            prediction={prediction}
-                        />
+                        </>
                     ) : (
-                        <LockedPredictionCard
-                            jokerOn={[...(myJokers.data?.values() ?? [])].some(
-                                (joker) => joker.matchId === currentMatch.id,
-                            )}
+                        <PointsEarnedCard
+                            jokerOn={jokerOn}
                             match={currentMatch}
                             prediction={prediction}
                         />
