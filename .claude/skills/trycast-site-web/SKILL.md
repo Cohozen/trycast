@@ -1,6 +1,6 @@
 ---
 name: trycast-site-web
-description: Travailler sur le site vitrine Astro de TryCast (apps/web/) — structure, bilingue FR/EN (dictionnaires typés, table des routes, pages légales jumelles, atterrissages autoLocale), tokens DS en CSS vanilla, commandes de vérification, preview navigateur et son piège de capture, formulaire waitlist (RPC join_waitlist, anti-spam SQL, tests E2E curl), déploiement Vercel. À consulter dès qu'on touche à apps/web/, à la landing, à un texte du site, aux pages légales ou à la waitlist.
+description: Travailler sur le site vitrine Astro de TryCast (apps/web/) — structure, bilingue FR/EN (dictionnaires typés, table des routes, pages légales jumelles, atterrissages autoLocale), tokens DS en CSS vanilla, commandes de vérification, preview navigateur et son piège de capture, formulaire waitlist (RPC join_waitlist, anti-spam SQL, tests E2E curl), page /rejoindre et .well-known/ des liens d'invitation, déploiement Vercel. À consulter dès qu'on touche à apps/web/, à la landing, à un texte du site, aux pages légales, à la waitlist ou à la vérification des domaines (assetlinks, AASA).
 ---
 
 # Site vitrine TryCast (`apps/web/`)
@@ -79,6 +79,9 @@ curl -s -o /dev/null -w '%{http_code}' -X POST "$PUBLIC_SUPABASE_URL/rest/v1/rpc
 Vérifier l'insert côté serveur (MCP `execute_sql` sur `waitlist_signups`), puis **purger les données de test** (`truncate public.waitlist_signups; truncate public.waitlist_attempts;`). Le select PostgREST direct sur ces tables doit répondre 401/permission denied.
 
 ## Liens d'invitation : `/rejoindre/<CODE>`
+
+Côté app (`buildInviteUrl()`, les quatre répliques de l'URL, `+native-intent.tsx`, invitation en
+attente, partage) : skill `trycast-liens-invitation`.
 
 Le site est **statique** : pas de `getStaticPaths` possible sur un code arbitraire. Une page
 unique `apps/web/src/pages/rejoindre.astro` est servie pour `/rejoindre/:code` par un `rewrite` de

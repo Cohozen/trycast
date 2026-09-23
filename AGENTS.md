@@ -38,8 +38,8 @@ Avant de considérer un lot terminé : `npm run verify` **à la racine** — for
 
 ## Sous-agents (`.claude/agents/`)
 
-Je les lance de moi-même, sans attendre qu'on le demande :
-- `relecteur` — avant chaque commit de code : relit le diff contre les conventions ci-dessous
+Je les lance de moi-même, sans attendre qu'on le demande. Un agent créé en cours de session n'est lançable qu'au tour suivant (« Agent type not found » d'ici là).
+- `relecteur` — avant chaque commit de code, jamais pour un commit de doc ou de config (son démarrage coûte ~40 k tokens) : relit le diff contre les conventions ci-dessous
 - `docs-lot` — à la fin de chaque lot, même une retouche : met à jour `AGENTS.md`, les skills, `docs/rgpd/` et `DASHBOARD.md` (sans commiter)
 - `verif-visuelle` — pour chaque passe visuelle sur émulateur ou simulateur
 
