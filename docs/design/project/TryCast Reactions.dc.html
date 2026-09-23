@@ -142,10 +142,10 @@
             <div class="tc-scroll" style="flex: 1; min-height: 0; overflow-y: auto; padding: 4px 16px 32px; display: flex; flex-direction: column; gap: 6px;">
               <sc-for list="{{ sc.rows }}" as="r" hint-placeholder-count="6">
                 <div style="position: relative;">
-                  <div onPointerDown="{{ r.onPressStart }}" onPointerUp="{{ r.onPressEnd }}" onPointerLeave="{{ r.onPressEnd }}" style="display: flex; flex-direction: column; gap: 7px; padding: 10px 12px; background: {{ r.rowBg }}; border-left: {{ r.rowEdge }}; border-radius: var(--radius-sm); cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none;">
-
+                  <div onPointerDown="{{ r.onPressStart }}" onPointerUp="{{ r.onPressEnd }}" onPointerLeave="{{ r.onPressEnd }}" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: {{ r.rowBg }}; border: {{ r.rowEdge }}; border-radius: var(--radius-sm); cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none;">
+                    <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ r.name }}" size="md" ring="{{ r.isMe }}" hint-size="40px,40px"></x-import>
+                    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                      <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ r.name }}" size="sm" ring="{{ r.isMe }}" hint-size="32px,32px"></x-import>
                       <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
                         <span style="font-size: 14px; font-weight: {{ r.nameWeight }}; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ r.displayName }}</span>
                         <sc-if value="{{ r.hasBadges }}" hint-placeholder-val="{{ false }}">
@@ -164,7 +164,7 @@
                     </div>
 
                     <sc-if value="{{ r.showReactBar }}" hint-placeholder-val="{{ true }}">
-                      <div style="display: flex; align-items: center; gap: 10px; margin-left: 42px; min-height: 32px;">
+                      <div style="display: flex; align-items: center; gap: 10px; min-height: 32px;">
                         <sc-if value="{{ r.showSmile }}" hint-placeholder-val="{{ true }}">
                           <button type="button" class="tc-hit" aria-label="Réagir au prono de {{ r.name }}" aria-expanded="{{ r.open }}" onClick="{{ r.onSmile }}" style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: {{ r.triggerRing }}; background: {{ r.triggerBg }}; border-radius: var(--radius-pill); color: {{ r.triggerColor }}; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);" style-hover="transform: scale(1.08); background: var(--surface-sunken);" style-active="transform: scale(0.94);">{{ r.triggerIcon }}</button>
                         </sc-if>
@@ -181,6 +181,7 @@
                         </sc-if>
                       </div>
                     </sc-if>
+                    </div>
                   </div>
 
                   <!-- popover, ancré au-dessus -->
@@ -567,7 +568,7 @@ class Component extends DCLogic {
           ptsStr: m.pts > 0 ? '+' + m.pts : '0',
           ptsColor: m.pts > 0 ? (m.exact ? 'var(--accent)' : 'var(--text)') : 'var(--text-faint)',
           rowBg: m.isMe ? 'color-mix(in srgb, var(--accent) 8%, var(--surface))' : 'var(--surface)',
-          rowEdge: m.isMe ? '3px solid var(--accent)' : '3px solid transparent',
+          rowEdge: m.isMe ? '1.5px solid var(--accent)' : '1.5px solid transparent',
           hasChips: chips.length > 0,
           chips,
           showSmile: canReact,

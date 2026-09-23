@@ -62,9 +62,11 @@
         <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint);">Compétition en cours</span>
         <span style="font-family: var(--font-display); font-size: 27px; line-height: 1.02; letter-spacing: 0.01em; color: var(--text);">{{ competitionName }}</span>
       </div>
-      <div style="flex: none; display: flex; align-items: center; gap: 6px; margin-top: 20px;">
-        <span style="display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: var(--radius-pill); background: {{ x2PillBg }}; border: 1px solid {{ x2PillBorder }}; color: {{ x2PillInk }}; font-size: 11px; font-weight: 700; letter-spacing: 0.03em; white-space: nowrap;" title="{{ x2PillTitle }}"><span style="font-family: var(--font-display); font-size: 13px; letter-spacing: 0.02em;">×2</span>{{ x2PillText }}</span>
-        <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: var(--radius-pill); background: var(--surface-sunken); border: 1px solid var(--border); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); white-space: nowrap;">J2</span>
+      <div style="flex: none; display: flex; align-items: flex-start; margin-top: -2px;">
+        <button type="button" aria-label="Notifications (3)" title="Notifications" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); color: var(--text); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background var(--dur) var(--ease-out);" style-hover="background: var(--surface-sunken);">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+          <span style="position: absolute; top: -4px; right: -4px; box-sizing: border-box; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; background: var(--accent); color: var(--on-accent); box-shadow: 0 0 0 2px var(--surface);">3</span>
+        </button>
       </div>
     </div>
 
@@ -72,7 +74,52 @@
     <sc-if value="{{ isDefault }}" hint-placeholder-val="{{ true }}">
       <div style="display: flex; flex-direction: column; gap: 18px;">
 
-        <!-- Mini-dashboard -->
+        <!-- Stats card · hero -->
+        <sc-if value="{{ isHeroStats }}" hint-placeholder-val="{{ true }}">
+        <div style="position: relative; overflow: hidden; border-radius: var(--radius-lg); background: var(--green-800); color: var(--sand-050); box-shadow: var(--shadow-md); padding: 16px 18px 14px; display: flex; flex-direction: column; gap: 12px;">
+          <div aria-hidden="true" style="position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 28px, transparent 28px 56px); pointer-events: none;"></div>
+          <div aria-hidden="true" style="position: absolute; right: -40px; top: -60px; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--grenat-500) 45%, transparent), transparent 70%); pointer-events: none;"></div>
+          <div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: color-mix(in srgb, var(--sand-050) 72%, transparent);">Tes points · Journée 3</span>
+            <sc-if value="{{ trendUp }}" hint-placeholder-val="{{ true }}">
+              <span style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px 3px 6px; border-radius: 999px; background: var(--grenat-500); color: #FFFFFF; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums;"><svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><path d="M5 1.5 9 7.5H1z"></path></svg>+86 places</span>
+            </sc-if>
+            <sc-if value="{{ trendDown }}" hint-placeholder-val="{{ false }}">
+              <span style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px 3px 6px; border-radius: 999px; background: color-mix(in srgb, var(--sand-050) 14%, transparent); border: 1px solid color-mix(in srgb, var(--sand-050) 22%, transparent); color: var(--sand-050); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums;"><svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><path d="M5 8.5 9 2.5H1z"></path></svg>−14 places</span>
+            </sc-if>
+            <sc-if value="{{ trendNone }}" hint-placeholder-val="{{ false }}">
+              <span style="display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--sand-050) 14%, transparent); border: 1px solid color-mix(in srgb, var(--sand-050) 22%, transparent); color: var(--sand-050); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums;">À 6 pts du 1 244ᵉ</span>
+            </sc-if>
+          </div>
+          <div style="position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;">
+            <div style="display: flex; align-items: baseline; gap: 6px;">
+              <span style="font-family: var(--font-display); font-size: 56px; line-height: 0.85; font-variant-numeric: tabular-nums;">248</span>
+              <span style="font-size: 14px; font-weight: 700; color: color-mix(in srgb, var(--sand-050) 72%, transparent);">pts</span>
+              <span style="margin-left: 4px; font-size: 13px; font-weight: 700; color: var(--grenat-300, #F2A7A7); font-variant-numeric: tabular-nums;">{{ dayPoints }}</span>
+            </div>
+            <div style="flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
+              <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: color-mix(in srgb, var(--sand-050) 60%, transparent);">Forme</span>
+              <div style="display: flex; gap: 4px;">
+                <span style="width: 9px; height: 18px; border-radius: 3px; background: var(--sand-050);"></span>
+                <span style="width: 9px; height: 18px; border-radius: 3px; background: var(--sand-050);"></span>
+                <span style="width: 9px; height: 18px; border-radius: 3px; background: color-mix(in srgb, var(--sand-050) 25%, transparent);"></span>
+                <span style="width: 9px; height: 18px; border-radius: 3px; background: var(--sand-050);"></span>
+                <span style="width: 9px; height: 18px; border-radius: 3px; background: var(--grenat-500); box-shadow: 0 0 0 1.5px var(--sand-050);"></span>
+              </div>
+            </div>
+          </div>
+          <div style="position: relative; display: flex; align-items: center; gap: 12px; padding-top: 11px; border-top: 1px solid color-mix(in srgb, var(--sand-050) 16%, transparent); font-size: 12px; white-space: nowrap; color: color-mix(in srgb, var(--sand-050) 78%, transparent);">
+            <span><strong style="color: var(--sand-050); font-variant-numeric: tabular-nums;">12</strong> bons pronos</span>
+            <sc-if value="{{ showGlobalRank }}" hint-placeholder-val="{{ true }}">
+              <span><strong style="color: var(--sand-050); font-variant-numeric: tabular-nums;">1 245ᵉ</strong> au général</span>
+            </sc-if>
+            <span style="margin-left: auto; display: inline-flex; align-items: center; gap: 2px; font-weight: 700; color: var(--sand-050); cursor: pointer;">Classement<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"></path></svg></span>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- Mini-dashboard (classic) -->
+        <sc-if value="{{ isClassicStats }}" hint-placeholder-val="{{ false }}">
         <div style="padding: 18px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); display: flex; align-items: stretch; justify-content: space-between; gap: 16px;">
           <div style="display: flex; flex-direction: column; gap: 2px;">
             <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint);">
@@ -94,6 +141,7 @@
             </sc-if>
           </div>
         </div>
+        </sc-if>
 
         <!-- League actions -->
         <div style="display: grid; grid-template-columns: 1fr 1px 1fr; align-items: stretch; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden;">
@@ -121,49 +169,38 @@
         <sc-if value="{{ hasLive }}" hint-placeholder-val="{{ false }}">
           <div style="display: flex; flex-direction: column; gap: 12px;">
             <div style="display: flex; align-items: center; gap: 8px; padding: 2px 4px;">
-              <span style="width: 7px; height: 7px; border-radius: 50%; background: var(--status-live); box-shadow: 0 0 0 4px color-mix(in srgb, var(--status-live) 22%, transparent);"></span>
+              <span style="width: 7px; height: 7px; border-radius: 50%; background: var(--status-live); box-shadow: 0 0 0 4px color-mix(in srgb, var(--status-live) 22%, transparent); animation: tc-live 1.4s ease-in-out infinite;"></span>
               <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text);">En cours</span>
             </div>
             <sc-for list="{{ liveMatches }}" as="m" hint-placeholder-count="1">
-              <div style="padding: 16px; background: var(--surface); border: 1.5px solid color-mix(in srgb, var(--status-live) 40%, var(--border)); border-radius: var(--radius-md); box-shadow: var(--glow-accent); display: flex; flex-direction: column;">
-                <!-- header: live clock only (competition already in the page header) -->
-                <div style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 14px;">
-                  <span style="display: inline-flex; align-items: center; gap: 5px; color: var(--status-live); font-family: var(--font-body); font-weight: 700; font-size: 11px; letter-spacing: 0.06em;">
-                    <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--status-live); animation: tc-live 1.4s ease-in-out infinite;"></span>LIVE {{ m.minute }}
+              <div style="padding: 14px 16px 16px; background: var(--surface); border: 1.5px solid color-mix(in srgb, var(--status-live) 40%, var(--border)); border-radius: var(--radius-lg); box-shadow: var(--glow-accent); display: flex; flex-direction: column; gap: 14px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                  <span style="display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-body); font-size: 12px; font-weight: 600; color: var(--text-muted);">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--status-live);"></span>
+                    <span>{{ m.period }}</span>
                   </span>
+                  <span style="font-family: var(--font-body); font-size: 11px; color: var(--text-faint); text-align: right;">Score légèrement différé</span>
                 </div>
-                <!-- teams -->
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                  <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 8px;">
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
                     <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TeamFlag" abbr="{{ m.home.abbr }}" color="{{ m.home.color }}" size="md" hint-size="46px,41px"></x-import>
-                    <span style="flex: 1; font-family: var(--font-body); font-weight: 600; font-size: 16px; color: var(--text);">{{ m.home.name }}</span>
-                    <span style="font-family: var(--font-display); font-size: 26px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ m.home.score }}</span>
+                    <span style="font-family: var(--font-body); font-weight: 700; font-size: 14px; color: var(--text); text-align: center; text-wrap: balance;">{{ m.home.name }}</span>
                   </div>
-                  <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="display: flex; align-items: center; gap: 12px; font-family: var(--font-display); font-size: 48px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">
+                    <span>{{ m.home.score }}</span>
+                    <span style="font-size: 24px; color: var(--text-faint);">-</span>
+                    <span>{{ m.away.score }}</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
                     <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TeamFlag" abbr="{{ m.away.abbr }}" color="{{ m.away.color }}" size="md" hint-size="46px,41px"></x-import>
-                    <span style="flex: 1; font-family: var(--font-body); font-weight: 600; font-size: 16px; color: var(--text);">{{ m.away.name }}</span>
-                    <span style="font-family: var(--font-display); font-size: 26px; line-height: 1; color: var(--text); font-variant-numeric: tabular-nums;">{{ m.away.score }}</span>
+                    <span style="font-family: var(--font-body); font-weight: 700; font-size: 14px; color: var(--text); text-align: center; text-wrap: balance;">{{ m.away.name }}</span>
                   </div>
                 </div>
-                <!-- prono + highlighted potential points, left-aligned pills -->
-                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border);">
-                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <span style="font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint);">Ton prono</span>
-                    <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); font-family: var(--font-body); font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums;">{{ m.pronoStr }}</span>
-                    <sc-if value="{{ m.showX2 }}" hint-placeholder-val="{{ false }}">
-                      <span style="display: inline-flex; align-items: center; justify-content: center; height: 22px; min-width: 30px; padding: 0 8px; border-radius: var(--radius-pill); background: var(--brand); color: var(--on-brand); font-family: var(--font-display); font-size: 12px; letter-spacing: 0.02em;">×2</span>
-                    </sc-if>
-                    <sc-if value="{{ m.showBonusHome }}" hint-placeholder-val="{{ false }}">
-                      <span style="display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: var(--radius-pill); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); color: var(--accent); font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: 0.02em;"><span style="width: 5px; height: 5px; border-radius: 50%; background: var(--accent);"></span>{{ m.home.abbr }} bonus</span>
-                    </sc-if>
-                    <sc-if value="{{ m.showBonusAway }}" hint-placeholder-val="{{ false }}">
-                      <span style="display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: var(--radius-pill); border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); color: var(--accent); font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: 0.02em;"><span style="width: 5px; height: 5px; border-radius: 50%; background: var(--accent);"></span>{{ m.away.abbr }} bonus</span>
-                    </sc-if>
-                  </div>
-                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-                    <span style="font-family: var(--font-body); font-weight: 600; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint);">Points potentiels</span>
-                    <span style="display: inline-flex; align-items: baseline; gap: 4px; padding: 5px 13px; border-radius: var(--radius-pill); background: var(--accent); color: var(--on-accent); box-shadow: var(--shadow-sm);"><span style="font-family: var(--font-display); font-size: 20px; line-height: 1; font-variant-numeric: tabular-nums;">{{ m.points }}</span><span style="font-family: var(--font-body); font-weight: 700; font-size: 11px; letter-spacing: 0.03em;">pts</span></span>
-                  </div>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; font-family: var(--font-body); font-size: 14px; color: var(--text-muted); font-variant-numeric: tabular-nums;">
+                  <span>Ton prono : {{ m.pronoStr }}</span>
+                  <sc-if value="{{ m.showX2 }}" hint-placeholder-val="{{ false }}">
+                    <span style="display: inline-flex; align-items: center; justify-content: center; height: 20px; min-width: 28px; padding: 0 7px; border-radius: var(--radius-pill); background: var(--brand); color: var(--on-brand); font-family: var(--font-display); font-size: 12px;">×2</span>
+                  </sc-if>
                 </div>
               </div>
             </sc-for>
@@ -343,7 +380,7 @@
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light' | 'dark'&quot;},&quot;screenState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;default&quot;,&quot;loading&quot;,&quot;no-league&quot;,&quot;no-matches&quot;],&quot;default&quot;:&quot;default&quot;,&quot;tsType&quot;:&quot;'default' | 'loading' | 'no-league' | 'no-matches'&quot;},&quot;competitionName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Tournoi des 6 Nations 2027&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showGlobalRank&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light' | 'dark'&quot;},&quot;screenState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;default&quot;,&quot;loading&quot;,&quot;no-league&quot;,&quot;no-matches&quot;],&quot;default&quot;:&quot;default&quot;,&quot;tsType&quot;:&quot;'default' | 'loading' | 'no-league' | 'no-matches'&quot;},&quot;competitionName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Tournoi des 6 Nations 2027&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showGlobalRank&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;statsCard&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;hero&quot;,&quot;classic&quot;],&quot;default&quot;:&quot;hero&quot;,&quot;tsType&quot;:&quot;'hero' | 'classic'&quot;},&quot;rankTrend&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;up&quot;,&quot;down&quot;,&quot;none&quot;],&quot;default&quot;:&quot;up&quot;,&quot;tsType&quot;:&quot;'up' | 'down' | 'none'&quot;}}">
 class Component extends DCLogic {
   state = { preds: null, touched: null, saving: {}, tab: 'matchs', x2: 'm2', x2Pressing: null };
 
@@ -404,7 +441,7 @@ class Component extends DCLogic {
     };
     const defs = [
       { date: "Aujourd'hui · sam. 6 févr.", round: 'Journée 2', matches: [
-        { id: 'm0', home: T.ITA, away: T.GAL, competition: 'Tournoi des 6 Nations', live: true, hs: 21, as: 18, minute: "58'", dist: [22, 14, 64] },
+        { id: 'm0', home: T.ITA, away: T.GAL, competition: 'Tournoi des 6 Nations', live: true, hs: 21, as: 18, minute: "58'", period: '2e mi-temps', dist: [22, 14, 64] },
         { id: 'm1', home: T.ECO, away: T.ANG, time: 'Coup d\u2019envoi 17h45', locked: false, dist: [38, 12, 50] },
         { id: 'm2', home: T.FRA, away: T.IRL, time: 'Coup d\u2019envoi 21h00', locked: false, dist: [57, 16, 27] },
       ]},
@@ -422,6 +459,7 @@ class Component extends DCLogic {
       const liveOutc = m.hs > m.as ? '1' : (m.hs < m.as ? '2' : 'N');
       const bonusPts = (value.bonusHome ? 1 : 0) + (value.bonusAway ? 1 : 0);
       liveMatches.push({
+        period: m.period,
         home: { ...m.home, score: m.hs },
         away: { ...m.away, score: m.as },
         competition: m.competition,
@@ -532,6 +570,12 @@ class Component extends DCLogic {
       theme: this.props.theme || 'light',
       competitionName: this.props.competitionName || 'Tournoi des 6 Nations 2027',
       showGlobalRank: this.props.showGlobalRank !== false,
+      trendUp: (this.props.rankTrend || 'up') === 'up',
+      trendDown: this.props.rankTrend === 'down',
+      trendNone: this.props.rankTrend === 'none',
+      dayPoints: this.props.rankTrend === 'down' ? '+4 cette journée' : '+32 cette journée',
+      isHeroStats: (this.props.statsCard || 'hero') === 'hero',
+      isClassicStats: this.props.statsCard === 'classic',
       isDefault: state === 'default',
       isLoading: state === 'loading',
       isNoLeague: state === 'no-league',
