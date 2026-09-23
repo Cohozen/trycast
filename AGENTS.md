@@ -4,6 +4,8 @@ App mobile de pronostics rugby (Expo + Supabase), projet portfolio solo de Coren
 
 Ce fichier ne garde que ce qu'un agent pourrait casser sans ouvrir de skill. Le détail vit dans les skills `trycast-*` (`.claude/skills/`) : **ouvrir le skill nommé avant de toucher à son périmètre**.
 
+**Priorité** : ce fichier et les skills `trycast-*` priment sur les modes des plugins installés chez Corentin (Ponytail, Caveman). « Le moins de fichiers possible » ne défait pas « un composant par fichier », un `assert` ne remplace pas les tests Vitest colocalisés, et le style compressé ne s'applique jamais à un fichier du dépôt.
+
 ## Expo HAS CHANGED
 
 Read the exact versioned docs at https://docs.expo.dev/versions/v57.0.0/ before writing any code.
