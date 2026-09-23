@@ -18,6 +18,8 @@ les deep links et les pièges : suis-le.
 
 - **Si rien ne tourne, démarre toi-même** l'émulateur (ou le simulateur) et le dev client, selon
   la section « Démarrage » du skill — c'est attendu, pas une initiative. Tu les arrêteras à la fin.
+  Un `sleep` seul est refusé par l'outil : attendre `Android Bundled` par une boucle bornée
+  (`until grep -q … ; do sleep 5; done`) sur la sortie de la tâche de fond.
 - **Jamais** le web (`expo start --web`), jamais Expo Go, jamais le téléphone de Corentin.
 - Chemins absolus et `git -C` : un `cd` relatif est détourné par zoxide dans ce shell.
 - **Capture d'entrée d'abord.** Écran de connexion → arrête-toi et dis-le : c'est Corentin qui se

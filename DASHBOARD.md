@@ -112,7 +112,7 @@ Pour préparer la revue App Store, plus longue que celle de Google. Ce que le Te
 - **iOS** : `npx expo prebuild --clean -p ios` depuis `apps/mobile` avant la prochaine passe simulateur (`ios/` porte des chemins de l'ancienne disposition).
 - Jeter le worktree `.claude/worktrees/stoic-dewdney-33788e` et les branches `claude/*` de juillet.
 - **SDK 58** : pas avant sa sortie réelle ni avant le lancement de la beta.
-- **Sous-agents** (`.claude/agents/`) : `relecteur` et `docs-lot` ont servi ; reste le premier passage réel de `verif-visuelle`, à la prochaine passe sur émulateur.
+- **Sous-agents** (`.claude/agents/`) : les trois ont fait leur premier passage réel le 2026-09-23 (`verif-visuelle` a démarré seul émulateur et dev client, ~45 s avec le cache Gradle). Coût côté agent : ~40 k tokens (`relecteur`), ~75 k (`docs-lot`), ~100 k (`verif-visuelle`).
 
 ## Décisions clés (actées, ne pas re-débattre)
 
