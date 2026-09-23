@@ -111,6 +111,7 @@ Pour préparer la revue App Store, plus longue que celle de Google. Ce que le Te
 - **iOS** : `npx expo prebuild --clean -p ios` depuis `apps/mobile` avant la prochaine passe simulateur (`ios/` porte des chemins de l'ancienne disposition).
 - Jeter le worktree `.claude/worktrees/stoic-dewdney-33788e` et les branches `claude/*` de juillet.
 - **SDK 58** : pas avant sa sortie réelle ni avant le lancement de la beta.
+- **Sous-agents** (`.claude/agents/` : `relecteur`, `docs-lot`, `verif-visuelle`) : chargés au démarrage d'une session, premier passage réel à faire dans la suivante.
 
 ## Décisions clés (actées, ne pas re-débattre)
 

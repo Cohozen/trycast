@@ -241,6 +241,11 @@ mot de passe. Le rejeu **garde** les comptes (la session reste valide) mais recr
 fictifs sous de nouveaux ids : reprendre les liens de la dernière sortie, et s'attendre au récap
 « Depuis ta dernière visite » à l'ouverture suivante (le fermer par « Fermer »).
 
+**Captures publiables** (fiche store, communication) : jamais depuis le dev client, dont le menu
+développeur se dessine par-dessus l'app, et locale forcée en français — l'émulateur démarre en
+anglais et l'app suit le système :
+`adb shell cmd locale set-app-locales com.cohozen.trycast --locales fr-FR`.
+
 ## Pièges connus
 
 - **`emulator` rend la main trop tôt** : la fenêtre s'ouvre bien avant que le système soit démarré,

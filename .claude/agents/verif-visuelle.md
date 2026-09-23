@@ -25,6 +25,8 @@ les deep links et les pièges : suis-le.
 - Metro déjà lancé par Corentin (port 8081 pris) : le réutiliser, le signaler dans ta réponse.
 - Données : rejouer `node --no-warnings scripts/seed-demo.mjs` depuis la racine si le message le
   demande. Il imprime les deep links de chaque cas.
+- Une retouche de tokens `global.css` qui « ne change rien » : soupçonner d'abord le cache Metro
+  (`npx expo start --clear`).
 - Un retour sur le **mouvement** (tremblement, saccade) ne se juge pas sur une capture fixe :
   filmer et mesurer, recette dans le skill `trycast-design-system`.
 - Rends l'état trouvé (thème, compte, préférences) et arrête ce que tu as lancé (Metro, émulateur,
