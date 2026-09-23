@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
+import { teamName } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
 import { buildBreakdownRows } from '@/features/predictions/breakdown-rows';
 import { BreakdownRowItem } from '@/features/predictions/components/breakdown-row-item';
@@ -8,7 +9,6 @@ import { parseBreakdown } from '@/features/predictions/verdict';
 import { computeMatchPoints } from '@/features/scoring/compute-match-points';
 import type { MatchPoints } from '@/features/scoring/types';
 import { useActiveScoringRules } from '@/features/scoring/use-active-scoring-rules';
-import { i18n } from '@/lib/i18n';
 import { Text, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
@@ -28,7 +28,7 @@ type PointsEarnedCardProps = {
  * « en attente ».
  */
 export function PointsEarnedCard({ match, prediction, jokerOn = false }: PointsEarnedCardProps) {
-    const { t } = useTranslation(['predictions']);
+    const { t } = useTranslation(['predictions', 'matches']);
     const rules = useActiveScoringRules();
     const isLive = match.status === 'in_play';
 
@@ -56,7 +56,6 @@ export function PointsEarnedCard({ match, prediction, jokerOn = false }: PointsE
         if (breakdown) points = { total: prediction.points_awarded, breakdown };
     }
 
-    const oddsFormatter = new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 2 });
     const rows =
         prediction && points
             ? buildBreakdownRows({
@@ -64,10 +63,9 @@ export function PointsEarnedCard({ match, prediction, jokerOn = false }: PointsE
                   total: points.total,
                   predictedHome: prediction.predicted_home_score,
                   predictedAway: prediction.predicted_away_score,
-                  homeCode: match.home_team?.code ?? match.home_team?.name ?? '?',
-                  awayCode: match.away_team?.code ?? match.away_team?.name ?? '?',
+                  homeName: match.home_team ? teamName(match.home_team, t) : '?',
+                  awayName: match.away_team ? teamName(match.away_team, t) : '?',
                   rules,
-                  formatOdds: (odds) => oddsFormatter.format(odds),
               })
             : [];
     const exact = (points?.breakdown.exactScorePoints ?? 0) > 0;
@@ -78,7 +76,7 @@ export function PointsEarnedCard({ match, prediction, jokerOn = false }: PointsE
     return (
         <View
             className={cn(
-                'gap-3 rounded-md bg-surface p-4',
+                'gap-3 rounded-md bg-surface px-4 pb-4 pt-3',
                 exact
                     ? 'border-[1.5px] border-accent/45 tc-glow-accent'
                     : 'border border-border tc-shadow-sm',
@@ -109,7 +107,7 @@ export function PointsEarnedCard({ match, prediction, jokerOn = false }: PointsE
                 <View className="flex-row items-baseline gap-1">
                     <Text
                         className={cn(
-                            'font-display text-[40px] leading-[42px]',
+                            'font-display text-[40px] leading-[40px]',
                             positive ? 'text-accent' : 'text-text-faint',
                         )}>
                         {total === null ? '–' : positive ? `+${total}` : '0'}

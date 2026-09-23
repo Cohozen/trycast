@@ -10,10 +10,12 @@ export type BreakdownLabelKey =
     | 'predictions:breakdown.exactScore'
     | 'predictions:breakdown.gap'
     | 'predictions:breakdown.defensive'
-    | 'predictions:breakdown.offensivePendingTeam'
-    | 'predictions:breakdown.offensiveScored'
-    | 'predictions:breakdown.offensiveMissed'
+    | 'predictions:breakdown.offensive'
     | 'predictions:breakdown.joker';
+
+export type BreakdownDetailKey =
+    | 'predictions:breakdown.offensiveTries'
+    | 'predictions:breakdown.offensivePending';
 
 export type BreakdownRow = {
     key: string;
@@ -24,6 +26,8 @@ export type BreakdownRow = {
     points: number | null;
     /** Badge « écart ≤ N » de la ligne du bonus défensif. */
     defensiveGapBadge?: number;
+    /** Précision discrète après le libellé (essais d'une ligne offensive). */
+    detail?: { key: BreakdownDetailKey; params?: Record<string, number> };
 };
 
 type BuildBreakdownRowsInput = {
@@ -32,10 +36,10 @@ type BuildBreakdownRowsInput = {
     total: number;
     predictedHome: number;
     predictedAway: number;
-    homeCode: string;
-    awayCode: string;
+    /** Noms d'équipe complets, déjà traduits (lignes offensives). */
+    homeName: string;
+    awayName: string;
     rules: Pick<ScoringRules, 'defensiveBonusMaxGap'>;
-    formatOdds: (odds: number) => string;
 };
 
 /**
@@ -48,33 +52,22 @@ export function buildBreakdownRows({
     total,
     predictedHome,
     predictedAway,
-    homeCode,
-    awayCode,
+    homeName,
+    awayName,
     rules,
-    formatOdds,
 }: BuildBreakdownRowsInput): BreakdownRow[] {
-    // La cote utilisée est portée par la ligne vainqueur (c'est elle qui
-    // explique le nombre de points) — pas de ligne « pondération » séparée.
-    const odds = formatOdds(breakdown.oddsUsed);
+    // Libellé nu : ni équipe ni cote (retour Corentin 2026-09-23) — la cote
+    // reste lisible dans les points de base 1/N/2 de la sheet.
     const rows: BreakdownRow[] = [
-        breakdown.predictedOutcome === 'draw'
-            ? {
-                  key: 'winner',
-                  labelKey: 'predictions:breakdown.winnerDraw',
-                  params: { odds },
-                  mark: breakdown.winnerCorrect ? 'ok' : 'ko',
-                  points: breakdown.winnerPoints,
-              }
-            : {
-                  key: 'winner',
-                  labelKey: 'predictions:breakdown.winner',
-                  params: {
-                      code: breakdown.predictedOutcome === 'home' ? homeCode : awayCode,
-                      odds,
-                  },
-                  mark: breakdown.winnerCorrect ? 'ok' : 'ko',
-                  points: breakdown.winnerPoints,
-              },
+        {
+            key: 'winner',
+            labelKey:
+                breakdown.predictedOutcome === 'draw'
+                    ? 'predictions:breakdown.winnerDraw'
+                    : 'predictions:breakdown.winner',
+            mark: breakdown.winnerCorrect ? 'ok' : 'ko',
+            points: breakdown.winnerPoints,
+        },
         {
             key: 'exact',
             labelKey: 'predictions:breakdown.exactScore',
@@ -102,38 +95,26 @@ export function buildBreakdownRows({
         });
     }
     // Une ligne par équipe cochée (bonus ou malus), tolère un breakdown v1
-    // (offensiveHome/Away absents ⇒ non coché).
-    const offensiveSides: { key: string; side?: OffensiveSideBreakdown; code: string }[] = [
-        { key: 'offensive-home', side: breakdown.offensiveHome, code: homeCode },
-        { key: 'offensive-away', side: breakdown.offensiveAway, code: awayCode },
+    // (offensiveHome/Away absents ⇒ non coché). Les essais passent en précision.
+    const offensiveSides: { key: string; side?: OffensiveSideBreakdown; team: string }[] = [
+        { key: 'offensive-home', side: breakdown.offensiveHome, team: homeName },
+        { key: 'offensive-away', side: breakdown.offensiveAway, team: awayName },
     ];
-    for (const { key, side, code } of offensiveSides) {
+    for (const { key, side, team } of offensiveSides) {
         if (!side?.checked) continue;
-        if (side.pending) {
-            rows.push({
-                key,
-                labelKey: 'predictions:breakdown.offensivePendingTeam',
-                params: { code },
-                mark: 'info',
-                points: null,
-            });
-        } else if (side.points < 0) {
-            rows.push({
-                key,
-                labelKey: 'predictions:breakdown.offensiveMissed',
-                params: { code, tries: side.tries ?? 0 },
-                mark: 'malus',
-                points: side.points,
-            });
-        } else {
-            rows.push({
-                key,
-                labelKey: 'predictions:breakdown.offensiveScored',
-                params: { code, tries: side.tries ?? 0, odds: formatOdds(side.oddsUsed) },
-                mark: side.points > 0 ? 'ok' : 'ko',
-                points: side.points,
-            });
-        }
+        rows.push({
+            key,
+            labelKey: 'predictions:breakdown.offensive',
+            params: { team },
+            mark: side.pending ? 'info' : side.points > 0 ? 'ok' : side.points < 0 ? 'malus' : 'ko',
+            points: side.pending ? null : side.points,
+            detail: side.pending
+                ? { key: 'predictions:breakdown.offensivePending' }
+                : {
+                      key: 'predictions:breakdown.offensiveTries',
+                      params: { count: side.tries ?? 0 },
+                  },
+        });
     }
     // Joker de la phase : le total est doublé — la ligne rapporte la seconde
     // moitié (= total de base), le total reste celui du scoring.

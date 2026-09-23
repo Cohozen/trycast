@@ -35,14 +35,14 @@ const LABELS: { name: string; render: (i18n: I18n) => string; expected: string }
         expected: String(GAP),
     },
     {
-        name: 'breakdown.winner',
-        render: (i18n) => i18n.t('predictions:breakdown.winner', { code: 'FRA', odds: '1,77' }),
-        expected: '1,77',
+        name: 'breakdown.offensive',
+        render: (i18n) => i18n.t('predictions:breakdown.offensive', { team: 'Irlande' }),
+        expected: 'Irlande',
     },
     {
-        name: 'breakdown.winnerDraw',
-        render: (i18n) => i18n.t('predictions:breakdown.winnerDraw', { odds: '1,77' }),
-        expected: '1,77',
+        name: 'breakdown.offensiveTries',
+        render: (i18n) => i18n.t('predictions:breakdown.offensiveTries', { count: 3 }),
+        expected: '3',
     },
 ];
 

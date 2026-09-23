@@ -71,19 +71,20 @@
     "breakdown": {
         "basePoints": "Points de base",
         "bonusPredicted": "Bonus pronostiqués",
-        "winner": "Bon vainqueur · {{code}} (cote {{odds}})",
-        "winnerDraw": "Bon résultat · match nul (cote {{odds}})",
+        "winner": "Bon vainqueur",
+        "winnerDraw": "Bon résultat · match nul",
         "exactScore": "Score exact",
         "gap": "Bonus écart",
         "defensive": "Bonus défensif",
         "defensiveBadge": "Défense · écart ≤ {{gap}}",
         "defensiveGap": "Écart ≤ {{gap}}",
-        "offensiveScored": "Attaque {{code}} · {{tries}} essais (cote {{odds}})",
-        "offensiveMissed": "Attaque {{code}} · {{tries}} essais",
-        "offensivePendingTeam": "Attaque {{code}} · en attente des essais",
         "finalScore": "Score final",
         "totalWon": "Total gagné",
-        "joker": "Point double de la phase"
+        "joker": "Point double de la phase",
+        "offensive": "Bonus offensif · {{team}}",
+        "offensiveTries_one": "{{count}} essai",
+        "offensiveTries_other": "{{count}} essais",
+        "offensivePending": "essais en attente"
     },
     "errors": {
         "deadline": "Trop tard : le coup d'envoi est passé, le prono est verrouillé.",

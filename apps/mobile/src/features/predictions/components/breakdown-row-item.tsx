@@ -49,14 +49,26 @@ export function BreakdownRowItem({ row, dense = false }: BreakdownRowItemProps) 
                             : '✗'}
                 </Text>
             </View>
-            <View className="flex-1 flex-row items-center gap-2">
+            {/* Une seule ligne : le libellé s'abrège, la précision et le badge restent */}
+            <View className="min-w-0 flex-1 flex-row items-center gap-2">
                 <Text
                     className={cn(
                         'shrink font-body text-text',
                         dense ? 'text-[13px]' : 'text-[14px]',
-                    )}>
+                    )}
+                    numberOfLines={1}>
                     {t(row.labelKey, row.params)}
                 </Text>
+                {row.detail ? (
+                    <Text
+                        className={cn(
+                            'flex-none font-body text-text-faint',
+                            dense ? 'text-[11px]' : 'text-[12px]',
+                        )}
+                        numberOfLines={1}>
+                        {t(row.detail.key, row.detail.params)}
+                    </Text>
+                ) : null}
                 {row.defensiveGapBadge !== undefined ? (
                     <Badge tone="info" variant="soft">
                         {t('predictions:breakdown.defensiveGap', { gap: row.defensiveGapBadge })}

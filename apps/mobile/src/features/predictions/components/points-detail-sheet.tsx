@@ -12,7 +12,6 @@ import { BreakdownRowItem } from '@/features/predictions/components/breakdown-ro
 import { parseBreakdown, verdictOf } from '@/features/predictions/verdict';
 import { useActiveScoringRules } from '@/features/scoring/use-active-scoring-rules';
 import { winnerPointsByOutcome } from '@/features/scoring/potential-by-outcome';
-import { i18n } from '@/lib/i18n';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
@@ -40,17 +39,14 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
         return null;
     }
 
-    const oddsFormatter = new Intl.NumberFormat(i18n.language, {
-        maximumFractionDigits: 2,
-    });
     // Rappel des points de base 1/N/2 vus pendant la phase de prono (même
     // calcul que la carte de prono : bon 1/N/2 seul, cote avec repli).
     const winnerPoints = winnerPointsByOutcome(
         { home: match.odds_home, draw: match.odds_draw, away: match.odds_away },
         rules,
     );
-    const homeCode = match.home_team?.code ?? match.home_team?.name ?? '?';
-    const awayCode = match.away_team?.code ?? match.away_team?.name ?? '?';
+    const homeName = match.home_team ? teamName(match.home_team, t) : '?';
+    const awayName = match.away_team ? teamName(match.away_team, t) : '?';
     const cells: { key: '1' | 'N' | '2'; outcome: 'home' | 'draw' | 'away' }[] = [
         { key: '1', outcome: 'home' },
         { key: 'N', outcome: 'draw' },
@@ -61,10 +57,9 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
         total: prediction.points_awarded ?? 0,
         predictedHome: prediction.predicted_home_score,
         predictedAway: prediction.predicted_away_score,
-        homeCode,
-        awayCode,
+        homeName,
+        awayName,
         rules,
-        formatOdds: (odds) => oddsFormatter.format(odds),
     });
     const bonusTags: string[] = [];
     if (prediction.predicted_bonus_off_home) {
@@ -74,8 +69,6 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
         bonusTags.push(match.away_team?.code ?? match.away_team?.name ?? '?');
     }
 
-    const homeName = match.home_team ? teamName(match.home_team, t) : '?';
-    const awayName = match.away_team ? teamName(match.away_team, t) : '?';
     const title = `${homeName} – ${awayName}`;
     const total = prediction.points_awarded ?? 0;
 

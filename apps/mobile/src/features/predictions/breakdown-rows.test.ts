@@ -33,10 +33,9 @@ function rowsFor(
         total,
         predictedHome: predicted[0],
         predictedAway: predicted[1],
-        homeCode: 'FRA',
-        awayCode: 'IRL',
+        homeName: 'France',
+        awayName: 'Irlande',
         rules: BAREME_V2,
-        formatOdds: String,
     });
 }
 
@@ -53,12 +52,19 @@ describe('buildBreakdownRows', () => {
         expect(keys(rowsFor([30, 10], [30, 10]))).not.toContain('defensive');
     });
 
-    it('porte le code du vainqueur pronostiqué et la cote utilisée', () => {
+    it('libelle le vainqueur sans équipe ni cote', () => {
         const [winner] = rowsFor([10, 20], [10, 20]);
-        expect(winner).toMatchObject({
-            labelKey: 'predictions:breakdown.winner',
-            params: { code: 'IRL', odds: '3' },
+        expect(winner).toMatchObject({ labelKey: 'predictions:breakdown.winner', mark: 'ok' });
+        expect(winner?.params).toBeUndefined();
+    });
+
+    it('nomme l’équipe en entier et passe les essais en précision', () => {
+        const rows = rowsFor([20, 15], [20, 15], { bonusOffHome: true, homeTries: 4 });
+        expect(rows.find((row) => row.key === 'offensive-home')).toMatchObject({
+            labelKey: 'predictions:breakdown.offensive',
+            params: { team: 'France' },
             mark: 'ok',
+            detail: { key: 'predictions:breakdown.offensiveTries', params: { count: 4 } },
         });
     });
 
@@ -67,6 +73,7 @@ describe('buildBreakdownRows', () => {
         expect(rows.find((row) => row.key === 'offensive-home')).toMatchObject({
             mark: 'info',
             points: null,
+            detail: { key: 'predictions:breakdown.offensivePending' },
         });
     });
 

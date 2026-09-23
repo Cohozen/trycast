@@ -71,19 +71,20 @@
     "breakdown": {
         "basePoints": "Base points",
         "bonusPredicted": "Predicted bonuses",
-        "winner": "Right winner · {{code}} (odds {{odds}})",
-        "winnerDraw": "Right result · draw (odds {{odds}})",
+        "winner": "Right winner",
+        "winnerDraw": "Right result · draw",
         "exactScore": "Exact score",
         "gap": "Margin bonus",
         "defensive": "Defensive bonus",
         "defensiveBadge": "Defense · margin ≤ {{gap}}",
         "defensiveGap": "Margin ≤ {{gap}}",
-        "offensiveScored": "{{code}} attack · {{tries}} tries (odds {{odds}})",
-        "offensiveMissed": "{{code}} attack · {{tries}} tries",
-        "offensivePendingTeam": "{{code}} attack · awaiting tries",
         "finalScore": "Final score",
         "totalWon": "Total won",
-        "joker": "Phase double points"
+        "joker": "Phase double points",
+        "offensive": "Attacking bonus · {{team}}",
+        "offensiveTries_one": "{{count}} try",
+        "offensiveTries_other": "{{count}} tries",
+        "offensivePending": "tries pending"
     },
     "errors": {
         "deadline": "Too late: kickoff has passed, the prediction is locked.",
