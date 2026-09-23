@@ -4,9 +4,10 @@
 > Mis à jour à la fin de chaque lot. **Pas de journal** : l'historique se lit dans `git log`
 > (et l'ancien journal des sessions par `git show 8418902:DASHBOARD.md`).
 >
-> État au **2026-09-23** : `main` poussé, à jour avec `origin/main`. Serveur de la v1.1.0 **entièrement
-> en prod** (coup de la journée et rang d'avant journée compris, passés le 2026-09-23) ; l'app
-> suivra avec le build 1.1.0.
+> État au **2026-09-23** : serveur de la v1.1.0 **entièrement en prod** (coup de la journée et rang
+> d'avant journée compris). **Release 1.1.0 préparée** (commit `chore(release): 1.1.0`, tag `v1.1.0`) :
+> reste `git push --follow-tags` puis `npm run build:prod`. L'empreinte a changé : le build 5 (1.0.0)
+> en circulation ne recevra plus aucune OTA, seul le build 1.1.0 les recevra.
 
 ## Avancement des lots
 
