@@ -62,13 +62,6 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
 
 ## Ce qu'il reste à faire
 
-### 🔎 Contrôle après le passage en prod du 2026-09-23
-Migrations `20260922000100_round_highlights.sql` et `20260923000100_my_previous_rank.sql` en prod.
-Confirmer que l'EF `notify` a bien été redéployée juste après (la clé d'unicité de
-`notification_sends` a changé) : dans le SQL editor prod,
-`select status_code, content from net._http_response order by created desc limit 3` doit montrer
-des 200 (`skipped` ou `success`) après un tick, pas d'erreur 42P10.
-
 ### 🔶 Beta fermée (Lot 9, phase 7)
 - **Recruter 12 testeurs** qui restent inscrits 14 jours. ⚠️ La waitlist est **vide** : lui envoyer du trafic bien avant novembre.
 - **Build de production 1.1.0** : aucune OTA d'ici là (le build en circulation, version code 5,
