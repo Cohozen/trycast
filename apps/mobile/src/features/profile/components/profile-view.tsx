@@ -1,15 +1,18 @@
-import { useRouter } from 'expo-router';
-import { ChevronLeft, ChevronRight, Settings, Users } from 'lucide-react-native';
+import { Stack, useRouter } from 'expo-router';
+import { ChevronRight, Settings, Users } from 'lucide-react-native';
 import { type ReactNode, useDeferredValue, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
+import { CollapsingHeaderTitle } from '@/components/collapsing-header-title';
+import { HeaderHairline } from '@/components/header-hairline';
 import { NotificationsBell } from '@/components/notifications-bell';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { IconButton } from '@/components/ui/icon-button';
+import { Screen } from '@/components/ui/screen';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useMyLeagues } from '@/features/leagues/use-my-leagues';
@@ -27,6 +30,7 @@ import { computeProfileStats } from '@/features/profile/compute-profile-stats';
 import { useProfile } from '@/features/profile/use-profile';
 import { i18n } from '@/lib/i18n';
 import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
+import { useCollapseProgress } from '@/components/use-collapse-progress';
 import { useScreenInsets } from '@/tw/use-screen-insets';
 
 type ProfileTab = 'stats' | 'predictions' | 'leagues';
@@ -36,7 +40,8 @@ type ProfileViewProps = {
     userId: string;
     /**
      * Mon propre profil (onglet Profil) : ajoute Réglages et l'onglet Ligues.
-     * En public, l'écran est poussé et porte un bouton retour à la place.
+     * En public, l'écran est poussé avec la barre native (retour système) et
+     * un header repliable.
      */
     isSelf: boolean;
 };
@@ -80,10 +85,15 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
     const accentColor = useThemeColor('accent');
     const faintColor = useThemeColor('text-faint');
     const screenInsets = useScreenInsets();
-    const safeInsets = useSafeAreaInsets();
-    // Profil public : écran poussé PAR-DESSUS les onglets, la tab bar flottante
-    // n'est pas là — son dégagement de 94px creuserait un vide en bas de liste.
-    const bottomPadding = isSelf ? screenInsets.bottomTabBar : Math.max(safeInsets.bottom, 16) + 24;
+    // Profil public : l'identité s'estompe au défilement et passe en résumé
+    // (avatar + pseudo) dans la barre native, comme le hero du détail de
+    // match ; les onglets restent ensuite collés sous la barre. `reach` : de
+    // quoi amener les onglets en haut même quand l'onglet affiché est court.
+    const collapse = useCollapseProgress({ start: 12, distance: 56, reach: 260 });
+    const identityStyle = useAnimatedStyle(() => ({
+        opacity: 1 - collapse.progress.value * 0.92,
+        transform: [{ scale: 1 - collapse.progress.value * 0.05 }],
+    }));
 
     const stats = computeProfileStats(predictions.data ?? new Map(), matches.data ?? []);
     const trend = computePointsByRound(predictions.data ?? new Map(), matches.data ?? []);
@@ -142,7 +152,9 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
             const newDay =
                 index === 0 || dayTitle !== dayTitleOf(finishedMatches[index - 1].kickoff_at);
             if (newDay) {
-                stickyIndices.push(predictionChildren.length);
+                // Profil public : ce sont les onglets qui collent, un en-tête
+                // de jour collant les pousserait hors de l'écran
+                if (isSelf) stickyIndices.push(predictionChildren.length);
                 // Fond opaque obligatoire : les cartes défilent dessous.
                 predictionChildren.push(
                     <View className="bg-bg py-1" key={`day-${dayTitle}`}>
@@ -169,186 +181,114 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
         }
     }
 
-    return (
-        <View className="flex-1 bg-bg">
-            {/* Bloc épinglé : identité, chiffres clés, compétition, onglets */}
-            <View
-                className="w-full max-w-[800px] flex-none gap-3.5 self-center px-5 pb-2"
-                style={{ paddingTop: screenInsets.top }}>
-                {/* Profil public : l'écran est poussé sans header natif */}
-                {isSelf ? null : (
-                    <View className="-ml-2 flex-row">
-                        <IconButton
-                            accessibilityLabel={t('common:actions.back')}
-                            onPress={() =>
-                                router.canGoBack() ? router.back() : router.replace('/leaderboard')
-                            }>
-                            <ChevronLeft color={textColor} size={22} strokeWidth={2} />
-                        </IconButton>
+    const identity = (
+        <View className="flex-row gap-3.5">
+            {profilePending ? (
+                <Skeleton className="h-16 flex-1" variant="block" />
+            ) : (
+                <>
+                    <Avatar
+                        name={profile?.username ?? '?'}
+                        ring
+                        size="lg"
+                        uri={profile?.avatar_url}
+                    />
+                    <View className="min-w-0 flex-1">
+                        <Text className="font-display text-[27px] leading-6.75 text-text">
+                            {profile?.username}
+                        </Text>
+                        {memberSince ? (
+                            <Text className="font-body text-[12.5px] text-text-muted">
+                                {t('profile:memberSince', { date: memberSince })}
+                            </Text>
+                        ) : null}
                     </View>
-                )}
-
-                {/* Identité (+ accès réglages sur mon profil) */}
-                <View className="flex-row gap-3.5">
-                    {profilePending ? (
-                        <Skeleton className="h-16 flex-1" variant="block" />
-                    ) : (
-                        <>
-                            <Avatar
-                                name={profile?.username ?? '?'}
-                                ring
-                                size="lg"
-                                uri={profile?.avatar_url}
-                            />
-                            <View className="min-w-0 flex-1">
-                                <Text className="font-display text-[27px] leading-6.75 text-text">
-                                    {profile?.username}
-                                </Text>
-                                {memberSince ? (
-                                    <Text className="font-body text-[12.5px] text-text-muted">
-                                        {t('profile:memberSince', { date: memberSince })}
-                                    </Text>
-                                ) : null}
-                            </View>
-                        </>
-                    )}
-                    {isSelf ? (
-                        <View className="flex-row gap-2">
-                            <NotificationsBell />
-                            <IconButton
-                                accessibilityLabel={t('profile:settings.title')}
-                                onPress={() => router.push('/settings')}
-                                variant="soft">
-                                <Settings color={textColor} size={20} strokeWidth={1.9} />
-                            </IconButton>
-                        </View>
-                    ) : null}
+                </>
+            )}
+            {isSelf ? (
+                <View className="flex-row gap-2">
+                    <NotificationsBell />
+                    <IconButton
+                        accessibilityLabel={t('profile:settings.title')}
+                        onPress={() => router.push('/settings')}
+                        variant="soft">
+                        <Settings color={textColor} size={20} strokeWidth={1.9} />
+                    </IconButton>
                 </View>
-
-                {/* Compétition : au-dessus des chiffres qu'elle filtre */}
-                {competitionList.length > 0 && competitionId ? (
-                    <CompetitionChips
-                        competitions={competitionList}
-                        onChange={setSelectedCompetitionId}
-                        value={competitionId}
-                    />
-                ) : null}
-
-                {/* Chiffres clés */}
-                <Card className="flex-row overflow-hidden p-0">
-                    {figures.map((figure, index) => (
-                        <View
-                            className={`flex-1 items-center gap-1 px-1 py-3 ${index > 0 ? 'border-l border-border' : ''}`}
-                            key={figure.key}>
-                            <Text className="font-display text-[23px] leading-5.75 text-text">
-                                {figure.value}
-                            </Text>
-                            <Text className="font-body-bold text-[9.5px] uppercase tracking-[0.57px] text-text-faint">
-                                {figure.label}
-                            </Text>
-                        </View>
-                    ))}
-                </Card>
-
-                <SegmentedControl
-                    onChange={setTab}
-                    options={[
-                        { value: 'stats', label: t('profile:tabs.stats') },
-                        { value: 'predictions', label: t('profile:tabs.predictions') },
-                        // Ligues : mes ligues, donc mon profil seulement
-                        ...(isSelf
-                            ? [{ value: 'leagues' as const, label: t('profile:tabs.leagues') }]
-                            : []),
-                    ]}
-                    value={tab}
+            ) : null}
+        </View>
+    );
+    const competitionChips =
+        competitionList.length > 0 && competitionId ? (
+            <CompetitionChips
+                competitions={competitionList}
+                onChange={setSelectedCompetitionId}
+                value={competitionId}
+            />
+        ) : null;
+    const figuresCard = (
+        <Card className="flex-row overflow-hidden p-0">
+            {figures.map((figure, index) => (
+                <View
+                    className={`flex-1 items-center gap-1 px-1 py-3 ${index > 0 ? 'border-l border-border' : ''}`}
+                    key={figure.key}>
+                    <Text className="font-display text-[23px] leading-5.75 text-text">
+                        {figure.value}
+                    </Text>
+                    <Text className="font-body-bold text-[9.5px] uppercase tracking-[0.57px] text-text-faint">
+                        {figure.label}
+                    </Text>
+                </View>
+            ))}
+        </Card>
+    );
+    const tabsControl = (
+        <SegmentedControl
+            onChange={setTab}
+            options={[
+                { value: 'stats', label: t('profile:tabs.stats') },
+                { value: 'predictions', label: t('profile:tabs.predictions') },
+                // Ligues : mes ligues, donc mon profil seulement
+                ...(isSelf
+                    ? [{ value: 'leagues' as const, label: t('profile:tabs.leagues') }]
+                    : []),
+            ]}
+            value={tab}
+        />
+    );
+    const tabContent = (
+        <>
+            {tabsLoading ? (
+                <View className="gap-2.5">
+                    <Skeleton className="h-24" variant="block" />
+                    <Skeleton className="h-24" variant="block" />
+                </View>
+            ) : deferredTab === 'stats' ? (
+                <ProfileStatsPanel
+                    owner={isSelf ? 'self' : 'other'}
+                    points={standing.data?.total_points ?? null}
+                    rank={myRank.data?.rank ?? null}
+                    stats={stats}
+                    totalPlayers={myRank.data?.total ?? null}
+                    trend={trend}
                 />
-            </View>
-
-            {/* Seul le contenu de l'onglet défile */}
-            <ScrollView
-                className="flex-1"
-                contentContainerClassName="w-full max-w-[800px] gap-3.5 self-center px-5 pt-3.5"
-                contentContainerStyle={{ paddingBottom: bottomPadding }}
-                stickyHeaderIndices={stickyIndices}>
-                {tabsLoading ? (
-                    <View className="gap-2.5">
-                        <Skeleton className="h-24" variant="block" />
-                        <Skeleton className="h-24" variant="block" />
-                    </View>
-                ) : deferredTab === 'stats' ? (
-                    <ProfileStatsPanel
-                        owner={isSelf ? 'self' : 'other'}
-                        points={standing.data?.total_points ?? null}
-                        rank={myRank.data?.rank ?? null}
-                        stats={stats}
-                        totalPlayers={myRank.data?.total ?? null}
-                        trend={trend}
-                    />
-                ) : deferredTab === 'predictions' ? (
-                    finishedMatches.length === 0 ? (
-                        <EmptyState
-                            message={t(
-                                isSelf
-                                    ? 'profile:predictions.emptyMessage'
-                                    : 'profile:predictions.emptyMessageOther',
-                            )}
-                            title={t('profile:predictions.emptyTitle')}
-                        />
-                    ) : (
-                        predictionChildren
-                    )
-                ) : leagues.length === 0 ? (
+            ) : deferredTab === 'predictions' ? (
+                finishedMatches.length === 0 ? (
                     <EmptyState
-                        action={
-                            <View className="w-full max-w-75 gap-2.5">
-                                <Button
-                                    fullWidth
-                                    onPress={() => router.push('/league/new')}
-                                    title={t('leagues:actions.create')}
-                                />
-                                <Button
-                                    fullWidth
-                                    onPress={() =>
-                                        router.push({
-                                            pathname: '/league/new',
-                                            params: { tab: 'join' },
-                                        })
-                                    }
-                                    title={t('leagues:actions.join')}
-                                    variant="secondary"
-                                />
-                            </View>
-                        }
-                        message={t('leagues:hero.message')}
-                        title={t('leagues:hero.title')}
+                        message={t(
+                            isSelf
+                                ? 'profile:predictions.emptyMessage'
+                                : 'profile:predictions.emptyMessageOther',
+                        )}
+                        title={t('profile:predictions.emptyTitle')}
                     />
                 ) : (
-                    <View className="gap-2.5">
-                        {leagues.map((league) => (
-                            <Pressable
-                                accessibilityRole="button"
-                                key={league.id}
-                                onPress={() =>
-                                    router.push({
-                                        pathname: '/league/[id]',
-                                        params: { id: league.id },
-                                    })
-                                }>
-                                <Card className="flex-row items-center gap-3 px-4 py-3.5">
-                                    <View className="h-9 w-9 items-center justify-center rounded-sm bg-accent/10">
-                                        <Users color={accentColor} size={17} strokeWidth={1.9} />
-                                    </View>
-                                    <Text className="min-w-0 flex-1 font-body-bold text-[15px] text-text">
-                                        {league.name}
-                                    </Text>
-                                    <ChevronRight color={faintColor} size={18} strokeWidth={2} />
-                                </Card>
-                            </Pressable>
-                        ))}
-                        {/* Mêmes boutons que l'état « aucune ligue » et que le
-                            Classement — seuls le titre et le message du héros
-                            sont réservés au cas sans ligue */}
-                        <View className="mt-1 gap-2.5">
+                    predictionChildren
+                )
+            ) : leagues.length === 0 ? (
+                <EmptyState
+                    action={
+                        <View className="w-full max-w-75 gap-2.5">
                             <Button
                                 fullWidth
                                 onPress={() => router.push('/league/new')}
@@ -366,8 +306,143 @@ export function ProfileView({ userId, isSelf }: ProfileViewProps) {
                                 variant="secondary"
                             />
                         </View>
+                    }
+                    message={t('leagues:hero.message')}
+                    title={t('leagues:hero.title')}
+                />
+            ) : (
+                <View className="gap-2.5">
+                    {leagues.map((league) => (
+                        <Pressable
+                            accessibilityRole="button"
+                            key={league.id}
+                            onPress={() =>
+                                router.push({
+                                    pathname: '/league/[id]',
+                                    params: { id: league.id },
+                                })
+                            }>
+                            <Card className="flex-row items-center gap-3 px-4 py-3.5">
+                                <View className="h-9 w-9 items-center justify-center rounded-sm bg-accent/10">
+                                    <Users color={accentColor} size={17} strokeWidth={1.9} />
+                                </View>
+                                <Text className="min-w-0 flex-1 font-body-bold text-[15px] text-text">
+                                    {league.name}
+                                </Text>
+                                <ChevronRight color={faintColor} size={18} strokeWidth={2} />
+                            </Card>
+                        </Pressable>
+                    ))}
+                    {/* Mêmes boutons que l'état « aucune ligue » et que le
+                        Classement — seuls le titre et le message du héros
+                        sont réservés au cas sans ligue */}
+                    <View className="mt-1 gap-2.5">
+                        <Button
+                            fullWidth
+                            onPress={() => router.push('/league/new')}
+                            title={t('leagues:actions.create')}
+                        />
+                        <Button
+                            fullWidth
+                            onPress={() =>
+                                router.push({
+                                    pathname: '/league/new',
+                                    params: { tab: 'join' },
+                                })
+                            }
+                            title={t('leagues:actions.join')}
+                            variant="secondary"
+                        />
                     </View>
-                )}
+                </View>
+            )}
+        </>
+    );
+
+    if (!isSelf) {
+        // Contenu aplati pour stickyHeaderIndices : les onglets doivent être
+        // un enfant direct du scroll (fond opaque, le contenu passe dessous).
+        const children: ReactNode[] = [
+            <Animated.View key="identity" style={[{ transformOrigin: 'top' }, identityStyle]}>
+                {identity}
+            </Animated.View>,
+            competitionChips ? <View key="competitions">{competitionChips}</View> : null,
+            <View key="figures">{figuresCard}</View>,
+        ].filter(Boolean);
+        const tabsIndex = children.length;
+        children.push(
+            <View className="bg-bg pb-1 pt-2" key="tabs">
+                {tabsControl}
+            </View>,
+        );
+        if (!tabsLoading && deferredTab === 'predictions' && finishedMatches.length > 0) {
+            children.push(...predictionChildren);
+        } else {
+            children.push(<View key="tab-content">{tabContent}</View>);
+        }
+
+        return (
+            <>
+                <Stack.Screen
+                    options={{
+                        headerTitleAlign: 'center',
+                        headerTitle: () => (
+                            <CollapsingHeaderTitle
+                                compact={
+                                    <>
+                                        <Avatar
+                                            name={profile?.username ?? '?'}
+                                            size="sm"
+                                            uri={profile?.avatar_url}
+                                        />
+                                        <Text
+                                            className="shrink font-body-semibold text-[16px] text-text"
+                                            numberOfLines={1}>
+                                            {profile?.username}
+                                        </Text>
+                                    </>
+                                }
+                                progress={collapse.progress}
+                                title={t('profile:title')}
+                            />
+                        ),
+                    }}
+                />
+                <HeaderHairline progress={collapse.progress} />
+                <Screen
+                    contentClassName="gap-3.5"
+                    contentContainerStyle={{ minHeight: collapse.minContentHeight }}
+                    onLayout={collapse.onLayout}
+                    scrollRef={collapse.scrollRef}
+                    stickyHeaderIndices={[tabsIndex]}
+                    top="none">
+                    {children}
+                </Screen>
+            </>
+        );
+    }
+
+    return (
+        <View className="flex-1 bg-bg">
+            {/* Bloc épinglé : identité, chiffres clés, compétition, onglets */}
+            <View
+                className="w-full max-w-[800px] flex-none gap-3.5 self-center px-5 pb-2"
+                style={{ paddingTop: screenInsets.top }}>
+                {identity}
+                {competitionChips}
+                {figuresCard}
+                {tabsControl}
+            </View>
+
+            {/* Seul le contenu de l'onglet défile */}
+            <ScrollView
+                className="flex-1"
+                contentContainerClassName="w-full max-w-[800px] gap-3.5 self-center px-5 pt-3.5"
+                contentContainerStyle={{ paddingBottom: screenInsets.bottomTabBar }}
+                stickyHeaderIndices={stickyIndices}>
+                {tabsLoading || deferredTab !== 'predictions' || finishedMatches.length === 0
+                    ? tabContent
+                    : predictionChildren}
             </ScrollView>
         </View>
     );
