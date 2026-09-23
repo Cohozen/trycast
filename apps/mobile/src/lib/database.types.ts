@@ -1026,6 +1026,10 @@ export type Database = {
                     username: string;
                 }[];
             };
+            get_my_previous_rank: {
+                Args: { p_before: string; p_competition_id: string };
+                Returns: number;
+            };
             get_prediction_distributions: {
                 Args: { p_competition_id: string };
                 Returns: {
