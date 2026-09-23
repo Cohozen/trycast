@@ -97,7 +97,7 @@ Le site a sa propre vérification : `cd apps/web && npm run check && npm run bui
 
 ### 2. Sécurité côté serveur — scripts E2E (racine, projet **dev**)
 
-Des scripts bash qui tapent l'API Supabase avec de vrais JWT, pour prouver que les règles tiennent **côté serveur** (RLS, RPC verrouillées, deadline au coup d'envoi), pas seulement dans l'UI : `e2e-auth.sh`, `e2e-predictions.sh`, `e2e-scoring.sh`, `e2e-leagues.sh`, `e2e-jokers.sh`, `e2e-reactions.sh`, `e2e-notifications.sh`, `e2e-privacy.sh`, `e2e-avatars.sh`, plus des vérifications SQL (`e2e-scoring.sql`, `e2e-round-highlights.sql`, `e2e-waitlist.sql`).
+Des scripts bash qui tapent l'API Supabase avec de vrais JWT, pour prouver que les règles tiennent **côté serveur** (RLS, RPC verrouillées, deadline au coup d'envoi), pas seulement dans l'UI : `e2e-auth.sh`, `e2e-predictions.sh`, `e2e-scoring.sh`, `e2e-leagues.sh`, `e2e-jokers.sh`, `e2e-reactions.sh`, `e2e-notifications.sh`, `e2e-privacy.sh`, `e2e-avatars.sh`, plus des vérifications SQL (`e2e-scoring.sql`, `e2e-round-highlights.sql`, `e2e-previous-rank.sql`, `e2e-waitlist.sql`).
 
 ```bash
 EMAIL1=e2e.user1@trycast.local EMAIL2=e2e.user2@trycast.local PASSWORD=motdepasse123 \

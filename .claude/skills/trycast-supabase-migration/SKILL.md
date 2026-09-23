@@ -58,6 +58,7 @@ Chaque script re-seede son état avant exécution. Ordre de seed cumulatif : use
 - Notifications : `bash scripts/e2e-notifications.sh` (seuls les users de test sont requis ; filtres PostgREST sur un token Expo → crochets à URL-encoder, cf. `TOKEN_ENC` dans le script)
 
 - Coup de la journée : `supabase db query --linked -f scripts/e2e-round-highlights.sql`, **sans seed**. Modèle à reprendre pour un calcul SQL : tout dans une transaction terminée par `rollback`, données créées sur place (users dans `auth.users`, compétition, ligue, matchs), petites fonctions `pg_temp.*` pour les assertions (`raise exception` qui nomme le cas), et une ligne « OK » en sortie. La garde d'appartenance d'une RPC se teste dans la même transaction : `set_config('request.jwt.claims', …, true)` puis `set local role authenticated`, et `reset role` avant d'asserter (les fonctions `pg_temp` ne sont pas exécutables par `authenticated`). Faire tourner une copie **faussée** au moins une fois : un script qui ne sait pas échouer ne prouve rien.
+- Rang d'avant journée : `supabase db query --linked -f scripts/e2e-previous-rank.sql`, **sans seed**, même modèle (agrégat, départage, comptes de démo exclus, frontière `p_before`, rang de l'appelant seul). ⚠️ `get_my_previous_rank` recopie les critères du classement : toucher au départage de `apply_match_scores` impose de la modifier aussi (skill `trycast-regles-metier`).
 
 Les scripts lisent `.env` (`EXPO_PUBLIC_SUPABASE_URL` / `_KEY`, clé publishable uniquement) et acceptent `EMAIL1/EMAIL2/PASSWORD` en override.
 

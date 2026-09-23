@@ -4,9 +4,10 @@
 > Mis à jour à la fin de chaque lot. **Pas de journal** : l'historique se lit dans `git log`
 > (et l'ancien journal des sessions par `git show 8418902:DASHBOARD.md`).
 >
-> État au **2026-09-23** : `main` en avance sur `origin/main` (allègement d'`AGENTS.md` et de ce
-> tableau, sous-agents, priorité d'`AGENTS.md` sur les plugins), **à pousser**. Serveur de la v1.1.0 en prod
-> sauf le **coup de la journée** (procédure prête ci-dessous) ; l'app suivra avec le build 1.1.0.
+> État au **2026-09-23** : `main` en avance sur `origin/main` (sous-agents, priorité d'`AGENTS.md`
+> sur les plugins, retours front du DS du 2026-09-23), **à pousser**. Serveur de la v1.1.0 en prod
+> sauf le **coup de la journée** et le **rang d'avant journée** (procédure prête ci-dessous) ; l'app
+> suivra avec le build 1.1.0.
 
 ## Avancement des lots
 
@@ -30,6 +31,9 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
   notifications de réaction reportées au lancement public.
 - ✅ **DS du 2026-09-21** — headers repliables, phases finales dans la bande des journées, etc. Migration en prod.
 - ✅ **Coup de la journée** — livré sur le dev, **prod à faire** (ci-dessous).
+- ✅ **DS du 2026-09-23** — carte « Tes points » de l'accueil (tendance de rang par journée),
+  points provisoires en live dans le détail de match, heure du coup d'envoi « 21h45 ». Migration
+  `get_my_previous_rank` livrée sur le dev, **prod à faire** (ci-dessous).
 - ✅ **Signaler un problème** (Sentry User Feedback) — reste à vérifier la réception dans Sentry et brancher l'alerte e-mail.
 - A priori aucune lib native ; le build est de toute façon imposé par le SDK 57.
 - **Version 1.1.0** → `npm run release -- --minor`. ⚠️ Calendrier serré, préparation du compte Apple comprise.
@@ -59,19 +63,22 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
 
 ## Ce qu'il reste à faire
 
-### 🔜 Coup de la journée — passage en prod (préparé le 2026-09-22)
-Une migration (`20260922000100_round_highlights.sql`, aucun secret Vault) et l'EF `notify`.
+### 🔜 Coup de la journée et rang d'avant journée — passage en prod (préparé le 2026-09-23)
+Deux migrations, sans secret Vault ni seed : `20260922000100_round_highlights.sql` et
+`20260923000100_my_previous_rank.sql`, plus l'EF `notify`. La seconde n'ajoute qu'une RPC en
+lecture ; tant qu'elle manque, la carte « Tes points » du build 1.1.0 affiche « À X pts du Nᵉ »
+au lieu des places gagnées ou perdues.
 ⚠️ **Ordre imposé** : la migration change la clé d'unicité de `notification_sends`, et la `notify`
 en place passe encore l'ancien `onConflict`. Déployer `notify` **juste après** le push, entre deux
 ticks (le cron tourne à xx:03, xx:13…) ; un tick entre les deux échoue au claim sans rien envoyer
 et se rattrape au suivant. La notification part dès la mise en prod ; son lien n'ouvre la journée
 qu'avec le build 1.1.0 (l'ancienne app l'ignore sans planter).
 1. `supabase link --project-ref bmdzadvugtkclnqjpndr`
-2. `supabase db push --dry-run` → **seule** `20260922000100_round_highlights.sql`
+2. `supabase db push --dry-run` → **exactement** `20260922000100_round_highlights.sql` et `20260923000100_my_previous_rank.sql`
 3. `supabase db push`
 4. `supabase functions deploy notify --project-ref bmdzadvugtkclnqjpndr`
 5. `supabase link --project-ref axxutfngespcdiqtrdao` puis `cat supabase/.temp/project-ref`
-6. Contrôle prod : `select status_code, content from net._http_response order by created desc limit 3` après le tick suivant (attendu : 200, `skipped` ou `success`).
+6. Contrôle prod : `select status_code, content from net._http_response order by created desc limit 3` après le tick suivant (attendu : 200, `skipped` ou `success`), et `select count(*) from pg_proc where proname = 'get_my_previous_rank'` (attendu : 1).
 
 ### 🔶 Beta fermée (Lot 9, phase 7)
 - **Recruter 12 testeurs** qui restent inscrits 14 jours. ⚠️ La waitlist est **vide** : lui envoyer du trafic bien avant novembre.
@@ -108,8 +115,8 @@ Pour préparer la revue App Store, plus longue que celle de Google. Ce que le Te
 ### Divers
 - **Push** : confirmer sur l'Android réel les deux boutons d'une notification reçue (« Marquer comme lu » perdu si l'app est tuée : dégradation assumée).
 - **Highlightly Pro** : décider du renouvellement avant chaque compétition ; sans lui, `/odds` en 401 (fallback ×2.0) et pas de score live.
-- **Carte LIVE** : projection des points à valider avec de vraies données in-play (prochain match NC en direct).
-- **iOS** : `npx expo prebuild --clean -p ios` depuis `apps/mobile` avant la prochaine passe simulateur (`ios/` porte des chemins de l'ancienne disposition).
+- **Points provisoires en live** (carte « Points gagnés » du détail de match) : à valider avec de vraies données in-play (prochain match NC en direct).
+- **Passe iOS sous Xcode 27** : AXe est cassé, et `verif-visuelle` n'a pas l'outil simulateur de Claude Code. Une passe iOS interactive se fait depuis la session principale, jusqu'à une version d'AXe compatible.
 - Jeter le worktree `.claude/worktrees/stoic-dewdney-33788e` et les branches `claude/*` de juillet.
 - **SDK 58** : pas avant sa sortie réelle ni avant le lancement de la beta.
 - **Sous-agents** (`.claude/agents/`) : les trois ont fait leur premier passage réel le 2026-09-23 (`verif-visuelle` a démarré seul émulateur et dev client, ~45 s avec le cache Gradle). Coût côté agent : ~40 k tokens (`relecteur`), ~75 k (`docs-lot`), ~100 k (`verif-visuelle`). Depuis, `relecteur` fait une seconde passe « sur-ingénierie » (grille de `ponytail-review`) qui rend un bloc « Simplifications » non bloquant : son coût est à remesurer. Les plugins Ponytail et Caveman restent réglés chez Corentin, hors dépôt : sans filtre, le hook de démarrage de Ponytail injecte ~1,5 k tokens dans chaque sous-agent.
@@ -128,9 +135,10 @@ Pour préparer la revue App Store, plus longue que celle de Google. Ce que le Te
 - **4 onglets** : Matchs / Résultats / Classement / Profil. **Auto-save optimiste** du prono.
 - Ligues : création/adhésion **uniquement par RPC** ; l'owner ne quitte pas sa ligue, il la supprime ou la transfère.
 - **i18n** : FR source, EN livré. **Site bilingue**, pas de redirection automatique, le français seul fait foi sur le légal.
-- **Design system v2** : vert = marque, grenat = étincelle jamais un fond. **Pastille active de la tab bar grenat dans les deux thèmes** : c'est le DS qui s'alignera sur l'app.
+- **Design system v2** : vert = marque, grenat = étincelle jamais un fond. Seule surface verte : la carte « Tes points » de l'accueil, voulue par la maquette. **Pastille active de la tab bar grenat dans les deux thèmes** : c'est le DS qui s'alignera sur l'app.
 - **Deux projets Supabase** : prod `bmdzadvugtkclnqjpndr` (ancien dev renommé, orga TryCast en Pro), dev `axxutfngespcdiqtrdao`. **Supabase branching écarté** (pensé pour les PR, branches sans données, URL neuve par branche, réapplique `config.toml`) ; à rouvrir pour tester une migration risquée sur des données de beta réelles.
 - **Le téléphone de Corentin n'est pas une cible de développement** : il porte le build du test interne.
+- **Points provisoires en live** (2026-09-23, lève « pas de projection live » de juillet) : calculés côté client contre le score live par le module de scoring partagé, rien n'est écrit ; bonus offensif « en attente » faute d'essais en direct.
 - **`expo.version` reste dans l'empreinte** : tout bump impose un build, un correctif JS part sans bump par `npm run ota:prod`.
 - **Âge minimum 16 ans** (hors programme Familles de Play).
 
@@ -141,8 +149,9 @@ Pour préparer la revue App Store, plus longue que celle de Google. Ce que le Te
 - **Plancher `browserslist`** de `package.json` obligatoire : le baisser re-casse silencieusement le dark natif (`light-dark()`).
 - Tailwind : neutraliser la palette par défaut (`--color-*: initial`).
 - Classement : rang du joueur au-dessus de la barre « moi » approximé à rang − 1 (documenté dans `pinned-me-row.tsx`).
+- **Critères du classement recopiés** dans `get_my_previous_rank` (total, scores exacts, moins de pronos scorés, démo exclue) : toucher au départage d'`apply_match_scores` impose de la modifier aussi.
 - Identifiants encore en dur : `package.json` (typegen `--project-id`), `app.json` (owner EAS, requis), migration cron `20260705000300`.
 - **⚠️ Données de test probablement en prod** (à vérifier par Corentin) : `select slug from public.competitions` (ligne `e2e-test` supprimable) et surtout `select api_game_id, kickoff_at from public.matches where api_game_id < 0` — seedés sur la vraie `nc-2026`, ils remontent dans les listes. L'app filtre les compétitions à id négatif, **pas les matchs**.
-- **Seed de démo** (`scripts/seed-demo.mjs`) : en novembre, les vraies journées de nc-2026 tomberont dans sa fenêtre fictive et il refusera de semer — décaler le scénario.
-- Base dev : ligue « Verif affichage » (`R2FANTMJ`) à retirer ; scores NC de juillet fictifs (le mode `audit` de `sync-tries` se mesure en prod) ; bonus défensif non observable au simulateur (couvert par `breakdown-labels.test.ts`).
+- **Seed de démo** (`scripts/seed-demo.mjs`) : en novembre, les vraies journées de nc-2026 tomberont dans sa fenêtre fictive et il refusera de semer — décaler le scénario. Il ne sème ni match reporté ni plus de deux notifications : l'état reporté du détail de match et le badge « 9+ » de la cloche restent invérifiés au simulateur.
+- Base dev : ligue « Verif affichage » (`R2FANTMJ`) à retirer ; scores NC de juillet fictifs (le mode `audit` de `sync-tries` se mesure en prod) ; bonus défensif non observable au simulateur (couvert par `breakdown-labels.test.ts` et `breakdown-rows.test.ts`).
 - Aptabase : `preview` et `production` se mélangent (tous deux en release) — négligeable tant que `preview` ne sert qu'à Corentin.

@@ -1,6 +1,6 @@
 ---
 name: trycast-regles-metier
-description: Règles de jeu actées de TryCast — joker par phase (×2, competition_phases, phase_jokers, set_/clear_phase_joker), phases finales (competition_stages, roundGroupKey, buildRoundStrip), réactions sur les pronos (prediction_reactions, REACTIONS, ReactionEmoji), coup de la journée (league_round_highlights, buildRoundHighlights, notification round_highlight), guide d'accueil (features/welcome) et état local par compte (features/celebration). À consulter dès qu'on touche à apps/mobile/src/features/{jokers,reactions,leagues,welcome,celebration}/, au scoring, à ces tables/RPC, à l'EF notify, ou à scripts/seed-competitions.sql.
+description: Règles de jeu actées de TryCast — joker par phase (×2, competition_phases, phase_jokers, set_/clear_phase_joker), phases finales (competition_stages, roundGroupKey, buildRoundStrip), réactions sur les pronos (prediction_reactions, REACTIONS, ReactionEmoji), coup de la journée (league_round_highlights, buildRoundHighlights, notification round_highlight), points provisoires en live et rang d'avant journée (PointsEarnedCard, buildBreakdownRows, get_my_previous_rank), guide d'accueil (features/welcome) et état local par compte (features/celebration). À consulter dès qu'on touche à apps/mobile/src/features/{jokers,reactions,leagues,welcome,celebration}/, au scoring, à ces tables/RPC, à l'EF notify, ou à scripts/seed-competitions.sql.
 ---
 
 # TryCast — règles de jeu actées
@@ -83,6 +83,30 @@ Décisions prises avec Corentin : **ne pas les re-débattre**. Chaque règle a s
   ligue suit ces params même déjà ouvert.
 - Vérification : `supabase db query --linked -f scripts/e2e-round-highlights.sql` (transaction
   annulée), démo dans la ligue « Les Potes du Samedi » (`RUGBY226`) de `scripts/seed-demo.mjs`.
+
+## Points en direct et rang d'avant journée (DS du 2026-09-23)
+
+- **Points provisoires en live** (décision de Corentin du 2026-09-23, qui lève celle de juillet
+  « pas de projection live ») : pendant un match en cours, la carte « Points gagnés » du détail
+  (`PointsEarnedCard`) calcule les points **côté client**, avec `computeMatchPoints` du module
+  partagé contre le score live, joker compris. Rien n'est écrit : le scoring serveur reste seul à
+  persister. Les essais étant inconnus en direct, le **bonus offensif reste « en attente »**. Match
+  terminé : breakdown persisté ; reporté ou annulé : prono en lecture seule
+  (`LockedPredictionCard`), sans points, et pronos de ligue masqués.
+- Lignes du barème : une seule fonction pure, `buildBreakdownRows`
+  (`apps/mobile/src/features/predictions/breakdown-rows.ts`), partagée par la sheet de détail et la
+  carte. La ligne du **bonus défensif est omise** quand l'écart pronostiqué dépasse
+  `defensiveBonusMaxGap` : le bonus y était impossible d'avance.
+- **Rang d'avant journée** (tendance « +N places » de la carte « Tes points » de l'accueil) : RPC
+  `get_my_previous_rank(p_competition_id, p_before)`, `security definer`, qui **recalcule** le
+  classement général depuis les pronos scorés dont le match a commencé avant `p_before` (premier
+  coup d'envoi de la journée, fourni par `summarizeRound` de
+  `apps/mobile/src/features/leagues/round-summary.ts`). Seul le rang de l'appelant sort.
+  ⚠️ **Ses critères recopient ceux du classement** : total, puis scores exacts, puis le moins de
+  pronos scorés (`apply_match_scores` → `standings`), comptes de démo exclus comme dans
+  `get_global_leaderboard`. Changer un critère de l'un sans les autres fait mentir le delta.
+  Vérification : `supabase db query --linked -f scripts/e2e-previous-rank.sql` (transaction
+  annulée, sans seed). Sans la RPC (prod pas encore migrée), la carte retombe sur « À X pts du Nᵉ ».
 
 ## Guide d'accueil (`apps/mobile/src/features/welcome/`)
 
