@@ -5,7 +5,7 @@
 > (et l'ancien journal des sessions par `git show 8418902:DASHBOARD.md`).
 >
 > État au **2026-09-23** : `main` en avance sur `origin/main` (allègement d'`AGENTS.md` et de ce
-> tableau, sous-agents), **à pousser**. Serveur de la v1.1.0 en prod
+> tableau, sous-agents, priorité d'`AGENTS.md` sur les plugins), **à pousser**. Serveur de la v1.1.0 en prod
 > sauf le **coup de la journée** (procédure prête ci-dessous) ; l'app suivra avec le build 1.1.0.
 
 ## Avancement des lots
@@ -112,7 +112,7 @@ Pour préparer la revue App Store, plus longue que celle de Google. Ce que le Te
 - **iOS** : `npx expo prebuild --clean -p ios` depuis `apps/mobile` avant la prochaine passe simulateur (`ios/` porte des chemins de l'ancienne disposition).
 - Jeter le worktree `.claude/worktrees/stoic-dewdney-33788e` et les branches `claude/*` de juillet.
 - **SDK 58** : pas avant sa sortie réelle ni avant le lancement de la beta.
-- **Sous-agents** (`.claude/agents/`) : les trois ont fait leur premier passage réel le 2026-09-23 (`verif-visuelle` a démarré seul émulateur et dev client, ~45 s avec le cache Gradle). Coût côté agent : ~40 k tokens (`relecteur`), ~75 k (`docs-lot`), ~100 k (`verif-visuelle`).
+- **Sous-agents** (`.claude/agents/`) : les trois ont fait leur premier passage réel le 2026-09-23 (`verif-visuelle` a démarré seul émulateur et dev client, ~45 s avec le cache Gradle). Coût côté agent : ~40 k tokens (`relecteur`), ~75 k (`docs-lot`), ~100 k (`verif-visuelle`). Depuis, `relecteur` fait une seconde passe « sur-ingénierie » (grille de `ponytail-review`) qui rend un bloc « Simplifications » non bloquant : son coût est à remesurer. Les plugins Ponytail et Caveman restent réglés chez Corentin, hors dépôt : sans filtre, le hook de démarrage de Ponytail injecte ~1,5 k tokens dans chaque sous-agent.
 
 ## Décisions clés (actées, ne pas re-débattre)
 
