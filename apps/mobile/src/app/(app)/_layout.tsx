@@ -40,6 +40,9 @@ export default function AppLayout() {
                         {/* title vide : le back natif des écrans poussés affiche juste le
                     chevron, pas le nom technique « (tabs) » */}
                         <Stack.Screen name="(tabs)" options={{ title: '' }} />
+                        {/* Idem pour le profil public : sans title, le retour d'un match
+                            ouvert depuis ce profil affiche « player/[id] » sur iOS */}
+                        <Stack.Screen name="player/[id]" options={{ title: '' }} />
                         <Stack.Screen
                             name="settings"
                             options={{
