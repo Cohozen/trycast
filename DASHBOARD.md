@@ -5,7 +5,7 @@
 > (et l'ancien journal des sessions par `git show 8418902:DASHBOARD.md`).
 >
 > État au **2026-09-23** : `main` en avance sur `origin/main` (sous-agents, priorité d'`AGENTS.md`
-> sur les plugins, retours front du DS du 2026-09-23), **à pousser**. Serveur de la v1.1.0 en prod
+> sur les plugins, retours front du DS du 2026-09-23 et leurs retouches), **à pousser**. Serveur de la v1.1.0 en prod
 > sauf le **coup de la journée** et le **rang d'avant journée** (procédure prête ci-dessous) ; l'app
 > suivra avec le build 1.1.0.
 
