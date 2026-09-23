@@ -8,6 +8,16 @@ Le numéro de build (`versionCode`) n'apparaît pas ici : il est attribué par E
 
 Écrit par `npm run release`, à partir des `--notes` passées à la commande.
 
+## 1.1.0 — 2026-09-23
+
+- Point double : un joker ×2 par phase, à poser sur le match de ton choix
+- Réactions sur les pronos des membres de ta ligue
+- Coup de la journée : le prono le plus osé de ta ligue, annoncé par notification
+- Accueil repensé : tes points, ta forme et les places gagnées sur la journée
+- Points provisoires en direct pendant les matchs
+- Phases finales dans les résultats de ligue
+- Guide d'accueil et bouton « Signaler un problème »
+
 ## 1.0.0 — 2026-09-03
 
 Première version distribuée, en test interne sur le Play Store.
