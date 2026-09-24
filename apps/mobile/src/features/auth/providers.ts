@@ -25,7 +25,7 @@ export type OAuthProvider = {
     id: OAuthProviderId;
     flow: OAuthFlow;
     /** Clé i18n du libellé du bouton (namespace auth). */
-    labelKey: 'auth:actions.continueWithGoogle';
+    labelKey: 'auth:actions.continueWithGoogle' | 'auth:actions.continueWithApple';
 };
 
 export type ProviderDefinition = {
@@ -39,19 +39,16 @@ export type ProviderDefinition = {
  * Ajouter un fournisseur se fait **ici et nulle part ailleurs** : les écrans
  * itèrent sur `resolveProviders()` et ne nomment aucun fournisseur.
  *
- * Apple, le jour où l'abonnement Apple Developer existera (il est le seul moyen
- * d'obtenir un Services ID, cf. plan) :
- *
- *     {
- *         id: 'apple',
- *         labelKey: 'auth:actions.continueWithApple',
- *         flows: { ios: 'native-id-token', android: 'web-redirect' },
- *     }
- *
- * plus la branche `apple` de `sign-in-with-provider.ts`, un `apple-mark.tsx` et
- * deux clés i18n par langue.
+ * Apple en premier : les règles de l'App Store ne le veulent pas moins en vue
+ * que les autres. iOS seulement — sur Android, le flux navigateur exigerait un
+ * Services ID et une clé secrète à renouveler tous les six mois.
  */
 const DEFINITIONS: ProviderDefinition[] = [
+    {
+        id: 'apple',
+        labelKey: 'auth:actions.continueWithApple',
+        flows: { ios: 'native-id-token' },
+    },
     {
         id: 'google',
         labelKey: 'auth:actions.continueWithGoogle',
@@ -79,7 +76,8 @@ export function isProviderConfigured(id: OAuthProviderId, platform: PlatformName
                 ? Boolean(GOOGLE_WEB_CLIENT_ID && GOOGLE_IOS_CLIENT_ID)
                 : Boolean(GOOGLE_WEB_CLIENT_ID);
         case 'apple':
-            return false;
+            // Aucun identifiant à fournir : le jeton est émis pour le bundle ID.
+            return platform === 'ios';
     }
 }
 

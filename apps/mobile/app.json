@@ -16,6 +16,7 @@
         "ios": {
             "bundleIdentifier": "com.cohozen.trycast",
             "supportsTablet": false,
+            "usesAppleSignIn": true,
             "associatedDomains": ["applinks:www.trycast.fr"],
             "config": {
                 "usesNonExemptEncryption": false

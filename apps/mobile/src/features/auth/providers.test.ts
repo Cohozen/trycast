@@ -16,7 +16,7 @@ const definitions: ProviderDefinition[] = [
     },
     {
         id: 'apple',
-        labelKey: 'auth:actions.continueWithGoogle',
+        labelKey: 'auth:actions.continueWithApple',
         flows: { ios: 'native-id-token', android: 'web-redirect' },
     },
 ];
@@ -60,5 +60,21 @@ describe('resolveProviders', () => {
 
     it('ne propose rien quand rien n’est configuré — l’app reste utilisable', () => {
         expect(resolveProviders('android', definitions, () => false)).toEqual([]);
+    });
+});
+
+// Liste réelle : Apple ne dépend d'aucune variable d'environnement, contrairement
+// à Google, ce qui rend ces assertions stables en CI.
+describe('Sign in with Apple', () => {
+    it('est proposé en premier sur iOS', () => {
+        expect(resolveProviders('ios')[0]).toEqual({
+            id: 'apple',
+            flow: 'native-id-token',
+            labelKey: 'auth:actions.continueWithApple',
+        });
+    });
+
+    it("n'est jamais proposé sur Android", () => {
+        expect(resolveProviders('android').map((p) => p.id)).not.toContain('apple');
     });
 });

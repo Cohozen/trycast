@@ -1,17 +1,17 @@
 import { useTranslation } from 'react-i18next';
 
+import { AppleMark } from '@/components/marks/apple-mark';
 import { GoogleMark } from '@/components/marks/google-mark';
 import { Button } from '@/components/ui/button';
 import type { OAuthProvider, OAuthProviderId } from '@/features/auth/providers';
 
 /**
- * Marque de chaque fournisseur. Un `apple-mark.tsx` s'ajoutera ici le jour où
- * l'entrée `apple` rejoindra `providers.ts` — c'est le seul endroit de l'UI qui
- * connaît les fournisseurs par leur nom.
+ * Marque de chaque fournisseur — le seul endroit de l'UI qui connaît les
+ * fournisseurs par leur nom.
  */
 const MARKS: Record<OAuthProviderId, React.ReactNode> = {
     google: <GoogleMark />,
-    apple: null,
+    apple: <AppleMark />,
 };
 
 type OAuthButtonProps = {

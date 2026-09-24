@@ -1,3 +1,4 @@
+import { signInWithApple } from '@/features/auth/apple-sign-in';
 import { signInWithGoogle, signOutFromGoogle } from '@/features/auth/google-sign-in';
 import type { OAuthProvider, OAuthProviderId } from '@/features/auth/providers';
 import { signInWithWebRedirect } from '@/features/auth/web-oauth';
@@ -9,16 +10,23 @@ import { supabase } from '@/lib/supabase';
  */
 export type ProviderSignInResult = 'success' | 'cancelled';
 
-/** Feuille native du fournisseur → jeton d'identité, ou `null` si renoncement. */
-async function requestIdToken(id: OAuthProviderId): Promise<string | null> {
+type IdTokenCredential = { idToken: string; nonce?: string };
+
+/**
+ * Feuille native du fournisseur → jeton d'identité, ou `null` si renoncement.
+ *
+ * `nonce` n'existe que si le fournisseur en a inscrit un dans le jeton : GoTrue
+ * exige qu'ils soient vides ou fournis tous les deux. Google n'en porte pas (la
+ * feuille native Android n'en demande pas), Apple si.
+ */
+async function requestIdToken(id: OAuthProviderId): Promise<IdTokenCredential | null> {
     switch (id) {
-        case 'google':
-            return signInWithGoogle();
+        case 'google': {
+            const idToken = await signInWithGoogle();
+            return idToken === null ? null : { idToken };
+        }
         case 'apple':
-            // Branche à écrire avec `expo-apple-authentication` en même temps que
-            // l'entrée `apple` de `providers.ts` : tant qu'elle n'y figure pas,
-            // aucun appelant ne peut arriver ici.
-            throw new Error("Sign in with Apple n'est pas encore branché");
+            return signInWithApple();
     }
 }
 
@@ -32,17 +40,15 @@ export async function signInWithProvider(provider: OAuthProvider): Promise<Provi
         return signInWithWebRedirect(provider.id);
     }
 
-    const idToken = await requestIdToken(provider.id);
-    if (idToken === null) {
+    const credential = await requestIdToken(provider.id);
+    if (credential === null) {
         return 'cancelled';
     }
 
     const { error } = await supabase.auth.signInWithIdToken({
         provider: provider.id,
-        token: idToken,
-        // Pas de `nonce` : la feuille native Android n'en demande pas, le jeton
-        // n'en porte donc aucun. GoTrue exige que les deux soient vides ou tous
-        // deux fournis — inutile d'activer « Skip nonce check » côté Supabase.
+        token: credential.idToken,
+        nonce: credential.nonce,
     });
     if (error) throw error;
 
