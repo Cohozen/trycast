@@ -69,6 +69,10 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
         bonusTags.push(match.away_team?.code ?? match.away_team?.name ?? '?');
     }
 
+    // Bonus défensif appliqué : automatique, pas pronostiqué, mais signalé
+    // dans la même rangée (pastille info, bleue)
+    const defensiveApplied = breakdown.defensiveBonusPoints > 0;
+
     const title = `${homeName} – ${awayName}`;
     const total = prediction.points_awarded ?? 0;
 
@@ -107,7 +111,7 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
                 </View>
             </View>
 
-            {bonusTags.length > 0 ? (
+            {bonusTags.length > 0 || defensiveApplied ? (
                 <View className="mb-3 gap-2">
                     <Text className="font-body-bold text-[10px] uppercase tracking-[0.6px] text-text-faint">
                         {t('predictions:breakdown.bonusPredicted')}
@@ -123,6 +127,14 @@ export function PointsDetailSheet({ match, prediction, visible, onClose }: Point
                                 </Text>
                             </View>
                         ))}
+                        {defensiveApplied ? (
+                            <View className="flex-row items-center gap-1.5 rounded-pill border border-info/45 bg-info/10 px-2.5 py-1">
+                                <View className="h-[5px] w-[5px] rounded-pill bg-info" />
+                                <Text className="font-body-semibold text-[12px] text-info">
+                                    {t('predictions:breakdown.defensive')}
+                                </Text>
+                            </View>
+                        ) : null}
                     </View>
                 </View>
             ) : null}
