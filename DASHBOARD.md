@@ -6,8 +6,8 @@
 >
 > État au **2026-09-24** : serveur de la v1.1.0 **entièrement en prod** (coup de la journée et rang
 > d'avant journée compris). **Release 1.1.0 publiée** (tag `v1.1.0`, GitHub Release) et
-> **build de production 7** terminé (canal `production`, empreinte `cd8204a1`) : reste à le
-> téléverser sur la Play Console. Le build 5 (1.0.0) ne reçoit plus aucune OTA. **DS du 2026-09-24
+> **build de production 7** sur la Play Console (canal `production`, empreinte `cd8204a1`),
+> installé par Corentin seul. Le build 5 (1.0.0) ne reçoit plus aucune OTA. **DS du 2026-09-24
 > poussé sur `main`, migration en prod** : il ajoute `expo-blur`, donc `main` a quitté l'empreinte
 > du build 7 et ce lot partira avec la prochaine release store, pas en OTA.
 
@@ -71,13 +71,13 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
 
 ### 🔶 Beta fermée (Lot 9, phase 7)
 - **Recruter 12 testeurs** qui restent inscrits 14 jours. ⚠️ La waitlist est **vide** : lui envoyer du trafic bien avant novembre.
-- **Build 1.1.0 (version code 7) sur la Play Console** : le téléverser en test, et coller le champ
-  « Nouveautés » depuis la section 1.1.0 du `CHANGELOG` (moins de 500 caractères). ⚠️ L'empreinte de
+- **Version 1.2.0 = premier build ouvert aux testeurs** (décision du 2026-09-24) : la 1.1.0
+  (version code 7) est sur la Play Console mais n'a servi qu'à Corentin. ⚠️ L'empreinte de
   `main` n'est plus `cd8204a1` depuis `expo-blur` : un correctif JS destiné au build 7 ne peut plus
   partir de `main` par `npm run ota:prod` (il partirait sans l'atteindre, en silence ; skill `trycast-release`).
 - **Livrer le DS du 2026-09-24** : `main` poussé et migration `20260924000100` en prod
   (2026-09-24, fonction réservée à `authenticated`, crons sains). Reste la release
-  (`npm run release -- --minor|--patch --notes "…"`, en `--dry-run` d'abord) et le build. Le dev client iOS n'est pas rebuildé (`expo-blur`) et la passe visuelle iOS du lot n'est
+  (`npm run release -- --minor|--patch --notes "…"`, en `--dry-run` d'abord) et le build, en version **1.2.0** (mineure, actée le 2026-09-24). Le dev client iOS n'est pas rebuildé (`expo-blur`) et la passe visuelle iOS du lot n'est
   pas faite.
 - **Avatars absents en prod** dans les classements et la liste des pronos d'un match, y compris celui
   de Corentin. Sur le dev, RPC et rendu sont corrects (vérifié à l'émulateur) ; en prod, l'`avatar_url`
