@@ -9,6 +9,8 @@ Les 7 e-mails d'auth (GoTrue) : confirmation d'inscription, réinitialisation de
 
 Le même générateur produit les **e-mails de la beta** (`docs/emails/`), envoyés en broadcast Resend et non par GoTrue : procédure dans `docs/emails/README.md`.
 
+⚠️ **Adresses relais Apple** (`@privaterelay.appleid.com`, comptes Sign in with Apple qui masquent leur adresse) : le relais d'Apple **rejette** tout e-mail dont le domaine ou l'expéditeur n'est pas déclaré dans Apple Developer → Sign in with Apple for Email Communication. `trycast.fr` et l'expéditeur Resend doivent y figurer, et tout nouvel expéditeur s'y ajoute avant son premier envoi. Sinon ces comptes ne reçoivent rien, pas même le préavis de purge des inactifs, alors que la politique de confidentialité promet qu'Apple fait suivre.
+
 ## Ne jamais éditer `supabase/templates/*.html` à la main
 
 Ces fichiers sont **générés**. La source est `scripts/build-email-templates.mjs`, qui porte aussi **les sujets et les clés GoTrue** de chaque template :

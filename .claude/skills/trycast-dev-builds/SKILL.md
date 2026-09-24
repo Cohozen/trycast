@@ -154,10 +154,8 @@ CommandError: No code signing certificates are available to use.
 Cause : `@expo/cli` exige la signature de développement **même pour le simulateur** dès que les
 entitlements contiennent `com.apple.developer.associated-domains` ou `…applesignin`
 (`simulatorBuildRequiresCodeSigning`, dans `run/ios/codeSigning/simulatorCodeSigning.js`). Or
-`associatedDomains` est déclaré depuis le 2026-09-09, et ce Mac n'a pas de Team ID Apple. Ce n'est
-pas une régression de version : la règle est la même en 57.0.4 et en 57.0.23. Le dev client du
-simulateur datait du 6 septembre, et personne n'avait rebuildé iOS depuis. **Sign in with Apple
-déclenchera la même règle.**
+`associatedDomains` est déclaré depuis le 2026-09-09, et `usesAppleSignIn` depuis le 2026-09-24. Ce
+n'est pas une régression de version : la règle est la même en 57.0.4 et en 57.0.23.
 
 Contournement **sans rien modifier au projet** : Xcode, lui, signe en local pour le simulateur, sans
 équipe. On compile directement, on installe, puis on connecte l'app à Metro :
@@ -174,10 +172,20 @@ xcrun simctl openurl booted "trycast://expo-development-client/?url=http%3A%2F%2
 Metro doit tourner (`npm start`, ou celui d'un `npm run android`, qui sert les deux plateformes).
 Le schéma et le workspace s'écrivent **`TryCast`**, pas `trycast` : `xcodebuild` sort en erreur 65
 sur un nom de schéma inconnu. `SENTRY_DISABLE_AUTO_UPLOAD` se transmet ici par l'environnement, pour
-la même raison que dans `npm run ios`. Le Team ID existe depuis le 2026-09-24 : `npm run ios` devrait
-refonctionner tel quel dès qu'un certificat de développement est présent sur ce Mac (c'est ce que
-réclame le message d'erreur). **Pas encore vérifié** : garder ce contournement jusqu'au prochain
-rebuild iOS réussi par `npm run ios`, puis retirer ce paragraphe.
+la même raison que dans `npm run ios`.
+
+Le Team ID ne suffit pas (vérifié le 2026-09-24, rebuild de Sign in with Apple) : `npm run ios`
+échoue toujours avec le même message, car `security find-identity -v -p codesigning` ne trouve
+**aucune identité** sur ce Mac. Il faut un **certificat de développement Apple** installé ici pour
+qu'il repasse ; d'ici là, le contournement ci-dessus est la voie normale, et il a marché ce jour-là.
+Le jour où `npm run ios` recompile tel quel, retirer ce paragraphe.
+
+⚠️ **La signature locale du simulateur n'embarque pas les entitlements.** Conséquence vécue le
+2026-09-24 : sans Apple ID dans les Réglages du simulateur, la feuille Sign in with Apple s'arrête
+sur « Connectez-vous à votre compte Apple », puis renvoie `AuthorizationError 1000`
+(`ERR_REQUEST_UNKNOWN`), que l'app affiche en **erreur générique**. C'est voulu : seul le code 1001
+(`ERR_REQUEST_CANCELED`) est un renoncement silencieux. Au simulateur, on ne vérifie que le rendu du
+bouton ; le parcours Apple complet se vérifie sur un iPhone en TestFlight.
 
 ⚠️ **`pod install` refuse les pods Swift dont les dépendances ne définissent pas de module** (vécu 2026-07-23, ajout de `@react-native-google-signin/google-signin`). Message : *« The Swift pod `AppCheckCore` depends upon `GoogleUtilities` and `RecaptchaInterop`, which do not define modules »* — le prebuild s'arrête net à l'étape CocoaPods. Correctif **dans `app.json`**, jamais dans le `Podfile` (généré, effacé par `--clean`) : plugin `expo-build-properties` avec les pods fautifs en `modular_headers`.
 
@@ -207,7 +215,7 @@ Un build **`development`** n'embarque pas de bundle JS : il le télécharge depu
 
 Un build **`preview`/`production`** bundle **sur les serveurs EAS** : les `EXPO_PUBLIC_*` y sont **inlinées à ce moment-là**, depuis l'**environnement EAS** (`eas env:create`, ou le dashboard Expo), jamais depuis le `.env` de la machine — il n'est pas envoyé.
 
-⚠️ **L'oubli est silencieux** quand le code traite l'absence d'une clé comme « fonctionnalité non configurée » — c'est le cas d'Aptabase, de Sentry et des fournisseurs d'identité (`apps/mobile/src/features/auth/providers.ts` n'affiche pas un bouton dont les identifiants manquent). Pas de crash, pas de log : la fonctionnalité **disparaît de l'app distribuée**. Réflexe : toute nouvelle `EXPO_PUBLIC_*` se pose dans `.env`, dans `.env.example` **et** dans les environnements EAS avant la première distribution.
+⚠️ **L'oubli est silencieux** quand le code traite l'absence d'une clé comme « fonctionnalité non configurée » — c'est le cas d'Aptabase, de Sentry et de Google (`apps/mobile/src/features/auth/providers.ts` n'affiche pas un bouton dont les identifiants manquent ; Apple n'en a aucun). Pas de crash, pas de log : la fonctionnalité **disparaît de l'app distribuée**. Réflexe : toute nouvelle `EXPO_PUBLIC_*` se pose dans `.env`, dans `.env.example` **et** dans les environnements EAS avant la première distribution.
 
 ## Piège : le répertoire de travail du shell (vécu 2026-07-22)
 

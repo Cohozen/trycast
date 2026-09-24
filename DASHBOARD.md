@@ -8,7 +8,8 @@
 > 1.2.0 publiée** (tag `v1.2.0`) et **déployée sur la Play Console** : c'est le premier build ouvert
 > aux testeurs. **Configuration de distribution iOS commitée** (lot 1 iOS) : elle déplace
 > l'empreinte Android (`f0e880d9` → `ea4e55aa`), donc **plus aucune OTA venue de `main` n'atteint la
-> 1.2.0** ; tout part avec la 1.3.0.
+> 1.2.0** ; tout part avec la 1.3.0. **Sign in with Apple commité** (lot 2 iOS), à activer côté
+> Supabase et Apple Developer par Corentin.
 
 ## Avancement des lots
 
@@ -16,8 +17,8 @@
 |-----|-------|------|
 | 0-5.5 | Fondations, auth, pipeline compétition, pronos + RLS, scoring, ligues, DS + i18n | ✅ Livrés |
 | 6 | Push (tokens, EF `notify`, deep links, préférences, boîte de réception) | ✅ Validé sur Android réel |
-| 7 | Finitions (e-mails Resend, reset par code, RGPD, anglais) | ✅ Déployé — iOS/APNs différé |
-| 8 | Connexion Google (socle multi-fournisseur, choix du pseudo) | ✅ Validé sur Android réel — Apple différé |
+| 7 | Finitions (e-mails Resend, reset par code, RGPD, anglais) | ✅ Déployé — push iOS (APNs) à vérifier sur iPhone |
+| 8 | Connexion Google (socle multi-fournisseur, choix du pseudo) | ✅ Validé sur Android réel — Apple livré en code sur iOS (lot 2 iOS), non testé sur appareil |
 | Web | Site Astro bilingue (landing, waitlist, légal, invitations) | ✅ En ligne sur `www.trycast.fr` |
 | **9** | **Mise en beta Play** | 🔶 Phases 1 à 6 livrées (test interne, OTA, dev/prod séparés) ; reste la **phase 7, beta fermée début octobre 2026** |
 
@@ -74,8 +75,8 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
   n'a servi qu'à Corentin. ⚠️ **La 1.2.0 ne reçoit plus d'OTA** : la configuration iOS d'`app.json`
   a déplacé l'empreinte Android, choix assumé. Un correctif pour les testeurs Android part avec la
   1.3.0 (nouveau build) ; `npm run ota:prod` ne le signale pas, il publierait sans que personne ne
-  reçoive rien. Le dev client iOS n'est pas rebuildé (`expo-blur`) et la passe visuelle iOS du DS du
-  2026-09-24 n'est pas faite.
+  reçoive rien. Le lot 2 iOS (deux dépendances natives) la déplace encore, sans autre conséquence.
+  Le dev client iOS est rebuildé (2026-09-24), mais la passe visuelle iOS du DS n'est pas faite.
 - **Avatars absents en prod** dans les classements et la liste des pronos d'un match, y compris celui
   de Corentin. Sur le dev, RPC et rendu sont corrects (vérifié à l'émulateur) ; en prod, l'`avatar_url`
   de Corentin est correct (2026-09-24). Reste à comparer les définitions renvoyées par
@@ -97,7 +98,7 @@ Championship. **App Store public en février 2027**, avec Android. Compte **indi
 |---|---|---|
 | ✅ 24 sept | Corentin | Programme validé (Team ID `5P7K97386D`), accords acceptés, DSA non-trader déclaré, bundle ID `com.cohozen.trycast` enregistré (Associated Domains, Push, Sign in with Apple), fiche App Store Connect créée, **nom « TryCast » réservé**, `apple-app-site-association` en ligne. |
 | ✅ 24 sept | Claude, puis Corentin | **Lot 1 — iOS distribuable** (ci-dessous) : premier build iOS de production (1.2.0, build 3, empreinte `e9fd702e`) envoyé par `eas submit`, validé par Apple, installé par TestFlight interne sur un iPhone de proche. |
-| 5–14 oct | Claude | **Lot 2 — Sign in with Apple**, iOS seulement, RGPD dans le même lot. Rebuild du dev client iOS (il n'a pas encore `expo-blur`), passe au simulateur. |
+| ✅ 24 sept | Claude | **Lot 2 — Sign in with Apple** (ci-dessous) : code, RGPD et politiques FR/EN commités, dev client iOS rebuildé. Restent les gestes de Corentin. |
 | 8–14 oct | Corentin + 1 ou 2 proches | iPhone réel en TestFlight interne (testeurs ajoutés comme utilisateurs App Store Connect) : push, lien `/rejoindre`, Google, Apple. Corentin n'a pas d'iPhone. |
 | ~15 oct | Corentin | Release **1.3.0**, groupe externe « Beta fermée », soumission à la revue beta : description, `contact@trycast.fr`, compte de démo des stores, note au relecteur (gratuit, aucune mise, les cotes pondèrent les points). « Informations de test » (description de la beta, « Ce qu'il faut tester ») remplies **en français** : c'est ce que le testeur lit dans TestFlight. |
 | ~17–20 oct | Claude, puis Corentin | **Lien public TestFlight** (acté le 2026-09-24), pas l'invitation par e-mail d'Apple (en anglais, texte non maîtrisé) : lien activé sur le groupe externe, **plafonné** (~30 testeurs) et révocable ; aucun Apple ID à collecter. Le lien part dans **notre mail en français** depuis `contact@trycast.fr`, par le broadcast Resend de la beta Android (à adapter : il ne vise qu'Android). Claude rédige ce mail et le « Ce qu'il faut tester ». Procédure du mail : 1) installer **TestFlight** (App Store, gratuit, outil officiel d'Apple) ; 2) ouvrir le lien **depuis l'iPhone** → « Accepter » → « Installer » ; 3) ouvrir TryCast, les mises à jour arrivent par TestFlight. Retours par « Signaler un problème » (Sentry), pas par TestFlight. |
@@ -117,16 +118,23 @@ Championship. **App Store public en février 2027**, avec Android. Compte **indi
   **APP_MANAGER**) dans les credentials EAS. L'EF `notify` passe par le service de push Expo, rien côté serveur.
 - ✅ Premier build, `eas submit`, TestFlight interne (2026-09-24). Reste à contrôler le rendu de
   l'icône (`icon.png` a un canal alpha, qu'Expo aplatit sur fond blanc pour iOS) et les push.
-- Reporté au lot 2, qui rebuilde le dev client iOS de toute façon : vérifier que `npm run ios`
-  recompile en local sans le contournement `xcodebuild` (skill `trycast-dev-builds`). Un seul rebuild
-  pour les deux lots.
+- `npm run ios` ne recompile toujours pas en local (vérifié le 2026-09-24) : ce Mac n'a aucun
+  certificat de développement Apple. Le contournement `xcodebuild` du skill `trycast-dev-builds`
+  marche ; installer un certificat de développement sur ce Mac le rendrait inutile.
 
-**Lot 2 — Sign in with Apple** (règle 4.8, exigée dès qu'un login social existe) :
-`expo-apple-authentication` (lib native ⇒ rebuild du dev client), `ios.usesAppleSignIn: true`,
-entrée `apple` dans `providers.ts` (flux `native-id-token`, **iOS seulement** : sur Android, le flux
-navigateur exigerait un Services ID et une clé secrète à renouveler tous les six mois), branche
-`apple` de `sign-in-with-provider.ts` avec nonce, fournisseur Apple côté Supabase (bundle ID comme
-client ID, pas de secret en flux natif). Registre, `confidentialite.astro` et `en/privacy.astro` dans le même lot.
+**Lot 2 — Sign in with Apple** (règle 4.8) : ✅ code commité (`expo-apple-authentication`,
+`expo-crypto`, `ios.usesAppleSignIn`, entrée `apple` iOS seulement et en premier), registre,
+sous-traitants et politiques FR/EN à jour. Passe au simulateur en sombre seulement (bouton au-dessus
+de Google, logo blanc) ; le rendu en clair reste à voir. Gestes de Corentin :
+1. **Supabase → Auth → Providers → Apple** : activer, Client IDs `com.cohozen.trycast`, secret vide
+   (flux natif). Sur le **dev** tout de suite, sur la **prod** dans la procédure de la 1.3.0 ; sans
+   cela, le bouton Apple échoue à la connexion.
+2. **Apple Developer → Sign in with Apple for Email Communication** : déclarer `trycast.fr` et
+   l'expéditeur Resend (`contact@trycast.fr` compris). Sinon les adresses relais
+   `@privaterelay.appleid.com` rejettent nos e-mails, préavis de purge des inactifs compris, alors
+   que la politique dit qu'Apple les fait suivre.
+3. **Parcours Apple complet sur l'iPhone TestFlight** (8–14 oct) : il ne va pas au bout au simulateur
+   (signature locale sans entitlements).
 
 **Session dédiée avant l'App Store public (février)** :
 - **Signaler, bloquer, filtre des pseudos** (règle 1.2 : pseudos et avatars visibles des autres
@@ -182,7 +190,9 @@ client ID, pas de secret en flux natif). Registre, `confidentialite.astro` et `e
   D-U-N-S). Les pages légales du site restent anonymes. **Statut DSA non-trader** tant qu'il n'y a
   ni publicité ni achat intégré ; la monétisation fera basculer trader (coordonnées publiées sur la
   fiche UE) et « professionnel » (mentions légales à réviser dans les deux langues).
-- **iOS suit Android** : beta fermée TestFlight sur invitation par e-mail, App Store public en février 2027.
+- **iOS suit Android** : beta fermée TestFlight par lien public, App Store public en février 2027.
+- **Sign in with Apple sur iOS seulement** (2026-09-24) : flux natif avec nonce, adresse e-mail seule
+  demandée. Pas d'Apple sur Android (Services ID et secret à renouveler tous les six mois).
 
 ## Points ouverts / dette assumée
 - **Chantier des cotes** (reporté) : capturer les cotes plus tôt et ne jamais écraser une bonne cote par du vide. Seul le badge « Outsider des cotes » du coup de la journée en dépend.

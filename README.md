@@ -48,7 +48,7 @@ Les **notifications push** nécessitent ce dev build (elles sont retirées d'Exp
 
 ```bash
 npx eas-cli build --profile development --platform android   # APK à installer (QR code)
-npx eas-cli build --profile development --platform ios       # build simulateur (iOS device = compte Apple Developer requis, Lot 7)
+npx eas-cli build --profile development --platform ios       # build simulateur
 ```
 
 Le build Android embarque l'identité Firebase (FCM) de l'app : le fichier `google-services.json` n'est pas versionné, il vit dans `apps/mobile/` en local et dans l'env EAS `GOOGLE_SERVICES_JSON` pour les builds cloud. Un push de test peut s'envoyer à la main depuis [expo.dev/notifications](https://expo.dev/notifications) avec le token affiché dans les logs Metro.
@@ -330,7 +330,7 @@ celle d'EAS). Le `.gitignore` racine n'y entre pas. Le champ `scripts` d'`apps/m
 en est **exclu** (`fingerprint.config.js`) : sans cette exclusion, ajouter une commande npm coupe les
 builds déjà distribués de toute mise à jour.
 
-iOS reste différé (pas de compte Apple Developer) : les scripts de build ne visent qu'Android.
+Les scripts `build:*` ne visent qu'Android ; iOS se build par `eas build -p ios` (profils d'`eas.json`) et part en TestFlight par `eas submit`.
 
 ### Numéro de version
 

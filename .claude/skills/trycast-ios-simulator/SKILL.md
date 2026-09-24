@@ -107,16 +107,22 @@ fictifs sous de nouveaux ids : reprendre les liens de la dernière sortie, et s'
   d'AXe compatible, piloter par l'**outil simulateur intégré** de Claude Code
   (`mcp__Claude_Code_iOS_Simulator__control` : `screenshot`, `tap` avec `duration` pour un appui
   long, `swipe`, `inspect`), en points logiques comme AXe. `simctl` (screenshot, openurl) marche toujours.
-  Toujours le cas le 2026-09-23 (passe faite par `screenshot` et `tap`, `inspect` indisponible).
+  Toujours le cas le 2026-09-24 (passes faites par `screenshot` et `tap`, `inspect` indisponible).
   ⚠️ **Le sous-agent `verif-visuelle` n'a pas cet outil** (ses outils : Bash, Read, Grep, Glob,
   Skill) : sous Xcode 27, une passe iOS qui doit taper ou faire défiler se fait depuis la session
   principale ; le sous-agent ne peut que capturer par `simctl` et ouvrir des deep links.
 
 - **`npm run ios` réclame un certificat de signature** (« No code signing certificates are
   available ») depuis que l'app déclare ses liens d'invitation (`associatedDomains`, 2026-09-09).
-  Pas de Team ID, donc pas de `expo run:ios` : compiler avec `xcodebuild` en direct, puis
-  `simctl install`. La recette complète est dans le skill `trycast-dev-builds`, section iOS.
-- **Tester un lien d'invitation sans liens universels** (inertes sans Team ID) : utiliser
+  Le Team ID existe, mais ce Mac n'a aucun certificat de développement : compiler avec
+  `xcodebuild` en direct, puis `simctl install`. La recette complète est dans le skill
+  `trycast-dev-builds`, section iOS.
+- **Sign in with Apple ne va pas au bout au simulateur** : le build signé en local n'a pas
+  d'entitlements, et sans Apple ID dans les Réglages du simulateur la feuille renvoie une erreur
+  générique (code 1000). C'est attendu : on y vérifie le rendu du bouton, pas le parcours (détail
+  dans `trycast-dev-builds`).
+- **Tester un lien d'invitation sans liens universels** (inertes dans un build signé en local, sans
+  entitlements) : utiliser
   `xcrun simctl openurl booted "trycast:///rejoindre/<CODE>"`, **avec trois barres obliques**. Avec
   deux, `rejoindre` devient l'hôte de l'URL et non son chemin : `+native-intent` n'y reconnaît pas
   d'invitation, et l'app affiche « Unmatched Route ». Ce n'est pas un bug : seule la forme
@@ -140,7 +146,7 @@ fictifs sous de nouveaux ids : reprendre les liens de la dernière sortie, et s'
 - **Un `swipe` peut ouvrir le menu développeur** par-dessus l'écran (vécu 2026-09-05) : panneau « TOOLS / Open DevTools / Toggle element inspector… ». Il se ferme par son bouton `Close` (repérable dans `describe-ui`) ; si l'écran reste pollué, un `xcrun simctl openurl booted trycast://<route>` repart propre.
 - **Vérifier une dimension se fait en la mesurant, pas à l'œil** : `xcrun simctl io booted screenshot`, puis `magick <png> -crop <w>x<h>+<x>+<y> +repage txt:-` et un filtre couleur en Python sur la sortie donne la boîte englobante exacte d'un élément coloré (a servi à prouver qu'un anneau d'avatar faisait bien 56 × 56 pt après correctif). Rappel d'échelle : iPhone 17 Pro = 402 × 874 pt pour 1206 × 2622 px, soit ×3.
 - **Prudence données** : les champs de score des matchs **auto-savent** dans la base dev — ne pas y taper de valeurs de test sans les remettre en l'état. Le champ « Code d'invitation » (`league/join`) est inoffensif tant qu'on ne soumet pas : c'est le bon endroit pour tester la saisie.
-- **Tester light/dark** (vécu 11/07/2026) : la préférence de thème de l'app (Réglages > Thème, celle de Corentin = **Sombre**) **prime sur le système** — `xcrun simctl ui booted appearance light` ne change alors rien à l'app. Recette : Profil (336,819) > engrenage (365,92) → segmenté Thème (Système (90,478) / Clair (201,478) / Sombre (311,478), confirmées le 17/07/2026 — la section Compte a grandi depuis les anciennes coordonnées y=322) → vérifier les écrans → **remettre « Sombre » et l'appearance système `dark` avant de finir** (état de test de Corentin). Après un tap thème, un `axe button home` + `xcrun simctl openurl booted trycast://` peut rester sur le springboard : rejouer l'`openurl`.
+- **Tester light/dark** (vécu 11/07/2026) : la préférence de thème de l'app (Réglages > Thème, celle de Corentin = **Sombre**) **prime sur le système** — `xcrun simctl ui booted appearance light` ne change alors rien à l'app. Recette : Profil (336,819) > engrenage (365,92) → segmenté Thème (Système (90,478) / Clair (201,478) / Sombre (311,478), confirmées le 17/07/2026 — la section Compte a grandi depuis les anciennes coordonnées y=322) → vérifier les écrans → **remettre « Sombre » et l'appearance système `dark` avant de finir** (état de test de Corentin). Après un tap thème, un `axe button home` + `xcrun simctl openurl booted trycast://` peut rester sur le springboard : rejouer l'`openurl`. **Écrans d'auth en clair** : le thème se règle par appareil et survit à la déconnexion, donc passer en « Clair » **avant** de se déconnecter (manqué le 2026-09-24 : l'écran de connexion n'a été vu qu'en sombre).
 
 ## Nettoyage fin de session
 
