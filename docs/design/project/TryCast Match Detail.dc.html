@@ -62,7 +62,7 @@
           </div>
 
           <!-- Top bar: back + status chip -->
-          <div style="flex: none; position: relative; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 14px 6px; background: var(--bg); border-bottom: {{ f.barBorder }};">
+          <div style="flex: none; position: relative; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: -52px; padding: 2px 14px 6px; background: {{ f.barBg }}; backdrop-filter: {{ f.barBlur }}; -webkit-backdrop-filter: {{ f.barBlur }};">
             <button type="button" aria-label="Retour" onClick="{{ f.onBack }}" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: none; background: transparent; color: var(--text); cursor: pointer; border-radius: var(--radius-pill); -webkit-tap-highlight-color: transparent;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
             </button>
@@ -81,7 +81,7 @@
           </div>
 
           <!-- Scroll region -->
-          <div class="tc-scroll" onScroll="{{ f.onScroll }}" style="flex: 1; min-height: 0; overflow-y: auto; padding: 4px 20px 40px;">
+          <div class="tc-scroll" onScroll="{{ f.onScroll }}" style="flex: 1; min-height: 0; overflow-y: auto; padding: 56px 20px 40px;">
 
             <!-- ===================== LOADING ===================== -->
             <sc-if value="{{ f.isLoading }}" hint-placeholder-val="{{ false }}">
@@ -285,12 +285,12 @@
                     </div>
                   </sc-if>
 
-                  <!-- reconciliation (terminé) -->
-                  <sc-if value="{{ f.pronoReconciled }}" hint-placeholder-val="{{ false }}">
+                  <!-- reconciliation (en cours = provisoire, terminé) -->
+                  <sc-if value="{{ f.showRecon }}" hint-placeholder-val="{{ false }}">
                     <div style="padding: 16px; background: var(--surface); border: {{ f.reconBorder }}; border-radius: var(--radius-md); box-shadow: {{ f.reconShadow }}; display: flex; flex-direction: column; gap: 12px;">
                       <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;">
                         <div style="display: flex; flex-direction: column; gap: 4px; padding-bottom: 2px;">
-                          <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted);">Points gagnés</span>
+                          <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted);">{{ f.reconTitle }}</span>
                           <span style="font-size: 13px; color: var(--text-muted);">Ton prono <span style="font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums;">{{ f.pronoStr }}</span></span>
                         </div>
                         <span style="display: inline-flex; align-items: baseline; gap: 4px;"><span style="font-family: var(--font-display); font-size: 40px; line-height: 1; color: {{ f.matchPtsColor }}; font-variant-numeric: tabular-nums;">{{ f.matchPtsStr }}</span><span style="font-weight: 700; font-size: 13px; color: {{ f.matchPtsColor }};">pts</span></span>
@@ -301,6 +301,40 @@
                             <span style="flex: none; width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: {{ r.markBg }}; border: {{ r.markBorder }}; color: {{ r.markColor }}; font-size: 11px; font-weight: 700;">{{ r.mark }}</span>
                             <span style="flex: 1; font-size: 13px; color: var(--text);">{{ r.label }}</span>
                             <span style="flex: none; font-weight: 700; font-size: 13px; color: {{ r.valColor }}; font-variant-numeric: tabular-nums;">{{ r.valStr }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </sc-if>
+
+                  <!-- communauté (en cours + terminé) -->
+                  <sc-if value="{{ f.showComm }}" hint-placeholder-val="{{ false }}">
+                    <div style="padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 14px;">
+                      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px;">
+                        <span style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted);">Ce qu'a joué la communauté</span>
+                        <span style="flex: none; font-size: 12px; color: var(--text-faint); font-variant-numeric: tabular-nums;">{{ f.commTotal }} pronos{{ f.commSuffix }}</span>
+                      </div>
+                      <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; gap: 3px; height: 10px;">
+                          <sc-for list="{{ f.commSplit }}" as="s" hint-placeholder-count="3">
+                            <div style="flex: {{ s.grow }}; min-width: 4px; border-radius: 3px; background: {{ s.bar }};"></div>
+                          </sc-for>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                          <sc-for list="{{ f.commSplit }}" as="s" hint-placeholder-count="3">
+                            <div style="flex: 1; display: flex; flex-direction: column; gap: 3px; align-items: {{ s.align }};">
+                              <span style="font-family: var(--font-display); font-size: 22px; line-height: 1; color: {{ s.pctColor }}; font-variant-numeric: tabular-nums;">{{ s.pctStr }}</span>
+                              <span style="display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--text-muted);">{{ s.label }}<sc-if value="{{ s.mine }}" hint-placeholder-val="{{ false }}"><span style="padding: 1px 6px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;">Toi</span></sc-if></span>
+                            </div>
+                          </sc-for>
+                        </div>
+                      </div>
+                      <div style="display: flex; flex-direction: column;">
+                        <sc-for list="{{ f.commRows }}" as="r" hint-placeholder-count="3">
+                          <div style="display: flex; align-items: baseline; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border);">
+                            <span style="flex: 1; font-size: 13px; color: var(--text);">{{ r.label }}</span>
+                            <span style="flex: none; font-size: 12px; color: var(--text-faint); font-variant-numeric: tabular-nums;">{{ r.sub }}</span>
+                            <span style="flex: none; font-weight: 700; font-size: 13px; color: var(--text); font-variant-numeric: tabular-nums;">{{ r.val }}</span>
                           </div>
                         </sc-for>
                       </div>
@@ -353,11 +387,7 @@
                       <!-- segmented control (DS) -->
                       <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.SegmentedControl" options="{{ f.segOptions }}" value="{{ f.viewValue }}" onChange="{{ f.setViewValue }}" hint-size="100%,40px"></x-import>
 
-                      <!-- context subtitle -->
-                      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 0 2px;">
-                        <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">{{ f.leagueLabel }}</span>
-                        <span style="flex: none; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-faint); white-space: nowrap;">{{ f.sectionCount }}</span>
-                      </div>
+
 
                       <!-- ===== VUE PRONOS ===== -->
                       <sc-if value="{{ f.viewPronos }}" hint-placeholder-val="{{ true }}">
@@ -780,9 +810,10 @@ class Component extends DCLogic {
 
       // reconciliation rows (finished)
       let reconRows = [], matchPts = 0, matchPtsColor = 'var(--text-faint)', reconBorder = '1px solid var(--border)', reconShadow = 'var(--shadow-sm)';
-      if (pronoReconciled) {
-        const goodWinner = (pv.home > pv.away) === (finalHome > finalAway) && (pv.home < pv.away) === (finalHome < finalAway);
-        const exact = pv.home === finalHome && pv.away === finalAway;
+      if (pronoReconciled || pronoReadonly) {
+        const rh = pronoReadonly ? hs : finalHome, ra = pronoReadonly ? as : finalAway;
+        const goodWinner = (pv.home > pv.away) === (rh > ra) && (pv.home < pv.away) === (rh < ra);
+        const exact = pv.home === rh && pv.away === ra;
         // FRA scored 4 tries -> offensive bonus valid; my bonusHome (FRA) correct
         const bonusOk = pv.bonusHome === true;
         const mk = (ok) => ok
@@ -905,7 +936,8 @@ class Component extends DCLogic {
         titleOpacity: (1 - Math.min(1, st * 1.6)).toFixed(2),
         compactOpacity: Math.max(0, (st - 0.35) / 0.65).toFixed(2),
         compactShift: 'translateY(' + ((1 - st) * 7).toFixed(1) + 'px)',
-        barBorder: st > 0.02 ? '1px solid color-mix(in srgb, var(--border) ' + Math.round(st * 100) + '%, transparent)' : '1px solid transparent',
+        barBg: 'color-mix(in srgb, var(--bg) ' + Math.round(100 - st * 24) + '%, transparent)',
+        barBlur: 'blur(' + Math.round(st * 20) + 'px) saturate(' + (1 + st * 0.5).toFixed(2) + ')',
         ...chipFor(status),
 
         home: FRA, away: IRL,
@@ -932,6 +964,32 @@ class Component extends DCLogic {
         roScoreHome, roScoreAway, roPoints, roShowBonusHome, roShowBonusAway,
         savedShown, savedText, savedColor, savedIsTick,
         reconRows, reconBorder, reconShadow,
+        showRecon: pronoReconciled || pronoReadonly,
+        reconTitle: pronoReadonly ? 'Points provisoires' : 'Points gagnés',
+        ...(() => {
+          const c = { total: 1284, home: 64, draw: 3, away: 33 };
+          const mine = pv.home > pv.away ? 'home' : (pv.home < pv.away ? 'away' : 'draw');
+          const isLive = pronoReadonly;
+          const sh = isLive ? liveHome : finalHome, sa = isLive ? liveAway : finalAway;
+          const fw = sh > sa ? 'home' : (sh < sa ? 'away' : 'draw');
+          const seg = (k, label, align) => ({ grow: c[k], label, align, mine: k === mine, pctStr: c[k] + '%',
+            bar: k === fw ? 'var(--accent)' : 'var(--border-strong)', pctColor: k === fw ? 'var(--accent)' : 'var(--text-muted)' });
+          return {
+            showComm: pronoReadonly || pronoReconciled,
+            commSuffix: isLive ? ' · à ' + liveMin : '',
+            commTotal: c.total.toLocaleString('fr-FR'),
+            commSplit: [seg('home', FRA.abbr, 'flex-start'), seg('draw', 'Nul', 'center'), seg('away', IRL.abbr, 'flex-end')],
+            commRows: isLive ? [
+              { label: 'Score le plus joué', sub: '11%', val: '24 – 17' },
+              { label: 'Score exact trouvé', sub: '9 joueurs · provisoire', val: '1%' },
+              { label: 'Points moyens', sub: 'toi ' + (matchPts > 0 ? '+' + matchPts : '0') + ' · provisoire', val: '+5,2' },
+            ] : [
+              { label: 'Score le plus joué', sub: '11%', val: '24 – 17' },
+              { label: 'Score exact trouvé', sub: '27 joueurs', val: '2%' },
+              { label: 'Points moyens', sub: 'toi ' + (matchPts > 0 ? '+' + matchPts : '0'), val: '+4,6' },
+            ],
+          };
+        })(),
         matchPtsStr: matchPts > 0 ? '+' + matchPts : '0',
         matchPtsColor,
 

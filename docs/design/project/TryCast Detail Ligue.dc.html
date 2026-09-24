@@ -79,8 +79,11 @@
             </span>
           </div>
 
+          <div style="flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column;">
+          <!-- HEADER (glass on scroll) -->
+          <div style="position: absolute; top: 0; left: 0; right: 0; z-index: 5; display: flex; flex-direction: column; background: {{ f.barBg }}; backdrop-filter: {{ f.barBlur }}; -webkit-backdrop-filter: {{ f.barBlur }};">
           <!-- NAV: back + overflow -->
-          <div style="flex: none; position: relative; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 12px 6px; background: var(--bg);">
+          <div style="flex: none; position: relative; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 12px 6px;">
             <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.IconButton" variant="ghost" ariaLabel="Retour" onClick="{{ f.noop }}" hint-size="44px,44px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></x-import>
             <span style="position: relative; flex: 1; min-width: 0; height: 34px; display: flex; align-items: center; justify-content: center;">
               <span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-faint); opacity: {{ f.navTitleOpacity }};">Ma ligue</span>
@@ -110,12 +113,13 @@
           </div>
 
           <!-- TABS -->
-          <div style="flex: none; padding: 0 20px 14px; border-bottom: {{ f.barBorder }};">
+          <div style="flex: none; padding: 0 20px 14px;">
             <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.SegmentedControl" options="{{ f.tabOptions }}" value="{{ f.tabValue }}" onChange="{{ f.setTab }}" hint-size="100%,40px"></x-import>
+          </div>
           </div>
 
           <!-- SCROLL REGION -->
-          <div class="tc-scroll" onScroll="{{ f.onScroll }}" style="flex: 1; min-height: 0; overflow-y: auto; padding: 2px 20px 32px;">
+          <div class="tc-scroll" onScroll="{{ f.onScroll }}" style="flex: 1; min-height: 0; overflow-y: auto; padding: 186px 20px 32px;">
 
             <!-- ===================== LOADING (per-tab skeleton) ===================== -->
             <sc-if value="{{ f.isLoading }}" hint-placeholder-val="{{ false }}">
@@ -397,6 +401,7 @@
               </div>
             </sc-if>
 
+          </div>
           </div>
 
           <!-- ============ TOAST · code copié ============ -->
@@ -712,7 +717,8 @@ class Component extends DCLogic {
         navTitleOpacity: (1 - Math.min(1, st * 2.2)).toFixed(2),
         compactOpacity: Math.min(1, Math.max(0, (st - 0.3) / 0.45)).toFixed(2),
         compactShift: 'translateY(' + ((1 - st) * 7).toFixed(1) + 'px)',
-        barBorder: st > 0.02 ? '1px solid color-mix(in srgb, var(--border) ' + Math.round(st * 100) + '%, transparent)' : '1px solid transparent',
+        barBg: 'color-mix(in srgb, var(--bg) ' + Math.round(100 - st * 24) + '%, transparent)',
+        barBlur: 'blur(' + Math.round(st * 20) + 'px) saturate(' + (1 + st * 0.5).toFixed(2) + ')',
 
         leagueName, leagueInitials, leagueCode,
         membersLine: isOneMember ? '1 membre' : memberFmt(memberCount),

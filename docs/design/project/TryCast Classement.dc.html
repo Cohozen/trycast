@@ -93,7 +93,7 @@
               <sc-if value="{{ f.tabLigues }}" hint-placeholder-val="{{ true }}">
                 <div style="position: relative;">
                   <button type="button" onClick="{{ f.onLeagueToggle }}" aria-haspopup="listbox" aria-expanded="{{ f.leagueMenuOpen }}" style="width: 100%; display: flex; align-items: center; gap: 11px; padding: 11px 14px; background: var(--surface); border: 1px solid {{ f.leagueTriggerBorder }}; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; color: var(--text); font-family: var(--font-body);">
-                    <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
+                    <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: var(--radius-sm); background: {{ f.leagueColor }}; color: var(--sand-050); font-family: var(--font-display); font-size: 16px; letter-spacing: 0.02em; box-shadow: var(--shadow-sm);">{{ f.leagueInitials }}</span>
                     <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;">
                       <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint);">Ligue affichée</span>
                       <span style="font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ f.leagueLabel }}</span>
@@ -105,7 +105,7 @@
                     <div role="listbox" style="position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 40; padding: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; gap: 2px; animation: tc-fade .14s ease;">
                       <sc-for list="{{ f.leagueMenu }}" as="opt" hint-placeholder-count="3">
                         <button type="button" role="option" aria-selected="{{ opt.active }}" onClick="{{ opt.onSelect }}" style="display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 10px; border: none; background: {{ opt.rowBg }}; border-radius: var(--radius-sm); cursor: pointer; text-align: left; -webkit-tap-highlight-color: transparent; font-family: var(--font-body);">
-                          <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--accent);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></span>
+                          <span style="flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: var(--radius-sm); background: {{ opt.color }}; color: var(--sand-050); font-family: var(--font-display); font-size: 14px; letter-spacing: 0.02em; box-shadow: var(--shadow-sm);">{{ opt.initials }}</span>
                           <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px;">
                             <span style="font-size: 14px; font-weight: {{ opt.weight }}; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ opt.label }}</span>
                             <span style="font-size: 11px; color: var(--text-faint);">{{ opt.members }}</span>
@@ -241,8 +241,8 @@
                         <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.Avatar" name="{{ s.name }}" size="sm" ring="{{ s.isMe }}" hint-size="32px,32px"></x-import>
                         <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;">
                           <span style="font-size: 14px; font-weight: {{ s.nameWeight }}; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ s.displayName }}</span>
-                          <span style="display: flex; align-items: center; gap: 7px; flex-wrap: wrap;">
-                            <span style="font-size: 11px; font-weight: 600; color: var(--text-faint);">{{ s.goodStr }}</span>
+                          <span style="display: flex; align-items: center; gap: 7px; flex-wrap: nowrap; min-width: 0;">
+                            <span style="font-size: 11px; font-weight: 600; color: var(--text-faint); white-space: nowrap;">{{ s.goodStr }}</span>
                             <sc-if value="{{ s.hasExact }}" hint-placeholder-val="{{ false }}"><span style="display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px 1px 5px; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: 0.01em;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4"></circle></svg>{{ s.exactStr }}</span></sc-if>
                           </span>
                         </span>
@@ -319,15 +319,17 @@ class Component extends DCLogic {
 
     const memberFmt = (n) => n + (n > 1 ? ' membres' : ' membre');
     const goodFmt = (n) => n + (n > 1 ? ' bons pronos' : ' bon prono');
-    const exactFmt = (n) => n + (n > 1 ? ' scores exacts' : ' score exact');
+    const exactFmt = (n) => n + (n > 1 ? ' exacts' : ' exact');
 
     // ---- Leagues ----
     const leagueOptions = [
-      { label: 'Les Potes', value: 'potes', members: 6 },
-      { label: 'Le Bureau', value: 'bureau', members: 14 },
-      { label: 'Famille', value: 'famille', members: 1 },
+      { label: 'Les Potes', value: 'potes', members: 6, color: 'var(--green-800)' },
+      { label: 'Le Bureau', value: 'bureau', members: 14, color: '#2A6FDB' },
+      { label: 'Famille', value: 'famille', members: 1, color: '#E0952A' },
     ];
     const leagueName = { potes: 'Les Potes', bureau: 'Le Bureau', famille: 'Famille' };
+    const leagueInitialsOf = (name) => { const p = (name || '').trim().split(/\s+/).filter(Boolean); if (!p.length) return '?'; return p.length === 1 ? p[0].slice(0, 2).toUpperCase() : (p[0][0] + p[1][0]).toUpperCase(); };
+    const leagueColorOf = (v) => (leagueOptions.find((o) => o.value === v) || leagueOptions[0]).color;
     const leagueMemberCount = { potes: 6, bureau: 14, famille: 1 };
 
     // standings: explicit rank to support ties; me flag marks current user
@@ -459,6 +461,7 @@ class Component extends DCLogic {
         const active = o.value === leagueValue;
         return {
           label: o.label, value: o.value, members: memberFmt(o.members),
+          initials: leagueInitialsOf(o.label), color: o.color,
           active, inactive: !active,
           weight: active ? 700 : 500,
           rowBg: active ? 'color-mix(in srgb, var(--accent) 8%, transparent)' : 'transparent',
@@ -479,6 +482,8 @@ class Component extends DCLogic {
 
         showSubHeader,
         leagueLabel: leagueName[leagueValue] || 'Les Potes',
+        leagueInitials: leagueInitialsOf(leagueName[leagueValue] || 'Les Potes'),
+        leagueColor: leagueColorOf(leagueValue),
         leagueMembers: memberFmt(leagueMemberCount[leagueValue] || 0),
         leagueMenu, leagueMenuOpen,
         leagueChevron: leagueMenuOpen ? 'rotate(180deg)' : 'none',
