@@ -8,8 +8,8 @@
 > d'avant journée compris). **Release 1.1.0 publiée** (tag `v1.1.0`, GitHub Release) et
 > **build de production 7** terminé (canal `production`, empreinte `cd8204a1`) : reste à le
 > téléverser sur la Play Console. Le build 5 (1.0.0) ne reçoit plus aucune OTA. **DS du 2026-09-24
-> commité sur `main`, non poussé** : il ajoute `expo-blur`, donc `main` a quitté l'empreinte du
-> build 7 et ce lot partira avec la prochaine release store, pas en OTA.
+> poussé sur `main`, migration en prod** : il ajoute `expo-blur`, donc `main` a quitté l'empreinte
+> du build 7 et ce lot partira avec la prochaine release store, pas en OTA.
 
 ## Avancement des lots
 
@@ -41,7 +41,7 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
 - ✅ **DS du 2026-09-24** (après la 1.1.0) — headers repliables en verre (`expo-blur`, lib native),
   bloc « Ce qu'a joué la communauté » du détail de match, carte de prono et rang par ligue du profil,
   avatars de ligue dans les sélecteurs, classement général chargé au défilement, guide d'accueil
-  raccourci. Migration `get_match_community_histogram` **pas encore en prod** ; nouvelle empreinte,
+  raccourci. Migration `get_match_community_histogram` en prod (2026-09-24) ; nouvelle empreinte,
   donc **une release store** (version à trancher : ce lot doit-il remplacer le build 7 pour la beta ?).
 
 ### Lancement public — 6 Nations 2027 (février)
@@ -75,15 +75,15 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
   « Nouveautés » depuis la section 1.1.0 du `CHANGELOG` (moins de 500 caractères). ⚠️ L'empreinte de
   `main` n'est plus `cd8204a1` depuis `expo-blur` : un correctif JS destiné au build 7 ne peut plus
   partir de `main` par `npm run ota:prod` (il partirait sans l'atteindre, en silence ; skill `trycast-release`).
-- **Livrer le DS du 2026-09-24**, dans cet ordre : pousser `main` ; mettre en prod la migration
-  `20260924000100` (skill `trycast-prod-rollout`) **avant** la release qui s'en sert ; préparer la
-  release (`npm run release -- --minor|--patch --notes "…"`, en `--dry-run` d'abord) et lancer le
-  build. Le dev client iOS n'est pas rebuildé (`expo-blur`) et la passe visuelle iOS du lot n'est
+- **Livrer le DS du 2026-09-24** : `main` poussé et migration `20260924000100` en prod
+  (2026-09-24, fonction réservée à `authenticated`, crons sains). Reste la release
+  (`npm run release -- --minor|--patch --notes "…"`, en `--dry-run` d'abord) et le build. Le dev client iOS n'est pas rebuildé (`expo-blur`) et la passe visuelle iOS du lot n'est
   pas faite.
 - **Avatars absents en prod** dans les classements et la liste des pronos d'un match, y compris celui
-  de Corentin. Sur le dev, RPC et rendu sont corrects (vérifié à l'émulateur) : diagnostic à mener en
-  prod, en comparant les définitions de `get_league_leaderboard`, `get_global_leaderboard` et
-  `get_match_league_predictions` avec celles du dev, puis la valeur d'`avatar_url` des profils.
+  de Corentin. Sur le dev, RPC et rendu sont corrects (vérifié à l'émulateur) ; en prod, l'`avatar_url`
+  de Corentin est correct (2026-09-24). Reste à comparer les définitions renvoyées par
+  `get_league_leaderboard`, `get_global_leaderboard` et `get_match_league_predictions` en prod avec
+  celles du dev (colonne `avatar_url` présente ?).
 - `SENTRY_AUTH_TOKEN` en secret EAS — un **jeton d'organisation**, pas personnel. Sans lui, pas de
   source maps : plantages en JS minifié.
 - `submit.production.android` d'`eas.json` attend le compte de service Google Play.
