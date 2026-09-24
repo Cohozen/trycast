@@ -35,11 +35,15 @@ npm run build:list                                          # ligne Fingerprint 
 ```
 
 `npm run release` fait cette comparaison à ta place et annonce laquelle des deux sorties
-s'applique. Ce qui déplace légitimement l'empreinte : une dépendance native ajoutée ou retirée,
-`app.json`, `eas.json`, les plugins de configuration, les assets déclarés dans la config, une
-montée de SDK, `fingerprint.config.js` lui-même — et `apps/mobile/.gitignore`, versionné pour
-cette raison. Détails dans `apps/mobile/scripts/README.md`. Toutes ces commandes se lancent depuis
-`apps/mobile`.
+s'applique. ⚠️ **`npm run ota:prod`, lui, ne la fait pas** (`apps/mobile/scripts/ota.mjs` ne vérifie
+qu'arbre propre, typecheck et tests) : il publie sur l'empreinte du moment, même si plus aucun build
+distribué ne la porte. Comparer à la main avant chaque OTA. Ce qui déplace légitimement l'empreinte :
+une dépendance native ajoutée ou retirée, `app.json`, `eas.json`, les plugins de configuration, les
+assets déclarés dans la config, une montée de SDK, `fingerprint.config.js` lui-même — et
+`apps/mobile/.gitignore`, versionné pour cette raison. **Une clé `ios.*` d'`app.json` déplace aussi
+l'empreinte Android** : la source `expoConfig` hache la configuration entière (vécu le 2026-09-24,
+`ios.privacyManifests` a coupé la 1.2.0 Android de toute OTA). Détails dans
+`apps/mobile/scripts/README.md`. Toutes ces commandes se lancent depuis `apps/mobile`.
 
 ### ⚠️ `expo.version` fait partie de l'empreinte
 
@@ -164,6 +168,13 @@ jour. Le pourquoi d'une version, lui, vit dans `CHANGELOG.md` et le tag.
 | `development` | APK dev client | bundle servi par Metro, donc `.env` local | — |
 | `preview` | release | **dev** | `preview` |
 | `production` | **AAB** pour la Play Console | **prod** | `production` |
+
+Côté iOS, le profil `production` sort un `.ipa` pour App Store Connect :
+`eas build -p ios --profile production`, puis `eas submit -p ios` (les scripts `build:*` et
+`build:list` ne visent qu'Android). `submit.production.ios`
+d'`eas.json` porte l'identifiant de l'app App Store Connect et le Team ID ; la **clé d'API App Store
+Connect** et la **clé APNs** ne vivent que dans les credentials EAS (proposées au premier build ou
+submit interactif, sinon `eas credentials`), jamais dans le dépôt.
 
 Commandes : `npm run build:dev|build:preview|build:prod`, `npm run env:preview|env:prod`, depuis
 `apps/mobile`. ⚠️ Un build `preview`/`production` inline les `EXPO_PUBLIC_*` au bundling **sur les

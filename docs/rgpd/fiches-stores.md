@@ -213,39 +213,22 @@ propre manifeste, mais Apple ne parse pas toujours correctement ceux des dépend
 CocoaPods statiques : les « required reason APIs » doivent être redéclarées au niveau de
 l'app.
 
-**À appliquer au moment du premier build iOS, pas avant** : iOS est différé (pas de compte
-Apple Developer) et toute modification d'`app.json` impose un rebuild du dev client — autant
-le faire en une seule passe avec les autres réglages natifs.
+**Appliqué dans `app.json` (`expo.ios.privacyManifests`) le 2026-09-24**, avec le lot « iOS
+distribuable » : c'est désormais `app.json` qui fait référence, ce document ne recopie plus le bloc.
 
-Bloc à ajouter sous `expo.ios` dans `app.json` :
+Les codes de raison ont été obtenus en agrégeant les manifestes de toutes les dépendances, pas
+recopiés d'un guide : le brouillon d'origine en omettait trois, apportés par `expo-file-system`. **Toute dépendance native ajoutée peut en apporter de nouveaux** : refaire
+l'agrégation (depuis `apps/mobile`) et comparer au bloc d'`app.json`.
 
-```json
-"privacyManifests": {
-    "NSPrivacyAccessedAPITypes": [
-        {
-            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
-            "NSPrivacyAccessedAPITypeReasons": ["CA92.1"]
-        },
-        {
-            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
-            "NSPrivacyAccessedAPITypeReasons": ["C617.1"]
-        },
-        {
-            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryDiskSpace",
-            "NSPrivacyAccessedAPITypeReasons": ["E174.1"]
-        },
-        {
-            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategorySystemBootTime",
-            "NSPrivacyAccessedAPITypeReasons": ["35F9.1"]
-        }
-    ]
-}
+```bash
+find node_modules -name PrivacyInfo.xcprivacy | xargs grep -ho '<string>[0-9A-F]\{4\}\.[0-9]</string>' | sort | uniq -c
 ```
 
-**Avant de l'appliquer** : relire https://docs.expo.dev/guides/apple-privacy/ pour la version
-du SDK en cours. Les codes de raison évoluent et Apple en refuse de périmés. Si un rejet
-mentionne une API non déclarée, le code manquant est indiqué dans le message — l'ajouter à
-ce bloc puis rebuilder.
+La commande ne donne que les codes : leur catégorie se lit dans le manifeste qui les porte.
+Modifier ce bloc, c'est modifier `app.json` : rebuild et déplacement d'empreinte, donc avec une
+release. Si un rejet d'Apple mentionne une API non déclarée, le code manquant figure dans le
+message ; la référence reste https://docs.expo.dev/guides/apple-privacy/ pour la version du SDK
+en cours.
 
 ---
 
@@ -255,7 +238,8 @@ ce bloc puis rebuilder.
 - [ ] Liens légaux accessibles **dans** l'app (fait — section À propos des Réglages)
 - [ ] Formulaire Data Safety rempli sur Play Console
 - [ ] Nutrition Labels remplies sur App Store Connect
-- [ ] `ios.privacyManifests` ajouté à `app.json` et build iOS régénéré
+- [x] `ios.privacyManifests` ajouté à `app.json` (2026-09-24)
+- [ ] Build iOS régénéré avec ce manifeste (premier `eas build -p ios --profile production`)
 - [x] Boîte `contact@trycast.fr` opérationnelle (adresse de support déclarée aux deux stores)
 - [x] ~~Si Aptabase / Sentry sont en service : déclarations mises à jour~~ → fait le
       22 juillet 2026, avant leur mise en service

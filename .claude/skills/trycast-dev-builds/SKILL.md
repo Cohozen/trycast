@@ -23,6 +23,7 @@ build distribué, au besoin après un `npm run ota:prod`.
 1. **Installation/retrait d'une lib contenant du code natif** — en pratique quasi tout package `expo-*` et toute lib `react-native-*` non pure-JS. (Pur JS = pas de rebuild : TanStack Query, i18next, date-fns…)
    - **Exception vérifiée** : un module natif déjà présent en **dépendance transitive** est déjà autolinké, donc déjà dans le binaire — l'expliciter dans `package.json` ne demande **aucun rebuild**. Vécu le 2026-07-21 avec `expo-application` (tiré par `expo-notifications`) : `npx expo install expo-application` puis lecture de `nativeApplicationVersion` a fonctionné du premier coup sur le dev build existant. Vérifier avant de conclure : `npx expo-modules-autolinking search | grep <module>` — s'il y apparaît, c'est déjà lié.
    - ⚠️ **`npx expo install` réindente `package.json` et `package-lock.json` en 2 espaces** (vécu le 2026-09-24 avec `expo-blur` : un diff de 29 000 lignes pour une dépendance). `npm run format` remet `package.json` d'aplomb, pas le lock, que Biome ne formate pas : le réindenter à 4 espaces (`node -e` avec `JSON.stringify(…, null, 4)` et un saut de ligne final), puis vérifier que `git diff --stat` ne montre plus que les lignes du paquet.
+   - ⚠️ **iOS : une lib native peut apporter des « required reason APIs »** que le bloc `ios.privacyManifests` d'`app.json` ne déclare pas encore. Refaire l'agrégation des `PrivacyInfo.xcprivacy` de `node_modules` (recette dans `docs/rgpd/fiches-stores.md`) et compléter le bloc dans le même lot ; sinon Apple le signale à la soumission.
 2. **Changement dans `app.json` / `app.config.ts`** — permissions, config plugins, icône/splash, `android.package`/`ios.bundleIdentifier`, `googleServicesFile`, `android.intentFilters` / `ios.associatedDomains`.
    - **Cas vécu le 2026-09-09** (liens d'invitation de ligue) : déclarer les liens d'application est un changement **purement déclaratif** — aucune ligne de JS ne change de comportement — et pourtant le manifeste Android et les entitlements iOS en dépendent, donc rebuild **et** déplacement d'empreinte. C'est le piège de cette famille de changements : rien dans le diff n'a l'air « natif ». Le reste du lot (message de partage, écran d'adhésion, page du site) était livrable en OTA : l'ordre de livraison compte, on livre le JS d'abord et la déclaration avec une release.
 3. **Montée de version du SDK Expo** (ou de React Native).
@@ -173,8 +174,10 @@ xcrun simctl openurl booted "trycast://expo-development-client/?url=http%3A%2F%2
 Metro doit tourner (`npm start`, ou celui d'un `npm run android`, qui sert les deux plateformes).
 Le schéma et le workspace s'écrivent **`TryCast`**, pas `trycast` : `xcodebuild` sort en erreur 65
 sur un nom de schéma inconnu. `SENTRY_DISABLE_AUTO_UPLOAD` se transmet ici par l'environnement, pour
-la même raison que dans `npm run ios`. Le jour où un Team ID existera, `npm run ios` refonctionnera
-tel quel.
+la même raison que dans `npm run ios`. Le Team ID existe depuis le 2026-09-24 : `npm run ios` devrait
+refonctionner tel quel dès qu'un certificat de développement est présent sur ce Mac (c'est ce que
+réclame le message d'erreur). **Pas encore vérifié** : garder ce contournement jusqu'au prochain
+rebuild iOS réussi par `npm run ios`, puis retirer ce paragraphe.
 
 ⚠️ **`pod install` refuse les pods Swift dont les dépendances ne définissent pas de module** (vécu 2026-07-23, ajout de `@react-native-google-signin/google-signin`). Message : *« The Swift pod `AppCheckCore` depends upon `GoogleUtilities` and `RecaptchaInterop`, which do not define modules »* — le prebuild s'arrête net à l'étape CocoaPods. Correctif **dans `app.json`**, jamais dans le `Podfile` (généré, effacé par `--clean`) : plugin `expo-build-properties` avec les pods fautifs en `modular_headers`.
 

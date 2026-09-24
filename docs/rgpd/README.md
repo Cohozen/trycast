@@ -10,7 +10,7 @@ non professionnel (LCEN 6-III-2).
 | [registre-des-traitements.md](registre-des-traitements.md) | Registre de l'article 30 : chaque traitement, sa finalité, sa base légale, sa durée de conservation. À présenter à la CNIL sur demande |
 | [sous-traitants.md](sous-traitants.md) | Qui touche aux données, où, et sous quelles garanties de transfert |
 | [procedure-droits.md](procedure-droits.md) | Comment répondre à une demande reçue à `contact@trycast.fr`, dans le délai d'un mois |
-| [fiches-stores.md](fiches-stores.md) | Brouillon des déclarations Play Data Safety et App Store Nutrition Labels, plus le bloc `ios.privacyManifests` à appliquer au premier build iOS |
+| [fiches-stores.md](fiches-stores.md) | Brouillon des déclarations Play Data Safety et App Store Nutrition Labels, plus la méthode pour tenir à jour le bloc `ios.privacyManifests` d'`app.json` |
 
 ## La règle qui compte
 

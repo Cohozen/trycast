@@ -6,8 +6,9 @@
 >
 > État au **2026-09-24** : serveur **entièrement en prod**, bloc communauté compris. **Release
 > 1.2.0 publiée** (tag `v1.2.0`) et **déployée sur la Play Console** : c'est le premier build ouvert
-> aux testeurs. Elle embarque `expo-blur`, donc une nouvelle empreinte : les builds 1.1.0 (7) et
-> 1.0.0 (5) ne reçoivent plus aucune OTA venue de `main`.
+> aux testeurs. **Configuration de distribution iOS commitée** (lot 1 iOS) : elle déplace
+> l'empreinte Android (`f0e880d9` → `ea4e55aa`), donc **plus aucune OTA venue de `main` n'atteint la
+> 1.2.0** ; tout part avec la 1.3.0.
 
 ## Avancement des lots
 
@@ -70,9 +71,11 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
 ### 🔶 Beta fermée (Lot 9, phase 7)
 - **Recruter 12 testeurs** qui restent inscrits 14 jours. ⚠️ La waitlist est **vide** : lui envoyer du trafic bien avant novembre.
 - **Version 1.2.0 sur la Play Console** (2026-09-24), premier build ouvert aux testeurs ; la 1.1.0
-  n'a servi qu'à Corentin. Les correctifs JS partent désormais par `npm run ota:prod` vers la 1.2.0.
-  Le dev client iOS n'est pas rebuildé (`expo-blur`) et la passe visuelle iOS du DS du 2026-09-24
-  n'est pas faite.
+  n'a servi qu'à Corentin. ⚠️ **La 1.2.0 ne reçoit plus d'OTA** : la configuration iOS d'`app.json`
+  a déplacé l'empreinte Android, choix assumé. Un correctif pour les testeurs Android part avec la
+  1.3.0 (nouveau build) ; `npm run ota:prod` ne le signale pas, il publierait sans que personne ne
+  reçoive rien. Le dev client iOS n'est pas rebuildé (`expo-blur`) et la passe visuelle iOS du DS du
+  2026-09-24 n'est pas faite.
 - **Avatars absents en prod** dans les classements et la liste des pronos d'un match, y compris celui
   de Corentin. Sur le dev, RPC et rendu sont corrects (vérifié à l'émulateur) ; en prod, l'`avatar_url`
   de Corentin est correct (2026-09-24). Reste à comparer les définitions renvoyées par
@@ -93,7 +96,7 @@ Championship. **App Store public en février 2027**, avec Android. Compte **indi
 | Quand | Qui | Étape |
 |---|---|---|
 | ✅ 24 sept | Corentin | Programme validé (Team ID `5P7K97386D`), accords acceptés, DSA non-trader déclaré, bundle ID `com.cohozen.trycast` enregistré (Associated Domains, Push, Sign in with Apple), fiche App Store Connect créée, **nom « TryCast » réservé**, `apple-app-site-association` en ligne. |
-| Dès le Team ID (~1er oct) | Claude, puis Corentin | **Lot 1 — iOS distribuable** (ci-dessous), fiche App Store Connect, premier `eas build -p ios --profile production` et `eas submit` lancés par Corentin (identifiants de signature interactifs), **TestFlight interne** (sans revue). |
+| ✅ 24 sept, puis ~1er oct | Claude, puis Corentin | **Lot 1 — iOS distribuable** (ci-dessous) : configuration commitée ; restent le premier `eas build -p ios --profile production` et `eas submit` lancés par Corentin (identifiants de signature interactifs), puis **TestFlight interne** (sans revue). |
 | 5–14 oct | Claude | **Lot 2 — Sign in with Apple**, iOS seulement, RGPD dans le même lot. Rebuild du dev client iOS (il n'a pas encore `expo-blur`), passe au simulateur. |
 | 8–14 oct | Corentin + 1 ou 2 proches | iPhone réel en TestFlight interne (testeurs ajoutés comme utilisateurs App Store Connect) : push, lien `/rejoindre`, Google, Apple. Corentin n'a pas d'iPhone. |
 | ~15 oct | Corentin | Release **1.3.0**, groupe externe « Beta fermée », soumission à la revue beta : description, `contact@trycast.fr`, compte de démo des stores, note au relecteur (gratuit, aucune mise, les cotes pondèrent les points). |
@@ -101,16 +104,22 @@ Championship. **App Store public en février 2027**, avec Android. Compte **indi
 | jusqu'au 7 nov | — | Marge pour un rejet et une nouvelle soumission. |
 
 **Lot 1 — iOS distribuable** (configuration seule) :
-- `app.json` : `ios.config.usesNonExemptEncryption: false`, bloc `ios.privacyManifests` de
-  `docs/rgpd/fiches-stores.md`. ⚠️ Comparer l'empreinte Android avant et après
-  (`npx expo-updates fingerprint:generate --platform android`) : si elle bouge, tout part avec la 1.3.0.
-- `eas.json` : `submit.production.ios` (identifiant de l'app App Store Connect, Team ID) et clé d'API App Store Connect.
-- Clé **APNs** dans les credentials EAS (`eas credentials`) ; l'EF `notify` passe par le service de push Expo, rien côté serveur.
+- ✅ `app.json` : `ios.config.usesNonExemptEncryption: false` et `ios.privacyManifests`, codes de
+  raison agrégés depuis les manifestes des dépendances (méthode dans `docs/rgpd/fiches-stores.md`).
+  Empreinte Android déplacée : voir « Beta fermée ».
+- ✅ `eas.json` : `submit.production.ios` (identifiant de l'app App Store Connect, Team ID).
 - ✅ `APPLE_TEAM_ID` dans Vercel (2026-09-24) : `apple-app-site-association` servi en 200,
   `application/json`, sans redirection, `appIDs` `5P7K97386D.com.cohozen.trycast` sur `/rejoindre/*`.
-  Reste à vérifier que `npm run ios` recompile en local sans le contournement `xcodebuild` (skill `trycast-dev-builds`).
-- `npm run env:prod` : vérifier `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID` dans l'environnement EAS de production.
-- `icon.png` a un canal alpha : Expo l'aplatit sur fond blanc pour iOS, contrôler le rendu sur le premier build.
+- ✅ `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID` présent dans l'environnement EAS de production, cohérent avec
+  l'`iosUrlScheme` du plugin Google d'`app.json`.
+- **Corentin** : clé **APNs** et clé d'API App Store Connect dans les credentials EAS — le premier
+  `eas build -p ios --profile production` interactif propose la première, le premier `eas submit` la
+  seconde (sinon `eas credentials`). L'EF `notify` passe par le service de push Expo, rien côté serveur.
+- **Corentin** : premier build, `eas submit`, TestFlight interne. Au premier build, contrôler le rendu
+  de l'icône : `icon.png` a un canal alpha, qu'Expo aplatit sur fond blanc pour iOS.
+- Reporté au lot 2, qui rebuilde le dev client iOS de toute façon : vérifier que `npm run ios`
+  recompile en local sans le contournement `xcodebuild` (skill `trycast-dev-builds`). Un seul rebuild
+  pour les deux lots.
 
 **Lot 2 — Sign in with Apple** (règle 4.8, exigée dès qu'un login social existe) :
 `expo-apple-authentication` (lib native ⇒ rebuild du dev client), `ios.usesAppleSignIn: true`,
