@@ -8,6 +8,14 @@ Le numéro de build (`versionCode`) n'apparaît pas ici : il est attribué par E
 
 Écrit par `npm run release`, à partir des `--notes` passées à la commande.
 
+## 1.2.0 — 2026-09-24
+
+- Détail d'un match : découvre ce qu'a joué la communauté (issue, score le plus joué, points moyens)
+- Profil : pronos plus compacts et ton rang dans chacune de tes ligues
+- Classement général chargé au fil du défilement, avatars des ligues dans les sélecteurs
+- Résultats : ouverture sur le jour même, sinon sur le dernier jour joué
+- Guide de démarrage plus court, en-têtes translucides
+
 ## 1.1.0 — 2026-09-23
 
 - Point double : un joker ×2 par phase, à poser sur le match de ton choix
