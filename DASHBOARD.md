@@ -84,16 +84,47 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
 - **Alerte sur les crons en échec** (proposé, non tranché) : aucune surveillance ne lit
   `cron.job_run_details` ; une panne a déjà duré un mois sans signal. À cadrer avant la beta.
 
-### 🔜 Compte Apple Developer — visé fin septembre 2026
-Pour préparer la revue App Store, plus longue que celle de Google. Ce que le Team ID débloque :
-- **Sans code** : `APPLE_TEAM_ID` dans Vercel génère l'`apple-app-site-association` (liens
-  d'invitation dans l'app sur iOS) ; `npm run ios` recompile en local (contournement `xcodebuild`
-  d'ici là, skill `trycast-dev-builds`).
-- **Sign in with Apple**, exigé dès qu'un autre login social existe : une entrée dans `providers.ts` + identifiants.
-- **Push iOS** : clé APNs à confier aux credentials EAS.
-- **Distribution iOS** : build EAS, TestFlight, fiche App Store Connect (brouillon des
-  déclarations dans `docs/rgpd/`), `ios.privacyManifests`, captures, revue.
-- Anonymat de l'éditeur à revoir à ce moment (bascule « professionnel » ⇒ identité complète).
+### 🔜 iOS — beta fermée TestFlight en octobre 2026 (plan du 2026-09-24)
+Objectif : des testeurs iPhone (amis, connaissances) **invités par e-mail** dans un groupe
+TestFlight externe, comme la beta fermée Play, à temps pour les journées de novembre du Nations
+Championship. **App Store public en février 2027**, avec Android. Compte **individuel**, statut DSA
+**non-trader** (voir « Décisions clés »).
+
+| Quand | Qui | Étape |
+|---|---|---|
+| 24–29 sept | Corentin | Inscription au programme (nom légal, double authentification, 99 $/an). **Chemin critique** : validation de quelques jours à deux semaines. |
+| Dès le Team ID (~1er oct) | Claude, puis Corentin | **Lot 1 — iOS distribuable** (ci-dessous), fiche App Store Connect, premier `eas build -p ios --profile production` et `eas submit` lancés par Corentin (identifiants de signature interactifs), **TestFlight interne** (sans revue). |
+| 5–14 oct | Claude | **Lot 2 — Sign in with Apple**, iOS seulement, RGPD dans le même lot. Rebuild du dev client iOS (il n'a pas encore `expo-blur`), passe au simulateur. |
+| 8–14 oct | Corentin + 1 ou 2 proches | iPhone réel en TestFlight interne (testeurs ajoutés comme utilisateurs App Store Connect) : push, lien `/rejoindre`, Google, Apple. Corentin n'a pas d'iPhone. |
+| ~15 oct | Corentin | Release **1.3.0**, groupe externe « Beta fermée », soumission à la revue beta : description, `contact@trycast.fr`, compte de démo des stores, note au relecteur (gratuit, aucune mise, les cotes pondèrent les points). |
+| ~17–20 oct | Corentin | Invitations par e-mail, sur le même canal que la beta Android (le broadcast Resend ne vise qu'Android : l'adapter). |
+| jusqu'au 7 nov | — | Marge pour un rejet et une nouvelle soumission. |
+
+**Lot 1 — iOS distribuable** (configuration seule) :
+- `app.json` : `ios.config.usesNonExemptEncryption: false`, bloc `ios.privacyManifests` de
+  `docs/rgpd/fiches-stores.md`. ⚠️ Comparer l'empreinte Android avant et après
+  (`npx expo-updates fingerprint:generate --platform android`) : si elle bouge, tout part avec la 1.3.0.
+- `eas.json` : `submit.production.ios` (identifiant de l'app App Store Connect, Team ID) et clé d'API App Store Connect.
+- Clé **APNs** dans les credentials EAS (`eas credentials`) ; l'EF `notify` passe par le service de push Expo, rien côté serveur.
+- `APPLE_TEAM_ID` dans Vercel : génère l'`apple-app-site-association` (liens d'invitation dans
+  l'app sur iOS). `npm run ios` recompile alors en local sans le contournement `xcodebuild` (skill `trycast-dev-builds`).
+- `npm run env:prod` : vérifier `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID` dans l'environnement EAS de production.
+- `icon.png` a un canal alpha : Expo l'aplatit sur fond blanc pour iOS, contrôler le rendu sur le premier build.
+
+**Lot 2 — Sign in with Apple** (règle 4.8, exigée dès qu'un login social existe) :
+`expo-apple-authentication` (lib native ⇒ rebuild du dev client), `ios.usesAppleSignIn: true`,
+entrée `apple` dans `providers.ts` (flux `native-id-token`, **iOS seulement** : sur Android, le flux
+navigateur exigerait un Services ID et une clé secrète à renouveler tous les six mois), branche
+`apple` de `sign-in-with-provider.ts` avec nonce, fournisseur Apple côté Supabase (bundle ID comme
+client ID, pas de secret en flux natif). Registre, `confidentialite.astro` et `en/privacy.astro` dans le même lot.
+
+**Session dédiée avant l'App Store public (février)** :
+- **Signaler, bloquer, filtre des pseudos** (règle 1.2 : pseudos et avatars visibles des autres
+  joueurs ; existants : exclusion par le propriétaire de ligue, contact publié). Motif de rejet le plus probable.
+- **Révocation des jetons Apple** à la suppression du compte (API REST d'Apple depuis l'EF `delete-account`, clé .p8 en secret).
+- Fiche App Store : captures 6,9″ (pas d'iPad), étiquettes de confidentialité (brouillon dans
+  `docs/rgpd/fiches-stores.md`), classification d'âge cohérente avec le minimum de 16 ans.
+- ⚠️ Un build TestFlight expire au bout de 90 jours : celui d'octobre tient jusqu'en janvier.
 
 ### Liens d'invitation — ouverts, sans urgence
 1. **Aperçu dans une messagerie** : vérifier la vignette dans WhatsApp (Facebook Sharing Debugger pour forcer le cache).
@@ -136,6 +167,12 @@ Pour préparer la revue App Store, plus longue que celle de Google. Ce que le Te
 - **Points provisoires en live** (2026-09-23, lève « pas de projection live » de juillet) : calculés côté client contre le score live par le module de scoring partagé, rien n'est écrit ; bonus offensif « en attente » faute d'essais en direct.
 - **`expo.version` reste dans l'empreinte** : tout bump impose un build, un correctif JS part sans bump par `npm run ota:prod`.
 - **Âge minimum 16 ans** (hors programme Familles de Play).
+- **Compte Apple Developer individuel** (2026-09-24) : le nom légal du titulaire s'affiche comme
+  vendeur sur l'App Store, en connaissance de cause (l'organisation exigerait entité juridique et
+  D-U-N-S). Les pages légales du site restent anonymes. **Statut DSA non-trader** tant qu'il n'y a
+  ni publicité ni achat intégré ; la monétisation fera basculer trader (coordonnées publiées sur la
+  fiche UE) et « professionnel » (mentions légales à réviser dans les deux langues).
+- **iOS suit Android** : beta fermée TestFlight sur invitation par e-mail, App Store public en février 2027.
 
 ## Points ouverts / dette assumée
 - **Chantier des cotes** (reporté) : capturer les cotes plus tôt et ne jamais écraser une bonne cote par du vide. Seul le badge « Outsider des cotes » du coup de la journée en dépend.
