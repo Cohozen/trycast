@@ -1010,6 +1010,18 @@ export type Database = {
                     username: string;
                 }[];
             };
+            get_match_community_histogram: {
+                Args: { p_match_id: string };
+                Returns: {
+                    bonus_off_away: boolean;
+                    bonus_off_home: boolean;
+                    joker: boolean;
+                    points_awarded: number;
+                    predicted_away_score: number;
+                    predicted_home_score: number;
+                    predictions: number;
+                }[];
+            };
             get_match_league_predictions: {
                 Args: { p_league_id: string; p_match_id: string };
                 Returns: {
