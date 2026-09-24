@@ -176,5 +176,6 @@ un testeur, le numéro de build ne bougeant pas d'une OTA à l'autre.
 
 **Comptes de démonstration des stores** : `scripts/seed-demo-account.mjs` (mot de passe en
 argument, jamais dans le dépôt ; `--project` exigé pour viser la prod). Ils portent
-`profiles.is_demo`, qui les **exclut du classement général** tout en les classant dans leur ligue
+`profiles.is_demo`, qui les **exclut du classement général** (et du bloc « Ce qu'a joué la
+communauté » du détail de match) tout en les classant dans leur ligue
 — la colonne n'a aucun `grant`, personne ne peut se marquer soi-même.

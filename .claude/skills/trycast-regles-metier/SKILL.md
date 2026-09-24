@@ -1,6 +1,6 @@
 ---
 name: trycast-regles-metier
-description: Règles de jeu actées de TryCast — joker par phase (×2, competition_phases, phase_jokers, set_/clear_phase_joker), phases finales (competition_stages, roundGroupKey, buildRoundStrip), réactions sur les pronos (prediction_reactions, REACTIONS, ReactionEmoji), coup de la journée (league_round_highlights, buildRoundHighlights, notification round_highlight), points provisoires en live et rang d'avant journée (PointsEarnedCard, buildBreakdownRows, get_my_previous_rank), guide d'accueil (features/welcome) et état local par compte (features/celebration). À consulter dès qu'on touche à apps/mobile/src/features/{jokers,reactions,leagues,welcome,celebration}/, au scoring, à ces tables/RPC, à l'EF notify, ou à scripts/seed-competitions.sql.
+description: Règles de jeu actées de TryCast — joker par phase (×2, competition_phases, phase_jokers, set_/clear_phase_joker), phases finales (competition_stages, roundGroupKey, buildRoundStrip), réactions sur les pronos (prediction_reactions, REACTIONS, ReactionEmoji), coup de la journée (league_round_highlights, buildRoundHighlights, notification round_highlight), points provisoires en live et rang d'avant journée (PointsEarnedCard, buildBreakdownRows, get_my_previous_rank), bloc « Ce qu'a joué la communauté » (get_match_community_histogram, summarizeCommunity), guide d'accueil (features/welcome) et état local par compte (features/celebration). À consulter dès qu'on touche à apps/mobile/src/features/{jokers,reactions,leagues,welcome,celebration}/, au scoring, à ces tables/RPC, à l'EF notify, ou à scripts/seed-competitions.sql.
 ---
 
 # TryCast — règles de jeu actées
@@ -108,10 +108,30 @@ Décisions prises avec Corentin : **ne pas les re-débattre**. Chaque règle a s
   Vérification : `supabase db query --linked -f scripts/e2e-previous-rank.sql` (transaction
   annulée, sans seed). Sans la RPC (prod pas encore migrée), la carte retombe sur « À X pts du Nᵉ ».
 
+## Ce qu'a joué la communauté (DS du 2026-09-24)
+
+- Bloc du détail d'un match **commencé** : parts 1/N/2, score le plus joué, scores exacts trouvés,
+  points moyens. RPC `get_match_community_histogram(p_match_id)`, `security definer`, qui ne rend
+  que des **agrégats** (nombre de pronos par score, bonus offensifs, joker et points attribués),
+  jamais une ligne individuelle ni un identifiant ; comptes de démo exclus.
+- ⚠️ **Les scores pronostiqués des autres restent secrets jusqu'au coup d'envoi** : la RPC ne rend
+  **rien** avant le kickoff, ni pour un match reporté ou annulé. Seules les parts 1/N/2
+  (`get_prediction_distributions`) sont visibles avant, par décision de Corentin. Ne pas avancer
+  le bloc avant le match, ni relâcher le filtre côté serveur ; le `enabled` de
+  `use-match-community.ts` n'est qu'une UX.
+- Le calcul vit côté client, dans `summarizeCommunity`
+  (`apps/mobile/src/features/predictions/community-summary.ts`, testé) : un groupe scoré garde ses
+  `points_awarded` (essais et joker compris) ; en live, ses points se recalculent contre le score en
+  direct avec le module de scoring partagé, bonus offensif en attente, comme la carte « Points
+  gagnés » (`match-points-of.ts`).
+
 ## Guide d'accueil (`apps/mobile/src/features/welcome/`)
 
 - Quatre volets dans une bottom sheet paginée, ouverts une fois au premier lancement et rejouables
-  depuis Réglages → À propos.
+  depuis Réglages → À propos, **par-dessus les Réglages** (plus de retour à l'écran précédent).
+- Les volets ne renvoient nulle part ailleurs : seul celui des notifications porte une action
+  (`WelcomeStepAction`). Les règles et les ligues sont proposées **au dernier volet**, en double
+  bouton à la place de « Passer » (`WelcomeAction`), pour qu'on lise tout avant de partir.
 - L'état « déjà vu » est une **préférence locale** (`trycast.welcome-guide-seen`), pas une colonne
   serveur : c'est cosmétique, et une réinstallation le rejoue — assumé.
 - ⚠️ **Ce flag pilote aussi la première demande de permission notifications** :

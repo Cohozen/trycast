@@ -4,10 +4,12 @@
 > Mis à jour à la fin de chaque lot. **Pas de journal** : l'historique se lit dans `git log`
 > (et l'ancien journal des sessions par `git show 8418902:DASHBOARD.md`).
 >
-> État au **2026-09-23** : serveur de la v1.1.0 **entièrement en prod** (coup de la journée et rang
+> État au **2026-09-24** : serveur de la v1.1.0 **entièrement en prod** (coup de la journée et rang
 > d'avant journée compris). **Release 1.1.0 publiée** (tag `v1.1.0`, GitHub Release) et
-> **build de production 7** terminé (canal `production`, empreinte `cd8204a1`, identique à `main`) :
-> reste à le téléverser sur la Play Console. Le build 5 (1.0.0) ne reçoit plus aucune OTA.
+> **build de production 7** terminé (canal `production`, empreinte `cd8204a1`) : reste à le
+> téléverser sur la Play Console. Le build 5 (1.0.0) ne reçoit plus aucune OTA. **DS du 2026-09-24
+> commité sur `main`, non poussé** : il ajoute `expo-blur`, donc `main` a quitté l'empreinte du
+> build 7 et ce lot partira avec la prochaine release store, pas en OTA.
 
 ## Avancement des lots
 
@@ -35,8 +37,12 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
   points provisoires en live dans le détail de match, heure du coup d'envoi « 21h45 », profil
   public en barre native. Migration `get_my_previous_rank` en prod (2026-09-23).
 - ✅ **Signaler un problème** (Sentry User Feedback) — reste à vérifier la réception dans Sentry et brancher l'alerte e-mail.
-- A priori aucune lib native ; le build est de toute façon imposé par le SDK 57.
 - ✅ **Version 1.1.0** — taguée et buildée le 2026-09-23 (build 7). Reste la Play Console ; préparation du compte Apple à suivre.
+- ✅ **DS du 2026-09-24** (après la 1.1.0) — headers repliables en verre (`expo-blur`, lib native),
+  bloc « Ce qu'a joué la communauté » du détail de match, carte de prono et rang par ligue du profil,
+  avatars de ligue dans les sélecteurs, classement général chargé au défilement, guide d'accueil
+  raccourci. Migration `get_match_community_histogram` **pas encore en prod** ; nouvelle empreinte,
+  donc **une release store** (version à trancher : ce lot doit-il remplacer le build 7 pour la beta ?).
 
 ### Lancement public — 6 Nations 2027 (février)
 - **Pronos de tournoi** avant le premier match : vainqueur, Grand Chelem, cuillère de bois, résolus
@@ -66,8 +72,18 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
 ### 🔶 Beta fermée (Lot 9, phase 7)
 - **Recruter 12 testeurs** qui restent inscrits 14 jours. ⚠️ La waitlist est **vide** : lui envoyer du trafic bien avant novembre.
 - **Build 1.1.0 (version code 7) sur la Play Console** : le téléverser en test, et coller le champ
-  « Nouveautés » depuis la section 1.1.0 du `CHANGELOG` (moins de 500 caractères). Les OTA sur le canal
-  `production` atteindront ce build tant que l'empreinte de `main` reste `cd8204a1` (skill `trycast-release`).
+  « Nouveautés » depuis la section 1.1.0 du `CHANGELOG` (moins de 500 caractères). ⚠️ L'empreinte de
+  `main` n'est plus `cd8204a1` depuis `expo-blur` : un correctif JS destiné au build 7 ne peut plus
+  partir de `main` par `npm run ota:prod` (il partirait sans l'atteindre, en silence ; skill `trycast-release`).
+- **Livrer le DS du 2026-09-24**, dans cet ordre : pousser `main` ; mettre en prod la migration
+  `20260924000100` (skill `trycast-prod-rollout`) **avant** la release qui s'en sert ; préparer la
+  release (`npm run release -- --minor|--patch --notes "…"`, en `--dry-run` d'abord) et lancer le
+  build. Le dev client iOS n'est pas rebuildé (`expo-blur`) et la passe visuelle iOS du lot n'est
+  pas faite.
+- **Avatars absents en prod** dans les classements et la liste des pronos d'un match, y compris celui
+  de Corentin. Sur le dev, RPC et rendu sont corrects (vérifié à l'émulateur) : diagnostic à mener en
+  prod, en comparant les définitions de `get_league_leaderboard`, `get_global_leaderboard` et
+  `get_match_league_predictions` avec celles du dev, puis la valeur d'`avatar_url` des profils.
 - `SENTRY_AUTH_TOKEN` en secret EAS — un **jeton d'organisation**, pas personnel. Sans lui, pas de
   source maps : plantages en JS minifié.
 - `submit.production.android` d'`eas.json` attend le compte de service Google Play.
@@ -99,7 +115,8 @@ Pour préparer la revue App Store, plus longue que celle de Google. Ce que le Te
 ### Divers
 - **Push** : confirmer sur l'Android réel les deux boutons d'une notification reçue (« Marquer comme lu » perdu si l'app est tuée : dégradation assumée).
 - **Highlightly Pro** : décider du renouvellement avant chaque compétition ; sans lui, `/odds` en 401 (fallback ×2.0) et pas de score live.
-- **Points provisoires en live** (carte « Points gagnés » du détail de match) : à valider avec de vraies données in-play (prochain match NC en direct).
+- **Points provisoires en live** (carte « Points gagnés » et bloc communauté du détail de match) : à valider avec de vraies données in-play (prochain match NC en direct).
+- **Avertissement React au changement de thème** : « Can't perform a React state update on a component that hasn't mounted yet » (`card.tsx`, `profile-stats.tsx`), vu à l'émulateur, à qualifier.
 - **Passe iOS sous Xcode 27** : AXe est cassé, et `verif-visuelle` n'a pas l'outil simulateur de Claude Code. Une passe iOS interactive se fait depuis la session principale, jusqu'à une version d'AXe compatible.
 - Jeter le worktree `.claude/worktrees/stoic-dewdney-33788e` et les branches `claude/*` de juillet.
 - **SDK 58** : pas avant sa sortie réelle ni avant le lancement de la beta.
