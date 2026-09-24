@@ -18,6 +18,7 @@ import { DayStrip } from '@/features/matches/components/day-strip';
 import {
     buildDayRange,
     dayKeyOf,
+    defaultDayIndex,
     MATCH_DAYS_ONLY,
     type StripDay,
 } from '@/features/matches/day-range';
@@ -51,6 +52,8 @@ export default function ResultsScreen() {
     // Jour courant (index de page) — en ref pour un tick haptique à chaque arrivée
     // sur un nouveau jour, sans déclencher de re-render.
     const currentIndexRef = useRef(-1);
+    // Jour visé lors du dernier montage de la liste (cf. onListLayout)
+    const layoutDayKeyRef = useRef<string | null>(null);
 
     const onRefresh = () =>
         Promise.all([
@@ -120,19 +123,21 @@ export default function ResultsScreen() {
         else resultsByDay.set(key, [match]);
     }
 
-    // Jour présélectionné = le dernier à matchs (le plus proche d'aujourd'hui).
-    let initialIndex = 0;
-    for (let i = days.length - 1; i >= 0; i--) {
-        if (days[i].hasMatches) {
-            initialIndex = i;
-            break;
-        }
-    }
+    // Jour présélectionné : aujourd'hui, sinon le dernier jour joué.
+    // `initialScrollIndex` n'est lu qu'au montage de la liste : l'onglet reste
+    // monté d'un jour à l'autre, et un jour de résultats apparaît au premier
+    // coup d'envoi. La liste est donc clé sur le jour visé, qui la remonte
+    // quand il change.
+    const initialIndex = defaultDayIndex(days, dayKeyOf(new Date()));
+    const targetDayKey = days[initialIndex]?.key ?? 'none';
 
-    // Amorce la ref au montage (événement : interdit d'écrire une ref au rendu)
-    // pour qu'aucun tick haptique ne parte sur la position initiale.
+    // Amorce la ref à chaque (re)montage (événement : interdit d'écrire une ref
+    // au rendu) pour qu'aucun tick haptique ne parte sur la position initiale.
     const onListLayout = () => {
-        if (currentIndexRef.current === -1) currentIndexRef.current = initialIndex;
+        if (layoutDayKeyRef.current !== targetDayKey) {
+            layoutDayKeyRef.current = targetDayKey;
+            currentIndexRef.current = initialIndex;
+        }
     };
 
     const onSelectDay = (index: number) => {
@@ -215,6 +220,7 @@ export default function ResultsScreen() {
                         })}
                         horizontal
                         initialScrollIndex={initialIndex}
+                        key={targetDayKey}
                         keyExtractor={(day: StripDay) => day.key}
                         onLayout={onListLayout}
                         onMomentumScrollEnd={onMomentumEnd}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildDayRange, dayKeyOf } from './day-range';
+import { buildDayRange, dayKeyOf, defaultDayIndex, type StripDay } from './day-range';
 
 describe('dayKeyOf', () => {
     it('produit une clé locale YYYY-MM-DD', () => {
@@ -62,5 +62,29 @@ describe('buildDayRange', () => {
             today,
         });
         expect(days).toEqual([]);
+    });
+});
+
+describe('defaultDayIndex', () => {
+    const day = (key: string, hasMatches = true): StripDay => ({
+        key,
+        date: new Date(`${key}T12:00:00`),
+        hasMatches,
+        isToday: false,
+    });
+
+    it('aujourd’hui quand il a des résultats', () => {
+        const days = [day('2026-09-20'), day('2026-09-24'), day('2026-09-26')];
+        expect(defaultDayIndex(days, '2026-09-24')).toBe(1);
+    });
+
+    it('sinon le dernier jour joué avant aujourd’hui', () => {
+        const days = [day('2026-09-20'), day('2026-09-21'), day('2026-09-24', false)];
+        expect(defaultDayIndex(days, '2026-09-24')).toBe(1);
+    });
+
+    it('à défaut le dernier jour de la bande, 0 si vide', () => {
+        expect(defaultDayIndex([day('2026-09-25'), day('2026-09-27')], '2026-09-24')).toBe(1);
+        expect(defaultDayIndex([], '2026-09-24')).toBe(0);
     });
 });

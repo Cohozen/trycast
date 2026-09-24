@@ -70,3 +70,15 @@ export function buildDayRange(options: DayRangeOptions): StripDay[] {
     }
     return days;
 }
+
+/**
+ * Jour présélectionné de la bande Résultats : aujourd'hui s'il a des
+ * résultats, sinon le dernier jour à résultats jusqu'à aujourd'hui (le
+ * dernier match joué), à défaut le dernier jour de la bande. 0 si vide.
+ */
+export function defaultDayIndex(days: readonly StripDay[], todayKey: string): number {
+    for (let i = days.length - 1; i >= 0; i--) {
+        if (days[i].hasMatches && days[i].key <= todayKey) return i;
+    }
+    return Math.max(0, days.length - 1);
+}
