@@ -56,7 +56,15 @@
     "predictions": {
         "emptyTitle": "Aucun prono terminé",
         "emptyMessage": "Tes pronos apparaîtront ici une fois les matchs joués et scorés.",
-        "emptyMessageOther": "Aucun prono terminé sur cette compétition."
+        "emptyMessageOther": "Aucun prono terminé sur cette compétition.",
+        "card": {
+            "final": "Final {{score}}",
+            "noProno": "Pas de prono",
+            "bonusOff": "Bonus off. {{code}}",
+            "defensive": "Bonus déf.",
+            "joker": "Point double",
+            "openPoints": "Voir le détail des points"
+        }
     },
     "username": {
         "label": "Pseudo",
@@ -183,5 +191,10 @@
             "confirm": "Supprimer définitivement",
             "deleting": "Suppression…"
         }
+    },
+    "leaguesTab": {
+        "yourRank": "Ton rang",
+        "rankSuffixFirst": "er",
+        "rankSuffix": "e"
     }
 }

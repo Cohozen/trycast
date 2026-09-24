@@ -94,5 +94,19 @@
     "validation": {
         "missingScore": "Indique un score.",
         "invalidScore": "Le score doit être un nombre entier positif."
+    },
+    "community": {
+        "title": "Ce qu'a joué la communauté",
+        "count_one": "{{count}} prono",
+        "count_other": "{{count}} pronos",
+        "draw": "Nul",
+        "you": "Toi",
+        "topScore": "Score le plus joué",
+        "exactFound": "Score exact trouvé",
+        "players_one": "{{count}} joueur",
+        "players_other": "{{count}} joueurs",
+        "average": "Points moyens",
+        "yourPoints": "toi {{points}}",
+        "provisional": "provisoire"
     }
 }

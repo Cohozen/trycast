@@ -3,7 +3,7 @@ import { initialsOf } from '@/features/leagues/initials';
 import { Text, View } from '@/tw';
 import { cn } from '@/tw/variants';
 
-type LeagueIconSize = 'sm' | 'md' | 'lg';
+type LeagueIconSize = 'sm' | 'option' | 'trigger' | 'list' | 'md' | 'lg';
 
 type LeagueIconProps = {
     name: string;
@@ -15,6 +15,11 @@ type LeagueIconProps = {
 const sizeClasses: Record<LeagueIconSize, { box: string; text: string }> = {
     // sm : titre compact de la barre native (header replié)
     sm: { box: 'h-[26px] w-[26px] rounded-[8px]', text: 'text-[13px]' },
+    // option / trigger : sélecteur de ligue (liste, puis déclencheur) ;
+    // list : lignes de l'onglet Ligues du profil (DS 2026-09-24)
+    option: { box: 'h-[32px] w-[32px] rounded-sm', text: 'text-[14px]' },
+    trigger: { box: 'h-[36px] w-[36px] rounded-sm', text: 'text-[16px]' },
+    list: { box: 'h-[40px] w-[40px] rounded-sm', text: 'text-[17px]' },
     md: { box: 'h-[58px] w-[58px]', text: 'text-[26px]' },
     lg: { box: 'h-[76px] w-[76px]', text: 'text-[32px]' },
 };

@@ -4,10 +4,8 @@ import { teamName } from '@/features/matches/format-match';
 import type { MatchWithTeams } from '@/features/matches/types';
 import { buildBreakdownRows } from '@/features/predictions/breakdown-rows';
 import { BreakdownRowItem } from '@/features/predictions/components/breakdown-row-item';
+import { matchPointsOf } from '@/features/predictions/match-points-of';
 import type { PredictionRow } from '@/features/predictions/types';
-import { parseBreakdown } from '@/features/predictions/verdict';
-import { computeMatchPoints } from '@/features/scoring/compute-match-points';
-import type { MatchPoints } from '@/features/scoring/types';
 import { useActiveScoringRules } from '@/features/scoring/use-active-scoring-rules';
 import { Text, View } from '@/tw';
 import { cn } from '@/tw/variants';
@@ -23,8 +21,8 @@ type PointsEarnedCardProps = {
  * Carte « Points gagnés » du détail d'un match en cours ou terminé (maquette
  * Match Detail, DS 2026-09-23) : total en tête, lignes du barème dessous.
  * Terminé : breakdown persisté par le scoring. En cours : points PROVISOIRES,
- * calculés ici contre le score live avec le module de scoring partagé
- * (décision 2026-09-23) — essais inconnus en direct, le bonus offensif reste
+ * calculés contre le score live par `matchPointsOf` (module de scoring partagé,
+ * décision 2026-09-23) — essais inconnus en direct, le bonus offensif reste
  * « en attente ».
  */
 export function PointsEarnedCard({ match, prediction, jokerOn = false }: PointsEarnedCardProps) {
@@ -32,29 +30,7 @@ export function PointsEarnedCard({ match, prediction, jokerOn = false }: PointsE
     const rules = useActiveScoringRules();
     const isLive = match.status === 'in_play';
 
-    let points: MatchPoints | null = null;
-    if (prediction && isLive) {
-        points = computeMatchPoints(
-            {
-                homeScore: prediction.predicted_home_score,
-                awayScore: prediction.predicted_away_score,
-                bonusOffHome: prediction.predicted_bonus_off_home,
-                bonusOffAway: prediction.predicted_bonus_off_away,
-                joker: jokerOn,
-            },
-            {
-                homeScore: match.live_home_score ?? 0,
-                awayScore: match.live_away_score ?? 0,
-                homeTries: null,
-                awayTries: null,
-            },
-            { home: match.odds_home, draw: match.odds_draw, away: match.odds_away },
-            rules,
-        );
-    } else if (prediction && prediction.points_awarded !== null) {
-        const breakdown = parseBreakdown(prediction);
-        if (breakdown) points = { total: prediction.points_awarded, breakdown };
-    }
+    const points = matchPointsOf(match, prediction, jokerOn, rules);
 
     const rows =
         prediction && points
@@ -76,7 +52,7 @@ export function PointsEarnedCard({ match, prediction, jokerOn = false }: PointsE
     return (
         <View
             className={cn(
-                'gap-3 rounded-md bg-surface px-4 pb-4 pt-3',
+                'gap-3 rounded-md bg-surface p-4',
                 exact
                     ? 'border-[1.5px] border-accent/45 tc-glow-accent'
                     : 'border border-border tc-shadow-sm',
@@ -105,11 +81,14 @@ export function PointsEarnedCard({ match, prediction, jokerOn = false }: PointsE
                     )}
                 </View>
                 <View className="flex-row items-baseline gap-1">
+                    {/* Sans le padding de police d'Android, Anton à 40 px gonfle la
+                        rangée (alignée en bas) et creuse le haut de la carte */}
                     <Text
                         className={cn(
                             'font-display text-[40px] leading-[40px]',
                             positive ? 'text-accent' : 'text-text-faint',
-                        )}>
+                        )}
+                        style={{ includeFontPadding: false }}>
                         {total === null ? '–' : positive ? `+${total}` : '0'}
                     </Text>
                     <Text

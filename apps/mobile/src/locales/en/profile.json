@@ -56,7 +56,15 @@
     "predictions": {
         "emptyTitle": "No completed predictions",
         "emptyMessage": "Your predictions will appear here once matches are played and scored.",
-        "emptyMessageOther": "No completed predictions in this competition."
+        "emptyMessageOther": "No completed predictions in this competition.",
+        "card": {
+            "final": "Final {{score}}",
+            "noProno": "No prediction",
+            "bonusOff": "Off. bonus {{code}}",
+            "defensive": "Def. bonus",
+            "joker": "Double points",
+            "openPoints": "See points breakdown"
+        }
     },
     "username": {
         "label": "Username",
@@ -183,5 +191,10 @@
             "confirm": "Delete permanently",
             "deleting": "Deleting…"
         }
+    },
+    "leaguesTab": {
+        "yourRank": "Your rank",
+        "rankSuffixFirst": "",
+        "rankSuffix": ""
     }
 }

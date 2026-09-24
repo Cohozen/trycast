@@ -9,6 +9,13 @@ import { ProfileView } from '@/features/profile/components/profile-view';
  * est le mien — les écrans n'exposent de toute façon pas ma propre ligne.
  */
 export default function PlayerScreen() {
-    const { id } = useLocalSearchParams<{ id: string }>();
-    return <ProfileView isSelf={false} userId={id} />;
+    // tab : ouverture depuis la liste des pronos d'un match, sur l'onglet Pronos
+    const { id, tab } = useLocalSearchParams<{ id: string; tab?: string }>();
+    return (
+        <ProfileView
+            initialTab={tab === 'predictions' ? 'predictions' : undefined}
+            isSelf={false}
+            userId={id}
+        />
+    );
 }

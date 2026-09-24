@@ -1,5 +1,7 @@
+import { BlurTargetView } from 'expo-blur';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { CircleHelp, Users } from 'lucide-react-native';
+import { useHeaderHeight } from 'expo-router/react-navigation';
+import { CircleHelp } from 'lucide-react-native';
 import { useDeferredValue, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View as RNView } from 'react-native';
@@ -7,7 +9,7 @@ import Animated, { scrollTo, useAnimatedStyle } from 'react-native-reanimated';
 import { scheduleOnUI } from 'react-native-worklets';
 
 import { CollapsingHeaderTitle } from '@/components/collapsing-header-title';
-import { HeaderHairline } from '@/components/header-hairline';
+import { GlassHeader } from '@/components/glass-header';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Screen } from '@/components/ui/screen';
@@ -18,6 +20,7 @@ import { useToast } from '@/components/ui/toast-provider';
 import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { useSession } from '@/features/auth/session-context';
 import { LeaderboardRow } from '@/features/leagues/components/leaderboard-row';
+import { LeagueIcon } from '@/features/leagues/components/league-icon';
 import { markTies } from '@/features/leagues/ranking';
 import { useLeagueLeaderboard } from '@/features/leagues/use-league-leaderboard';
 import { useMyLeagues } from '@/features/leagues/use-my-leagues';
@@ -30,14 +33,19 @@ import { LockedPredictionCard } from '@/features/predictions/components/locked-p
 import { MaskedPredictions } from '@/features/predictions/components/masked-predictions';
 import { MemberPredictionRow } from '@/features/predictions/components/member-prediction-row';
 import { PredictionCard } from '@/features/predictions/components/prediction-card';
+import { CommunityCard } from '@/features/predictions/components/community-card';
 import { PointsEarnedCard } from '@/features/predictions/components/points-earned-card';
+import { summarizeCommunity } from '@/features/predictions/community-summary';
+import { matchPointsOf } from '@/features/predictions/match-points-of';
 import { useCommunityDistributions } from '@/features/predictions/use-community-distributions';
+import { useMatchCommunity } from '@/features/predictions/use-match-community';
 import { useMatchLeaguePredictions } from '@/features/predictions/use-match-league-predictions';
 import { useMyPredictions } from '@/features/predictions/use-my-predictions';
 import { findCompetitionPhase, jokerCardState } from '@/features/jokers/find-competition-phase';
 import { useCompetitionPhases } from '@/features/jokers/use-competition-phases';
 import { useMyJokers } from '@/features/jokers/use-my-jokers';
 import { useOpenPlayerProfile } from '@/features/profile/use-open-player-profile';
+import { useActiveScoringRules } from '@/features/scoring/use-active-scoring-rules';
 import { ReactionsSheet } from '@/features/reactions/components/reactions-sheet';
 import { toReactionMessageKey } from '@/features/reactions/errors';
 import { parseReactionCounts } from '@/features/reactions/reactions';
@@ -74,9 +82,10 @@ export default function MatchScreen() {
     const router = useRouter();
     const { session } = useSession();
     const userId = session?.user.id;
-    const accentColor = useThemeColor('accent');
     const textFaintColor = useThemeColor('text-faint');
     const openPlayerProfile = useOpenPlayerProfile(userId);
+    // Depuis un prono de la liste : le profil s'ouvre sur ses pronos
+    const openPlayerPredictions = useOpenPlayerProfile(userId, 'predictions');
 
     const match = useMatch(id);
     const competitionId = match.data?.competition_id;
@@ -89,6 +98,8 @@ export default function MatchScreen() {
     const myJokers = useMyJokers(competitionId);
     const phases = useCompetitionPhases(competitionId);
     const distributions = useCommunityDistributions(competitionId);
+    const community = useMatchCommunity(id, kickoffPassed);
+    const rules = useActiveScoringRules();
     const myLeagues = useMyLeagues();
 
     const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(leagueParam ?? null);
@@ -122,6 +133,10 @@ export default function MatchScreen() {
     // Défilement jusqu'à la ligne du lauréat, une seule fois : sa position se
     // mesure dans la fenêtre, relativement au hero (en haut du contenu)
     const heroRef = useRef<RNView>(null);
+    // Barre native transparente : le contenu démarre sous elle et défile
+    // dessous, flouté par GlassHeader (DS 2026-09-24)
+    const headerHeight = useHeaderHeight();
+    const blurTarget = useRef<RNView>(null);
     const focusedFor = useRef<string | undefined>(undefined);
     const scrollRef = collapse.scrollRef;
     const focusRow = (row: RNView | null) => {
@@ -149,15 +164,18 @@ export default function MatchScreen() {
         transform: [{ scale: 1 - collapse.progress.value * 0.05 }],
     }));
 
-    const refreshControl = usePullToRefresh(() =>
-        Promise.all([
-            match.refetch(),
-            myPredictions.refetch(),
-            distributions.refetch(),
-            myLeagues.refetch(),
-            leaguePredictions.refetch(),
-            leagueBoard.refetch(),
-        ]),
+    const refreshControl = usePullToRefresh(
+        () =>
+            Promise.all([
+                match.refetch(),
+                myPredictions.refetch(),
+                distributions.refetch(),
+                community.refetch(),
+                myLeagues.refetch(),
+                leaguePredictions.refetch(),
+                leagueBoard.refetch(),
+            ]),
+        headerHeight,
     );
 
     if (match.isPending) {
@@ -206,6 +224,32 @@ export default function MatchScreen() {
     const matchPhaseWindow = findCompetitionPhase(phases.data ?? [], currentMatch.kickoff_at);
     const jokerState = jokerCardState(currentMatch.id, matchPhaseWindow, jokerMap);
 
+    // Ce qu'a joué la communauté : contre le score live en cours, final ensuite
+    const isLive = currentMatch.status === 'in_play';
+    const servedScore = isLive
+        ? { home: currentMatch.live_home_score ?? 0, away: currentMatch.live_away_score ?? 0 }
+        : { home: currentMatch.home_score ?? 0, away: currentMatch.away_score ?? 0 };
+    const communitySummary =
+        kickoffPassed && community.data
+            ? summarizeCommunity(
+                  community.data,
+                  servedScore,
+                  {
+                      home: currentMatch.odds_home,
+                      draw: currentMatch.odds_draw,
+                      away: currentMatch.odds_away,
+                  },
+                  rules,
+              )
+            : null;
+    const myOutcome = prediction
+        ? prediction.predicted_home_score > prediction.predicted_away_score
+            ? ('home' as const)
+            : prediction.predicted_home_score < prediction.predicted_away_score
+              ? ('away' as const)
+              : ('draw' as const)
+        : null;
+
     const reactionsEntry = leaguePredictions.data?.find(
         (entry) => entry.user_id === reactionsTarget?.userId,
     );
@@ -215,6 +259,8 @@ export default function MatchScreen() {
             <Stack.Screen
                 options={{
                     headerTitleAlign: 'center',
+                    headerTransparent: true,
+                    headerStyle: { backgroundColor: 'transparent' },
                     headerRight: () => <MatchStatusChip match={currentMatch} />,
                     // iOS 26 enveloppe headerRight d'une capsule en verre : le chip
                     // porte déjà son fond, on masque celui du système
@@ -234,185 +280,272 @@ export default function MatchScreen() {
                     ),
                 }}
             />
-            <HeaderHairline progress={collapse.progress} />
-            <Screen
-                contentClassName="gap-5 px-6"
-                contentContainerStyle={{ minHeight: collapse.minContentHeight }}
-                onLayout={collapse.onLayout}
-                scrollRef={collapse.scrollRef}
-                refreshControl={refreshControl}
-                top="none">
-                {/* Vue hôte : repère mesurable du haut du contenu (focusRow) */}
-                <RNView collapsable={false} ref={heroRef}>
-                    <Animated.View style={[{ transformOrigin: 'top' }, heroStyle]}>
-                        <MatchHero match={currentMatch} />
-                    </Animated.View>
-                </RNView>
+            <BlurTargetView ref={blurTarget} style={{ flex: 1 }}>
+                <Screen
+                    contentClassName="gap-5 px-6"
+                    contentContainerStyle={{
+                        minHeight: collapse.minContentHeight,
+                        paddingTop: headerHeight,
+                    }}
+                    onLayout={collapse.onLayout}
+                    scrollRef={collapse.scrollRef}
+                    refreshControl={refreshControl}
+                    top="none">
+                    {/* Vue hôte : repère mesurable du haut du contenu (focusRow) */}
+                    <RNView collapsable={false} ref={heroRef}>
+                        <Animated.View style={[{ transformOrigin: 'top' }, heroStyle]}>
+                            <MatchHero match={currentMatch} />
+                        </Animated.View>
+                    </RNView>
 
-                {/* Mon prono, selon la phase : saisie avant le match, points
+                    {/* Mon prono, selon la phase : saisie avant le match, points
                     (provisoires en live) ensuite, lecture seule si reporté/annulé */}
-                <View className="gap-3">
-                    {phase === 'upcoming' && userId ? (
-                        <>
-                            <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
-                                {t('predictions:reconciliation.yourProno')}
-                            </Text>
-                            <View className="gap-2.5">
-                                <PredictionCard
-                                    distribution={distribution}
-                                    joker={
-                                        matchPhaseWindow && jokerState !== 'none'
-                                            ? { phaseId: matchPhaseWindow.id, state: jokerState }
-                                            : undefined
-                                    }
+                    <View className="gap-3">
+                        {phase === 'upcoming' && userId ? (
+                            <>
+                                <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
+                                    {t('predictions:reconciliation.yourProno')}
+                                </Text>
+                                <View className="gap-2.5">
+                                    <PredictionCard
+                                        distribution={distribution}
+                                        joker={
+                                            matchPhaseWindow && jokerState !== 'none'
+                                                ? {
+                                                      phaseId: matchPhaseWindow.id,
+                                                      state: jokerState,
+                                                  }
+                                                : undefined
+                                        }
+                                        match={currentMatch}
+                                        prediction={prediction}
+                                        userId={userId}
+                                    />
+                                    <Text className="text-center font-body text-[12px] text-text-muted">
+                                        {t('predictions:toPredict.autoSave')}
+                                    </Text>
+                                </View>
+                            </>
+                        ) : calledOff || phase === 'locked' ? (
+                            <>
+                                <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
+                                    {t('predictions:reconciliation.yourProno')}
+                                </Text>
+                                <LockedPredictionCard
+                                    jokerOn={jokerOn}
                                     match={currentMatch}
                                     prediction={prediction}
-                                    userId={userId}
                                 />
-                                <Text className="text-center font-body text-[12px] text-text-muted">
-                                    {t('predictions:toPredict.autoSave')}
-                                </Text>
-                            </View>
-                        </>
-                    ) : calledOff || phase === 'locked' ? (
-                        <>
-                            <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
-                                {t('predictions:reconciliation.yourProno')}
-                            </Text>
-                            <LockedPredictionCard
+                            </>
+                        ) : (
+                            <PointsEarnedCard
                                 jokerOn={jokerOn}
                                 match={currentMatch}
                                 prediction={prediction}
                             />
-                        </>
-                    ) : (
-                        <PointsEarnedCard
-                            jokerOn={jokerOn}
-                            match={currentMatch}
-                            prediction={prediction}
-                        />
-                    )}
-                    {/* Lien discret vers le référentiel des règles — texte faint,
+                        )}
+                        {/* Lien discret vers le référentiel des règles — texte faint,
                         jamais de grenat (réservé CTA/live/sélection) */}
-                    <Pressable
-                        accessibilityRole="button"
-                        className="flex-row items-center justify-center gap-1.5"
-                        hitSlop={8}
-                        onPress={() => router.push('/rules')}>
-                        <CircleHelp color={textFaintColor} size={14} strokeWidth={1.9} />
-                        <Text className="font-body-medium text-[12px] text-text-muted">
-                            {t('scoring:rules.link')}
-                        </Text>
-                    </Pressable>
-                </View>
-
-                {/* Mes ligues : pronos des membres + classement */}
-                {myLeagues.isPending ? null : leagues.length === 0 ? (
-                    <View className="items-center gap-3 rounded-lg border border-border bg-surface px-5 py-6 tc-shadow-sm">
-                        <Text className="text-center font-display text-[22px] text-text">
-                            {t('leagues:hero.title')}
-                        </Text>
-                        <Text className="max-w-[260px] text-center font-body text-[13px] leading-[19px] text-text-muted">
-                            {t('leagues:hero.message')}
-                        </Text>
-                        <View className="mt-1 w-full max-w-[280px] gap-2.5">
-                            <Button
-                                fullWidth
-                                onPress={() => router.push('/league/new')}
-                                title={t('leagues:actions.create')}
-                            />
-                            <Button
-                                fullWidth
-                                onPress={() =>
-                                    router.push({
-                                        pathname: '/league/new',
-                                        params: { tab: 'join' },
-                                    })
-                                }
-                                title={t('leagues:actions.join')}
-                                variant="secondary"
-                            />
-                        </View>
-                    </View>
-                ) : (
-                    <View className="gap-3">
-                        <View className="flex-row items-center justify-between gap-2">
-                            <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
-                                {t('leagues:leaderboard.tabs.leagues')}
+                        <Pressable
+                            accessibilityRole="button"
+                            className="flex-row items-center justify-center gap-1.5"
+                            hitSlop={8}
+                            onPress={() => router.push('/rules')}>
+                            <CircleHelp color={textFaintColor} size={14} strokeWidth={1.9} />
+                            <Text className="font-body-medium text-[12px] text-text-muted">
+                                {t('scoring:rules.link')}
                             </Text>
-                            {leagues.length === 1 ? (
-                                <Text className="font-body text-[11px] text-text-faint">
-                                    {t('matches:detail.singleLeague')}
-                                </Text>
-                            ) : null}
-                        </View>
+                        </Pressable>
+                    </View>
 
-                        {leagues.length > 1 && currentLeagueId ? (
-                            <Select
-                                accessibilityLabel={t('leagues:leaderboard.select.overline')}
-                                icon={<Users color={accentColor} size={18} strokeWidth={1.9} />}
-                                onChange={setSelectedLeagueId}
-                                options={leagues.map((league) => ({
-                                    value: league.id,
-                                    label: league.name,
-                                    description: t('leagues:detail.members', {
-                                        count: league.member_count,
-                                    }),
-                                }))}
-                                overline={t('leagues:leaderboard.select.overline')}
-                                trailing={
-                                    currentLeague
-                                        ? t('leagues:detail.members', {
-                                              count: currentLeague.member_count,
-                                          })
-                                        : undefined
-                                }
-                                value={currentLeagueId}
-                            />
-                        ) : null}
-
-                        <SegmentedControl
-                            onChange={setView}
-                            options={[
-                                {
-                                    value: 'predictions',
-                                    label: t('matches:detail.tabs.predictions'),
-                                },
-                                {
-                                    value: 'leaderboard',
-                                    label: t('matches:detail.tabs.leaderboard'),
-                                },
-                            ]}
-                            value={view}
+                    {communitySummary ? (
+                        <CommunityCard
+                            awayLabel={currentMatch.away_team?.code ?? '2'}
+                            homeLabel={currentMatch.home_team?.code ?? '1'}
+                            isLive={isLive}
+                            myOutcome={myOutcome}
+                            myPoints={
+                                matchPointsOf(currentMatch, prediction, jokerOn, rules)?.total ??
+                                null
+                            }
+                            summary={communitySummary}
                         />
+                    ) : null}
 
-                        {currentLeague ? (
-                            <View className="flex-row items-baseline justify-between gap-2 px-0.5">
-                                <Text className="font-body-bold text-[12px] text-text-muted">
-                                    {currentLeague.name}
-                                </Text>
-                                <Text className="font-body-bold text-[11px] uppercase tracking-[0.44px] text-text-faint">
-                                    {t('leagues:leaderboard.players', {
-                                        count: currentLeague.member_count,
-                                    })}
-                                </Text>
+                    {/* Mes ligues : pronos des membres + classement */}
+                    {myLeagues.isPending ? null : leagues.length === 0 ? (
+                        <View className="items-center gap-3 rounded-lg border border-border bg-surface px-5 py-6 tc-shadow-sm">
+                            <Text className="text-center font-display text-[22px] text-text">
+                                {t('leagues:hero.title')}
+                            </Text>
+                            <Text className="max-w-[260px] text-center font-body text-[13px] leading-[19px] text-text-muted">
+                                {t('leagues:hero.message')}
+                            </Text>
+                            <View className="mt-1 w-full max-w-[280px] gap-2.5">
+                                <Button
+                                    fullWidth
+                                    onPress={() => router.push('/league/new')}
+                                    title={t('leagues:actions.create')}
+                                />
+                                <Button
+                                    fullWidth
+                                    onPress={() =>
+                                        router.push({
+                                            pathname: '/league/new',
+                                            params: { tab: 'join' },
+                                        })
+                                    }
+                                    title={t('leagues:actions.join')}
+                                    variant="secondary"
+                                />
                             </View>
-                        ) : null}
+                        </View>
+                    ) : (
+                        <View className="gap-3">
+                            <View className="flex-row items-center justify-between gap-2">
+                                <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
+                                    {t('leagues:leaderboard.tabs.leagues')}
+                                </Text>
+                                {leagues.length === 1 ? (
+                                    <Text className="font-body text-[11px] text-text-faint">
+                                        {t('matches:detail.singleLeague')}
+                                    </Text>
+                                ) : null}
+                            </View>
 
-                        {deferredView === 'predictions' ? (
-                            !kickoffPassed ? (
-                                <MaskedPredictions />
-                            ) : leaguePredictions.isPending ? (
+                            {leagues.length > 1 && currentLeagueId ? (
+                                <Select
+                                    accessibilityLabel={t('leagues:leaderboard.select.overline')}
+                                    leading={(option, placement) => {
+                                        const league = leagues.find(
+                                            (row) => row.id === option.value,
+                                        );
+                                        return league ? (
+                                            <LeagueIcon
+                                                color={league.color}
+                                                name={league.name}
+                                                size={placement}
+                                            />
+                                        ) : null;
+                                    }}
+                                    onChange={setSelectedLeagueId}
+                                    options={leagues.map((league) => ({
+                                        value: league.id,
+                                        label: league.name,
+                                        description: t('leagues:detail.members', {
+                                            count: league.member_count,
+                                        }),
+                                    }))}
+                                    overline={t('leagues:leaderboard.select.overline')}
+                                    trailing={
+                                        currentLeague
+                                            ? t('leagues:detail.members', {
+                                                  count: currentLeague.member_count,
+                                              })
+                                            : undefined
+                                    }
+                                    value={currentLeagueId}
+                                />
+                            ) : null}
+
+                            <SegmentedControl
+                                onChange={setView}
+                                options={[
+                                    {
+                                        value: 'predictions',
+                                        label: t('matches:detail.tabs.predictions'),
+                                    },
+                                    {
+                                        value: 'leaderboard',
+                                        label: t('matches:detail.tabs.leaderboard'),
+                                    },
+                                ]}
+                                value={view}
+                            />
+
+                            {deferredView === 'predictions' ? (
+                                !kickoffPassed ? (
+                                    <MaskedPredictions />
+                                ) : leaguePredictions.isPending ? (
+                                    <View className="gap-2">
+                                        <Skeleton className="h-14" variant="block" />
+                                        <Skeleton className="h-14" variant="block" />
+                                        <Skeleton className="h-14" variant="block" />
+                                    </View>
+                                ) : leaguePredictions.isError ? (
+                                    <EmptyState
+                                        action={
+                                            <Button
+                                                onPress={() => void leaguePredictions.refetch()}
+                                                title={t('common:actions.retry')}
+                                                variant="secondary"
+                                            />
+                                        }
+                                        title={t('leagues:errors.load')}
+                                    />
+                                ) : (
+                                    <View className="gap-2">
+                                        {leaguePredictions.data.map((entry) => (
+                                            <RNView
+                                                collapsable={false}
+                                                key={entry.user_id}
+                                                onLayout={
+                                                    entry.user_id === memberParam
+                                                        ? (event) =>
+                                                              focusRow(
+                                                                  event.currentTarget as unknown as RNView,
+                                                              )
+                                                        : undefined
+                                                }>
+                                                <MemberPredictionRow
+                                                    entry={entry}
+                                                    highlighted={
+                                                        focusing && entry.user_id === memberParam
+                                                    }
+                                                    isMe={entry.user_id === userId}
+                                                    match={currentMatch}
+                                                    onOpenReactions={() =>
+                                                        setReactionsTarget({
+                                                            userId: entry.user_id,
+                                                            username: entry.username,
+                                                        })
+                                                    }
+                                                    onPress={openPlayerPredictions(entry.user_id)}
+                                                    onReact={(next) =>
+                                                        setReaction.mutate(
+                                                            { targetUserId: entry.user_id, next },
+                                                            {
+                                                                onError: (error) =>
+                                                                    toast.show(
+                                                                        t(
+                                                                            toReactionMessageKey(
+                                                                                error,
+                                                                            ),
+                                                                        ),
+                                                                        'neutral',
+                                                                    ),
+                                                            },
+                                                        )
+                                                    }
+                                                />
+                                            </RNView>
+                                        ))}
+                                        <Text className="mt-1.5 text-center font-body text-[11px] text-text-faint">
+                                            {t('reactions:footer')}
+                                        </Text>
+                                    </View>
+                                )
+                            ) : leagueBoard.isPending ? (
                                 <View className="gap-2">
-                                    <Skeleton className="h-14" variant="block" />
-                                    <Skeleton className="h-14" variant="block" />
-                                    <Skeleton className="h-14" variant="block" />
+                                    <Skeleton className="h-16" variant="block" />
+                                    <Skeleton className="h-16" variant="block" />
+                                    <Skeleton className="h-16" variant="block" />
                                 </View>
-                            ) : leaguePredictions.isError ? (
+                            ) : leagueBoard.isError ? (
                                 <EmptyState
                                     action={
                                         <Button
-                                            onPress={() => void leaguePredictions.refetch()}
+                                            onPress={() => void leagueBoard.refetch()}
                                             title={t('common:actions.retry')}
                                             variant="secondary"
                                         />
@@ -421,85 +554,22 @@ export default function MatchScreen() {
                                 />
                             ) : (
                                 <View className="gap-2">
-                                    {leaguePredictions.data.map((entry) => (
-                                        <RNView
-                                            collapsable={false}
+                                    {boardEntries.map((entry) => (
+                                        <LeaderboardRow
+                                            entry={entry}
+                                            isMe={entry.user_id === userId}
                                             key={entry.user_id}
-                                            onLayout={
-                                                entry.user_id === memberParam
-                                                    ? (event) =>
-                                                          focusRow(
-                                                              event.currentTarget as unknown as RNView,
-                                                          )
-                                                    : undefined
-                                            }>
-                                            <MemberPredictionRow
-                                                entry={entry}
-                                                highlighted={
-                                                    focusing && entry.user_id === memberParam
-                                                }
-                                                isMe={entry.user_id === userId}
-                                                match={currentMatch}
-                                                onOpenReactions={() =>
-                                                    setReactionsTarget({
-                                                        userId: entry.user_id,
-                                                        username: entry.username,
-                                                    })
-                                                }
-                                                onPress={openPlayerProfile(entry.user_id)}
-                                                onReact={(next) =>
-                                                    setReaction.mutate(
-                                                        { targetUserId: entry.user_id, next },
-                                                        {
-                                                            onError: (error) =>
-                                                                toast.show(
-                                                                    t(toReactionMessageKey(error)),
-                                                                    'neutral',
-                                                                ),
-                                                        },
-                                                    )
-                                                }
-                                            />
-                                        </RNView>
+                                            onPress={openPlayerProfile(entry.user_id)}
+                                            tie={entry.tie}
+                                        />
                                     ))}
-                                    <Text className="mt-1.5 text-center font-body text-[11px] text-text-faint">
-                                        {t('reactions:footer')}
-                                    </Text>
                                 </View>
-                            )
-                        ) : leagueBoard.isPending ? (
-                            <View className="gap-2">
-                                <Skeleton className="h-16" variant="block" />
-                                <Skeleton className="h-16" variant="block" />
-                                <Skeleton className="h-16" variant="block" />
-                            </View>
-                        ) : leagueBoard.isError ? (
-                            <EmptyState
-                                action={
-                                    <Button
-                                        onPress={() => void leagueBoard.refetch()}
-                                        title={t('common:actions.retry')}
-                                        variant="secondary"
-                                    />
-                                }
-                                title={t('leagues:errors.load')}
-                            />
-                        ) : (
-                            <View className="gap-2">
-                                {boardEntries.map((entry) => (
-                                    <LeaderboardRow
-                                        entry={entry}
-                                        isMe={entry.user_id === userId}
-                                        key={entry.user_id}
-                                        onPress={openPlayerProfile(entry.user_id)}
-                                        tie={entry.tie}
-                                    />
-                                ))}
-                            </View>
-                        )}
-                    </View>
-                )}
-            </Screen>
+                            )}
+                        </View>
+                    )}
+                </Screen>
+            </BlurTargetView>
+            <GlassHeader blurTarget={blurTarget} progress={collapse.progress} />
             <ReactionsSheet
                 counts={parseReactionCounts(reactionsEntry?.reactions)}
                 leagueId={currentLeagueId}

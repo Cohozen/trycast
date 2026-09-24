@@ -1,4 +1,6 @@
+import { BlurTargetView } from 'expo-blur';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { useHeaderHeight } from 'expo-router/react-navigation';
 import {
     ArrowLeftRight,
     ChevronRight,
@@ -9,11 +11,13 @@ import {
     Users,
     UserX,
 } from 'lucide-react-native';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { View as RNView } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
 import { CollapsingHeaderTitle } from '@/components/collapsing-header-title';
+import { GlassHeader } from '@/components/glass-header';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -96,17 +100,29 @@ export default function LeagueScreen() {
     const league = leagues.data?.find((row) => row.id === id);
     const isOwner = !!league && league.owner_id === userId;
 
-    // Header repliable (DS 2026-09-21) : l'identité s'estompe entre 8 et 53 px
-    // de défilement, la pastille + le nom prennent place dans la barre native,
-    // les onglets restent épinglés.
+    // Header repliable en verre (DS 2026-09-24) : identité et onglets vivent
+    // sous la barre native, dans le même verre. L'identité se replie au pixel
+    // près du défilement (le contenu reste collé aux onglets) et s'estompe
+    // entre 8 et 53 px, la pastille + le nom prennent place dans la barre.
     const collapse = useCollapseProgress({ start: 8, distance: 45, reach: 90 });
-    const borderColor = useThemeColor('border');
+    const headerHeight = useHeaderHeight();
+    const blurTarget = useRef<RNView>(null);
+    // Hauteurs naturelles, mesurées une fois : le contenu défilant les réserve
+    const [identityHeight, setIdentityHeight] = useState(0);
+    const [tabsHeight, setTabsHeight] = useState(0);
+    const identityClip = useAnimatedStyle(() =>
+        identityHeight > 0
+            ? {
+                  height: Math.min(
+                      identityHeight,
+                      Math.max(0, identityHeight - collapse.offset.value),
+                  ),
+              }
+            : {},
+    );
     const identityStyle = useAnimatedStyle(() => ({
         opacity: Math.max(0, 1 - collapse.progress.value * 1.8),
         transform: [{ scale: 1 - collapse.progress.value * 0.06 }],
-    }));
-    const tabsBorderStyle = useAnimatedStyle(() => ({
-        opacity: collapse.progress.value > 0.02 ? collapse.progress.value : 0,
     }));
 
     if (leagues.isPending || leaderboard.isPending) {
@@ -143,6 +159,8 @@ export default function LeagueScreen() {
             <Stack.Screen
                 options={{
                     headerTitleAlign: 'center',
+                    headerTransparent: true,
+                    headerStyle: { backgroundColor: 'transparent' },
                     headerTitle: () => (
                         <CollapsingHeaderTitle
                             compact={
@@ -163,104 +181,102 @@ export default function LeagueScreen() {
                     ),
                 }}
             />
-            <Screen
-                contentClassName="gap-0 pb-10"
-                contentContainerStyle={{ minHeight: collapse.minContentHeight }}
-                onLayout={collapse.onLayout}
-                scrollRef={collapse.scrollRef}
-                // Index 1 = les onglets (0 = l'identité) : épinglés sous la barre
-                stickyHeaderIndices={[1]}
-                top="none">
-                {/* Identité */}
-                <Animated.View
-                    style={[
-                        {
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            gap: 14,
-                            paddingTop: 6,
-                            paddingBottom: 14,
-                            transformOrigin: 'left',
-                        },
-                        identityStyle,
-                    ]}>
-                    <LeagueIcon color={league.color} name={league.name} />
-                    <View className="min-w-0 flex-1">
-                        <Text
-                            className="font-display text-[28px] leading-[29px] text-text"
-                            numberOfLines={1}>
-                            {league.name}
-                        </Text>
-                        <View className="flex-row flex-wrap items-center gap-2">
-                            <MembersLine count={members.length} />
-                            <Badge tone={isOwner ? 'brand' : 'neutral'} variant="soft">
-                                {isOwner
-                                    ? t('leagues:detail.badges.admin')
-                                    : t('leagues:detail.badges.member')}
-                            </Badge>
-                        </View>
+            <BlurTargetView ref={blurTarget} style={{ flex: 1 }}>
+                <Screen
+                    contentClassName="gap-0 pb-10"
+                    contentContainerStyle={{
+                        minHeight: collapse.minContentHeight,
+                        paddingTop: headerHeight + identityHeight + tabsHeight,
+                    }}
+                    onLayout={collapse.onLayout}
+                    scrollRef={collapse.scrollRef}
+                    top="none">
+                    <View className="gap-4 pt-1">
+                        {tab === 'standings' ? (
+                            <StandingsTab
+                                inviteCode={league.invite_code}
+                                members={members}
+                                onInvite={() => setTab('settings')}
+                                userId={userId}
+                            />
+                        ) : null}
+                        {tab === 'results' ? (
+                            <ResultsTab
+                                competitionId={league.competition_id}
+                                initialRound={roundParam}
+                                leagueId={league.id}
+                                userId={userId}
+                            />
+                        ) : null}
+                        {tab === 'settings' ? (
+                            <SettingsTab
+                                isOwner={isOwner}
+                                league={league}
+                                members={members}
+                                // Ouvert par deep link, l'écran n'a pas de pile derrière lui :
+                                // repli sur l'onglet Classement plutôt qu'un GO_BACK dans le vide
+                                onLeft={() =>
+                                    router.canGoBack()
+                                        ? router.back()
+                                        : router.replace('/leaderboard')
+                                }
+                                userId={userId}
+                            />
+                        ) : null}
                     </View>
-                </Animated.View>
+                </Screen>
+            </BlurTargetView>
+            <GlassHeader blurTarget={blurTarget} progress={collapse.progress}>
+                <View className="w-full max-w-[800px] self-center px-5">
+                    {/* Identité : se replie au défilement (hauteur rognée) */}
+                    <Animated.View style={[{ overflow: 'hidden' }, identityClip]}>
+                        <Animated.View
+                            onLayout={(event) => setIdentityHeight(event.nativeEvent.layout.height)}
+                            style={[
+                                {
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    gap: 14,
+                                    paddingTop: 6,
+                                    paddingBottom: 14,
+                                    transformOrigin: 'left',
+                                },
+                                identityStyle,
+                            ]}>
+                            <LeagueIcon color={league.color} name={league.name} />
+                            <View className="min-w-0 flex-1">
+                                <Text
+                                    className="font-display text-[28px] leading-[29px] text-text"
+                                    numberOfLines={1}>
+                                    {league.name}
+                                </Text>
+                                <View className="flex-row flex-wrap items-center gap-2">
+                                    <MembersLine count={members.length} />
+                                    <Badge tone={isOwner ? 'brand' : 'neutral'} variant="soft">
+                                        {isOwner
+                                            ? t('leagues:detail.badges.admin')
+                                            : t('leagues:detail.badges.member')}
+                                    </Badge>
+                                </View>
+                            </View>
+                        </Animated.View>
+                    </Animated.View>
 
-                {/* Onglets épinglés : fond opaque, filet en fondu une fois replié */}
-                <View className="bg-bg pb-3.5">
-                    <SegmentedControl
-                        onChange={setTab}
-                        options={[
-                            { value: 'standings', label: t('leagues:detail.tabs.standings') },
-                            { value: 'results', label: t('leagues:detail.tabs.results') },
-                            { value: 'settings', label: t('leagues:detail.tabs.settings') },
-                        ]}
-                        value={tab}
-                    />
-                    <Animated.View
-                        pointerEvents="none"
-                        style={[
-                            {
-                                position: 'absolute',
-                                left: -20,
-                                right: -20,
-                                bottom: 0,
-                                height: 1,
-                                backgroundColor: borderColor,
-                            },
-                            tabsBorderStyle,
-                        ]}
-                    />
+                    <View
+                        className="pb-3.5"
+                        onLayout={(event) => setTabsHeight(event.nativeEvent.layout.height)}>
+                        <SegmentedControl
+                            onChange={setTab}
+                            options={[
+                                { value: 'standings', label: t('leagues:detail.tabs.standings') },
+                                { value: 'results', label: t('leagues:detail.tabs.results') },
+                                { value: 'settings', label: t('leagues:detail.tabs.settings') },
+                            ]}
+                            value={tab}
+                        />
+                    </View>
                 </View>
-
-                <View className="gap-4 pt-1">
-                    {tab === 'standings' ? (
-                        <StandingsTab
-                            inviteCode={league.invite_code}
-                            members={members}
-                            onInvite={() => setTab('settings')}
-                            userId={userId}
-                        />
-                    ) : null}
-                    {tab === 'results' ? (
-                        <ResultsTab
-                            competitionId={league.competition_id}
-                            initialRound={roundParam}
-                            leagueId={league.id}
-                            userId={userId}
-                        />
-                    ) : null}
-                    {tab === 'settings' ? (
-                        <SettingsTab
-                            isOwner={isOwner}
-                            league={league}
-                            members={members}
-                            // Ouvert par deep link, l'écran n'a pas de pile derrière lui :
-                            // repli sur l'onglet Classement plutôt qu'un GO_BACK dans le vide
-                            onLeft={() =>
-                                router.canGoBack() ? router.back() : router.replace('/leaderboard')
-                            }
-                            userId={userId}
-                        />
-                    ) : null}
-                </View>
-            </Screen>
+            </GlassHeader>
         </>
     );
 }

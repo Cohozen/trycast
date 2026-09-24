@@ -94,5 +94,19 @@
     "validation": {
         "missingScore": "Enter a score.",
         "invalidScore": "The score must be a positive whole number."
+    },
+    "community": {
+        "title": "What the community played",
+        "count_one": "{{count}} prediction",
+        "count_other": "{{count}} predictions",
+        "draw": "Draw",
+        "you": "You",
+        "topScore": "Most played score",
+        "exactFound": "Exact score found",
+        "players_one": "{{count}} player",
+        "players_other": "{{count}} players",
+        "average": "Average points",
+        "yourPoints": "you {{points}}",
+        "provisional": "provisional"
     }
 }

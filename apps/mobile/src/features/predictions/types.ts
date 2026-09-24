@@ -36,3 +36,14 @@ export type MemberPrediction = Omit<
     Database['public']['Functions']['get_match_league_predictions']['Returns'][number],
     'my_reaction'
 > & { my_reaction: string | null };
+
+/**
+ * Pronos d'un match regroupés à l'identique (RPC get_match_community_histogram,
+ * uniquement après kickoff) : agrégat, jamais une ligne individuelle.
+ * `points_awarded` : null tant que le match n'est pas scoré — le typegen
+ * déclare non-nullables toutes les colonnes d'une RPC, d'où la correction.
+ */
+export type CommunityHistogramRow = Omit<
+    Database['public']['Functions']['get_match_community_histogram']['Returns'][number],
+    'points_awarded'
+> & { points_awarded: number | null };

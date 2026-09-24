@@ -24,6 +24,11 @@ type SelectProps<V extends string> = {
     /** Icône de la tuile de gauche — passer la couleur explicitement
      * (ex. `<Users color={useThemeColor('accent')} size={18} />`) */
     icon?: React.ReactNode;
+    /**
+     * Visuel propre à chaque option (ex. avatar de ligue), affiché dans la
+     * liste et, pour l'option choisie, dans le trigger à la place de `icon`.
+     */
+    leading?: (option: SelectOption<V>, placement: 'trigger' | 'option') => React.ReactNode;
     /** Méta à droite du trigger (ex. compte de membres) */
     trailing?: string;
     accessibilityLabel?: string;
@@ -45,6 +50,7 @@ export function Select<V extends string>({
     onChange,
     overline,
     icon,
+    leading,
     trailing,
     accessibilityLabel,
 }: SelectProps<V>) {
@@ -82,7 +88,9 @@ export function Select<V extends string>({
                         open ? 'border-accent' : 'border-border',
                     )}
                     onPress={openPanel}>
-                    {icon ? (
+                    {leading && selected ? (
+                        leading(selected, 'trigger')
+                    ) : icon ? (
                         <View className="h-[34px] w-[34px] items-center justify-center rounded-sm bg-accent/10">
                             {icon}
                         </View>
@@ -137,6 +145,7 @@ export function Select<V extends string>({
                                             setAnchor(null);
                                             if (!active) onChange(option.value);
                                         }}>
+                                        {leading?.(option, 'option')}
                                         <View className="min-w-0 flex-1 gap-px">
                                             <View className="flex-row items-center gap-2">
                                                 <Text

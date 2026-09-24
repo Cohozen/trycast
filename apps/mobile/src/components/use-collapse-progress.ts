@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { type Component, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import type Animated from 'react-native-reanimated';
 import {
@@ -25,26 +25,33 @@ type CollapseRange = {
 /**
  * Progression d'un header repliable, de 0 (déplié) à 1 (replié), lue sur le
  * thread UI. `scrollRef` se pose sur une ScrollView réanimée — `Screen` en est
- * une (KeyboardAwareScrollView). Pas de prop `onScroll` : un handler réanimé
+ * une (KeyboardAwareScrollView) — ou une `Animated.FlatList` (type en paramètre). Pas de prop `onScroll` : un handler réanimé
  * passé à KeyboardAwareScrollView casse en « Cannot copy value of type
  * WorkletEventHandlerNative ».
  */
-export function useCollapseProgress({ start, distance, reach = start + distance }: CollapseRange): {
+export function useCollapseProgress<TScroll extends Component = Animated.ScrollView>({
+    start,
+    distance,
+    reach = start + distance,
+}: CollapseRange): {
     progress: SharedValue<number>;
-    scrollRef: AnimatedRef<Animated.ScrollView>;
+    /** Défilement brut (px), pour un bloc qui se replie au pixel près. */
+    offset: SharedValue<number>;
+    scrollRef: AnimatedRef<TScroll>;
     /** À poser sur la ScrollView : mesure la hauteur visible. */
     onLayout: (event: LayoutChangeEvent) => void;
     /** Hauteur mini du contenu (contentContainerStyle) garantissant `reach`. */
     minContentHeight: number | undefined;
 } {
     const [viewport, setViewport] = useState(0);
-    const scrollRef = useAnimatedRef<Animated.ScrollView>();
+    const scrollRef = useAnimatedRef<TScroll>();
     const offset = useScrollOffset(scrollRef);
     const progress = useDerivedValue(() =>
         Math.min(1, Math.max(0, (offset.value - start) / distance)),
     );
     return {
         progress,
+        offset,
         scrollRef,
         onLayout: (event) => setViewport(event.nativeEvent.layout.height),
         minContentHeight: viewport > 0 ? viewport + reach : undefined,

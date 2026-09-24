@@ -13,9 +13,14 @@ import { useThemeColor } from '@/tw';
  * de fond (ex. cadence live à 60 s). `refetch` est capturé par ref : le
  * callback interne reste stable même si l'appelant recrée sa fonction à chaque
  * rendu.
+ *
+ * `topOffset` : hauteur d'une barre transparente posée par-dessus le contenu
+ * (header en verre) — le spinner Android se cale dessous au lieu d'y
+ * disparaître.
  */
 export function usePullToRefresh(
     refetch: () => Promise<unknown>,
+    topOffset?: number,
 ): ReactElement<RefreshControlProps> {
     const [refreshing, setRefreshing] = useState(false);
     const refetchRef = useRef(refetch);
@@ -40,6 +45,7 @@ export function usePullToRefresh(
             colors={Platform.OS === 'android' ? [accent] : undefined}
             onRefresh={onRefresh}
             progressBackgroundColor={Platform.OS === 'android' ? surface : undefined}
+            progressViewOffset={topOffset}
             refreshing={refreshing}
             tintColor={accent}
         />
