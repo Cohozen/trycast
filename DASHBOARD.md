@@ -96,7 +96,7 @@ Championship. **App Store public en février 2027**, avec Android. Compte **indi
 | Quand | Qui | Étape |
 |---|---|---|
 | ✅ 24 sept | Corentin | Programme validé (Team ID `5P7K97386D`), accords acceptés, DSA non-trader déclaré, bundle ID `com.cohozen.trycast` enregistré (Associated Domains, Push, Sign in with Apple), fiche App Store Connect créée, **nom « TryCast » réservé**, `apple-app-site-association` en ligne. |
-| ✅ 24 sept, puis ~1er oct | Claude, puis Corentin | **Lot 1 — iOS distribuable** (ci-dessous) : configuration commitée ; restent le premier `eas build -p ios --profile production` et `eas submit` lancés par Corentin (identifiants de signature interactifs), puis **TestFlight interne** (sans revue). |
+| ✅ 24 sept | Claude, puis Corentin | **Lot 1 — iOS distribuable** (ci-dessous) : premier build iOS de production (1.2.0, build 3, empreinte `e9fd702e`) envoyé par `eas submit`, validé par Apple, installé par TestFlight interne sur un iPhone de proche. |
 | 5–14 oct | Claude | **Lot 2 — Sign in with Apple**, iOS seulement, RGPD dans le même lot. Rebuild du dev client iOS (il n'a pas encore `expo-blur`), passe au simulateur. |
 | 8–14 oct | Corentin + 1 ou 2 proches | iPhone réel en TestFlight interne (testeurs ajoutés comme utilisateurs App Store Connect) : push, lien `/rejoindre`, Google, Apple. Corentin n'a pas d'iPhone. |
 | ~15 oct | Corentin | Release **1.3.0**, groupe externe « Beta fermée », soumission à la revue beta : description, `contact@trycast.fr`, compte de démo des stores, note au relecteur (gratuit, aucune mise, les cotes pondèrent les points). |
@@ -112,11 +112,11 @@ Championship. **App Store public en février 2027**, avec Android. Compte **indi
   `application/json`, sans redirection, `appIDs` `5P7K97386D.com.cohozen.trycast` sur `/rejoindre/*`.
 - ✅ `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID` présent dans l'environnement EAS de production, cohérent avec
   l'`iosUrlScheme` du plugin Google d'`app.json`.
-- **Corentin** : clé **APNs** et clé d'API App Store Connect dans les credentials EAS — le premier
-  `eas build -p ios --profile production` interactif propose la première, le premier `eas submit` la
-  seconde (sinon `eas credentials`). L'EF `notify` passe par le service de push Expo, rien côté serveur.
-- **Corentin** : premier build, `eas submit`, TestFlight interne. Au premier build, contrôler le rendu
-  de l'icône : `icon.png` a un canal alpha, qu'Expo aplatit sur fond blanc pour iOS.
+- ✅ Clé **APNs** (créée au premier `eas build -p ios` interactif, avec une connexion par l'**Apple ID
+  e-mail**, pas le Team ID) et clé d'API App Store Connect (créée au premier `eas submit`, rôle
+  **APP_MANAGER**) dans les credentials EAS. L'EF `notify` passe par le service de push Expo, rien côté serveur.
+- ✅ Premier build, `eas submit`, TestFlight interne (2026-09-24). Reste à contrôler le rendu de
+  l'icône (`icon.png` a un canal alpha, qu'Expo aplatit sur fond blanc pour iOS) et les push.
 - Reporté au lot 2, qui rebuilde le dev client iOS de toute façon : vérifier que `npm run ios`
   recompile en local sans le contournement `xcodebuild` (skill `trycast-dev-builds`). Un seul rebuild
   pour les deux lots.
