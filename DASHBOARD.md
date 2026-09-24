@@ -92,7 +92,7 @@ Championship. **App Store public en février 2027**, avec Android. Compte **indi
 
 | Quand | Qui | Étape |
 |---|---|---|
-| 24–29 sept | Corentin | Inscription au programme (nom légal, double authentification, 99 $/an). **Chemin critique** : validation de quelques jours à deux semaines. |
+| ✅ 24 sept | Corentin | Programme validé (Team ID `5P7K97386D`), accords acceptés, DSA non-trader déclaré, bundle ID `com.cohozen.trycast` enregistré (Associated Domains, Push, Sign in with Apple), fiche App Store Connect créée, **nom « TryCast » réservé**, `apple-app-site-association` en ligne. |
 | Dès le Team ID (~1er oct) | Claude, puis Corentin | **Lot 1 — iOS distribuable** (ci-dessous), fiche App Store Connect, premier `eas build -p ios --profile production` et `eas submit` lancés par Corentin (identifiants de signature interactifs), **TestFlight interne** (sans revue). |
 | 5–14 oct | Claude | **Lot 2 — Sign in with Apple**, iOS seulement, RGPD dans le même lot. Rebuild du dev client iOS (il n'a pas encore `expo-blur`), passe au simulateur. |
 | 8–14 oct | Corentin + 1 ou 2 proches | iPhone réel en TestFlight interne (testeurs ajoutés comme utilisateurs App Store Connect) : push, lien `/rejoindre`, Google, Apple. Corentin n'a pas d'iPhone. |
@@ -106,8 +106,9 @@ Championship. **App Store public en février 2027**, avec Android. Compte **indi
   (`npx expo-updates fingerprint:generate --platform android`) : si elle bouge, tout part avec la 1.3.0.
 - `eas.json` : `submit.production.ios` (identifiant de l'app App Store Connect, Team ID) et clé d'API App Store Connect.
 - Clé **APNs** dans les credentials EAS (`eas credentials`) ; l'EF `notify` passe par le service de push Expo, rien côté serveur.
-- `APPLE_TEAM_ID` dans Vercel : génère l'`apple-app-site-association` (liens d'invitation dans
-  l'app sur iOS). `npm run ios` recompile alors en local sans le contournement `xcodebuild` (skill `trycast-dev-builds`).
+- ✅ `APPLE_TEAM_ID` dans Vercel (2026-09-24) : `apple-app-site-association` servi en 200,
+  `application/json`, sans redirection, `appIDs` `5P7K97386D.com.cohozen.trycast` sur `/rejoindre/*`.
+  Reste à vérifier que `npm run ios` recompile en local sans le contournement `xcodebuild` (skill `trycast-dev-builds`).
 - `npm run env:prod` : vérifier `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID` dans l'environnement EAS de production.
 - `icon.png` a un canal alpha : Expo l'aplatit sur fond blanc pour iOS, contrôler le rendu sur le premier build.
 
