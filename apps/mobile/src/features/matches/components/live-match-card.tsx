@@ -21,9 +21,13 @@ function TeamSide({ team }: { team: MatchWithTeams['home_team'] }) {
     return (
         <View className="min-w-0 flex-1 items-center gap-2">
             <TeamFlag size="md" team={team} />
+            {/* Une ligne, quelle que soit la largeur d'écran : un nom long
+                (« Nouvelle-Zélande ») rétrécit au lieu de passer sur deux */}
             <Text
+                adjustsFontSizeToFit
                 className="text-center font-body-bold text-[14px] leading-[17px] text-text"
-                numberOfLines={2}>
+                minimumFontScale={0.7}
+                numberOfLines={1}>
                 {team ? teamName(team, t) : t('matches:teamTbd')}
             </Text>
         </View>
