@@ -1,7 +1,8 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ChevronRight, Globe, Users } from 'lucide-react-native';
+import { ChevronRight, Globe } from 'lucide-react-native';
 import { useDeferredValue, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FlatList } from 'react-native';
 
 import { HeaderActions } from '@/components/header-actions';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import { Select } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSession } from '@/features/auth/session-context';
 import { LeaderboardRow } from '@/features/leagues/components/leaderboard-row';
+import { LeagueIcon } from '@/features/leagues/components/league-icon';
 import { PinnedMeRow } from '@/features/leagues/components/pinned-me-row';
 import { Podium } from '@/features/leagues/components/podium';
 import { markTies } from '@/features/leagues/ranking';
@@ -24,10 +26,8 @@ import { useActiveCompetition } from '@/features/matches/use-active-competition'
 import { useOpenPlayerProfile } from '@/features/profile/use-open-player-profile';
 import { useProfile } from '@/features/profile/use-profile';
 import { trackEvent } from '@/lib/analytics';
-import { Pressable, ScrollView, Text, useThemeColor, View } from '@/tw';
+import { ActivityIndicator, Pressable, Text, useThemeColor, View } from '@/tw';
 import { useScreenInsets } from '@/tw/use-screen-insets';
-
-const PAGE_SIZE = 50;
 
 type Scope = 'leagues' | 'global';
 
@@ -61,9 +61,7 @@ export default function LeaderboardScreen() {
         if (requestedScope) router.setParams({ scope: undefined });
     }, [requestedScope, router]);
     const [selectedLeagueId, setSelectedLeagueId] = useState<string | null>(null);
-    const [limit, setLimit] = useState(PAGE_SIZE);
     const textMuted = useThemeColor('text-muted');
-    const accentColor = useThemeColor('accent');
     const brandColor = useThemeColor('brand');
     const screenInsets = useScreenInsets();
 
@@ -86,7 +84,6 @@ export default function LeaderboardScreen() {
 
     const globalBoard = useGlobalLeaderboard(
         effectiveScope === 'global' ? competition.data?.id : undefined,
-        limit,
     );
     const leagueBoard = useLeagueLeaderboard(
         effectiveScope === 'leagues' ? currentLeagueId : undefined,
@@ -126,209 +123,235 @@ export default function LeaderboardScreen() {
         entries.length > 0 &&
         !entries.some((entry) => entry.user_id === userId);
 
+    // Pages suivantes du général au fil du défilement (le classement d'une
+    // ligue arrive en une fois)
+    const loadMore = () => {
+        if (
+            deferredScope === 'global' &&
+            globalBoard.hasNextPage &&
+            !globalBoard.isFetchingNextPage
+        ) {
+            void globalBoard.fetchNextPage();
+        }
+    };
+    const showRows = !loading && !failed && entries.length > 0;
+
+    const header = (
+        <View
+            className="w-full max-w-[800px] gap-4 self-center px-5 pb-2"
+            style={{ paddingTop: screenInsets.top }}>
+            <View className="flex-row items-start gap-3">
+                <View className="min-w-0 flex-1 gap-1">
+                    <Text className="font-display text-3xl leading-7.5 tracking-[0.3px] text-text">
+                        {t('leagues:leaderboard.title')}
+                    </Text>
+                    {competition.data ? (
+                        <Text className="font-body text-[13px] text-text-muted">
+                            {competition.data.name}
+                        </Text>
+                    ) : null}
+                </View>
+                <HeaderActions />
+            </View>
+
+            {leagues.length > 0 ? (
+                <SegmentedControl
+                    onChange={setScope}
+                    options={[
+                        { value: 'leagues', label: t('leagues:leaderboard.tabs.leagues') },
+                        { value: 'global', label: t('leagues:leaderboard.tabs.global') },
+                    ]}
+                    value={effectiveScope}
+                />
+            ) : null}
+
+            {deferredScope === 'leagues' && leagues.length > 0 && currentLeagueId ? (
+                <View className="gap-2.5">
+                    <Select
+                        accessibilityLabel={t('leagues:leaderboard.select.overline')}
+                        leading={(option, placement) => {
+                            const league = leagues.find((row) => row.id === option.value);
+                            return league ? (
+                                <LeagueIcon
+                                    color={league.color}
+                                    name={league.name}
+                                    size={placement}
+                                />
+                            ) : null;
+                        }}
+                        onChange={setSelectedLeagueId}
+                        options={leagues.map((league) => ({
+                            value: league.id,
+                            label: league.name,
+                            description: t('leagues:detail.members', {
+                                count: league.member_count,
+                            }),
+                        }))}
+                        overline={t('leagues:leaderboard.select.overline')}
+                        trailing={
+                            currentLeague
+                                ? t('leagues:detail.members', {
+                                      count: currentLeague.member_count,
+                                  })
+                                : undefined
+                        }
+                        value={currentLeagueId}
+                    />
+                    {/* Accès au détail : lien discret sous le sélecteur (DS du 2026-09-21) */}
+                    <Pressable
+                        accessibilityRole="link"
+                        className="flex-row items-center gap-0.5 self-end px-0.5"
+                        hitSlop={8}
+                        onPress={() =>
+                            router.push({
+                                pathname: '/league/[id]',
+                                params: { id: currentLeagueId },
+                            })
+                        }>
+                        <Text className="font-body-semibold text-[12px] text-text-muted">
+                            {t('leagues:leaderboard.viewDetail')}
+                        </Text>
+                        <ChevronRight color={textMuted} size={13} strokeWidth={2.4} />
+                    </Pressable>
+                </View>
+            ) : null}
+
+            {deferredScope === 'global' ? (
+                <Card className="flex-row items-center gap-2.5 px-3.5 py-2.75">
+                    <View className="h-[34px] w-[34px] items-center justify-center rounded-sm bg-brand/10">
+                        <Globe color={brandColor} size={18} strokeWidth={1.9} />
+                    </View>
+                    <View className="min-w-0 flex-1 gap-px">
+                        <Text className="font-body-bold text-[10px] uppercase tracking-[0.6px] text-text-faint">
+                            {t('leagues:leaderboard.general.overline')}
+                        </Text>
+                        <Text className="font-body-bold text-[15px] text-text">
+                            {t('leagues:leaderboard.general.title')}
+                        </Text>
+                    </View>
+                    {myRank.data ? (
+                        <Text className="font-body text-[12px] text-text-muted">
+                            {t('leagues:leaderboard.players', { count: myRank.data.total })}
+                        </Text>
+                    ) : null}
+                </Card>
+            ) : null}
+
+            {loading ? (
+                <View className="gap-2.5">
+                    <Skeleton className="h-16" variant="block" />
+                    <Skeleton className="h-16" variant="block" />
+                    <Skeleton className="h-16" variant="block" />
+                </View>
+            ) : failed ? (
+                // Dans le flux, pas en plein écran : le sélecteur d'onglet
+                // reste accessible, l'autre portée peut très bien répondre.
+                <EmptyState
+                    action={
+                        <Button
+                            onPress={() => {
+                                void competition.refetch();
+                                void myLeagues.refetch();
+                                void board.refetch();
+                            }}
+                            title={t('common:actions.retry')}
+                            variant="secondary"
+                        />
+                    }
+                    title={t('leagues:errors.load')}
+                />
+            ) : entries.length === 0 ? (
+                <EmptyState
+                    action={
+                        leagues.length === 0 ? (
+                            <View className="w-full max-w-75 gap-2.5">
+                                <Button
+                                    fullWidth
+                                    onPress={() => router.push('/league/new')}
+                                    title={t('leagues:actions.create')}
+                                />
+                                <Button
+                                    fullWidth
+                                    onPress={() =>
+                                        router.push({
+                                            pathname: '/league/new',
+                                            params: { tab: 'join' },
+                                        })
+                                    }
+                                    title={t('leagues:actions.join')}
+                                    variant="secondary"
+                                />
+                            </View>
+                        ) : undefined
+                    }
+                    message={t('leagues:leaderboard.empty')}
+                    title={t('leagues:leaderboard.title')}
+                />
+            ) : (
+                <View className="gap-4">
+                    {entries.length >= 3 ? (
+                        <Podium
+                            entries={entries}
+                            meUserId={userId}
+                            onSelect={(id) =>
+                                router.push({ pathname: '/player/[id]', params: { id } })
+                            }
+                        />
+                    ) : null}
+                    <View className="flex-row items-baseline justify-between gap-2 px-0.5">
+                        <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
+                            {t('leagues:leaderboard.full')}
+                        </Text>
+                        <Text className="font-body-bold text-[11px] uppercase tracking-[0.44px] text-text-faint">
+                            {t('leagues:leaderboard.players', {
+                                count:
+                                    deferredScope === 'global'
+                                        ? (myRank.data?.total ?? entries.length)
+                                        : entries.length,
+                            })}
+                        </Text>
+                    </View>
+                </View>
+            )}
+        </View>
+    );
+
     return (
         <View className="flex-1 bg-bg">
-            <ScrollView
-                className="flex-1"
-                contentContainerClassName="w-full max-w-[800px] gap-4 self-center px-5"
-                contentContainerStyle={{
-                    paddingTop: screenInsets.top,
-                    paddingBottom: screenInsets.bottomTabBar,
-                }}>
-                <View className="flex-row items-start gap-3">
-                    <View className="min-w-0 flex-1 gap-1">
-                        <Text className="font-display text-3xl leading-7.5 tracking-[0.3px] text-text">
-                            {t('leagues:leaderboard.title')}
-                        </Text>
-                        {competition.data ? (
-                            <Text className="font-body text-[13px] text-text-muted">
-                                {competition.data.name}
-                            </Text>
-                        ) : null}
-                    </View>
-                    <HeaderActions />
-                </View>
-
-                {leagues.length > 0 ? (
-                    <SegmentedControl
-                        // « Charger plus » ne survit pas à un changement de portée
-                        onChange={(next) => {
-                            setScope(next);
-                            setLimit(PAGE_SIZE);
-                        }}
-                        options={[
-                            { value: 'leagues', label: t('leagues:leaderboard.tabs.leagues') },
-                            { value: 'global', label: t('leagues:leaderboard.tabs.global') },
-                        ]}
-                        value={effectiveScope}
-                    />
-                ) : null}
-
-                {deferredScope === 'leagues' && leagues.length > 0 && currentLeagueId ? (
-                    <View className="gap-2.5">
-                        <Select
-                            accessibilityLabel={t('leagues:leaderboard.select.overline')}
-                            icon={<Users color={accentColor} size={18} strokeWidth={1.9} />}
-                            onChange={(next) => {
-                                setSelectedLeagueId(next);
-                                setLimit(PAGE_SIZE);
-                            }}
-                            options={leagues.map((league) => ({
-                                value: league.id,
-                                label: league.name,
-                                description: t('leagues:detail.members', {
-                                    count: league.member_count,
-                                }),
-                            }))}
-                            overline={t('leagues:leaderboard.select.overline')}
-                            trailing={
-                                currentLeague
-                                    ? t('leagues:detail.members', {
-                                          count: currentLeague.member_count,
-                                      })
-                                    : undefined
-                            }
-                            value={currentLeagueId}
-                        />
-                        {/* Accès au détail : lien discret sous le sélecteur (DS du 2026-09-21) */}
-                        <Pressable
-                            accessibilityRole="link"
-                            className="flex-row items-center gap-0.5 self-end px-0.5"
-                            hitSlop={8}
-                            onPress={() =>
-                                router.push({
-                                    pathname: '/league/[id]',
-                                    params: { id: currentLeagueId },
-                                })
-                            }>
-                            <Text className="font-body-semibold text-[12px] text-text-muted">
-                                {t('leagues:leaderboard.viewDetail')}
-                            </Text>
-                            <ChevronRight color={textMuted} size={13} strokeWidth={2.4} />
-                        </Pressable>
-                    </View>
-                ) : null}
-
-                {deferredScope === 'global' ? (
-                    <Card className="flex-row items-center gap-2.5 px-3.5 py-2.75">
-                        <View className="h-[34px] w-[34px] items-center justify-center rounded-sm bg-brand/10">
-                            <Globe color={brandColor} size={18} strokeWidth={1.9} />
-                        </View>
-                        <View className="min-w-0 flex-1 gap-px">
-                            <Text className="font-body-bold text-[10px] uppercase tracking-[0.6px] text-text-faint">
-                                {t('leagues:leaderboard.general.overline')}
-                            </Text>
-                            <Text className="font-body-bold text-[15px] text-text">
-                                {t('leagues:leaderboard.general.title')}
-                            </Text>
-                        </View>
-                        {myRank.data ? (
-                            <Text className="font-body text-[12px] text-text-muted">
-                                {t('leagues:leaderboard.players', { count: myRank.data.total })}
-                            </Text>
-                        ) : null}
-                    </Card>
-                ) : null}
-
-                {loading ? (
-                    <View className="gap-2.5">
-                        <Skeleton className="h-16" variant="block" />
-                        <Skeleton className="h-16" variant="block" />
-                        <Skeleton className="h-16" variant="block" />
-                    </View>
-                ) : failed ? (
-                    // Dans le flux, pas en plein écran : le sélecteur d'onglet
-                    // reste accessible, l'autre portée peut très bien répondre.
-                    <EmptyState
-                        action={
-                            <Button
-                                onPress={() => {
-                                    void competition.refetch();
-                                    void myLeagues.refetch();
-                                    void board.refetch();
-                                }}
-                                title={t('common:actions.retry')}
-                                variant="secondary"
-                            />
-                        }
-                        title={t('leagues:errors.load')}
-                    />
-                ) : entries.length === 0 ? (
-                    <EmptyState
-                        action={
-                            leagues.length === 0 ? (
-                                <View className="w-full max-w-75 gap-2.5">
-                                    <Button
-                                        fullWidth
-                                        onPress={() => router.push('/league/new')}
-                                        title={t('leagues:actions.create')}
-                                    />
-                                    <Button
-                                        fullWidth
-                                        onPress={() =>
-                                            router.push({
-                                                pathname: '/league/new',
-                                                params: { tab: 'join' },
-                                            })
-                                        }
-                                        title={t('leagues:actions.join')}
-                                        variant="secondary"
-                                    />
-                                </View>
-                            ) : undefined
-                        }
-                        message={t('leagues:leaderboard.empty')}
-                        title={t('leagues:leaderboard.title')}
-                    />
-                ) : (
-                    <View className="gap-4">
-                        {entries.length >= 3 ? (
-                            <Podium
-                                entries={entries}
-                                meUserId={userId}
-                                onSelect={(id) =>
-                                    router.push({ pathname: '/player/[id]', params: { id } })
-                                }
-                            />
-                        ) : null}
-
-                        <View className="gap-2">
-                            <View className="flex-row items-baseline justify-between gap-2 px-0.5">
-                                <Text className="font-body-bold text-[13px] uppercase tracking-[1.17px] text-text">
-                                    {t('leagues:leaderboard.full')}
-                                </Text>
-                                <Text className="font-body-bold text-[11px] uppercase tracking-[0.44px] text-text-faint">
-                                    {t('leagues:leaderboard.players', { count: entries.length })}
-                                </Text>
-                            </View>
-                            {entries.map((entry) => (
-                                <LeaderboardRow
-                                    entry={entry}
-                                    isMe={entry.user_id === userId}
-                                    key={entry.user_id}
-                                    onPress={openPlayerProfile(entry.user_id)}
-                                    tie={entry.tie}
-                                />
-                            ))}
+            {/* Virtualisée : le général peut compter des milliers de lignes */}
+            <FlatList
+                contentContainerStyle={{ paddingBottom: screenInsets.bottomTabBar }}
+                data={showRows ? entries : []}
+                keyExtractor={(entry) => entry.user_id}
+                ListFooterComponent={
+                    showRows ? (
+                        <View className="w-full max-w-[800px] self-center px-5">
+                            {globalBoard.isFetchingNextPage && deferredScope === 'global' ? (
+                                <ActivityIndicator className="py-3" />
+                            ) : null}
                             {hasTies ? (
                                 <Text className="px-1 pt-1 font-body text-[12px] leading-[17px] text-text-muted">
                                     {t('leagues:leaderboard.tieNote')}
                                 </Text>
                             ) : null}
-                            {deferredScope === 'global' && entries.length === limit ? (
-                                <Pressable
-                                    accessibilityRole="button"
-                                    className="items-center py-3"
-                                    onPress={() => setLimit((current) => current + PAGE_SIZE)}>
-                                    <Text className="font-body-semibold text-[13px] text-accent">
-                                        {t('leagues:leaderboard.loadMore')}
-                                    </Text>
-                                </Pressable>
-                            ) : null}
                         </View>
+                    ) : null
+                }
+                ListHeaderComponent={header}
+                onEndReached={loadMore}
+                onEndReachedThreshold={0.8}
+                renderItem={({ item: entry }) => (
+                    <View className="w-full max-w-[800px] self-center px-5 pb-2">
+                        <LeaderboardRow
+                            entry={entry}
+                            isMe={entry.user_id === userId}
+                            onPress={openPlayerProfile(entry.user_id)}
+                            tie={entry.tie}
+                        />
                     </View>
                 )}
-            </ScrollView>
+                style={{ flex: 1 }}
+            />
 
             {showPinnedMe && standing.data && myRank.data?.rank != null && profile ? (
                 <PinnedMeRow

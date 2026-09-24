@@ -16,7 +16,6 @@
             "global": "Overall"
         },
         "empty": "The leaderboard will appear after the first scored matches.",
-        "loadMore": "Load more",
         "select": {
             "overline": "League shown"
         },
@@ -36,8 +35,8 @@
         "row": {
             "predictions_one": "{{count}} prediction",
             "predictions_other": "{{count}} predictions",
-            "exacts_one": "{{count}} exact score",
-            "exacts_other": "{{count}} exact scores",
+            "exacts_one": "{{count}} exact",
+            "exacts_other": "{{count}} exact",
             "openProfile": "View {{username}}'s profile"
         },
         "viewDetail": "View details"
@@ -111,7 +110,7 @@
             "roundOverline": "Round",
             "roundShort": "R",
             "roundTitle": "Round {{round}}",
-            "exactsNone": "no exact scores",
+            "exactsNone": "0 exact",
             "notPlayedTitle": "Round not played yet",
             "notPlayedMessage": "Round {{round}} points will show here once the matches are done and predictions reconciled.",
             "backToPlayed": "See round {{round}}",
