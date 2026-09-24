@@ -129,7 +129,7 @@ de Google, logo blanc) ; le rendu en clair reste à voir. Gestes de Corentin :
 1. **Supabase → Auth → Providers → Apple** : activer, Client IDs `com.cohozen.trycast`, secret vide
    (flux natif). ✅ **dev** (2026-09-24) ; **prod** dans la procédure de la 1.3.0 ; sans cela, le
    bouton Apple échoue à la connexion.
-2. **Relais e-mail d'Apple** — Certificates, Identifiers & Profiles → **Services** (barre latérale)
+2. ✅ **Relais e-mail d'Apple** (2026-09-24, SPF réussi pour les deux domaines) — Certificates, Identifiers & Profiles → **Services** (barre latérale)
    → « Sign in with Apple for Email Communication » → **Configure** → « + » d'Email Sources →
    domaines `trycast.fr, send.trycast.fr` → Next → Register ; les deux doivent afficher un SPF
    réussi. `send.trycast.fr` est l'expéditeur d'enveloppe de Resend (SPF `amazonses.com`), à
