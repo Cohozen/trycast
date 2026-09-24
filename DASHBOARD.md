@@ -118,9 +118,8 @@ Championship. **App Store public en février 2027**, avec Android. Compte **indi
   **APP_MANAGER**) dans les credentials EAS. L'EF `notify` passe par le service de push Expo, rien côté serveur.
 - ✅ Premier build, `eas submit`, TestFlight interne (2026-09-24). Reste à contrôler le rendu de
   l'icône (`icon.png` a un canal alpha, qu'Expo aplatit sur fond blanc pour iOS) et les push.
-- `npm run ios` ne recompile toujours pas en local (vérifié le 2026-09-24) : ce Mac n'a aucun
-  certificat de développement Apple. Le contournement `xcodebuild` du skill `trycast-dev-builds`
-  marche ; installer un certificat de développement sur ce Mac le rendrait inutile.
+- ✅ `npm run ios` recompile en local (2026-09-24) : certificat Apple Development créé par Xcode et
+  intermédiaire WWDR G3 ajouté au trousseau. Le certificat expire en septembre 2027.
 
 **Lot 2 — Sign in with Apple** (règle 4.8) : ✅ code commité (`expo-apple-authentication`,
 `expo-crypto`, `ios.usesAppleSignIn`, entrée `apple` iOS seulement et en premier), registre,

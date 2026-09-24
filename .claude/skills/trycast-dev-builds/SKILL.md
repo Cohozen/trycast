@@ -142,23 +142,34 @@ npx expo prebuild --clean -p ios && npm run ios
 
 ⚠️ Le `--clean` est **obligatoire** : un `expo run:ios` sur un `ios/` préexistant ne ré-applique pas les config plugins (vécu : `NSPhotoLibraryUsageDescription` manquant → crash TCC au picker photo).
 
-⚠️ **`npm run ios` ne compile plus en local depuis les liens d'invitation** (constaté le
-2026-09-11). Il s'arrête avant tout build, avec un message qui parle d'appareil physique alors qu'on
-vise le simulateur :
+⚠️ **`npm run ios` exige un certificat de développement Apple sur ce Mac, même pour le
+simulateur.** `@expo/cli` impose la signature dès que les entitlements contiennent
+`com.apple.developer.associated-domains` ou `…applesignin` (`simulatorBuildRequiresCodeSigning`,
+dans `run/ios/codeSigning/simulatorCodeSigning.js`) — c'est le cas depuis les liens d'invitation
+(2026-09-09) et Sign in with Apple (2026-09-24). Sans certificat, il s'arrête avant tout build avec un
+message qui parle, à tort, d'appareil physique :
 
 ```
 › Your computer requires some additional setup before you can build onto physical iOS devices.
 CommandError: No code signing certificates are available to use.
 ```
 
-Cause : `@expo/cli` exige la signature de développement **même pour le simulateur** dès que les
-entitlements contiennent `com.apple.developer.associated-domains` ou `…applesignin`
-(`simulatorBuildRequiresCodeSigning`, dans `run/ios/codeSigning/simulatorCodeSigning.js`). Or
-`associatedDomains` est déclaré depuis le 2026-09-09, et `usesAppleSignIn` depuis le 2026-09-24. Ce
-n'est pas une régression de version : la règle est la même en 57.0.4 et en 57.0.23.
+Réparé le 2026-09-24 (Corentin), en deux gestes :
+1. **Xcode → Settings → Accounts** → Apple ID du compte développeur → équipe `5P7K97386D` →
+   **Manage Certificates** → « + » → **Apple Development**. Le certificat et sa clé privée
+   arrivent dans le trousseau (valable un an : **expire en septembre 2027**).
+2. Le certificat restait **invalide** : `security find-identity -v -p codesigning` → « 0 valid
+   identities found », alors que la même commande **sans `-v`** le listait. Cause : le trousseau
+   n'avait que l'ancien intermédiaire WWDR (expiré en 2023), pas **WWDR G3** qui a émis le
+   certificat. Correctif : télécharger `https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer`,
+   l'ouvrir, l'ajouter au trousseau session. Installer un certificat touche au trousseau : geste
+   de Corentin, jamais de l'agent.
 
-Contournement **sans rien modifier au projet** : Xcode, lui, signe en local pour le simulateur, sans
-équipe. On compile directement, on installe, puis on connecte l'app à Metro :
+Contrôle : `security find-identity -v -p codesigning` doit afficher « 1 valid identities found ».
+`npm run ios` affiche alors `Signing and building iOS app with: Apple Development: …` et va au bout.
+
+**Repli sans certificat** (autre Mac, certificat expiré) : Xcode signe en local pour le simulateur,
+sans équipe ni entitlements. Compiler directement, installer, puis connecter l'app à Metro :
 
 ```bash
 LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 npx expo prebuild --clean -p ios
@@ -169,23 +180,17 @@ xcrun simctl install booted ios/build/Build/Products/Debug-iphonesimulator/TryCa
 xcrun simctl openurl booted "trycast://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"
 ```
 
-Metro doit tourner (`npm start`, ou celui d'un `npm run android`, qui sert les deux plateformes).
-Le schéma et le workspace s'écrivent **`TryCast`**, pas `trycast` : `xcodebuild` sort en erreur 65
-sur un nom de schéma inconnu. `SENTRY_DISABLE_AUTO_UPLOAD` se transmet ici par l'environnement, pour
-la même raison que dans `npm run ios`.
+Metro doit tourner (`npm start`). Le schéma et le workspace s'écrivent **`TryCast`** : `xcodebuild`
+sort en erreur 65 sur un nom de schéma inconnu. `SENTRY_DISABLE_AUTO_UPLOAD` se transmet par
+l'environnement, pour la même raison que dans `npm run ios`.
 
-Le Team ID ne suffit pas (vérifié le 2026-09-24, rebuild de Sign in with Apple) : `npm run ios`
-échoue toujours avec le même message, car `security find-identity -v -p codesigning` ne trouve
-**aucune identité** sur ce Mac. Il faut un **certificat de développement Apple** installé ici pour
-qu'il repasse ; d'ici là, le contournement ci-dessus est la voie normale, et il a marché ce jour-là.
-Le jour où `npm run ios` recompile tel quel, retirer ce paragraphe.
-
-⚠️ **La signature locale du simulateur n'embarque pas les entitlements.** Conséquence vécue le
-2026-09-24 : sans Apple ID dans les Réglages du simulateur, la feuille Sign in with Apple s'arrête
-sur « Connectez-vous à votre compte Apple », puis renvoie `AuthorizationError 1000`
+⚠️ **Sign in with Apple au simulateur.** Vécu le 2026-09-24 avec le repli `xcodebuild` (sans
+entitlements) et sans Apple ID dans les Réglages du simulateur : la feuille s'arrête sur
+« Connectez-vous à votre compte Apple », puis renvoie `AuthorizationError 1000`
 (`ERR_REQUEST_UNKNOWN`), que l'app affiche en **erreur générique**. C'est voulu : seul le code 1001
-(`ERR_REQUEST_CANCELED`) est un renoncement silencieux. Au simulateur, on ne vérifie que le rendu du
-bouton ; le parcours Apple complet se vérifie sur un iPhone en TestFlight.
+(`ERR_REQUEST_CANCELED`) est un renoncement silencieux. Un build signé par `npm run ios` embarque les
+entitlements : avec un Apple ID connecté dans le simulateur, le parcours devrait aller au bout
+(**pas encore vérifié**). La référence reste l'iPhone en TestFlight.
 
 ⚠️ **`pod install` refuse les pods Swift dont les dépendances ne définissent pas de module** (vécu 2026-07-23, ajout de `@react-native-google-signin/google-signin`). Message : *« The Swift pod `AppCheckCore` depends upon `GoogleUtilities` and `RecaptchaInterop`, which do not define modules »* — le prebuild s'arrête net à l'étape CocoaPods. Correctif **dans `app.json`**, jamais dans le `Podfile` (généré, effacé par `--clean`) : plugin `expo-build-properties` avec les pods fautifs en `modular_headers`.
 

@@ -112,15 +112,15 @@ fictifs sous de nouveaux ids : reprendre les liens de la dernière sortie, et s'
   Skill) : sous Xcode 27, une passe iOS qui doit taper ou faire défiler se fait depuis la session
   principale ; le sous-agent ne peut que capturer par `simctl` et ouvrir des deep links.
 
-- **`npm run ios` réclame un certificat de signature** (« No code signing certificates are
-  available ») depuis que l'app déclare ses liens d'invitation (`associatedDomains`, 2026-09-09).
-  Le Team ID existe, mais ce Mac n'a aucun certificat de développement : compiler avec
-  `xcodebuild` en direct, puis `simctl install`. La recette complète est dans le skill
+- **`npm run ios` exige un certificat de développement Apple valide sur ce Mac**, même pour le
+  simulateur (liens d'invitation et Sign in with Apple). Installé le 2026-09-24, expire en
+  septembre 2027. « No code signing certificates are available » = certificat absent, expiré ou
+  sans l'intermédiaire WWDR G3 : diagnostic, correctif et repli `xcodebuild` dans le skill
   `trycast-dev-builds`, section iOS.
-- **Sign in with Apple ne va pas au bout au simulateur** : le build signé en local n'a pas
-  d'entitlements, et sans Apple ID dans les Réglages du simulateur la feuille renvoie une erreur
-  générique (code 1000). C'est attendu : on y vérifie le rendu du bouton, pas le parcours (détail
-  dans `trycast-dev-builds`).
+- **Sign in with Apple au simulateur** : sans Apple ID dans les Réglages du simulateur, la feuille
+  renvoie une erreur générique (code 1000), et c'est attendu. Un build de `npm run ios` embarque les
+  entitlements : avec un Apple ID connecté, le parcours devrait aller au bout (pas encore vérifié ;
+  détail dans `trycast-dev-builds`). La référence reste l'iPhone en TestFlight.
 - **Tester un lien d'invitation sans liens universels** (inertes dans un build signé en local, sans
   entitlements) : utiliser
   `xcrun simctl openurl booted "trycast:///rejoindre/<CODE>"`, **avec trois barres obliques**. Avec
