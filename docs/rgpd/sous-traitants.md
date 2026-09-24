@@ -16,7 +16,8 @@
 | **Expo** | Passerelle d'envoi des notifications push | Jeton d'appareil, titre et corps de la notification | États-Unis | Oui |
 | **Google (Firebase Cloud Messaging)** | Livraison des notifications sur Android | Jeton d'appareil, contenu de la notification | États-Unis | Oui |
 | **Google (Sign in with Google)** | Fournisseur d'identité, au choix de l'utilisateur | Adresse e-mail, identifiant de compte Google, nom et photo du compte Google. Google sait qu'un de ses comptes se connecte à TryCast | États-Unis | Oui — Data Privacy Framework / clauses contractuelles types |
-| **Apple (APNs)** | Livraison des notifications sur iOS *(pas encore actif — iOS différé)* | Jeton d'appareil, contenu de la notification | États-Unis | Oui |
+| **Apple (Sign in with Apple)** | Fournisseur d'identité sur iOS, au choix de l'utilisateur | Identifiant Apple et adresse e-mail (réelle ou relais `@privaterelay.appleid.com`) ; le nom n'est pas demandé. Apple sait qu'un de ses comptes se connecte à TryCast | États-Unis | Oui — Data Privacy Framework / clauses contractuelles types |
+| **Apple (APNs)** | Livraison des notifications sur iOS | Jeton d'appareil, contenu de la notification | États-Unis | Oui |
 | **Aptabase** | Mesure d'usage de l'application | Événements de parcours nommés, version de l'app, système d'exploitation. **Aucun identifiant** | UE (région encodée dans la clé `A-EU-…`) | Non |
 | **Sentry** | Rapports de plantage ; signalements de problèmes envoyés depuis l'app | Pile d'appel, modèle d'appareil, versions, fil d'Ariane des écrans ; pour un signalement, le message, l'écran ouvert et, si l'utilisateur le choisit, son e-mail et son pseudo | UE — Francfort (`ingest.de.sentry.io`) | Non |
 | **Highlightly** | Fournisseur de calendriers, résultats et cotes | **Aucune donnée personnelle** — les appels ne portent que sur des matchs | — | Sans objet |
@@ -27,12 +28,12 @@
   atteindre un téléphone sans passer par le service de push de la plateforme. C'est la
   raison pour laquelle les notifications reposent sur le **consentement** et restent
   entièrement désactivables.
-- **Sign in with Google n'est pas un sous-traitant** au sens de l'article 28 : Google agit
-  ici comme **responsable de traitement distinct** (il authentifie ses propres utilisateurs
-  selon sa propre politique). Il figure dans ce tableau comme destinataire. Deux
+- **Sign in with Google et Sign in with Apple ne sont pas des sous-traitants** au sens de
+  l'article 28 : Google et Apple agissent ici comme **responsables de traitement distincts** (chacun authentifie ses propres utilisateurs
+  selon sa propre politique). Ils figurent dans ce tableau comme destinataires. Deux
   conséquences pratiques : le transfert est **entièrement évitable par l'utilisateur** — la
   création de compte par e-mail + mot de passe reste offerte et de premier plan —, et
-  aucune donnée de jeu (pronostics, ligues, classements) ne lui est transmise.
+  aucune donnée de jeu (pronostics, ligues, classements) ne leur est transmise.
 - **Resend stocke tout aux États-Unis**, quelle que soit la région d'envoi. Vérifié le
   14 septembre 2026 sur sa page RGPD (mise à jour du 17 août 2026) : la région choisie pour
   le domaine (`eu-west-1`) décide d'où partent les e-mails, **pas** d'où sont conservés leur
