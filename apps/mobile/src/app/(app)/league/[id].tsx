@@ -101,25 +101,16 @@ export default function LeagueScreen() {
     const isOwner = !!league && league.owner_id === userId;
 
     // Header repliable en verre (DS 2026-09-24) : identité et onglets vivent
-    // sous la barre native, dans le même verre. L'identité se replie au pixel
-    // près du défilement (le contenu reste collé aux onglets) et s'estompe
-    // entre 8 et 53 px, la pastille + le nom prennent place dans la barre.
+    // sous la barre native, dans le même verre. L'identité glisse sous la
+    // barre au pixel près du défilement (le contenu reste collé aux onglets,
+    // cf. GlassHeader) et s'estompe entre 8 et 53 px, la pastille + le nom
+    // prennent place dans la barre.
     const collapse = useCollapseProgress({ start: 8, distance: 45, reach: 90 });
     const headerHeight = useHeaderHeight();
     const blurTarget = useRef<RNView>(null);
     // Hauteurs naturelles, mesurées une fois : le contenu défilant les réserve
     const [identityHeight, setIdentityHeight] = useState(0);
     const [tabsHeight, setTabsHeight] = useState(0);
-    const identityClip = useAnimatedStyle(() =>
-        identityHeight > 0
-            ? {
-                  height: Math.min(
-                      identityHeight,
-                      Math.max(0, identityHeight - collapse.offset.value),
-                  ),
-              }
-            : {},
-    );
     const identityStyle = useAnimatedStyle(() => ({
         opacity: Math.max(0, 1 - collapse.progress.value * 1.8),
         transform: [{ scale: 1 - collapse.progress.value * 0.06 }],
@@ -226,40 +217,41 @@ export default function LeagueScreen() {
                     </View>
                 </Screen>
             </BlurTargetView>
-            <GlassHeader blurTarget={blurTarget} progress={collapse.progress}>
-                <View className="w-full max-w-[800px] self-center px-5">
-                    {/* Identité : se replie au défilement (hauteur rognée) */}
-                    <Animated.View style={[{ overflow: 'hidden' }, identityClip]}>
-                        <Animated.View
-                            onLayout={(event) => setIdentityHeight(event.nativeEvent.layout.height)}
-                            style={[
-                                {
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    gap: 14,
-                                    paddingTop: 6,
-                                    paddingBottom: 14,
-                                    transformOrigin: 'left',
-                                },
-                                identityStyle,
-                            ]}>
-                            <LeagueIcon color={league.color} name={league.name} />
-                            <View className="min-w-0 flex-1">
-                                <Text
-                                    className="font-display text-[28px] leading-[29px] text-text"
-                                    numberOfLines={1}>
-                                    {league.name}
-                                </Text>
-                                <View className="flex-row flex-wrap items-center gap-2">
-                                    <MembersLine count={members.length} />
-                                    <Badge tone={isOwner ? 'brand' : 'neutral'} variant="soft">
-                                        {isOwner
-                                            ? t('leagues:detail.badges.admin')
-                                            : t('leagues:detail.badges.member')}
-                                    </Badge>
-                                </View>
+            <GlassHeader
+                blurTarget={blurTarget}
+                collapseHeight={identityHeight}
+                offset={collapse.offset}
+                progress={collapse.progress}>
+                <View className="w-full max-w-[800px] self-center px-5" pointerEvents="box-none">
+                    <Animated.View
+                        onLayout={(event) => setIdentityHeight(event.nativeEvent.layout.height)}
+                        style={[
+                            {
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 14,
+                                paddingTop: 6,
+                                paddingBottom: 14,
+                                transformOrigin: 'left',
+                            },
+                            identityStyle,
+                        ]}>
+                        <LeagueIcon color={league.color} name={league.name} />
+                        <View className="min-w-0 flex-1">
+                            <Text
+                                className="font-display text-[28px] leading-[29px] text-text"
+                                numberOfLines={1}>
+                                {league.name}
+                            </Text>
+                            <View className="flex-row flex-wrap items-center gap-2">
+                                <MembersLine count={members.length} />
+                                <Badge tone={isOwner ? 'brand' : 'neutral'} variant="soft">
+                                    {isOwner
+                                        ? t('leagues:detail.badges.admin')
+                                        : t('leagues:detail.badges.member')}
+                                </Badge>
                             </View>
-                        </Animated.View>
+                        </View>
                     </Animated.View>
 
                     <View

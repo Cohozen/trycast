@@ -45,7 +45,10 @@ export function useCollapseProgress<TScroll extends Component = Animated.ScrollV
 } {
     const [viewport, setViewport] = useState(0);
     const scrollRef = useAnimatedRef<TScroll>();
-    const offset = useScrollOffset(scrollRef);
+    // Branché une fois la liste mesurée (donc montée) : les écrans rendent un
+    // squelette pendant le chargement, et une ref encore vide au premier
+    // passage fait avertir Reanimated (« animatedRef is not initialized »)
+    const offset = useScrollOffset(viewport > 0 ? scrollRef : null);
     const progress = useDerivedValue(() =>
         Math.min(1, Math.max(0, (offset.value - start) / distance)),
     );

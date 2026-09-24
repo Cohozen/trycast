@@ -129,14 +129,6 @@ export function ProfileView({ userId, isSelf, initialTab }: ProfileViewProps) {
         opacity: 1 - collapse.progress.value * 0.92,
         transform: [{ scale: 1 - collapse.progress.value * 0.05 }],
     }));
-    const topClip = useAnimatedStyle(() => {
-        if (topHeight === 0) return {};
-        const hidden = Math.min(topHeight, Math.max(0, collapse.offset.value));
-        return { height: topHeight - hidden };
-    });
-    const topSlide = useAnimatedStyle(() => ({
-        transform: [{ translateY: -Math.min(topHeight, Math.max(0, collapse.offset.value)) }],
-    }));
 
     // Pagination de l'onglet Pronos, remise à zéro à chaque onglet/compétition
     const pageKey = `${deferredTab}:${competitionId}`;
@@ -223,7 +215,7 @@ export function ProfileView({ userId, isSelf, initialTab }: ProfileViewProps) {
     };
 
     const identity = (
-        <View className="flex-row gap-3.5">
+        <View className="flex-row items-center gap-3.5">
             {profilePending ? (
                 <Skeleton className="h-16 flex-1" variant="block" />
             ) : (
@@ -507,23 +499,24 @@ export function ProfileView({ userId, isSelf, initialTab }: ProfileViewProps) {
                         paddingBottom: 40,
                     })}
                 </BlurTargetView>
-                <GlassHeader blurTarget={blurTarget} progress={collapse.progress}>
-                    <View className="w-full max-w-[800px] self-center px-5">
+                <GlassHeader
+                    blurTarget={blurTarget}
+                    collapseHeight={topHeight}
+                    offset={collapse.offset}
+                    progress={collapse.progress}>
+                    <View
+                        className="w-full max-w-[800px] self-center px-5"
+                        pointerEvents="box-none">
                         {/* Bloc du haut : glisse sous la barre au défilement */}
-                        <Animated.View style={[{ overflow: 'hidden' }, topClip]}>
-                            <Animated.View
-                                onLayout={(event) => setTopHeight(event.nativeEvent.layout.height)}
-                                style={topSlide}>
-                                <View className="gap-3.5 pb-3.5">
-                                    <Animated.View
-                                        style={[{ transformOrigin: 'top' }, identityStyle]}>
-                                        {identity}
-                                    </Animated.View>
-                                    {competitionChips}
-                                    {figuresCard}
-                                </View>
+                        <View
+                            className="gap-3.5 pb-3.5"
+                            onLayout={(event) => setTopHeight(event.nativeEvent.layout.height)}>
+                            <Animated.View style={[{ transformOrigin: 'top' }, identityStyle]}>
+                                {identity}
                             </Animated.View>
-                        </Animated.View>
+                            {competitionChips}
+                            {figuresCard}
+                        </View>
                         <View
                             className="pb-2"
                             onLayout={(event) => setTabsHeight(event.nativeEvent.layout.height)}>
