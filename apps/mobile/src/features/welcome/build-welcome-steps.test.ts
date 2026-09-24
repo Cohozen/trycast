@@ -18,10 +18,10 @@ describe('buildWelcomeSteps', () => {
         }
     });
 
-    it('renvoie vers les règles et les ligues, quoi qu’il arrive', () => {
-        const steps = keys('granted');
-        expect(steps[1]?.action).toBe('rules');
-        expect(steps[2]?.action).toBe('leagues');
+    it('ne met aucun bouton dans les volets pronos et ligues (double bouton du dernier volet)', () => {
+        const steps = keys('undetermined');
+        expect(steps[1]?.action).toBeNull();
+        expect(steps[2]?.action).toBeNull();
     });
 
     it('propose d’activer les notifications tant que rien n’a été demandé', () => {

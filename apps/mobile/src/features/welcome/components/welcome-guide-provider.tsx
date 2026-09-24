@@ -20,7 +20,7 @@ import {
 import { trackEvent } from '@/lib/analytics';
 
 import { buildWelcomeSteps } from '../build-welcome-steps';
-import type { WelcomeStep, WelcomeStepAction } from '../types';
+import type { WelcomeAction, WelcomeStep } from '../types';
 import { loadWelcomeGuideSeen, markWelcomeGuideSeen } from '../welcome-guide-store';
 import { WelcomeGuideSheet } from './welcome-guide-sheet';
 
@@ -102,7 +102,7 @@ export function WelcomeGuideProvider({ children }: { children: ReactNode }) {
     }, [resolveSteps]);
 
     const onAction = useCallback(
-        (action: WelcomeStepAction) => {
+        (action: WelcomeAction) => {
             switch (action) {
                 case 'rules':
                     close(true);

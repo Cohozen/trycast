@@ -9,7 +9,8 @@ type WelcomeContext = {
 };
 
 /**
- * Compose les volets du guide. Seul le dernier varie : son bouton dépend de
+ * Compose les volets du guide. Seul le dernier porte un bouton dans la page,
+ * et il varie : il dépend de
  * l'état de la permission notifications. Le volet lui-même reste toujours
  * affiché — son texte (« on te rappelle avant le coup d'envoi ») reste vrai
  * quelle que soit la permission, et le retirer ferait sauter un point de
@@ -18,8 +19,8 @@ type WelcomeContext = {
 export function buildWelcomeSteps({ permission, pushSupported }: WelcomeContext): WelcomeStep[] {
     return [
         { key: 'intro', action: null },
-        { key: 'predictions', action: 'rules' },
-        { key: 'leagues', action: 'leagues' },
+        { key: 'predictions', action: null },
+        { key: 'leagues', action: null },
         {
             key: 'notifications',
             action: !pushSupported

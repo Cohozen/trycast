@@ -49,8 +49,8 @@ type WelcomeStepPageProps = {
 };
 
 /**
- * Un volet du guide : symbole, titre, une ou deux phrases, et le bouton qui
- * envoie là où ça se passe. Hauteur minimale commune à tous les volets —
+ * Un volet du guide : symbole, titre, une ou deux phrases, et le bouton du
+ * volet notifications. Hauteur minimale commune à tous les volets —
  * sinon la sheet grandit et rétrécit à chaque glissé.
  */
 export function WelcomeStepPage({ step, width, onAction }: WelcomeStepPageProps) {
@@ -62,7 +62,7 @@ export function WelcomeStepPage({ step, width, onAction }: WelcomeStepPageProps)
     const { action } = step;
 
     return (
-        <View className="min-h-65 items-center justify-center gap-3.5 px-6" style={{ width }}>
+        <View className="min-h-65 items-center justify-center gap-3.5 px-5" style={{ width }}>
             {Icon ? (
                 <View className="h-14 w-14 items-center justify-center rounded-md bg-brand/10">
                     <Icon color={brandColor} size={26} strokeWidth={1.9} />
@@ -80,7 +80,7 @@ export function WelcomeStepPage({ step, width, onAction }: WelcomeStepPageProps)
             <View className="gap-2.5">
                 {content.bodyKeys.map((key) => (
                     <Text
-                        className="max-w-80 text-center font-body text-[14px] leading-5.25 text-text-muted"
+                        className="text-center font-body text-[14px] leading-5.25 text-text-muted"
                         key={key}>
                         {t(key)}
                     </Text>

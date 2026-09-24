@@ -12,13 +12,13 @@ import { Button } from '@/components/ui/button';
 import { View } from '@/tw';
 import { cn } from '@/tw/variants';
 
-import type { WelcomeStep, WelcomeStepAction } from '../types';
+import type { WelcomeAction, WelcomeStep } from '../types';
 import { WelcomeStepPage } from './welcome-step-page';
 
 type WelcomeGuideSheetProps = {
     visible: boolean;
     steps: WelcomeStep[];
-    onAction: (action: WelcomeStepAction) => void;
+    onAction: (action: WelcomeAction) => void;
     /** `completed` : le guide a été suivi jusqu'au bout (vs. passé ou glissé). */
     onClose: (completed: boolean) => void;
 };
@@ -27,6 +27,8 @@ type WelcomeGuideSheetProps = {
  * Guide d'accueil : les volets défilent horizontalement (glissé ou bouton),
  * la sheet se ferme par « C'est parti », « Passer » ou le glissé vers le bas
  * de la primitive. Rien n'est bloquant — on peut en sortir à tout moment.
+ * Au dernier volet, « Passer » cède sa place au double bouton règles /
+ * ligues : on les propose une fois tout lu.
  */
 export function WelcomeGuideSheet({ visible, steps, onAction, onClose }: WelcomeGuideSheetProps) {
     const { t } = useTranslation(['welcome']);
@@ -111,20 +113,35 @@ export function WelcomeGuideSheet({ visible, steps, onAction, onClose }: Welcome
                     onPress={goNext}
                     title={isLast ? t('welcome:nav.done') : t('welcome:nav.next')}
                 />
-                {/* Rendu même au dernier volet, en transparent : le retirer
-                    ferait remonter le haut de la sheet d'un cran. */}
-                <View
-                    accessibilityElementsHidden={isLast}
-                    className={cn(isLast && 'opacity-0')}
-                    importantForAccessibility={isLast ? 'no-hide-descendants' : 'auto'}
-                    pointerEvents={isLast ? 'none' : 'auto'}>
+                {/* Même hauteur que « Passer » : la sheet ne saute pas d'un cran
+                    en arrivant au dernier volet. */}
+                {isLast ? (
+                    <View className="flex-row gap-2">
+                        <View className="flex-1">
+                            <Button
+                                fullWidth
+                                onPress={() => onAction('rules')}
+                                title={t('welcome:nav.rules')}
+                                variant="secondary"
+                            />
+                        </View>
+                        <View className="flex-1">
+                            <Button
+                                fullWidth
+                                onPress={() => onAction('leagues')}
+                                title={t('welcome:nav.leagues')}
+                                variant="secondary"
+                            />
+                        </View>
+                    </View>
+                ) : (
                     <Button
                         fullWidth
                         onPress={() => onClose(false)}
                         title={t('welcome:nav.skip')}
                         variant="ghost"
                     />
-                </View>
+                )}
             </View>
         </BottomSheet>
     );

@@ -288,14 +288,9 @@ export default function SettingsScreen() {
             {/* À propos */}
             <View className="gap-2.5">
                 <SectionLabel>{t('profile:settings.sections.about')}</SectionLabel>
-                {/* Le guide se rejoue sur l'écran d'où l'on vient, pas
-                    par-dessus les Réglages */}
-                <Pressable
-                    accessibilityRole="button"
-                    onPress={() => {
-                        router.back();
-                        replay();
-                    }}>
+                {/* Le guide se rejoue par-dessus les Réglages : la page ne
+                    change pas sous la sheet */}
+                <Pressable accessibilityRole="button" onPress={replay}>
                     <Card className="flex-row items-center gap-3 px-4 py-3.5">
                         <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">
                             <Sparkles color={brandColor} size={17} strokeWidth={1.9} />
