@@ -1204,6 +1204,7 @@ export type Database = {
                 Args: { p_platform: string; p_token: string };
                 Returns: undefined;
             };
+            report_cron_health: { Args: never; Returns: Json };
             set_phase_joker: { Args: { p_match_id: string }; Returns: string };
             set_prediction_reaction: {
                 Args: {
