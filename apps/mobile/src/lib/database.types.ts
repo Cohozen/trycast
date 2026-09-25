@@ -783,6 +783,78 @@ export type Database = {
                 };
                 Relationships: [];
             };
+            user_blocks: {
+                Row: {
+                    blocked_id: string;
+                    blocker_id: string;
+                    created_at: string;
+                };
+                Insert: {
+                    blocked_id: string;
+                    blocker_id: string;
+                    created_at?: string;
+                };
+                Update: {
+                    blocked_id?: string;
+                    blocker_id?: string;
+                    created_at?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'user_blocks_blocked_id_fkey';
+                        columns: ['blocked_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'profiles';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'user_blocks_blocker_id_fkey';
+                        columns: ['blocker_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'profiles';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
+            user_reports: {
+                Row: {
+                    created_at: string;
+                    id: string;
+                    reason: string;
+                    reported_id: string;
+                    reporter_id: string;
+                };
+                Insert: {
+                    created_at?: string;
+                    id?: string;
+                    reason: string;
+                    reported_id: string;
+                    reporter_id: string;
+                };
+                Update: {
+                    created_at?: string;
+                    id?: string;
+                    reason?: string;
+                    reported_id?: string;
+                    reporter_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'user_reports_reported_id_fkey';
+                        columns: ['reported_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'profiles';
+                        referencedColumns: ['id'];
+                    },
+                    {
+                        foreignKeyName: 'user_reports_reporter_id_fkey';
+                        columns: ['reporter_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'profiles';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             waitlist_attempts: {
                 Row: {
                     created_at: string;
@@ -1138,6 +1210,24 @@ export type Database = {
                 }[];
             };
             match_phase_id: { Args: { p_match_id: string }; Returns: string };
+            moderate_profile: {
+                Args: { p_avatar: boolean; p_user_id: string; p_username: boolean };
+                Returns: {
+                    avatar_url: string | null;
+                    created_at: string;
+                    id: string;
+                    is_demo: boolean;
+                    locale: string | null;
+                    username: string;
+                    username_chosen: boolean;
+                };
+                SetofOptions: {
+                    from: '*';
+                    to: 'profiles';
+                    isOneToOne: true;
+                    isSetofReturn: false;
+                };
+            };
             notify_reminder_targets: {
                 Args: never;
                 Returns: {
