@@ -98,8 +98,8 @@ Championship. **App Store public en février 2027**, avec Android. Compte **indi
 |---|---|---|
 | ✅ 24 sept | Corentin | Programme validé (Team ID `5P7K97386D`), accords acceptés, DSA non-trader déclaré, bundle ID `com.cohozen.trycast` enregistré (Associated Domains, Push, Sign in with Apple), fiche App Store Connect créée, **nom « TryCast » réservé**, `apple-app-site-association` en ligne. |
 | ✅ 24 sept | Claude, puis Corentin | **Lot 1 — iOS distribuable** (ci-dessous) : premier build iOS de production (1.2.0, build 3, empreinte `e9fd702e`) envoyé par `eas submit`, validé par Apple, installé par TestFlight interne sur un iPhone de proche. |
-| ✅ 24 sept | Claude | **Lot 2 — Sign in with Apple** (ci-dessous) : code, RGPD et politiques FR/EN commités, dev client iOS rebuildé. Restent les gestes de Corentin. |
-| 8–14 oct | Corentin + 1 ou 2 proches | iPhone réel en TestFlight interne (testeurs ajoutés comme utilisateurs App Store Connect) : push, Google, Apple. ✅ Inscription et partage d'une invitation par le lien `/rejoindre` validés le 2026-09-24 (build 1.2.0). Corentin n'a pas d'iPhone. |
+| ✅ 24 sept | Claude | **Lot 2 — Sign in with Apple** (ci-dessous) : code, RGPD et politiques FR/EN commités, dev client iOS rebuildé ; ✅ 25 sept : validé sur iPhone (TestFlight 1.2.0 build 4, Supabase prod). |
+| 8–14 oct | Corentin + 1 ou 2 proches | iPhone réel en TestFlight interne (testeurs ajoutés comme utilisateurs App Store Connect) : push, Google. ✅ Apple validé le 2026-09-25 (build 4). ✅ Inscription et partage d'une invitation par le lien `/rejoindre` validés le 2026-09-24 (build 1.2.0). Corentin n'a pas d'iPhone. |
 | ~15 oct | Corentin | Release **1.3.0**, groupe externe « Beta fermée », soumission à la revue beta : description, `contact@trycast.fr`, compte de démo des stores, note au relecteur (gratuit, aucune mise, les cotes pondèrent les points). « Informations de test » (description de la beta, « Ce qu'il faut tester ») remplies **en français** : c'est ce que le testeur lit dans TestFlight. |
 | ~17–20 oct | Claude, puis Corentin | **Lien public TestFlight** (acté le 2026-09-24), pas l'invitation par e-mail d'Apple (en anglais, texte non maîtrisé) : lien activé sur le groupe externe, **plafonné** (~30 testeurs) et révocable ; aucun Apple ID à collecter. Le lien part dans **notre mail en français** depuis `contact@trycast.fr`, par le broadcast Resend de la beta Android (à adapter : il ne vise qu'Android). Claude rédige ce mail et le « Ce qu'il faut tester ». Procédure du mail : 1) installer **TestFlight** (App Store, gratuit, outil officiel d'Apple) ; 2) ouvrir le lien **depuis l'iPhone** → « Accepter » → « Installer » ; 3) ouvrir TryCast, les mises à jour arrivent par TestFlight. Retours par « Signaler un problème » (Sentry), pas par TestFlight. |
 | jusqu'au 7 nov | — | Marge pour un rejet et une nouvelle soumission. |
@@ -126,8 +126,7 @@ Championship. **App Store public en février 2027**, avec Android. Compte **indi
 sous-traitants et politiques FR/EN à jour. Passe au simulateur en sombre seulement (bouton au-dessus
 de Google, logo blanc) ; le rendu en clair reste à voir. Gestes de Corentin :
 1. **Supabase → Auth → Providers → Apple** : activer, Client IDs `com.cohozen.trycast`, secret vide
-   (flux natif). ✅ **dev** (2026-09-24) ; **prod** dans la procédure de la 1.3.0 ; sans cela, le
-   bouton Apple échoue à la connexion.
+   (flux natif). ✅ **dev** et ✅ **prod** (2026-09-24).
 2. ✅ **Relais e-mail d'Apple** (2026-09-24, SPF réussi pour les deux domaines) — Certificates, Identifiers & Profiles → **Services** (barre latérale)
    → « Sign in with Apple for Email Communication » → **Configure** → « + » d'Email Sources →
    domaines `trycast.fr, send.trycast.fr` → Next → Register ; les deux doivent afficher un SPF
@@ -136,8 +135,13 @@ de Google, logo blanc) ; le rendu en clair reste à voir. Gestes de Corentin :
    (`noreply@`, DKIM Resend) et Proton (`contact@`). SPF des deux vérifiés par `dig` le 2026-09-24.
    Sans cela, les adresses relais `@privaterelay.appleid.com` rejettent nos e-mails, préavis de
    purge des inactifs compris, alors que la politique dit qu'Apple les fait suivre.
-3. **Parcours Apple complet sur l'iPhone TestFlight** (8–14 oct) : il ne va pas au bout au simulateur
-   (signature locale sans entitlements).
+3. ✅ **Parcours Apple complet sur iPhone** (2026-09-25, TestFlight 1.2.0 build 4, Supabase prod) :
+   inscription avec e-mail masqué (adresse relais, pseudo demandé), annulation sans message,
+   reconnexion sans redemande de pseudo, rangées « Mot de passe » et « Adresse e-mail » masquées,
+   e-mail envoyé depuis `contact@` reçu via le relais, suppression du compte depuis l'app. Au
+   simulateur, la saisie du mot de passe Apple ID reste bloquée (bug connu du simulateur) : la
+   référence est l'iPhone. Tant que la révocation des jetons n'existe pas (février), TryCast reste
+   listé dans « Se connecter avec Apple » de l'Apple ID après suppression du compte.
 
 **Session dédiée avant l'App Store public (février)** :
 - **Signaler, bloquer, filtre des pseudos** (règle 1.2 : pseudos et avatars visibles des autres
