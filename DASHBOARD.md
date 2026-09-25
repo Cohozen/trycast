@@ -8,9 +8,11 @@
 > 1.2.0 publiée** (tag `v1.2.0`) et **déployée sur la Play Console**. **Configuration de
 > distribution iOS commitée** (lot 1 iOS) : elle déplace l'empreinte Android (`f0e880d9` →
 > `ea4e55aa`), donc **plus aucune OTA venue de `main` n'atteint la 1.2.0** ; tout part avec la
-> 1.3.0. **Sign in with Apple validé sur iPhone** (2026-09-25). **Plan de la 1.3.0 acté le
-> 2026-09-25** : beta fermée Android **et** iOS vers le 8-9 octobre, conformité App Store avancée
-> de février, soumission App Review pendant la beta (voir « v1.3.0 »). Chantier A : **wording
+> 1.3.0. **Sign in with Apple et push validés sur iPhone** (2026-09-25) ; le tap sur une
+> notification app tuée figeait le splash, corrigé en code, à revérifier au build 1.3.0. **Plan
+> de la 1.3.0 acté le 2026-09-25** : beta fermée Android **et** iOS vers le 8-9 octobre,
+> conformité App Store avancée de février, soumission App Review pendant la beta (voir
+> « v1.3.0 »). Chantier A : **wording
 > livré** (app, e-mails sur dev, site), e-mails d'auth à pousser en prod ; **alerte sur les crons
 > en échec livrée sur le dev** (moniteur Sentry `cron-health`), secret et push prod à faire.
 
@@ -20,8 +22,8 @@
 |-----|-------|------|
 | 0-5.5 | Fondations, auth, pipeline compétition, pronos + RLS, scoring, ligues, DS + i18n | ✅ Livrés |
 | 6 | Push (tokens, EF `notify`, deep links, préférences, boîte de réception) | ✅ Validé sur Android réel |
-| 7 | Finitions (e-mails Resend, reset par code, RGPD, anglais) | ✅ Déployé — push iOS (APNs) à vérifier sur iPhone |
-| 8 | Connexion Google (socle multi-fournisseur, choix du pseudo) | ✅ Validé sur Android réel — Apple livré en code sur iOS (lot 2 iOS), non testé sur appareil |
+| 7 | Finitions (e-mails Resend, reset par code, RGPD, anglais) | ✅ Déployé — push iOS (APNs) validé sur iPhone, sauf le tap app tuée (corrigé, à revérifier au build 1.3.0) |
+| 8 | Connexion Google (socle multi-fournisseur, choix du pseudo) | ✅ Validé sur Android réel — Apple (iOS seulement, lot 2 iOS) validé sur iPhone le 2026-09-25 |
 | Web | Site Astro bilingue (landing, waitlist, légal, invitations) | ✅ En ligne sur `www.trycast.fr` |
 | **9** | **Mise en beta Play** | 🔶 Phases 1 à 6 livrées (test interne, OTA, dev/prod séparés) ; reste la **phase 7, beta fermée Android + iOS vers le 8-9 octobre 2026 (build 1.3.0)** |
 
@@ -98,7 +100,13 @@ La version publique de février (pronos de tournoi) repassera de toute façon en
 - ✅ **Passe iOS au simulateur** (2026-09-25) : connexion (bouton Apple en clair lisible, même
   contour que Google), saisie du code, récap, accueil, résultats, classement, profil, détail de
   match en direct, réglages et guide d'accueil (nouveaux textes), en clair et en sombre ; icône sans
-  bord blanc sur l'écran d'accueil. Aucun écart. Reste le **push sur iPhone** (TestFlight, un proche).
+  bord blanc sur l'écran d'accueil. Aucun écart.
+- ✅ **Push sur iPhone** (2026-09-25, TestFlight 1.2.0 build 4, Supabase prod) : bannière, son, tap
+  app en arrière-plan vers Résultats, boutons d'action. Un seul échec : **app tuée, le tap sur la
+  bannière laissait l'app figée sur le splash**. Corrigé en code (la navigation attendait la clé du
+  routeur, présente avant que le layout racine soit rendu) et vérifié au simulateur ; la 1.2.0 ne
+  recevant plus d'OTA, **à revérifier sur iPhone avec le build 1.3.0** (app tuée, tap, arrivée sur
+  Résultats).
 
 **B. Conformité App Store** (l'ex-« session dédiée » de février, avancée) — ne bloque pas la beta,
 bloque la soumission App Review. Rien de natif : si B arrive après le gel, les testeurs le
@@ -208,7 +216,7 @@ Championship. **App Store public en février 2027**, avec Android. Compte **indi
 | ✅ 24 sept | Corentin | Programme validé (Team ID `5P7K97386D`), accords acceptés, DSA non-trader déclaré, bundle ID `com.cohozen.trycast` enregistré (Associated Domains, Push, Sign in with Apple), fiche App Store Connect créée, **nom « TryCast » réservé**, `apple-app-site-association` en ligne. |
 | ✅ 24 sept | Claude, puis Corentin | **Lot 1 — iOS distribuable** (ci-dessous) : premier build iOS de production (1.2.0, build 3, empreinte `e9fd702e`) envoyé par `eas submit`, validé par Apple, installé par TestFlight interne sur un iPhone de proche. |
 | ✅ 24 sept | Claude | **Lot 2 — Sign in with Apple** (ci-dessous) : code, RGPD et politiques FR/EN commités, dev client iOS rebuildé ; ✅ 25 sept : validé sur iPhone (TestFlight 1.2.0 build 4, Supabase prod). |
-| d'ici le 5 oct | Corentin + 1 ou 2 proches | iPhone réel en TestFlight interne (testeurs ajoutés comme utilisateurs App Store Connect) : push, Google. ✅ Apple validé le 2026-09-25 (build 4). ✅ Inscription et partage d'une invitation par le lien `/rejoindre` validés le 2026-09-24 (build 1.2.0). Corentin n'a pas d'iPhone. |
+| d'ici le 5 oct | Corentin + 1 ou 2 proches | iPhone réel en TestFlight interne (testeurs ajoutés comme utilisateurs App Store Connect) : Google. ✅ Apple et push validés le 2026-09-25 (build 4), sauf le tap sur une notification app tuée, corrigé et à revérifier au build 1.3.0. ✅ Inscription et partage d'une invitation par le lien `/rejoindre` validés le 2026-09-24 (build 1.2.0). Corentin n'a pas d'iPhone. |
 | ~6 oct (avancé du 15, plan du 25 sept) | Corentin | Release **1.3.0**, groupe externe « Beta fermée », soumission à la revue beta : description, `contact@trycast.fr`, compte de démo des stores, note au relecteur (gratuit, aucune mise, les cotes pondèrent les points). « Informations de test » (description de la beta, « Ce qu'il faut tester ») remplies **en français** : c'est ce que le testeur lit dans TestFlight. |
 | ~8-9 oct (avancé du 17-20) | Claude, puis Corentin | **Lien public TestFlight** (acté le 2026-09-24), pas l'invitation par e-mail d'Apple (en anglais, texte non maîtrisé) : lien activé sur le groupe externe, **plafonné** (~30 testeurs) et révocable ; aucun Apple ID à collecter. Le lien part dans **notre mail en français** depuis `contact@trycast.fr`, par le broadcast Resend de la beta Android (à adapter : il ne vise qu'Android). Claude rédige ce mail et le « Ce qu'il faut tester ». Procédure du mail : 1) installer **TestFlight** (App Store, gratuit, outil officiel d'Apple) ; 2) ouvrir le lien **depuis l'iPhone** → « Accepter » → « Installer » ; 3) ouvrir TryCast, les mises à jour arrivent par TestFlight. Retours par « Signaler un problème » (Sentry), pas par TestFlight. |
 | jusqu'au 7 nov | — | Marge pour un rejet et une nouvelle soumission. |
@@ -225,8 +233,9 @@ Championship. **App Store public en février 2027**, avec Android. Compte **indi
 - ✅ Clé **APNs** (créée au premier `eas build -p ios` interactif, avec une connexion par l'**Apple ID
   e-mail**, pas le Team ID) et clé d'API App Store Connect (créée au premier `eas submit`, rôle
   **APP_MANAGER**) dans les credentials EAS. L'EF `notify` passe par le service de push Expo, rien côté serveur.
-- ✅ Premier build, `eas submit`, TestFlight interne (2026-09-24). Reste à contrôler le rendu de
-  l'icône (`icon.png` a un canal alpha, qu'Expo aplatit sur fond blanc pour iOS) et les push.
+- ✅ Premier build, `eas submit`, TestFlight interne (2026-09-24). Push validés sur iPhone le
+  2026-09-25 (voir la passe iOS du chantier A). Reste à contrôler sur l'appareil le rendu de
+  l'icône (`icon.png` a un canal alpha, qu'Expo aplatit sur fond blanc pour iOS).
 - ✅ `npm run ios` recompile en local (2026-09-24) : certificat Apple Development créé par Xcode et
   intermédiaire WWDR G3 ajouté au trousseau. Le certificat expire en septembre 2027.
 
@@ -268,7 +277,7 @@ propriétaire de ligue, contact publié.
 - Faire relire les pages légales anglaises si ce n'est pas fait.
 
 ### Divers
-- **Push** : confirmer sur l'Android réel les deux boutons d'une notification reçue (« Marquer comme lu » perdu si l'app est tuée : dégradation assumée).
+- **Push** : confirmer sur l'Android réel les deux boutons d'une notification reçue (« Marquer comme lu » perdu si l'app est tuée : dégradation assumée), et, au build 1.3.0, le tap sur une notification app tuée (même correctif que sur iPhone : même JS).
 - **Highlightly Pro** : décider du renouvellement avant chaque compétition ; sans lui, `/odds` en 401 (fallback ×2.0) et pas de score live.
 - **Points provisoires en live** (carte « Points gagnés » et bloc communauté du détail de match) : à valider avec de vraies données in-play (prochain match NC en direct).
 - **Avertissement React au changement de thème** : « Can't perform a React state update on a component that hasn't mounted yet » (`card.tsx`, `profile-stats.tsx`), vu à l'émulateur, à qualifier.
