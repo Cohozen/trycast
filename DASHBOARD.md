@@ -4,12 +4,13 @@
 > Mis à jour à la fin de chaque lot. **Pas de journal** : l'historique se lit dans `git log`
 > (et l'ancien journal des sessions par `git show 8418902:DASHBOARD.md`).
 >
-> État au **2026-09-24** : serveur **entièrement en prod**, bloc communauté compris. **Release
-> 1.2.0 publiée** (tag `v1.2.0`) et **déployée sur la Play Console** : c'est le premier build ouvert
-> aux testeurs. **Configuration de distribution iOS commitée** (lot 1 iOS) : elle déplace
-> l'empreinte Android (`f0e880d9` → `ea4e55aa`), donc **plus aucune OTA venue de `main` n'atteint la
-> 1.2.0** ; tout part avec la 1.3.0. **Sign in with Apple commité** (lot 2 iOS), à activer côté
-> Supabase et Apple Developer par Corentin.
+> État au **2026-09-25** : serveur **entièrement en prod**, bloc communauté compris. **Release
+> 1.2.0 publiée** (tag `v1.2.0`) et **déployée sur la Play Console**. **Configuration de
+> distribution iOS commitée** (lot 1 iOS) : elle déplace l'empreinte Android (`f0e880d9` →
+> `ea4e55aa`), donc **plus aucune OTA venue de `main` n'atteint la 1.2.0** ; tout part avec la
+> 1.3.0. **Sign in with Apple validé sur iPhone** (2026-09-25). **Plan de la 1.3.0 acté le
+> 2026-09-25** : beta fermée Android **et** iOS vers le 8-9 octobre, conformité App Store avancée
+> de février, soumission App Review pendant la beta (voir « v1.3.0 »).
 
 ## Avancement des lots
 
@@ -20,14 +21,14 @@
 | 7 | Finitions (e-mails Resend, reset par code, RGPD, anglais) | ✅ Déployé — push iOS (APNs) à vérifier sur iPhone |
 | 8 | Connexion Google (socle multi-fournisseur, choix du pseudo) | ✅ Validé sur Android réel — Apple livré en code sur iOS (lot 2 iOS), non testé sur appareil |
 | Web | Site Astro bilingue (landing, waitlist, légal, invitations) | ✅ En ligne sur `www.trycast.fr` |
-| **9** | **Mise en beta Play** | 🔶 Phases 1 à 6 livrées (test interne, OTA, dev/prod séparés) ; reste la **phase 7, beta fermée début octobre 2026** |
+| **9** | **Mise en beta Play** | 🔶 Phases 1 à 6 livrées (test interne, OTA, dev/prod séparés) ; reste la **phase 7, beta fermée Android + iOS vers le 8-9 octobre 2026 (build 1.3.0)** |
 
 ## Feuille de route (actée le 2026-09-14)
 
 Un jalon = un build ; ce qui n'y figure pas n'est pas au programme.
 
-### v1.1.0 — build de la beta fermée (visé début octobre 2026)
-Le build qu'installeront les testeurs, et celui des journées de novembre du Nations Championship.
+### v1.1.0 et v1.2.0 — livrées
+Ce qui était prévu pour la beta ; la 1.2.0 est sur la Play Console, mais les testeurs installeront la 1.3.0.
 - ✅ **Joker par phase** — serveur en prod.
 - ✅ **Réactions emoji** — serveur en prod. Pictos maison animés plus tard (sans migration) ;
   notifications de réaction reportées au lancement public.
@@ -43,6 +44,90 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
   avatars de ligue dans les sélecteurs, classement général chargé au défilement, guide d'accueil
   raccourci. Migration `get_match_community_histogram` en prod (2026-09-24) ; nouvelle empreinte,
   donc **une release store** (version à trancher : ce lot doit-il remplacer le build 7 pour la beta ?).
+
+### v1.3.0 — beta fermée Android + iOS, candidat App Store (plan du 2026-09-25)
+Le build des testeurs des deux plateformes, et celui qui part en revue App Store. La 1.2.0 ne
+reçoit plus d'OTA : tout ce qui doit atteindre un testeur passe par ce build.
+
+**Pourquoi le 8-9 octobre.** Highlightly publie les matchs environ un mois avant (Top 14 du
+24 octobre visible le 25 septembre) : ceux des 6-7 novembre du Nations Championship arriveront
+vers le 6-7 octobre. Ouvrir la beta **après** leur arrivée, pour qu'un testeur trouve des matchs à
+pronostiquer dès l'installation ; pas beaucoup plus tard, car les 14 jours de test fermé exigés par
+Google courent pendant le creux avant les matchs. Base prod vide : sans importance, les testeurs
+sont des proches contactés directement.
+
+| Quand | Qui | Étape |
+|---|---|---|
+| 25 sept → ~5 oct | Claude | Chantiers A à D ci-dessous, dans cet ordre |
+| ~5 oct | Claude, puis Corentin | **Gel** : captures des fiches (E), `npm run release -- --minor` |
+| ~6 oct | Corentin | Builds production Android + iOS, `eas submit` des deux. iOS : groupe externe, soumission à la **Beta App Review** (24-48 h pour le premier build externe). Android : piste de test fermé |
+| ~8-9 oct | Corentin | **Beta ouverte** : un seul mail en français depuis `contact@trycast.fr`, lien d'opt-in Play et lien public TestFlight (procédure dans « iOS » ci-dessous) |
+| dès B et E prêts | Corentin | **Soumission App Review, publication manuelle** : une version approuvée attend « Pending Developer Release » sans être publique. Un rejet = correctif + nouveau build, sans attendre février |
+| ~23 oct | Corentin | 14 jours de test fermé Play avec ≥ 12 testeurs **Android** inscrits sans interruption → demande d'accès à la production (questionnaire, examen ~7 jours). La production reste non publiée jusqu'en février |
+| 6-7 nov | — | Journées NC : premiers points des testeurs |
+| avant ~5 janv. | Corentin | Le build TestFlight d'octobre expire (90 jours) : un build plus récent avant |
+
+⚠️ Les testeurs iPhone ne comptent pas dans les 12 de Google.
+⚠️ Soumettre à l'App Review n'est pas publier : cocher « publication manuelle ». Tant qu'une
+version attend, en soumettre une autre impose de retirer la première (« Developer Rejected »).
+La version publique de février (pronos de tournoi) repassera de toute façon en revue.
+
+**A. Bloquants de la beta**
+- **Avatars absents en prod** (détail dans « Beta fermée »).
+- **Matchs de test à id négatif en prod** (voir la dette) : les supprimer avant qu'un testeur les voie.
+- **Wording** : liste de Corentin, issue des tests iPhone — *à fournir*.
+- `SENTRY_AUTH_TOKEN` (source maps de la beta) ; **alerte sur les crons en échec** à trancher.
+- **Passe iOS** : DS en clair et en sombre (bouton Apple en clair compris), rendu de l'icône
+  (canal alpha aplati), push sur iPhone.
+
+**B. Conformité App Store** (l'ex-« session dédiée » de février, avancée) — ne bloque pas la beta,
+bloque la soumission App Review. Rien de natif : si B arrive après le gel, les testeurs le
+reçoivent par OTA de la 1.3.0 (sans bump), et l'App Review part sur un nouveau build de la même
+version (vérifier l'empreinte avant, skill `trycast-release`).
+- **Signaler, bloquer, filtre des pseudos** (règle 1.2, motif de rejet le plus probable : pseudos
+  et avatars visibles des autres joueurs). Proposition à valider à l'ouverture du lot :
+  *signaler* depuis le profil public, motifs en **liste fermée** (pseudo, avatar), une ligne en
+  base et un e-mail à `contact@` (traitement à la main en SQL, pas d'app d'administration) ;
+  *bloquer* masque avatar et réactions du joueur bloqué pour soi ; *filtre* = liste de mots
+  refusés par la RPC de choix du pseudo, erreur en clé i18n. Nouveau traitement ⇒ registre,
+  politiques FR + EN, `export-data`, même lot.
+- **Révocation des jetons Apple** à la suppression du compte (règle 5.1.1(v), contrôlée en revue) :
+  l'`authorizationCode` rendu à la connexion Apple, échangé côté serveur contre un refresh token
+  conservé, révoqué par l'EF `delete-account` ; clé .p8 en secret des EF, **sur les deux projets**.
+  Les comptes Apple créés avant le lot n'auront pas de jeton : accepté.
+
+**C. Confort**
+- **E-mail de bienvenue des comptes Google et Apple.** Un compte e-mail reçoit déjà l'e-mail de
+  confirmation ; un compte fournisseur ne reçoit rien. Déclencheur proposé : le passage de
+  `username_chosen` à `true` par `claim_username` (une seule fois par compte, le pseudo est connu),
+  envoi par Resend depuis une EF appelée en `pg_net`. ⚠️ Un secret Vault neuf se crée sur **chaque
+  projet avant le push**. En français seulement pour la beta. Vérifier que le registre couvre
+  cet e-mail (gestion du compte). Il passe par le relais Apple, déjà déclaré.
+- **Face ID / empreinte** — *interprétation à confirmer par Corentin*. Recommandé : **pas de
+  verrou biométrique à l'ouverture** (la session persiste, rien de sensible à protéger, une friction
+  à chaque ouverture) ; plutôt le **remplissage des mots de passe par le système**, déverrouillé
+  par Face ID ou l'empreinte, sans lib native. Les champs portent déjà `autoComplete` ; manque, sur
+  iOS, `webcredentials:www.trycast.fr` dans `associatedDomains` (`app.json`, dans l'empreinte :
+  ça tombe bien, la 1.3.0 est un build) et la clé `webcredentials` dans
+  l'`apple-app-site-association` servi par le site (`apps/web/scripts/build-well-known.mjs`). Côté
+  Android, Google Password Manager fonctionne déjà avec `autoComplete`. Apple et Google Sign-In
+  sont déjà des connexions biométriques en une touche.
+
+**D. Outillage**
+- **`eas submit` Android** : compte de service Google Cloud (API Google Play Android Developer
+  activée), invité dans la Play Console avec le droit de publier sur les pistes de test, clé JSON
+  **confiée à EAS** (`eas credentials`), jamais dans le dépôt ; `submit.production.android` d'`eas.json`
+  avec la piste de test fermé (`alpha` par défaut) et `releaseStatus: "draft"` pour garder la
+  main sur les notes de version. Gestes Google : Corentin ; `eas.json` : Claude.
+
+**E. Fiches des stores** (au gel, après le dernier changement d'écran)
+- **Play, fiche refaite** : 4 à 6 captures au nouveau DS depuis un build `preview` en français,
+  thème sombre, compte de démo (méthode dans `docs/stores/play-store.md`), description relue ;
+  les testeurs voient cette fiche à l'opt-in.
+- **App Store** : captures 6,9″ (pas d'iPad), étiquettes de confidentialité (brouillon dans
+  `docs/rgpd/fiches-stores.md`), classification d'âge cohérente avec le minimum de 16 ans (répondre
+  « jeu d'argent simulé » avec soin : pronostics gratuits, sans mise ni gain), compte de démo peuplé
+  en prod, note au relecteur.
 
 ### Lancement public — 6 Nations 2027 (février)
 - **Pronos de tournoi** avant le premier match : vainqueur, Grand Chelem, cuillère de bois, résolus
@@ -84,7 +169,7 @@ Le build qu'installeront les testeurs, et celui des journées de novembre du Nat
   celles du dev (colonne `avatar_url` présente ?).
 - `SENTRY_AUTH_TOKEN` en secret EAS — un **jeton d'organisation**, pas personnel. Sans lui, pas de
   source maps : plantages en JS minifié.
-- `submit.production.android` d'`eas.json` attend le compte de service Google Play.
+- `submit.production.android` d'`eas.json` attend le compte de service Google Play (chantier D de « v1.3.0 »).
 - **Alerte sur les crons en échec** (proposé, non tranché) : aucune surveillance ne lit
   `cron.job_run_details` ; une panne a déjà duré un mois sans signal. À cadrer avant la beta.
 
@@ -99,9 +184,9 @@ Championship. **App Store public en février 2027**, avec Android. Compte **indi
 | ✅ 24 sept | Corentin | Programme validé (Team ID `5P7K97386D`), accords acceptés, DSA non-trader déclaré, bundle ID `com.cohozen.trycast` enregistré (Associated Domains, Push, Sign in with Apple), fiche App Store Connect créée, **nom « TryCast » réservé**, `apple-app-site-association` en ligne. |
 | ✅ 24 sept | Claude, puis Corentin | **Lot 1 — iOS distribuable** (ci-dessous) : premier build iOS de production (1.2.0, build 3, empreinte `e9fd702e`) envoyé par `eas submit`, validé par Apple, installé par TestFlight interne sur un iPhone de proche. |
 | ✅ 24 sept | Claude | **Lot 2 — Sign in with Apple** (ci-dessous) : code, RGPD et politiques FR/EN commités, dev client iOS rebuildé ; ✅ 25 sept : validé sur iPhone (TestFlight 1.2.0 build 4, Supabase prod). |
-| 8–14 oct | Corentin + 1 ou 2 proches | iPhone réel en TestFlight interne (testeurs ajoutés comme utilisateurs App Store Connect) : push, Google. ✅ Apple validé le 2026-09-25 (build 4). ✅ Inscription et partage d'une invitation par le lien `/rejoindre` validés le 2026-09-24 (build 1.2.0). Corentin n'a pas d'iPhone. |
-| ~15 oct | Corentin | Release **1.3.0**, groupe externe « Beta fermée », soumission à la revue beta : description, `contact@trycast.fr`, compte de démo des stores, note au relecteur (gratuit, aucune mise, les cotes pondèrent les points). « Informations de test » (description de la beta, « Ce qu'il faut tester ») remplies **en français** : c'est ce que le testeur lit dans TestFlight. |
-| ~17–20 oct | Claude, puis Corentin | **Lien public TestFlight** (acté le 2026-09-24), pas l'invitation par e-mail d'Apple (en anglais, texte non maîtrisé) : lien activé sur le groupe externe, **plafonné** (~30 testeurs) et révocable ; aucun Apple ID à collecter. Le lien part dans **notre mail en français** depuis `contact@trycast.fr`, par le broadcast Resend de la beta Android (à adapter : il ne vise qu'Android). Claude rédige ce mail et le « Ce qu'il faut tester ». Procédure du mail : 1) installer **TestFlight** (App Store, gratuit, outil officiel d'Apple) ; 2) ouvrir le lien **depuis l'iPhone** → « Accepter » → « Installer » ; 3) ouvrir TryCast, les mises à jour arrivent par TestFlight. Retours par « Signaler un problème » (Sentry), pas par TestFlight. |
+| d'ici le 5 oct | Corentin + 1 ou 2 proches | iPhone réel en TestFlight interne (testeurs ajoutés comme utilisateurs App Store Connect) : push, Google. ✅ Apple validé le 2026-09-25 (build 4). ✅ Inscription et partage d'une invitation par le lien `/rejoindre` validés le 2026-09-24 (build 1.2.0). Corentin n'a pas d'iPhone. |
+| ~6 oct (avancé du 15, plan du 25 sept) | Corentin | Release **1.3.0**, groupe externe « Beta fermée », soumission à la revue beta : description, `contact@trycast.fr`, compte de démo des stores, note au relecteur (gratuit, aucune mise, les cotes pondèrent les points). « Informations de test » (description de la beta, « Ce qu'il faut tester ») remplies **en français** : c'est ce que le testeur lit dans TestFlight. |
+| ~8-9 oct (avancé du 17-20) | Claude, puis Corentin | **Lien public TestFlight** (acté le 2026-09-24), pas l'invitation par e-mail d'Apple (en anglais, texte non maîtrisé) : lien activé sur le groupe externe, **plafonné** (~30 testeurs) et révocable ; aucun Apple ID à collecter. Le lien part dans **notre mail en français** depuis `contact@trycast.fr`, par le broadcast Resend de la beta Android (à adapter : il ne vise qu'Android). Claude rédige ce mail et le « Ce qu'il faut tester ». Procédure du mail : 1) installer **TestFlight** (App Store, gratuit, outil officiel d'Apple) ; 2) ouvrir le lien **depuis l'iPhone** → « Accepter » → « Installer » ; 3) ouvrir TryCast, les mises à jour arrivent par TestFlight. Retours par « Signaler un problème » (Sentry), pas par TestFlight. |
 | jusqu'au 7 nov | — | Marge pour un rejet et une nouvelle soumission. |
 
 **Lot 1 — iOS distribuable** (configuration seule) :
@@ -143,13 +228,9 @@ de Google, logo blanc) ; le rendu en clair reste à voir. Gestes de Corentin :
    référence est l'iPhone. Tant que la révocation des jetons n'existe pas (février), TryCast reste
    listé dans « Se connecter avec Apple » de l'Apple ID après suppression du compte.
 
-**Session dédiée avant l'App Store public (février)** :
-- **Signaler, bloquer, filtre des pseudos** (règle 1.2 : pseudos et avatars visibles des autres
-  joueurs ; existants : exclusion par le propriétaire de ligue, contact publié). Motif de rejet le plus probable.
-- **Révocation des jetons Apple** à la suppression du compte (API REST d'Apple depuis l'EF `delete-account`, clé .p8 en secret).
-- Fiche App Store : captures 6,9″ (pas d'iPad), étiquettes de confidentialité (brouillon dans
-  `docs/rgpd/fiches-stores.md`), classification d'âge cohérente avec le minimum de 16 ans.
-- ⚠️ Un build TestFlight expire au bout de 90 jours : celui d'octobre tient jusqu'en janvier.
+**Conformité App Store** (modération, révocation des jetons Apple, fiche) : avancée de février
+dans la 1.3.0, chantiers B et E de « v1.3.0 ». Existant côté règle 1.2 : exclusion par le
+propriétaire de ligue, contact publié.
 
 ### Liens d'invitation — ouverts, sans urgence
 1. **Aperçu dans une messagerie** : vérifier la vignette dans WhatsApp (Facebook Sharing Debugger pour forcer le cache).
