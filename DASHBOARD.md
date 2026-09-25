@@ -320,9 +320,9 @@ propriétaire de ligue, contact publié.
   ou deux mois payants, d'ici quelques semaines). Les matchs fictifs de `seed-demo` (un « en direct »
   qui ne finit jamais) font appeler l'API à chaque tick par `sync-live` et `sync-results` du dev
   (~100 à 230 appels/jour depuis le 23 sept.), d'où des 429 dès la fin de matinée, prod comprise.
-  Décidé le 2026-09-25 : **ces deux crons désactivés sur le dev** (inutiles avec les données de
-  démo), par Corentin (`cron.alter_job(…, active := false)`, écriture refusée à l'agent par le
-  classifieur) ; à réactiver le temps de tester le pipeline, ou l'appeler à la main.
+  ✅ 2026-09-25 : **ces deux crons sont désactivés sur le dev** (inutiles avec les données de démo),
+  par `cron.alter_job(jobid, active := false)` ; `active := true` pour tester le pipeline. L'alerte
+  Sentry `cron-health` est filtrée sur `production`.
 - **Seed de démo** (`scripts/seed-demo.mjs`) : en novembre, les vraies journées de nc-2026 tomberont dans sa fenêtre fictive et il refusera de semer — décaler le scénario. Il ne sème ni match reporté ni plus de deux notifications : l'état reporté du détail de match et le badge « 9+ » de la cloche restent invérifiés au simulateur.
 - Base dev : ligue « Verif affichage » (`R2FANTMJ`) à retirer ; scores NC de juillet fictifs (le mode `audit` de `sync-tries` se mesure en prod) ; bonus défensif non observable au simulateur (couvert par `breakdown-labels.test.ts` et `breakdown-rows.test.ts`).
 - Aptabase : `preview` et `production` se mélangent (tous deux en release) — négligeable tant que `preview` ne sert qu'à Corentin.
