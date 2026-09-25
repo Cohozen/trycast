@@ -5,7 +5,7 @@ import type { Dictionary } from './fr';
 
 export const en: Dictionary = {
     meta: {
-        ogImageAlt: 'TryCast — rugby predictions with your mates',
+        ogImageAlt: 'TryCast - rugby predictions with your mates',
     },
     nav: {
         concept: 'How it works',
@@ -31,7 +31,7 @@ export const en: Dictionary = {
         noMoney: 'No real-money betting · no stakes · a free social game.',
     },
     landing: {
-        title: 'TryCast — Your rugby. Your mates. Your calls.',
+        title: 'TryCast - Your rugby. Your mates. Your calls.',
         description:
             'The free rugby predictions app to play with your mates: exact score, tries, attacking bonus, points weighted by the odds. No real money. Launching February 2027.',
         ogImage: '/og-default-en.png',
@@ -42,7 +42,7 @@ export const en: Dictionary = {
         lede: {
             before: 'The free predictions app built ',
             strong: 'for rugby',
-            after: ' — exact score, tries, attacking bonus, points weighted by the odds. No real money. 100% between mates.',
+            after: ' - exact score, tries, attacking bonus, points weighted by the odds. No real money. 100% between mates.',
         },
         ctaPrimary: 'Join the waitlist',
         ctaSecondary: 'See how it works',
@@ -73,7 +73,7 @@ export const en: Dictionary = {
         },
     },
     steps: {
-        kicker: '01 — 03',
+        kicker: '01 - 03',
         title: 'How it works',
         items: {
             predict: {
@@ -108,7 +108,7 @@ export const en: Dictionary = {
             },
             live: {
                 title: 'Live leaderboards',
-                body: 'Follow your position in real time — in your league and overall — as the matches unfold.',
+                body: 'Follow your position in real time - in your league and overall - as the matches unfold.',
             },
             competitions: {
                 title: 'Multi-competition',
@@ -123,7 +123,7 @@ export const en: Dictionary = {
     difference: {
         overline: 'The difference',
         title: 'Built for rugby, not patched together from football.',
-        body: 'Rugby has its own rules: exact score, tries, attacking bonus, odds. We put them at the heart of the game — not bolted on afterwards.',
+        body: 'Rugby has its own rules: exact score, tries, attacking bonus, odds. We put them at the heart of the game - not bolted on afterwards.',
         them: 'Generic apps',
         rows: {
             rugby: {
@@ -201,12 +201,12 @@ export const en: Dictionary = {
         emailLabel: 'Email address',
         trap: 'Do not fill in this field',
         submit: 'Sign me up',
-        errorEmail: 'Oops — check your email address.',
-        errorNetwork: 'Oops — that didn’t go through. Try again in a moment.',
+        errorEmail: 'Oops - check your email address.',
+        errorNetwork: 'Oops - that didn’t go through. Try again in a moment.',
         reassurance: 'Free, no strings attached. We never share your email.',
     },
     invite: {
-        title: 'Join a league — TryCast',
+        title: 'Join a league - TryCast',
         description: 'You’re invited to join a rugby predictions league on TryCast.',
         overline: 'Invitation',
         heading: 'Join the league',
@@ -224,16 +224,16 @@ export const en: Dictionary = {
         open: 'Open TryCast',
         home: 'Back to home',
         confirmed: {
-            title: 'Email confirmed — TryCast',
+            title: 'Email confirmed - TryCast',
             description: 'Your email address is confirmed. Head back to the TryCast app to log in.',
             heading: 'Email confirmed',
             body: 'Your email address is verified. Head back to the TryCast app and log in to start predicting.',
         },
         emailChanged: {
-            title: 'Email updated — TryCast',
+            title: 'Email updated - TryCast',
             description: 'Your email address change is confirmed. Head back to the TryCast app.',
             heading: 'Email updated',
-            body: 'Your email address change is confirmed. You can head back to the TryCast app — your new address is active.',
+            body: 'Your email address change is confirmed. You can head back to the TryCast app - your new address is active.',
         },
     },
     legal: {

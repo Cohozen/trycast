@@ -50,10 +50,10 @@ export function localePath(route: RouteName, locale: Locale): string {
  * (garde-fou structurel : scripts/check-legal-parity.mjs).
  */
 export const legalUpdatedAt = {
-    terms: '2026-09-03',
-    privacy: '2026-09-24',
-    legalNotice: '2026-07-15',
-    deleteAccount: '2026-07-27',
+    terms: '2026-09-25',
+    privacy: '2026-09-25',
+    legalNotice: '2026-09-25',
+    deleteAccount: '2026-09-25',
 } as const satisfies Partial<Record<RouteName, string>>;
 
 export type LegalRoute = keyof typeof legalUpdatedAt;

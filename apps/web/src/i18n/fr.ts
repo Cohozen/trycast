@@ -5,7 +5,7 @@
 
 export const fr = {
     meta: {
-        ogImageAlt: 'TryCast — pronostics rugby entre amis',
+        ogImageAlt: 'TryCast - pronostics rugby entre amis',
     },
     nav: {
         concept: 'Le concept',
@@ -33,7 +33,7 @@ export const fr = {
         noMoney: "Aucun pari d'argent · aucune mise · jeu social gratuit.",
     },
     landing: {
-        title: 'TryCast — Ton rugby. Tes potes. Tes pronos.',
+        title: 'TryCast - Ton rugby. Tes potes. Tes pronos.',
         description:
             "L'appli gratuite de pronostics rugby entre amis : score exact, essais, bonus offensif, points pondérés par les cotes. Sans argent réel. Lancement février 2027.",
         /** Vignette d'aperçu : l'accroche y est écrite (scripts/build-og-images.sh). */
@@ -46,7 +46,7 @@ export const fr = {
         lede: {
             before: "L'appli gratuite de pronos pensée ",
             strong: 'pour le rugby',
-            after: ' — score exact, essais, bonus offensif, points pondérés par les cotes. Sans argent réel. 100% entre amis.',
+            after: ' - score exact, essais, bonus offensif, points pondérés par les cotes. Sans argent réel. 100% entre amis.',
         },
         ctaPrimary: "Rejoindre la liste d'attente",
         ctaSecondary: 'Voir le concept',
@@ -78,7 +78,7 @@ export const fr = {
         },
     },
     steps: {
-        kicker: '01 — 03',
+        kicker: '01 - 03',
         title: 'Comment ça marche',
         items: {
             predict: {
@@ -113,7 +113,7 @@ export const fr = {
             },
             live: {
                 title: 'Classements live',
-                body: 'Suis ta place en temps réel — dans ta ligue et au général — au fil des matchs.',
+                body: 'Suis ta place en temps réel - dans ta ligue et au général - au fil des matchs.',
             },
             competitions: {
                 title: 'Multi-compétitions',
@@ -128,7 +128,7 @@ export const fr = {
     difference: {
         overline: 'La différence',
         title: 'Pensé pour le rugby, pas bricolé depuis le foot.',
-        body: 'Le rugby a ses propres règles : score exact, essais, bonus offensif, cotes. On les a mises au cœur du jeu — pas collées après coup.',
+        body: 'Le rugby a ses propres règles : score exact, essais, bonus offensif, cotes. On les a mises au cœur du jeu - pas collées après coup.',
         them: 'Les apps génériques',
         rows: {
             rugby: {
@@ -206,12 +206,12 @@ export const fr = {
         emailLabel: 'Adresse e-mail',
         trap: 'Ne pas remplir ce champ',
         submit: "Je m'inscris",
-        errorEmail: 'Oups — vérifie ton adresse e-mail.',
-        errorNetwork: "Oups — ça n'a pas voulu passer. Réessaie dans un instant.",
+        errorEmail: 'Oups - vérifie ton adresse e-mail.',
+        errorNetwork: "Oups - ça n'a pas voulu passer. Réessaie dans un instant.",
         reassurance: 'Gratuit, sans engagement. On ne partage jamais ton e-mail.',
     },
     invite: {
-        title: 'Rejoindre une ligue — TryCast',
+        title: 'Rejoindre une ligue - TryCast',
         description: 'Tu es invité à rejoindre une ligue de pronostics rugby sur TryCast.',
         overline: 'Invitation',
         heading: 'Rejoins la ligue',
@@ -230,14 +230,14 @@ export const fr = {
         open: 'Ouvrir TryCast',
         home: "Retour à l'accueil",
         confirmed: {
-            title: 'Adresse confirmée — TryCast',
+            title: 'Adresse confirmée - TryCast',
             description:
                 "Ton adresse e-mail est confirmée. Retourne dans l'app TryCast pour te connecter.",
             heading: 'Adresse confirmée',
             body: "Ton adresse e-mail est validée. Retourne dans l'app TryCast et connecte-toi pour commencer à pronostiquer.",
         },
         emailChanged: {
-            title: 'E-mail mis à jour — TryCast',
+            title: 'E-mail mis à jour - TryCast',
             description:
                 "Ton changement d'adresse e-mail est confirmé. Retourne dans l'app TryCast.",
             heading: 'E-mail mis à jour',
