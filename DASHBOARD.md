@@ -186,10 +186,6 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   puis les e-mails d'auth en prod depuis la racine,
   `npm run emails:push -- --project=<ref prod> --dry-run`, puis sans `--dry-run` (skill
   `trycast-emails`). Les locales de l'app partent avec le build 1.3.0.
-- **Projet EAS parasite `@cohozen/trycast-repo`** (2026-09-25) : créé par un `eas env:create` lancé
-  depuis la racine du dépôt (réponse « yes » à « create an EAS project »). Le `app.json` qu'il a
-  écrit à la racine est supprimé ; reste à supprimer le projet sur expo.dev (Project settings →
-  Delete). Toute commande `eas` se lance depuis `apps/mobile`.
 - `submit.production.android` d'`eas.json` attend le compte de service Google Play (chantier D de « v1.3.0 »).
 - **Alerte sur les crons en échec, gestes de Corentin**, dans cet ordre : créer le secret
   `sentry_cron_checkin_url` (URL en `environment=production`, commande dans l'en-tête de
