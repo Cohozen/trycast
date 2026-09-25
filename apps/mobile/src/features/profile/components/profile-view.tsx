@@ -457,7 +457,9 @@ export function ProfileView({ userId, isSelf, initialTab }: ProfileViewProps) {
             removeClippedSubviews={false}
             renderItem={renderItem}
             stickyHeaderIndices={stickyIndices}
-            style={{ flex: 1 }}
+            // Fond sur la liste, pas sur BlurTargetView : sous Android, le flou ne
+            // capture que les enfants de sa cible, sans le fond de celle-ci
+            style={{ flex: 1, backgroundColor: bgColor }}
             windowSize={9}
         />
     );
@@ -492,7 +494,7 @@ export function ProfileView({ userId, isSelf, initialTab }: ProfileViewProps) {
                         ),
                     }}
                 />
-                <BlurTargetView ref={blurTarget} style={{ flex: 1, backgroundColor: bgColor }}>
+                <BlurTargetView ref={blurTarget} style={{ flex: 1 }}>
                     {list({
                         minHeight: collapse.minContentHeight,
                         paddingTop: headerHeight + topHeight + tabsHeight + 8,

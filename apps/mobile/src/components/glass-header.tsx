@@ -1,7 +1,7 @@
 import { BlurView } from 'expo-blur';
 import { useHeaderHeight } from 'expo-router/react-navigation';
 import type { ReactNode, RefObject } from 'react';
-import { StyleSheet, type View as RNView } from 'react-native';
+import { StyleSheet, type View as RNView, useColorScheme } from 'react-native';
 import Animated, { type SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 
 import { useThemeColor, View } from '@/tw';
@@ -52,6 +52,7 @@ export function GlassHeader({
 }: GlassHeaderProps) {
     const headerHeight = useHeaderHeight();
     const bgColor = useThemeColor('bg');
+    const scheme = useColorScheme();
     const veil = useAnimatedStyle(() => ({ opacity: 1 - 0.24 * progress.value }));
     const slide = useAnimatedStyle(() => ({
         transform: [
@@ -69,6 +70,15 @@ export function GlassHeader({
                     blurMethod="dimezisBlurViewSdk31Plus"
                     blurTarget={blurTarget}
                     intensity={40}
+                    // Android : `default` pose un voile blanc fixe, qui grise
+                    // le thème sombre. iOS : `default` (.regular) suit le thème
+                    tint={
+                        process.env.EXPO_OS === 'android'
+                            ? scheme === 'dark'
+                                ? 'dark'
+                                : 'light'
+                            : 'default'
+                    }
                     style={StyleSheet.absoluteFill}
                 />
                 <Animated.View
