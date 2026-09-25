@@ -95,8 +95,10 @@ La version publique de février (pronos de tournoi) repassera de toute façon en
   appels HTTP des crons en échec majoritaire, job de `job_runs` en erreur seule) ; un check-in
   manquant alerte aussi. En service sur le **dev** (check-ins acceptés par Sentry). Restent les
   gestes de Corentin, dans « Ce qu'il reste à faire ».
-- **Passe iOS** : DS en clair et en sombre (bouton Apple en clair compris), rendu de l'icône
-  (canal alpha aplati), push sur iPhone.
+- ✅ **Passe iOS au simulateur** (2026-09-25) : connexion (bouton Apple en clair lisible, même
+  contour que Google), saisie du code, récap, accueil, résultats, classement, profil, détail de
+  match en direct, réglages et guide d'accueil (nouveaux textes), en clair et en sombre ; icône sans
+  bord blanc sur l'écran d'accueil. Aucun écart. Reste le **push sur iPhone** (TestFlight, un proche).
 
 **B. Conformité App Store** (l'ex-« session dédiée » de février, avancée) — ne bloque pas la beta,
 bloque la soumission App Review. Rien de natif : si B arrive après le gel, les testeurs le
@@ -314,7 +316,13 @@ propriétaire de ligue, contact publié.
 - **Critères du classement recopiés** dans `get_my_previous_rank` (total, scores exacts, moins de pronos scorés, démo exclue) : toucher au départage d'`apply_match_scores` impose de la modifier aussi.
 - Identifiants encore en dur : `package.json` (typegen `--project-id`), `app.json` (owner EAS, requis), migration cron `20260705000300`.
 - **⚠️ Données de test probablement en prod** (à vérifier par Corentin) : `select slug from public.competitions` (ligne `e2e-test` supprimable) et surtout `select api_game_id, kickoff_at from public.matches where api_game_id < 0` — seedés sur la vraie `nc-2026`, ils remontent dans les listes. L'app filtre les compétitions à id négatif, **pas les matchs**. Le SQL de nettoyage (constat, suppression, recalcul absolu des `standings` des joueurs touchés) est fourni à Corentin et attend son exécution en prod.
-- **Quota Highlightly sur le dev** : `sync-live` et `sync-results` y prennent des 429 (« daily request limits ») à partir de ~12 h UTC chaque jour, d'où un moniteur `cron-health` en `error` sur le dev. Question posée à Corentin : le dev partage-t-il la clé Highlightly de la prod ? Si oui, le dev consomme le quota de la prod.
+- **Quota Highlightly partagé** : dev et prod ont **la même clé** (gratuite jusqu'à la prise d'un
+  ou deux mois payants, d'ici quelques semaines). Les matchs fictifs de `seed-demo` (un « en direct »
+  qui ne finit jamais) font appeler l'API à chaque tick par `sync-live` et `sync-results` du dev
+  (~100 à 230 appels/jour depuis le 23 sept.), d'où des 429 dès la fin de matinée, prod comprise.
+  Décidé le 2026-09-25 : **ces deux crons désactivés sur le dev** (inutiles avec les données de
+  démo), par Corentin (`cron.alter_job(…, active := false)`, écriture refusée à l'agent par le
+  classifieur) ; à réactiver le temps de tester le pipeline, ou l'appeler à la main.
 - **Seed de démo** (`scripts/seed-demo.mjs`) : en novembre, les vraies journées de nc-2026 tomberont dans sa fenêtre fictive et il refusera de semer — décaler le scénario. Il ne sème ni match reporté ni plus de deux notifications : l'état reporté du détail de match et le badge « 9+ » de la cloche restent invérifiés au simulateur.
 - Base dev : ligue « Verif affichage » (`R2FANTMJ`) à retirer ; scores NC de juillet fictifs (le mode `audit` de `sync-tries` se mesure en prod) ; bonus défensif non observable au simulateur (couvert par `breakdown-labels.test.ts` et `breakdown-rows.test.ts`).
 - Aptabase : `preview` et `production` se mélangent (tous deux en release) — négligeable tant que `preview` ne sert qu'à Corentin.
