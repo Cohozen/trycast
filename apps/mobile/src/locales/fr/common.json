@@ -31,5 +31,6 @@
             "privacy": "politique de confidentialité",
             "after": "."
         }
-    }
+    },
+    "blockedPlayer": "Joueur masqué"
 }

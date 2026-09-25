@@ -197,5 +197,27 @@
         "yourRank": "Ton rang",
         "rankSuffixFirst": "er",
         "rankSuffix": "e"
+    },
+    "playerActions": {
+        "open": "Plus d'actions",
+        "reportTitle": "Signaler",
+        "reportIntro": "Un pseudo ou une photo te choque ? On regarde sous 24 h.",
+        "reportUsername": "Pseudo inapproprié",
+        "reportAvatar": "Photo inappropriée",
+        "reported": "Merci, ton signalement a bien été envoyé.",
+        "blockTitle": "Bloquer",
+        "blockIntro": "Son pseudo et sa photo seront masqués partout pour toi, et tu ne verras plus ses réactions. Le joueur n'en est pas prévenu.",
+        "block": "Bloquer ce joueur",
+        "unblockIntro": "Tu as bloqué ce joueur : son pseudo et sa photo sont masqués pour toi.",
+        "unblock": "Débloquer",
+        "blocked": "Joueur bloqué.",
+        "unblocked": "Joueur débloqué."
+    },
+    "blockedPlayers": {
+        "title": "Joueurs bloqués",
+        "intro": "Leur pseudo et leur photo sont masqués pour toi, et leurs réactions n'apparaissent plus.",
+        "emptyTitle": "Aucun joueur bloqué",
+        "emptyBody": "Tu peux bloquer un joueur depuis son profil.",
+        "since": "Bloqué le {{date}}"
     }
 }

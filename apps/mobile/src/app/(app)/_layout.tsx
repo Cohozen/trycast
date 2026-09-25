@@ -71,6 +71,15 @@ export default function AppLayout() {
                             }}
                         />
                         <Stack.Screen
+                            name="blocked-players"
+                            options={{
+                                headerShown: true,
+                                title: t('profile:blockedPlayers.title'),
+                                gestureEnabled: true,
+                                animation: 'simple_push',
+                            }}
+                        />
+                        <Stack.Screen
                             name="rules"
                             options={{
                                 headerShown: true,

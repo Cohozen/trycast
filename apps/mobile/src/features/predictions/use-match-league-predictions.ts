@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import type { MemberPrediction } from '@/features/predictions/types';
+import { useMaskBlocked } from '@/features/profile/use-mask-blocked';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -17,10 +18,12 @@ export function useMatchLeaguePredictions(
     leagueId: string | undefined,
     kickoffPassed: boolean,
 ) {
+    const mask = useMaskBlocked();
     return useQuery({
         queryKey: ['predictions', 'league', leagueId, matchId],
         enabled: !!matchId && !!leagueId && kickoffPassed,
         staleTime: 60_000,
+        select: mask,
         queryFn: async (): Promise<MemberPrediction[]> => {
             const { data, error } = await supabase.rpc('get_match_league_predictions', {
                 p_match_id: matchId as string,

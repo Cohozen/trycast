@@ -197,5 +197,27 @@
         "yourRank": "Your rank",
         "rankSuffixFirst": "",
         "rankSuffix": ""
+    },
+    "playerActions": {
+        "open": "More actions",
+        "reportTitle": "Report",
+        "reportIntro": "Offensive username or photo? We'll look into it within 24 hours.",
+        "reportUsername": "Inappropriate username",
+        "reportAvatar": "Inappropriate photo",
+        "reported": "Thanks, your report has been sent.",
+        "blockTitle": "Block",
+        "blockIntro": "Their username and photo will be hidden everywhere for you, and you won't see their reactions. The player isn't notified.",
+        "block": "Block this player",
+        "unblockIntro": "You've blocked this player: their username and photo are hidden for you.",
+        "unblock": "Unblock",
+        "blocked": "Player blocked.",
+        "unblocked": "Player unblocked."
+    },
+    "blockedPlayers": {
+        "title": "Blocked players",
+        "intro": "Their username and photo are hidden for you, and their reactions no longer show.",
+        "emptyTitle": "No blocked players",
+        "emptyBody": "You can block a player from their profile.",
+        "since": "Blocked on {{date}}"
     }
 }

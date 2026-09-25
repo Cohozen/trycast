@@ -31,5 +31,6 @@
             "privacy": "privacy policy",
             "after": "."
         }
-    }
+    },
+    "blockedPlayer": "Hidden player"
 }

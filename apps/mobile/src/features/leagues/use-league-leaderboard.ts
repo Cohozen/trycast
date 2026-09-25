@@ -1,5 +1,6 @@
 import { queryOptions, useQuery } from '@tanstack/react-query';
 
+import { useMaskBlocked } from '@/features/profile/use-mask-blocked';
 import { supabase } from '@/lib/supabase';
 
 /** Requête du classement d'une ligue, partagée avec `useMyLeagueRanks` (même cache). */
@@ -22,5 +23,6 @@ export function leagueLeaderboardQuery(leagueId: string | undefined) {
  * résultat vide à un non-membre : l'écran le traite comme « ligue introuvable ».
  */
 export function useLeagueLeaderboard(leagueId: string | undefined) {
-    return useQuery(leagueLeaderboardQuery(leagueId));
+    const mask = useMaskBlocked();
+    return useQuery({ ...leagueLeaderboardQuery(leagueId), select: mask });
 }

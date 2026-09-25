@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 
+import { useMaskBlocked } from '@/features/profile/use-mask-blocked';
 import { supabase } from '@/lib/supabase';
 
 /** Taille d'une page : le serveur plafonne `p_limit` à 100. */
@@ -12,6 +13,7 @@ export const GLOBAL_LEADERBOARD_PAGE_SIZE = 50;
  * s'en charge. `data` est la liste aplatie des pages chargées.
  */
 export function useGlobalLeaderboard(competitionId: string | undefined) {
+    const mask = useMaskBlocked();
     return useInfiniteQuery({
         queryKey: ['leaderboard', 'global', competitionId],
         enabled: !!competitionId,
@@ -29,6 +31,6 @@ export function useGlobalLeaderboard(competitionId: string | undefined) {
             lastPage.length === GLOBAL_LEADERBOARD_PAGE_SIZE
                 ? allPages.length * GLOBAL_LEADERBOARD_PAGE_SIZE
                 : undefined,
-        select: (data) => data.pages.flat(),
+        select: (data) => mask(data.pages.flat()),
     });
 }

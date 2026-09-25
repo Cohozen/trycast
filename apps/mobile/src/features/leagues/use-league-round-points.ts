@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
+import { useMaskBlocked } from '@/features/profile/use-mask-blocked';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -9,9 +10,11 @@ import { supabase } from '@/lib/supabase';
  * journée et le rang se calculent côté client (groupRoundPoints).
  */
 export function useLeagueRoundPoints(leagueId: string | undefined) {
+    const mask = useMaskBlocked();
     return useQuery({
         queryKey: ['leagues', leagueId, 'roundPoints'],
         enabled: !!leagueId,
+        select: mask,
         queryFn: async () => {
             const { data, error } = await supabase.rpc('get_league_round_points', {
                 p_league_id: leagueId as string,

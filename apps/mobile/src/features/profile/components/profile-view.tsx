@@ -1,7 +1,7 @@
 import { BlurTargetView } from 'expo-blur';
 import { Stack, useRouter } from 'expo-router';
 import { useHeaderHeight } from 'expo-router/react-navigation';
-import { ChevronRight, Settings } from 'lucide-react-native';
+import { ChevronRight, Ellipsis, Settings } from 'lucide-react-native';
 import { useDeferredValue, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ListRenderItemInfo, View as RNView } from 'react-native';
@@ -30,10 +30,12 @@ import { PointsDetailSheet } from '@/features/predictions/components/points-deta
 import type { PredictionRow } from '@/features/predictions/types';
 import { useUserPredictions } from '@/features/predictions/use-user-predictions';
 import { CompetitionChips } from '@/features/profile/components/competition-chips';
+import { PlayerActionsSheet } from '@/features/profile/components/player-actions-sheet';
 import { ProfilePredictionCard } from '@/features/profile/components/profile-prediction-card';
 import { ProfileStatsPanel } from '@/features/profile/components/profile-stats';
 import { computePointsByRound } from '@/features/profile/compute-points-by-round';
 import { computeProfileStats } from '@/features/profile/compute-profile-stats';
+import { useBlockedIds } from '@/features/profile/use-blocked-ids';
 import { useProfile } from '@/features/profile/use-profile';
 import { i18n } from '@/lib/i18n';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
@@ -81,6 +83,12 @@ export function ProfileView({ userId, isSelf, initialTab }: ProfileViewProps) {
     const router = useRouter();
 
     const { data: profile, isPending: profilePending } = useProfile(userId);
+    // Joueur que j'ai bloqué : pseudo et photo masqués, comme dans les classements
+    const { data: blockedIds } = useBlockedIds();
+    const isBlocked = !isSelf && (blockedIds?.has(userId) ?? false);
+    const displayName = isBlocked ? t('common:blockedPlayer') : profile?.username;
+    const displayAvatar = isBlocked ? null : profile?.avatar_url;
+    const [actionsOpen, setActionsOpen] = useState(false);
     const competitions = useCompetitions();
     const [selectedCompetitionId, setSelectedCompetitionId] = useState<string | null>(null);
     const [tab, setTab] = useState<ProfileTab>(initialTab ?? 'stats');
@@ -220,15 +228,10 @@ export function ProfileView({ userId, isSelf, initialTab }: ProfileViewProps) {
                 <Skeleton className="h-16 flex-1" variant="block" />
             ) : (
                 <>
-                    <Avatar
-                        name={profile?.username ?? '?'}
-                        ring
-                        size="lg"
-                        uri={profile?.avatar_url}
-                    />
+                    <Avatar name={displayName ?? '?'} ring size="lg" uri={displayAvatar} />
                     <View className="min-w-0 flex-1">
                         <Text className="font-display text-[27px] leading-6.75 text-text">
-                            {profile?.username}
+                            {displayName}
                         </Text>
                         {memberSince ? (
                             <Text className="font-body text-[12.5px] text-text-muted">
@@ -248,7 +251,14 @@ export function ProfileView({ userId, isSelf, initialTab }: ProfileViewProps) {
                         <Settings color={textColor} size={20} strokeWidth={1.9} />
                     </IconButton>
                 </View>
-            ) : null}
+            ) : (
+                <IconButton
+                    accessibilityLabel={t('profile:playerActions.open')}
+                    onPress={() => setActionsOpen(true)}
+                    variant="soft">
+                    <Ellipsis color={textColor} size={20} strokeWidth={1.9} />
+                </IconButton>
+            )}
         </View>
     );
     const competitionChips =
@@ -477,14 +487,14 @@ export function ProfileView({ userId, isSelf, initialTab }: ProfileViewProps) {
                                 compact={
                                     <>
                                         <Avatar
-                                            name={profile?.username ?? '?'}
+                                            name={displayName ?? '?'}
                                             size="sm"
-                                            uri={profile?.avatar_url}
+                                            uri={displayAvatar}
                                         />
                                         <Text
                                             className="shrink font-body-semibold text-[16px] text-text"
                                             numberOfLines={1}>
-                                            {profile?.username}
+                                            {displayName}
                                         </Text>
                                     </>
                                 }
@@ -527,6 +537,12 @@ export function ProfileView({ userId, isSelf, initialTab }: ProfileViewProps) {
                     </View>
                 </GlassHeader>
                 {pointsSheet}
+                <PlayerActionsSheet
+                    isBlocked={isBlocked}
+                    onClose={() => setActionsOpen(false)}
+                    userId={userId}
+                    visible={actionsOpen}
+                />
             </>
         );
     }

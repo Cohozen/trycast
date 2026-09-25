@@ -11,6 +11,7 @@ import {
     MessageSquareWarning,
     ShieldCheck,
     Sparkles,
+    UserX,
 } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -44,6 +45,7 @@ import {
     setThemePreference,
     type ThemePreference,
 } from '@/features/profile/theme-preference';
+import { useBlockedIds } from '@/features/profile/use-blocked-ids';
 import { useDeleteAccount, useProfile } from '@/features/profile/use-profile';
 import { useFeedback } from '@/features/feedback/components/feedback-provider';
 import { useWelcomeGuide } from '@/features/welcome/components/welcome-guide-provider';
@@ -62,6 +64,7 @@ export default function SettingsScreen() {
     const feedback = useFeedback();
     const { session } = useSession();
     const { data: profile } = useProfile(session?.user.id);
+    const { data: blockedIds } = useBlockedIds();
     const deleteAccount = useDeleteAccount();
 
     const [theme, setTheme] = useState<ThemePreference>('system');
@@ -283,6 +286,24 @@ export default function SettingsScreen() {
             <View className="gap-2.5">
                 <SectionLabel>{t('profile:settings.sections.privacy')}</SectionLabel>
                 <PrivacySettings userId={session?.user.id ?? ''} />
+                <Pressable
+                    accessibilityRole="button"
+                    onPress={() => router.push('/blocked-players')}>
+                    <Card className="flex-row items-center gap-3 px-4 py-3.5">
+                        <View className="h-8 w-8 items-center justify-center rounded-sm bg-brand/10">
+                            <UserX color={brandColor} size={17} strokeWidth={1.9} />
+                        </View>
+                        <Text className="flex-1 font-body-semibold text-[15px] text-text">
+                            {t('profile:blockedPlayers.title')}
+                        </Text>
+                        {blockedIds?.size ? (
+                            <Text className="font-body text-[14px] text-text-muted">
+                                {blockedIds.size}
+                            </Text>
+                        ) : null}
+                        <ChevronRight color={textFaintColor} size={18} strokeWidth={1.9} />
+                    </Card>
+                </Pressable>
             </View>
 
             {/* À propos */}
