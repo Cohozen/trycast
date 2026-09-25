@@ -10,7 +10,8 @@
 > `ea4e55aa`), donc **plus aucune OTA venue de `main` n'atteint la 1.2.0** ; tout part avec la
 > 1.3.0. **Sign in with Apple validé sur iPhone** (2026-09-25). **Plan de la 1.3.0 acté le
 > 2026-09-25** : beta fermée Android **et** iOS vers le 8-9 octobre, conformité App Store avancée
-> de février, soumission App Review pendant la beta (voir « v1.3.0 »).
+> de février, soumission App Review pendant la beta (voir « v1.3.0 »). Chantier A : **wording
+> livré** (app, e-mails sur dev, site), e-mails d'auth à pousser en prod.
 
 ## Avancement des lots
 
@@ -74,23 +75,15 @@ La version publique de février (pronos de tournoi) repassera de toute façon en
 
 **A. Bloquants de la beta**
 - **Matchs de test à id négatif en prod** (voir la dette) : les supprimer avant qu'un testeur les voie.
-- **Wording** (retours des tests iPhone, 2026-09-25), FR et EN ensemble :
-  - **Plus de tiret cadratin « — » dans les textes visibles**, remplacé par un tiret « - » :
-    `locales/*/leagues.json` (6 chacun), `locales/*/auth.json` (`reset.resent`), pied des e-mails
-    d'auth (`AUTH_FOOTER` de `scripts/build-email-templates.mjs`, puis `emails:build` et
-    `emails:push`). Même règle pour les textes des fiches (titre Play « TryCast — Pronos Rugby »,
-    chantier E) et pour **le site** : `apps/web/src/i18n/fr.ts` et `en.ts` (12 chacun), pages
-    légales FR et EN (confidentialité ~26 chacune, suppression de compte, mentions légales, CGU),
-    `rejoindre.astro`, `<title>` éventuels des layouts. Pages légales : jumelles FR/EN dans le même
-    commit et `legalUpdatedAt` avancé (skill `trycast-site-web`), puis `npm run check && npm run
-    build`. Les commentaires du code et du CSS ne sont pas concernés.
-  - **Mot de passe oublié, saisie du code** (`auth.reset.subtitle`) : préciser que l'e-mail ne part
-    que si un compte est associé à l'adresse saisie.
-  - **Guide d'accueil** (`locales/*/welcome.json`) : reformuler « À la fin, il n'y en a qu'un en
-    haut du classement » (trop négatif) ; « Raté, il coûte 10 points » → « Raté, tu perds
-    10 points » ; retitrer « Le sel du jeu, c'est la ligue » (« sel » peu compris) ; « partage son
-    code à 8 caractères » → « partage son code ». Le « code à 8 caractères » de l'écran « Rejoindre
-    une ligue » reste, exprès : il guide la saisie.
+- ✅ **Wording** (retours des tests iPhone, 2026-09-25), FR et EN ensemble : tiret simple « - » à
+  la place du tiret cadratin dans les textes visibles de l'app, du pied des e-mails d'auth (poussé
+  sur **dev**) et du site (pages légales jumelles, `legalUpdatedAt` des quatre pages au
+  2026-09-25) ; saisie du code de reset qui précise que l'e-mail ne part que si un compte est
+  associé à l'adresse ; guide d'accueil reformulé (« Joue avec tes potes », « Raté, tu perds
+  10 points »). Restent, exprès : le « — » de valeur absente dans l'app (règle dans `AGENTS.md`)
+  et le « code à 8 caractères » de l'écran « Rejoindre une ligue », qui guide la saisie.
+  Reste : **les e-mails d'auth à pousser en prod** (Corentin, voir « Ce qu'il reste à faire ») et
+  le titre Play « TryCast — Pronos Rugby », avec la fiche (chantier E).
 - `SENTRY_AUTH_TOKEN` (source maps de la beta) ; **alerte sur les crons en échec** à trancher.
 - **Passe iOS** : DS en clair et en sombre (bouton Apple en clair compris), rendu de l'icône
   (canal alpha aplati), push sur iPhone.
@@ -139,7 +132,8 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
 **E. Fiches des stores** (au gel, après le dernier changement d'écran)
 - **Play, fiche refaite** : 4 à 6 captures au nouveau DS depuis un build `preview` en français,
   thème sombre, compte de démo (méthode dans `docs/stores/play-store.md`), description relue ;
-  les testeurs voient cette fiche à l'opt-in.
+  les testeurs voient cette fiche à l'opt-in. Titre « TryCast - Pronos Rugby », tiret simple
+  (Play Console et `docs/stores/play-store.md`), comme tous les textes visibles.
 - **App Store** : captures 6,9″ (pas d'iPad), étiquettes de confidentialité (brouillon dans
   `docs/rgpd/fiches-stores.md`), classification d'âge cohérente avec le minimum de 16 ans (répondre
   « jeu d'argent simulé » avec soin : pronostics gratuits, sans mise ni gain), compte de démo peuplé
@@ -178,6 +172,10 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   1.3.0 (nouveau build) ; `npm run ota:prod` ne le signale pas, il publierait sans que personne ne
   reçoive rien. Le lot 2 iOS (deux dépendances natives) la déplace encore, sans autre conséquence.
   Le dev client iOS est rebuildé (2026-09-24), mais la passe visuelle iOS du DS n'est pas faite.
+- **Wording de la 1.3.0, gestes de Corentin** : pousser `main` (le site se rebuilde sur Vercel),
+  puis les e-mails d'auth en prod depuis la racine,
+  `npm run emails:push -- --project=<ref prod> --dry-run`, puis sans `--dry-run` (skill
+  `trycast-emails`). Les locales de l'app partent avec le build 1.3.0.
 - `SENTRY_AUTH_TOKEN` en secret EAS — un **jeton d'organisation**, pas personnel. Sans lui, pas de
   source maps : plantages en JS minifié.
 - `submit.production.android` d'`eas.json` attend le compte de service Google Play (chantier D de « v1.3.0 »).

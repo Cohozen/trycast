@@ -5,7 +5,7 @@ description: Ajouter ou étendre un domaine métier TryCast dans apps/mobile/src
 
 # TryCast — ajouter/étendre un domaine métier
 
-Squelette de référence : `apps/mobile/src/features/leagues/`. Reproduire **exactement** cette structure. **Aucune chaîne UI en dur** : tout texte visible vit dans `apps/mobile/src/locales/fr/<domaine>.json` (FR = langue source, guillemets typographiques `’`) et passe par i18next.
+Squelette de référence : `apps/mobile/src/features/leagues/`. Reproduire **exactement** cette structure. **Aucune chaîne UI en dur** : tout texte visible vit dans `apps/mobile/src/locales/fr/<domaine>.json` (FR = langue source, guillemets typographiques `’`) et passe par i18next. En ponctuation, tiret simple « - », jamais de tiret cadratin « — » (retours des tests iPhone, 2026-09-25 ; même règle pour les e-mails et le site). Le « — » affiché **seul, à la place d'une valeur absente** n'est pas de la ponctuation et reste, exprès : points et rang du profil (`profile-view.tsx`, `profile-prediction-card.tsx`), prono d'un membre (`member-prediction-row.tsx`), bande des journées (`round-strip-items.ts`), équipe inconnue de la célébration (`celebration-overlay.tsx`). Ne pas le « corriger » en tiret simple.
 
 ## Structure d'un domaine (`apps/mobile/src/features/<domaine>/`)
 
