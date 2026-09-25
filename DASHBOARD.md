@@ -73,9 +73,19 @@ version attend, en soumettre une autre impose de retirer la première (« Develo
 La version publique de février (pronos de tournoi) repassera de toute façon en revue.
 
 **A. Bloquants de la beta**
-- **Avatars absents en prod** (détail dans « Beta fermée »).
 - **Matchs de test à id négatif en prod** (voir la dette) : les supprimer avant qu'un testeur les voie.
-- **Wording** : liste de Corentin, issue des tests iPhone — *à fournir*.
+- **Wording** (retours des tests iPhone, 2026-09-25), FR et EN ensemble :
+  - **Plus de tiret cadratin « — » dans les textes visibles**, remplacé par un tiret « - » :
+    `locales/*/leagues.json` (6 chacun), `locales/*/auth.json` (`reset.resent`), pied des e-mails
+    d'auth (`AUTH_FOOTER` de `scripts/build-email-templates.mjs`, puis `emails:build` et
+    `emails:push`). Même règle pour les textes des fiches (titre Play « TryCast — Pronos Rugby »,
+    chantier E). Les commentaires du code ne sont pas concernés.
+  - **Mot de passe oublié, saisie du code** (`auth.reset.subtitle`) : préciser que l'e-mail ne part
+    que si un compte est associé à l'adresse saisie.
+  - **Guide d'accueil** (`locales/*/welcome.json`) : reformuler « À la fin, il n'y en a qu'un en
+    haut du classement » (trop négatif) ; « Raté, il coûte 10 points » → « Raté, tu perds
+    10 points » ; retitrer « Le sel du jeu, c'est la ligue » (« sel » peu compris) ; « partage son
+    code à 8 caractères » → « partage son code ».
 - `SENTRY_AUTH_TOKEN` (source maps de la beta) ; **alerte sur les crons en échec** à trancher.
 - **Passe iOS** : DS en clair et en sombre (bouton Apple en clair compris), rendu de l'icône
   (canal alpha aplati), push sur iPhone.
@@ -85,7 +95,8 @@ bloque la soumission App Review. Rien de natif : si B arrive après le gel, les 
 reçoivent par OTA de la 1.3.0 (sans bump), et l'App Review part sur un nouveau build de la même
 version (vérifier l'empreinte avant, skill `trycast-release`).
 - **Signaler, bloquer, filtre des pseudos** (règle 1.2, motif de rejet le plus probable : pseudos
-  et avatars visibles des autres joueurs). Proposition à valider à l'ouverture du lot :
+  et avatars visibles des autres joueurs). **Périmètre à discuter en détail à l'ouverture du
+  lot** (demande de Corentin, 2026-09-25), en particulier le blocage. Point de départ :
   *signaler* depuis le profil public, motifs en **liste fermée** (pseudo, avatar), une ligne en
   base et un e-mail à `contact@` (traitement à la main en SQL, pas d'app d'administration) ;
   *bloquer* masque avatar et réactions du joueur bloqué pour soi ; *filtre* = liste de mots
@@ -97,16 +108,16 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   Les comptes Apple créés avant le lot n'auront pas de jeton : accepté.
 
 **C. Confort**
-- **E-mail de bienvenue des comptes Google et Apple.** Un compte e-mail reçoit déjà l'e-mail de
-  confirmation ; un compte fournisseur ne reçoit rien. Déclencheur proposé : le passage de
+- **E-mail de bienvenue des comptes Google et Apple, et d'eux seuls** (acté le 2026-09-25) : un
+  compte e-mail reçoit déjà l'e-mail de confirmation, un compte fournisseur ne reçoit rien.
+  Déclencheur proposé : le passage de
   `username_chosen` à `true` par `claim_username` (une seule fois par compte, le pseudo est connu),
   envoi par Resend depuis une EF appelée en `pg_net`. ⚠️ Un secret Vault neuf se crée sur **chaque
   projet avant le push**. En français seulement pour la beta. Vérifier que le registre couvre
   cet e-mail (gestion du compte). Il passe par le relais Apple, déjà déclaré.
-- **Face ID / empreinte** — *interprétation à confirmer par Corentin*. Recommandé : **pas de
-  verrou biométrique à l'ouverture** (la session persiste, rien de sensible à protéger, une friction
-  à chaque ouverture) ; plutôt le **remplissage des mots de passe par le système**, déverrouillé
-  par Face ID ou l'empreinte, sans lib native. Les champs portent déjà `autoComplete` ; manque, sur
+- **Remplissage des mots de passe par le système** (acté le 2026-09-25), déverrouillé par Face ID
+  ou l'empreinte, sans lib native. **Pas de verrou biométrique à l'ouverture**, écarté : la session
+  persiste, rien de sensible à protéger, une friction à chaque ouverture. Les champs portent déjà `autoComplete` ; manque, sur
   iOS, `webcredentials:www.trycast.fr` dans `associatedDomains` (`app.json`, dans l'empreinte :
   ça tombe bien, la 1.3.0 est un build) et la clé `webcredentials` dans
   l'`apple-app-site-association` servi par le site (`apps/web/scripts/build-well-known.mjs`). Côté
@@ -162,11 +173,6 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   1.3.0 (nouveau build) ; `npm run ota:prod` ne le signale pas, il publierait sans que personne ne
   reçoive rien. Le lot 2 iOS (deux dépendances natives) la déplace encore, sans autre conséquence.
   Le dev client iOS est rebuildé (2026-09-24), mais la passe visuelle iOS du DS n'est pas faite.
-- **Avatars absents en prod** dans les classements et la liste des pronos d'un match, y compris celui
-  de Corentin. Sur le dev, RPC et rendu sont corrects (vérifié à l'émulateur) ; en prod, l'`avatar_url`
-  de Corentin est correct (2026-09-24). Reste à comparer les définitions renvoyées par
-  `get_league_leaderboard`, `get_global_leaderboard` et `get_match_league_predictions` en prod avec
-  celles du dev (colonne `avatar_url` présente ?).
 - `SENTRY_AUTH_TOKEN` en secret EAS — un **jeton d'organisation**, pas personnel. Sans lui, pas de
   source maps : plantages en JS minifié.
 - `submit.production.android` d'`eas.json` attend le compte de service Google Play (chantier D de « v1.3.0 »).
