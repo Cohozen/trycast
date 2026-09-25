@@ -48,7 +48,6 @@ function RootNavigator() {
     const { i18n } = useTranslation();
     useSyncLocale(session?.user.id);
     useRegisterPushToken(session?.user.id);
-    useNotificationObserver(session?.user.id);
     useNotificationBadgeSync(session?.user.id);
     const profile = useProfile(session?.user.id);
 
@@ -73,7 +72,10 @@ function RootNavigator() {
     // clignoter avant d'être renvoyé sur l'onboarding. `isLoading` (et non
     // `isPending`) est délibéré : il retombe à faux sans session comme en cas
     // d'échec réseau — un profil illisible ne doit pas bloquer sur le splash.
-    if (isLoading || !fontsLoaded || profile.isLoading) {
+    const appReady = !isLoading && fontsLoaded && !profile.isLoading;
+    useNotificationObserver(session?.user.id, appReady);
+
+    if (!appReady) {
         return null;
     }
 
