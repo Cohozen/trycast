@@ -86,6 +86,11 @@ pour attraper les plantages de démarrage) et le `RootLayout` est exporté via
 ré-initialisation : c'est la seule façon de ne pas devoir attendre AsyncStorage avant de
 pouvoir capturer quoi que ce soit.
 
+Côté serveur, le projet Sentry reçoit aussi les check-ins du moniteur Crons `cron-health`,
+envoyés par pg_cron depuis Supabase : un statut `ok`/`error` par heure, aucune donnée
+d'utilisateur. Mécanique, secret Vault et lecture d'une alerte : skill
+`trycast-supabase-migration`.
+
 ## Signalements de problèmes (User Feedback)
 
 Le bouton « Signaler un problème » (`apps/mobile/src/features/feedback/`, registre §11)

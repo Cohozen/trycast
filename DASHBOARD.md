@@ -11,7 +11,8 @@
 > 1.3.0. **Sign in with Apple validé sur iPhone** (2026-09-25). **Plan de la 1.3.0 acté le
 > 2026-09-25** : beta fermée Android **et** iOS vers le 8-9 octobre, conformité App Store avancée
 > de février, soumission App Review pendant la beta (voir « v1.3.0 »). Chantier A : **wording
-> livré** (app, e-mails sur dev, site), e-mails d'auth à pousser en prod.
+> livré** (app, e-mails sur dev, site), e-mails d'auth à pousser en prod ; **alerte sur les crons
+> en échec livrée sur le dev** (moniteur Sentry `cron-health`), secret et push prod à faire.
 
 ## Avancement des lots
 
@@ -74,7 +75,9 @@ version attend, en soumettre une autre impose de retirer la première (« Develo
 La version publique de février (pronos de tournoi) repassera de toute façon en revue.
 
 **A. Bloquants de la beta**
-- **Matchs de test à id négatif en prod** (voir la dette) : les supprimer avant qu'un testeur les voie.
+- **Matchs de test à id négatif en prod** (voir la dette) : les supprimer avant qu'un testeur les
+  voie. Le SQL de nettoyage est fourni à Corentin (constat, suppression, recalcul absolu des
+  `standings` des joueurs touchés) ; reste son exécution en prod.
 - ✅ **Wording** (retours des tests iPhone, 2026-09-25), FR et EN ensemble : tiret simple « - » à
   la place du tiret cadratin dans les textes visibles de l'app, du pied des e-mails d'auth (poussé
   sur **dev**) et du site (pages légales jumelles, `legalUpdatedAt` des quatre pages au
@@ -84,7 +87,13 @@ La version publique de février (pronos de tournoi) repassera de toute façon en
   et le « code à 8 caractères » de l'écran « Rejoindre une ligue », qui guide la saisie.
   Reste : **les e-mails d'auth à pousser en prod** (Corentin, voir « Ce qu'il reste à faire ») et
   le titre Play « TryCast — Pronos Rugby », avec la fiche (chantier E).
-- `SENTRY_AUTH_TOKEN` (source maps de la beta) ; **alerte sur les crons en échec** à trancher.
+- `SENTRY_AUTH_TOKEN` (source maps de la beta) : geste de Corentin (voir « Ce qu'il reste à
+  faire »). Les source maps des OTA ne sont volontairement pas branchées pour l'instant.
+- ✅ **Alerte sur les crons en échec** (2026-09-25) : job pg_cron `cron-health` à la demie de
+  chaque heure, qui envoie un check-in `ok` ou `error` à un moniteur Sentry Crons (échec d'un job,
+  appels HTTP des crons en échec majoritaire, job de `job_runs` en erreur seule) ; un check-in
+  manquant alerte aussi. En service sur le **dev** (check-ins acceptés par Sentry). Restent les
+  gestes de Corentin, dans « Ce qu'il reste à faire ».
 - **Passe iOS** : DS en clair et en sombre (bouton Apple en clair compris), rendu de l'icône
   (canal alpha aplati), push sur iPhone.
 
@@ -177,10 +186,22 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   `npm run emails:push -- --project=<ref prod> --dry-run`, puis sans `--dry-run` (skill
   `trycast-emails`). Les locales de l'app partent avec le build 1.3.0.
 - `SENTRY_AUTH_TOKEN` en secret EAS — un **jeton d'organisation**, pas personnel. Sans lui, pas de
-  source maps : plantages en JS minifié.
+  source maps : plantages en JS minifié. Depuis `apps/mobile` :
+  `eas env:set --name SENTRY_AUTH_TOKEN --environment production --visibility secret --type string`
+  (`env:create` est déprécié). Les source maps des OTA restent volontairement non branchées pour
+  l'instant.
+- **Projet EAS parasite `@cohozen/trycast-repo`** (2026-09-25) : créé par un `eas env:create` lancé
+  depuis la racine du dépôt (réponse « yes » à « create an EAS project »). Le `app.json` qu'il a
+  écrit à la racine est supprimé ; reste à supprimer le projet sur expo.dev (Project settings →
+  Delete). Toute commande `eas` se lance depuis `apps/mobile`.
 - `submit.production.android` d'`eas.json` attend le compte de service Google Play (chantier D de « v1.3.0 »).
-- **Alerte sur les crons en échec** (proposé, non tranché) : aucune surveillance ne lit
-  `cron.job_run_details` ; une panne a déjà duré un mois sans signal. À cadrer avant la beta.
+- **Alerte sur les crons en échec, gestes de Corentin**, dans cet ordre : créer le secret
+  `sentry_cron_checkin_url` (URL en `environment=production`, commande dans l'en-tête de
+  `supabase/migrations/20260925000100_cron_health.sql`) dans le Vault **prod avant le push** ;
+  pousser la migration en prod (skill `trycast-prod-rollout`, une seule migration attendue au
+  dry-run) ; régler dans Sentry l'alerte e-mail du moniteur `cron-health` sur l'environnement
+  `production` seul (le dev est souvent en `error`, voir « Points ouverts »).
+- **Matchs de test à id négatif en prod** : exécuter le SQL de nettoyage fourni (voir la dette).
 
 ### 🔜 iOS — beta fermée TestFlight en octobre 2026 (plan du 2026-09-24)
 Objectif : des testeurs iPhone (amis, connaissances) **invités par e-mail** dans un groupe
@@ -300,7 +321,8 @@ propriétaire de ligue, contact publié.
 - Classement : rang du joueur au-dessus de la barre « moi » approximé à rang − 1 (documenté dans `pinned-me-row.tsx`).
 - **Critères du classement recopiés** dans `get_my_previous_rank` (total, scores exacts, moins de pronos scorés, démo exclue) : toucher au départage d'`apply_match_scores` impose de la modifier aussi.
 - Identifiants encore en dur : `package.json` (typegen `--project-id`), `app.json` (owner EAS, requis), migration cron `20260705000300`.
-- **⚠️ Données de test probablement en prod** (à vérifier par Corentin) : `select slug from public.competitions` (ligne `e2e-test` supprimable) et surtout `select api_game_id, kickoff_at from public.matches where api_game_id < 0` — seedés sur la vraie `nc-2026`, ils remontent dans les listes. L'app filtre les compétitions à id négatif, **pas les matchs**.
+- **⚠️ Données de test probablement en prod** (à vérifier par Corentin) : `select slug from public.competitions` (ligne `e2e-test` supprimable) et surtout `select api_game_id, kickoff_at from public.matches where api_game_id < 0` — seedés sur la vraie `nc-2026`, ils remontent dans les listes. L'app filtre les compétitions à id négatif, **pas les matchs**. Le SQL de nettoyage (constat, suppression, recalcul absolu des `standings` des joueurs touchés) est fourni à Corentin et attend son exécution en prod.
+- **Quota Highlightly sur le dev** : `sync-live` et `sync-results` y prennent des 429 (« daily request limits ») à partir de ~12 h UTC chaque jour, d'où un moniteur `cron-health` en `error` sur le dev. Question posée à Corentin : le dev partage-t-il la clé Highlightly de la prod ? Si oui, le dev consomme le quota de la prod.
 - **Seed de démo** (`scripts/seed-demo.mjs`) : en novembre, les vraies journées de nc-2026 tomberont dans sa fenêtre fictive et il refusera de semer — décaler le scénario. Il ne sème ni match reporté ni plus de deux notifications : l'état reporté du détail de match et le badge « 9+ » de la cloche restent invérifiés au simulateur.
 - Base dev : ligue « Verif affichage » (`R2FANTMJ`) à retirer ; scores NC de juillet fictifs (le mode `audit` de `sync-tries` se mesure en prod) ; bonus défensif non observable au simulateur (couvert par `breakdown-labels.test.ts` et `breakdown-rows.test.ts`).
 - Aptabase : `preview` et `production` se mélangent (tous deux en release) — négligeable tant que `preview` ne sert qu'à Corentin.

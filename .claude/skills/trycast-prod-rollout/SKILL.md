@@ -48,7 +48,9 @@ select name from vault.secrets;
 ```
 Le secret manquant se crée dans le SQL editor prod (`select vault.create_secret('<valeur>', '<nom>');`),
 jamais en argument de commande. Oublier `edge_functions_base_url` a coupé **tous les crons prod du
-2026-08-15 au 2026-09-15**, sans aucune alerte.
+2026-08-15 au 2026-09-15**, sans aucune alerte. Le moniteur Sentry `cron-health` signale désormais
+ce genre de panne, à condition que son propre secret `sentry_cron_checkin_url` existe sur le projet
+(skill `trycast-supabase-migration`).
 
 **1. Lier la CLI à la prod**
 ```bash

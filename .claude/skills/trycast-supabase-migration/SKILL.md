@@ -1,6 +1,6 @@
 ---
 name: trycast-supabase-migration
-description: Faire évoluer le schéma Supabase de TryCast — écrire une migration SQL (tables, RLS, RPC security definer, grants), db push, régénérer les types, et vérifier en E2E. À utiliser dès qu'on touche à supabase/migrations/, une policy RLS, une RPC/fonction SQL, ou qu'on doit relancer typegen / un script e2e. Couvre aussi l'import des essais (EF sync-tries, Wikipedia, saisie admin) et le piège des content_path de config.toml.
+description: Faire évoluer le schéma Supabase de TryCast — écrire une migration SQL (tables, RLS, RPC security definer, grants), db push, régénérer les types, et vérifier en E2E. À utiliser dès qu'on touche à supabase/migrations/, une policy RLS, une RPC/fonction SQL, ou qu'on doit relancer typegen / un script e2e. Couvre aussi l'import des essais (EF sync-tries, Wikipedia, saisie admin), la surveillance des crons (moniteur Sentry cron-health, lire une alerte) et le piège des content_path de config.toml.
 ---
 
 # TryCast — migration Supabase & RLS
@@ -74,6 +74,17 @@ Un agent ne pousse jamais en prod lui-même.
 - `supabase db query --linked "<sql>"`, ou `-f fichier.sql` ;
 - vérifier d'abord que le projet lié est le dev : `cat supabase/.temp/project-ref` doit correspondre à l'URL du `.env` ;
 - un secret (Vault, par exemple) va dans un fichier `-f` créé sous `umask 077` puis supprimé, jamais en argument de commande.
+- ⚠️ En mode auto, le classifieur refuse **toute écriture de secret Vault** par l'agent, même sur le dev (« Secret-Store Writes », vécu le 2026-09-25 avec `sentry_cron_checkin_url`) : préparer le fichier et la commande, c'est Corentin qui la lance.
+
+## Surveillance des crons : moniteur Sentry `cron-health`
+
+Le job pg_cron `cron-health` (`30 * * * *`, migration `20260925000100_cron_health.sql`) appelle `public.report_cron_health()`, qui fait le bilan de l'heure écoulée et envoie un check-in `ok` ou `error` au moniteur Sentry Crons `cron-health` (créé et tenu à jour par le `monitor_config` du check-in, rien à régler dans Sentry hors l'alerte). L'heure est en erreur si un job de `cron.job_run_details` a échoué, si les appels HTTP de `net._http_response` ont **plus échoué que réussi**, ou si un job n'a écrit **que des erreurs** dans `job_runs`. Quelques 500 isolés (« JWT issued at future », plateforme) restent du bruit, exprès. Un check-in **manquant** alerte aussi : secret absent, pg_cron arrêté ou fonction cassée.
+
+- **Lire une alerte** : dans le SQL editor du projet concerné, `select public.report_cron_health();` renvoie le bilan (`cron_failed`, `http_ok`, `http_failed`, `jobs_down`). Elle envoie un check-in de plus, sans conséquence. Le détail se lit ensuite dans `cron.job_run_details`, `net._http_response` et `job_runs`.
+- La fonction est fermée à `public`, `anon` et `authenticated` : outillage seul, jamais appelée par l'app.
+- Secret `sentry_cron_checkin_url`, **un par projet**, déduit du DSN public de l'app (`https://<clé>@o<org>.ingest.de.sentry.io/<projet>`) : `https://o<org>.ingest.de.sentry.io/api/<projet>/cron/cron-health/<clé>/?environment=production`, `environment=development` sur le dev. Commande dans l'en-tête de la migration.
+- L'alerte e-mail se règle côté Sentry sur l'environnement **`production` seul** : le dev est souvent en `error` (quota Highlightly épuisé l'après-midi, 429 sur `sync-live` et `sync-results`), c'est attendu.
+- Le check-in ne porte qu'un statut : ni compteur ni donnée d'utilisateur ne sort. Ne pas y ajouter le bilan sans repasser par `docs/rgpd/`.
 
 ## Edge Functions
 
