@@ -98,14 +98,23 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
 
         setSubmitting(true);
         try {
-            const { data: available, error: rpcError } = await supabase.rpc('username_available', {
-                candidate: username,
-            });
+            // Le filtre des pseudos est vérifié avant signUp : refusé par le
+            // trigger de création de profil, il remonterait de GoTrue en erreur
+            // générique.
+            const [availability, cleanliness] = await Promise.all([
+                supabase.rpc('username_available', { candidate: username }),
+                supabase.rpc('username_is_clean', { candidate: username }),
+            ]);
+            const rpcError = availability.error ?? cleanliness.error;
             if (rpcError) {
                 setError(t(toAuthMessageKey(rpcError)));
                 return;
             }
-            if (!available) {
+            if (!cleanliness.data) {
+                setFieldErrors({ username: t('auth:errors.usernameNotAllowed') });
+                return;
+            }
+            if (!availability.data) {
                 setFieldErrors({ username: t('auth:errors.usernameTaken') });
                 return;
             }

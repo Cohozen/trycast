@@ -1235,6 +1235,7 @@ export type Database = {
             };
             unregister_push_token: { Args: { p_token: string }; Returns: undefined };
             username_available: { Args: { candidate: string }; Returns: boolean };
+            username_is_clean: { Args: { candidate: string }; Returns: boolean };
         };
         Enums: {
             league_role: 'owner' | 'member';

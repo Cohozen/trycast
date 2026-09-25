@@ -70,7 +70,8 @@
         "label": "Pseudo",
         "hint": "3–20 caractères · lettres, chiffres et « _ » · doit être unique.",
         "updated": "Pseudo mis à jour !",
-        "taken": "Ce pseudo est déjà pris. Essaie autre chose."
+        "taken": "Ce pseudo est déjà pris. Essaie autre chose.",
+        "notAllowed": "Ce pseudo n'est pas autorisé. Choisis-en un autre."
     },
     "errors": {
         "invalid": "Pseudo invalide : 3–20 caractères, lettres, chiffres et « _ »."

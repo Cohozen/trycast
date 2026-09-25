@@ -70,7 +70,8 @@
         "label": "Username",
         "hint": "3–20 characters · letters, numbers and \"_\" · must be unique.",
         "updated": "Username updated!",
-        "taken": "That username is taken. Try another one."
+        "taken": "That username is taken. Try another one.",
+        "notAllowed": "That username isn't allowed. Pick another one."
     },
     "errors": {
         "invalid": "Invalid username: 3–20 characters, letters, numbers and \"_\"."
