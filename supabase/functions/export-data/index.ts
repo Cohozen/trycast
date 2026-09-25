@@ -46,6 +46,8 @@ Deno.serve(async (req: Request) => {
         prefs,
         consents,
         devices,
+        blocks,
+        reports,
     ] = await Promise.all([
         admin.from('profiles').select('*').eq('id', uid).maybeSingle(),
         admin.from('predictions').select('*').eq('user_id', uid),
@@ -71,6 +73,10 @@ Deno.serve(async (req: Request) => {
             .eq('user_id', uid)
             .order('created_at', { ascending: true }),
         admin.from('push_tokens').select('platform, created_at, updated_at').eq('user_id', uid),
+        // Modération : ce que l'utilisateur a fait, jamais les signalements qui
+        // le visent (ils révéleraient qui l'a signalé)
+        admin.from('user_blocks').select('blocked_id, created_at').eq('blocker_id', uid),
+        admin.from('user_reports').select('reported_id, reason, created_at').eq('reporter_id', uid),
     ]);
 
     const payload = {
@@ -91,6 +97,8 @@ Deno.serve(async (req: Request) => {
         notification_preferences: prefs.data ?? null,
         consents: consents.data ?? [],
         push_devices: devices.data ?? [],
+        blocked_players: blocks.data ?? [],
+        reports_made: reports.data ?? [],
     };
 
     return json(payload, 200);

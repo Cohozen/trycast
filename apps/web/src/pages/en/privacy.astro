@@ -63,10 +63,12 @@ import ContentLayout from '../../layouts/content-layout.astro';
         </li>
         <li>
             <strong>If you choose “Continue with Apple”</strong> (on iPhone) - Apple sends us an
-            account identifier and your email address, or a relay address
-            <code>@privaterelay.appleid.com</code> if you choose to hide yours: Apple then forwards
+            account identifier and your email address, or a relay
+            address <code>@privaterelay.appleid.com</code> if you choose to hide yours: Apple then forwards
             our emails to your real address. We do not ask for your name. We keep no Apple password
-            or token. This option is <strong>optional</strong>, like Google. Legal basis:
+            or token. When you delete your account, the app asks you to sign in with Apple one last
+            time: the code obtained is used only to revoke TryCast's access to your Apple account,
+            and it is not kept. This option is <strong>optional</strong>, like Google. Legal basis:
             performance of the contract.
         </li>
         <li>
@@ -101,6 +103,14 @@ import ContentLayout from '../../layouts/content-layout.astro';
             our communications, usage measurement and crash reports (see §8). Legal basis: our
             obligation to be able to prove your choice.
         </li>
+        <li>
+            <strong>Reports and blocks</strong> - if you report a player's username or photo, we
+            record your identifier, theirs, the reason and the date, and an alert email is sent
+            to <a href="mailto:contact@trycast.fr">contact@trycast.fr</a>, without your identity.
+            If you block a player, we record that block to hide their content from you. Legal
+            basis: performance of the contract (the rules of use in the terms) and our legitimate
+            interest in protecting players.
+        </li>
     </ul>
     <p>
         We collect <strong>no location data</strong>, no address book and no sensitive data.
@@ -116,6 +126,11 @@ import ContentLayout from '../../layouts/content-layout.astro';
         players. If you add a photo, it is served from a public web address: it is neither listed
         nor indexed, but it remains accessible to anyone who has the link.
     </p>
+    <p>
+        Your username, photo and points also appear in the <strong>overall leaderboard</strong> of
+        each competition, visible to every registered player. A player you report or block is
+        never told.
+    </p>
 
     <h2>4. Where is the data hosted, and who else handles it?</h2>
     <p>
@@ -128,7 +143,7 @@ import ContentLayout from '../../layouts/content-layout.astro';
             States; transfers are governed by the European Commission's standard contractual
             clauses.</li>
         <li><strong>Resend</strong> - delivery of account-related emails (address confirmation,
-            password reset) and of closed beta emails. Emails are sent from servers located in the
+            password reset), closed beta emails and report alerts sent to the publisher. Emails are sent from servers located in the
             European Union (Ireland), but Resend, a company established in the United States,
             stores their content, their delivery logs and the beta mailing list there; transfers
             are governed by standard contractual clauses and the Data Privacy Framework.</li>
@@ -183,6 +198,12 @@ import ContentLayout from '../../layouts/content-layout.astro';
         <li>
             <strong>Messages sent to contact@trycast.fr</strong>: 1 year after the exchange ends, 3
             years for a request to exercise your rights (so we can prove it was handled).
+        </li>
+        <li>
+            <strong>Report</strong>: until it is handled, then deleted.
+        </li>
+        <li>
+            <strong>Block</strong>: until you unblock the player, or either account is deleted.
         </li>
         <li>
             <strong>Account</strong>: for as long as your account exists. Deleting your account

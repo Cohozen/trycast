@@ -23,10 +23,10 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 | **Personnes concernées** | Utilisateurs de l'application (≥ 16 ans) |
 | **Catégories de données** | Adresse e-mail, mot de passe (haché, jamais en clair — **absent** des comptes créés via un fournisseur d'identité), pseudo, photo de profil (facultative), langue, dates de création et de dernière connexion. Pour un compte créé via **Sign in with Google** : identifiant de compte Google, et les métadonnées transmises par Google (nom complet, URL de la photo de profil Google) conservées telles quelles par Supabase Auth. Pour un compte créé via **Sign in with Apple** (iOS seulement) : identifiant Apple et adresse e-mail — éventuellement une adresse relais `@privaterelay.appleid.com` si l'utilisateur masque la sienne ; le nom n'est **pas demandé** |
 | **Où** | `auth.users` (Supabase Auth — dont `raw_user_meta_data` pour les métadonnées du fournisseur), `public.profiles`, bucket Storage `avatars` |
-| **Destinataires** | Supabase (hébergement), Resend (e-mails de compte), **Google** pour les comptes utilisant Sign in with Google, **Apple** pour ceux utilisant Sign in with Apple (le fournisseur connaît alors la connexion à TryCast). Le pseudo et la photo sont visibles des autres membres des ligues rejointes ; l'e-mail ne l'est jamais |
+| **Destinataires** | Supabase (hébergement), Resend (e-mails de compte), **Google** pour les comptes utilisant Sign in with Google, **Apple** pour ceux utilisant Sign in with Apple (le fournisseur connaît alors la connexion à TryCast). Le pseudo et la photo sont visibles des autres membres des ligues rejointes, et de tous les inscrits dans le classement général ; l'e-mail ne l'est jamais |
 | **Transferts hors UE** | Oui, vers **Resend** (États-Unis) : les e-mails partent de la région UE, mais leur contenu et leurs journaux sont stockés aux États-Unis. Et vers Google ou Apple (États-Unis), **uniquement** pour les comptes utilisant le fournisseur correspondant. Tous sont encadrés par le Data Privacy Framework et les clauses contractuelles types |
 | **Conservation** | Durée de vie du compte ; suppression immédiate et définitive à la demande de l'utilisateur ; suppression automatique après 3 ans d'inactivité (préavis par e-mail) |
-| **Sécurité** | RLS PostgreSQL (chaque compte ne lit/écrit que ses lignes), TLS, mot de passe haché par GoTrue, suppression via Edge Function `delete-account` qui purge aussi le dossier avatar. Sign in with Google et Sign in with Apple : jeton d'identité vérifié par Supabase Auth (avec nonce contre le rejeu pour Apple), aucun mot de passe ni jeton du fournisseur conservé |
+| **Sécurité** | RLS PostgreSQL (chaque compte ne lit/écrit que ses lignes), TLS, mot de passe haché par GoTrue, suppression via Edge Function `delete-account` qui purge aussi le dossier avatar. Sign in with Google et Sign in with Apple : jeton d'identité vérifié par Supabase Auth (avec nonce contre le rejeu pour Apple), aucun mot de passe ni jeton du fournisseur conservé. Apple : jeton révoqué à la suppression du compte, à partir d'un code demandé à ce moment-là et jamais stocké |
 
 > **Sur les données transmises par Google** : seule l'adresse e-mail est utilisée (elle
 > identifie le compte et porte la liaison avec un compte e-mail préexistant). Le nom
@@ -36,8 +36,10 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 >
 > **Sur Sign in with Apple** : l'app ne demande que l'adresse e-mail (portée `EMAIL`), jamais
 > le nom. Si l'utilisateur choisit de masquer son adresse, Apple fournit une adresse relais
-> qui fait suivre vers la sienne ; c'est elle qui identifie le compte. La révocation des
-> jetons Apple à la suppression du compte est prévue avant l'App Store public.
+> qui fait suivre vers la sienne ; c'est elle qui identifie le compte. À la suppression du
+> compte (v1.3.0), l'app rouvre la feuille Apple : l'`authorizationCode` obtenu est échangé puis
+> révoqué aussitôt par l'EF `delete-account` (règle 5.1.1(v) de l'App Store). Ni le code ni le
+> jeton ne sont conservés ; un échec chez Apple est journalisé et n'empêche pas la suppression.
 
 ## 2. Jeu : pronostics, points et classements
 
@@ -181,6 +183,23 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 | **Transferts hors UE** | Aucun |
 | **Conservation** | Selon la politique de rétention de Sentry (90 jours par défaut) ; suppression plus tôt sur demande |
 | **Sécurité** | L'identité ne passe que par le signalement (`captureFeedback`), jamais par `Sentry.setUser`. Les paramètres d'écran joints sont filtrés par liste blanche : le code d'invitation d'une ligue n'est jamais envoyé. Envoyé même si les diagnostics sont coupés, puisque c'est un geste explicite ; le fil d'Ariane reste alors vide |
+
+## 12. Modération : signalements de joueurs et blocages
+
+| | |
+|---|---|
+| **Finalité** | Permettre de signaler un pseudo ou une photo de profil contraire aux règles d'usage, les retirer, et permettre à chacun de bloquer un joueur (exigence de la règle 1.2 de l'App Store, v1.3.0) |
+| **Base légale** | Exécution du contrat — art. 6.1.b (règles d'usage des CGU) et intérêt légitime — art. 6.1.f (protéger les joueurs des contenus offensants) |
+| **Personnes concernées** | Utilisateurs qui signalent ou bloquent, et joueurs signalés ou bloqués |
+| **Catégories de données** | Signalement : identifiant du signaleur, identifiant du joueur signalé, motif en liste fermée (`username` ou `avatar`, jamais de texte libre), date. Blocage : identifiant du bloqueur, identifiant du joueur bloqué, date |
+| **Où** | Supabase (tables `user_reports` et `user_blocks`, UE) ; alerte e-mail par Resend vers `contact@trycast.fr` (Proton) |
+| **Destinataires** | L'éditeur seul. L'alerte e-mail contient le motif, le pseudo et l'identifiant du joueur signalé, **jamais l'identité du signaleur**. Le joueur signalé ou bloqué n'en est jamais informé |
+| **Transferts hors UE** | Resend stocke le contenu des e-mails aux États-Unis (clauses contractuelles types / Data Privacy Framework, cf. sous-traitants) |
+| **Conservation** | Signalement : jusqu'à son traitement, qui le supprime (`moderate_profile`, ou suppression s'il est rejeté). Blocage : jusqu'au déblocage ou à la suppression de l'un des deux comptes (cascade). L'e-mail d'alerte suit la règle des messages de `contact@` (§ 9) |
+| **Sécurité** | RLS : chacun ne lit, crée et supprime que ses propres blocages ; un signalement ne se crée qu'en son nom et **aucun client ne peut les relire**. Traitement manuel depuis le SQL editor (`moderate_profile`, réservée à `service_role`). Clé Resend dans le Vault. Filtre des pseudos à l'écriture (contrainte `profiles_username_clean`), sans donnée collectée |
+
+Droits : les blocages et signalements faits par l'utilisateur figurent dans l'export
+(`export-data`) ; ceux qui le visent n'y figurent pas, pour protéger l'identité du signaleur.
 
 ---
 

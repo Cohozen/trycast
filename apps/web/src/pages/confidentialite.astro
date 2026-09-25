@@ -59,11 +59,14 @@ import ContentLayout from '../layouts/content-layout.astro';
         </li>
         <li>
             <strong>Si tu choisis « Continuer avec Apple »</strong> (sur iPhone) - Apple nous
-            transmet un identifiant de compte et ton adresse e-mail, ou une adresse relais
-            <code>@privaterelay.appleid.com</code> si tu choisis de masquer la tienne : Apple fait
+            transmet un identifiant de compte et ton adresse e-mail, ou une adresse
+            relais <code>@privaterelay.appleid.com</code> si tu choisis de masquer la tienne : Apple fait
             alors suivre nos e-mails vers ta vraie adresse. Nous ne demandons pas ton nom. Nous ne
-            conservons aucun mot de passe ni jeton Apple. Cette option est
-            <strong>facultative</strong>, comme Google. Base légale : l'exécution du contrat.
+            conservons aucun mot de passe ni jeton Apple. Quand tu supprimes ton compte,
+            l'application te demande de te reconnecter une dernière fois avec Apple : le code
+            obtenu sert seulement à révoquer l'accès de TryCast à ton compte Apple, il n'est pas
+            conservé. Cette option
+            est <strong>facultative</strong>, comme Google. Base légale : l'exécution du contrat.
         </li>
         <li>
             <strong>Photo de profil</strong> - facultative. Si tu en ajoutes une, elle est
@@ -97,6 +100,14 @@ import ContentLayout from '../layouts/content-layout.astro';
             refusé nos communications, la mesure d'usage et les rapports de plantage (voir §8).
             Base légale : notre obligation de pouvoir prouver ton choix.
         </li>
+        <li>
+            <strong>Signalements et blocages</strong> - si tu signales le pseudo ou la photo d'un
+            joueur, nous enregistrons ton identifiant, le sien, le motif et la date, et un e-mail
+            d'alerte part vers <a href="mailto:contact@trycast.fr">contact@trycast.fr</a>, sans ton
+            identité. Si tu bloques un joueur, nous enregistrons ce blocage pour masquer ses
+            contenus à tes yeux. Base légale : l'exécution du contrat (les règles d'usage des
+            conditions d'utilisation) et notre intérêt légitime à protéger les joueurs.
+        </li>
     </ul>
     <p>
         Nous ne collectons <strong>aucune donnée de localisation</strong>, aucun carnet d'adresses
@@ -113,6 +124,11 @@ import ContentLayout from '../layouts/content-layout.astro';
         autres joueurs. Si tu ajoutes une photo, elle est servie depuis une adresse web publique :
         elle n'est ni listée ni indexée, mais elle reste accessible à qui possède le lien.
     </p>
+    <p>
+        Ton pseudo, ta photo et tes points apparaissent aussi dans le <strong>classement
+        général</strong> de chaque compétition, visible de tous les joueurs inscrits. Un joueur
+        que tu signales ou que tu bloques n'en est jamais informé.
+    </p>
 
     <h2>4. Où sont hébergées les données, et qui d'autre y touche ?</h2>
     <p>
@@ -126,7 +142,8 @@ import ContentLayout from '../layouts/content-layout.astro';
             transferts sont encadrés par les clauses contractuelles types de la Commission
             européenne.</li>
         <li><strong>Resend</strong> - acheminement des e-mails liés au compte (confirmation
-            d'adresse, réinitialisation du mot de passe) et des e-mails de la beta fermée. Les
+            d'adresse, réinitialisation du mot de passe), des e-mails de la beta fermée et des
+            alertes de signalement adressées à l'éditeur. Les
             e-mails partent de serveurs situés dans l'Union européenne (Irlande), mais Resend,
             société établie aux États-Unis, y conserve leur contenu, leurs journaux d'envoi et la
             liste des destinataires de la beta ; les transferts sont encadrés par les clauses
@@ -185,6 +202,13 @@ import ContentLayout from '../layouts/content-layout.astro';
             <strong>Messages envoyés à contact@trycast.fr</strong> : 1 an après la fin de
             l'échange, 3 ans pour une demande d'exercice de tes droits (pour pouvoir prouver
             qu'elle a été traitée).
+        </li>
+        <li>
+            <strong>Signalement</strong> : jusqu'à son traitement, puis supprimé.
+        </li>
+        <li>
+            <strong>Blocage</strong> : jusqu'à ce que tu débloques le joueur, ou que l'un des deux
+            comptes soit supprimé.
         </li>
         <li>
             <strong>Compte</strong> : tant que ton compte existe. La suppression du compte (depuis

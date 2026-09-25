@@ -127,6 +127,8 @@ RES=$(curl -s -X POST "$URL/functions/v1/export-data" \
   -H "apikey: $KEY" -H "Authorization: Bearer $T1")
 echo "$RES" | grep -q "\"id\":\"$U1\"" || fail "export-data JWT (id du compte attendu, obtenu $RES)"
 echo "$RES" | grep -q '"consents"' || fail "export-data structure (bloc consents attendu)"
+echo "$RES" | grep -q '"blocked_players"' || fail "export-data structure (bloc blocked_players attendu)"
+echo "$RES" | grep -q '"reports_made"' || fail "export-data structure (bloc reports_made attendu)"
 ok "export-data renvoie le JSON du compte appelant"
 
 echo "🎉 e2e-privacy OK"
