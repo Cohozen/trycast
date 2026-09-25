@@ -99,7 +99,9 @@ fictifs sous de nouveaux ids : reprendre les liens de la dernière sortie, et s'
   Son action `text` passe par un clavier **matériel** : le clavier logiciel ne s'affiche
   pas, donc un comportement « au-dessus du clavier » ne se vérifie pas ici (le faire sur
   l'émulateur Android). Un toast (2,2 s) se rate facilement : enchaîner plusieurs captures
-  juste après l'action.
+  juste après l'action. À l'inverse, son `screenshot` pris juste après un `tap` montre souvent
+  l'écran **d'avant** (vécu le 2026-09-25) : pour juger du résultat d'un geste, capturer par
+  `xcrun simctl io booted screenshot` après ~1 s.
 
 - **AXe cassé depuis Xcode 27** (vécu le 2026-09-18) : toute commande `axe` échoue en
   `Failed to load essential private frameworks … Developer/Library/PrivateFrameworks/SimulatorKit.framework`
@@ -107,7 +109,7 @@ fictifs sous de nouveaux ids : reprendre les liens de la dernière sortie, et s'
   d'AXe compatible, piloter par l'**outil simulateur intégré** de Claude Code
   (`mcp__Claude_Code_iOS_Simulator__control` : `screenshot`, `tap` avec `duration` pour un appui
   long, `swipe`, `inspect`), en points logiques comme AXe. `simctl` (screenshot, openurl) marche toujours.
-  Toujours le cas le 2026-09-24 (passes faites par `screenshot` et `tap`, `inspect` indisponible).
+  Toujours le cas le 2026-09-25 (passes faites par `screenshot` et `tap`, `inspect` indisponible).
   ⚠️ **Le sous-agent `verif-visuelle` n'a pas cet outil** (ses outils : Bash, Read, Grep, Glob,
   Skill) : sous Xcode 27, une passe iOS qui doit taper ou faire défiler se fait depuis la session
   principale ; le sous-agent ne peut que capturer par `simctl` et ouvrir des deep links.

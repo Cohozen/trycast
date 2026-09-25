@@ -1,6 +1,6 @@
 ---
 name: trycast-regles-metier
-description: Règles de jeu actées de TryCast — joker par phase (×2, competition_phases, phase_jokers, set_/clear_phase_joker), phases finales (competition_stages, roundGroupKey, buildRoundStrip), réactions sur les pronos (prediction_reactions, REACTIONS, ReactionEmoji), coup de la journée (league_round_highlights, buildRoundHighlights, notification round_highlight), points provisoires en live et rang d'avant journée (PointsEarnedCard, buildBreakdownRows, get_my_previous_rank), bloc « Ce qu'a joué la communauté » (get_match_community_histogram, summarizeCommunity), guide d'accueil (features/welcome) et état local par compte (features/celebration). À consulter dès qu'on touche à apps/mobile/src/features/{jokers,reactions,leagues,welcome,celebration}/, au scoring, à ces tables/RPC, à l'EF notify, ou à scripts/seed-competitions.sql.
+description: Règles de jeu actées de TryCast — joker par phase (×2, competition_phases, phase_jokers, set_/clear_phase_joker), phases finales (competition_stages, roundGroupKey, buildRoundStrip), réactions sur les pronos (prediction_reactions, REACTIONS, ReactionEmoji), coup de la journée (league_round_highlights, buildRoundHighlights, notification round_highlight), points provisoires en live et rang d'avant journée (PointsEarnedCard, buildBreakdownRows, get_my_previous_rank), bloc « Ce qu'a joué la communauté » (get_match_community_histogram, summarizeCommunity), guide d'accueil (features/welcome), état local par compte (features/celebration) et modération (filtre des pseudos username_is_clean, blocage user_blocks et useMaskBlocked, signalement user_reports et moderate_profile). À consulter dès qu'on touche à apps/mobile/src/features/{jokers,reactions,leagues,welcome,celebration}/, au blocage ou au signalement (features/profile), à un hook qui montre des joueurs, au scoring, à ces tables/RPC, à l'EF notify, ou à scripts/seed-competitions.sql.
 ---
 
 # TryCast — règles de jeu actées
@@ -50,7 +50,8 @@ Décisions prises avec Corentin : **ne pas les re-débattre**. Chaque règle a s
   ligne « — ».
 - Table `prediction_reactions` **sans aucun grant client** : écritures par
   `set_/clear_prediction_reaction`, lectures par `get_match_league_predictions` (compteurs,
-  `my_reaction`) et `get_prediction_reactors`.
+  `my_reaction`) et `get_prediction_reactors`. Ces deux lectures écartent les réactions des joueurs
+  que l'appelant a bloqués (voir « Modération ») : toute réécriture doit garder ce filtre.
 - Les réactions **survivent au départ** de leur auteur et sont alors anonymisées à la lecture
   (« Ancien membre ») ; la suppression du compte les efface.
 - Placement (DS du 2026-09-20) : **barre de réaction** en deuxième ligne de la ligne membre —
@@ -139,6 +140,56 @@ Décisions prises avec Corentin : **ne pas les re-débattre**. Chaque règle a s
   guide qui relaie l'appel — sinon le dialogue système surgit à froid par-dessus la sheet de
   bienvenue. Ne pas rétablir l'appel direct au montage. Même contrainte pour l'invitation en
   attente (skill `trycast-liens-invitation`).
+
+## Modération : filtre des pseudos, blocage, signalement (v1.3.0)
+
+Règle 1.2 de l'App Store (contenu créé par les utilisateurs : pseudos et photos, visibles de tous
+dans le classement général). Migrations `20260926000100_username_filter.sql` et
+`20260926000200_moderation.sql`, vérification `supabase db query --linked -f
+scripts/e2e-moderation.sql` (transaction annulée, sans seed).
+
+- **Filtre des pseudos** : contrainte `profiles_username_clean` (fonction immutable
+  `username_is_clean`, posée `not valid`), qui couvre les trois chemins d'écriture du pseudo. Deux
+  listes : des sous-chaînes cherchées dans le pseudo sans ses « _ », et des mots courts refusés
+  seulement en segment entier, pour ne pas attraper « constant », « Scunthorpe » ou « supporter » ;
+  le leetspeak est ramené avant comparaison. **Enrichir une liste = `create or replace function`
+  dans une nouvelle migration**, jamais en éditant l'ancienne. Plafond connu : deux mots collés
+  (« salepute ») passent, le signalement prend le relais.
+- La fonction est exposée en RPC (anon compris) : l'écran d'inscription la vérifie **avant**
+  `signUp`, sinon le refus du trigger de création de profil remonte de GoTrue en « Database error
+  saving new user ». Ailleurs, le 23514 se distingue du check de format par le nom de la contrainte
+  dans le message (`toProfileMessageKey`).
+- **Pas de filtre sur les noms de ligue**, exprès : ils ne sont visibles qu'avec le code, et on
+  peut quitter la ligue.
+- **Blocage à sens unique**, préférence d'affichage et non règle de sécurité : le joueur bloqué
+  devient « Joueur masqué » sans photo partout pour le bloqueur, **rang conservé**, profil toujours
+  ouvrable (pour débloquer). Il n'en sait rien.
+  - Masquage **côté client** : `useMaskBlocked` passé en `select` aux hooks qui montrent des
+    joueurs (classements général et de ligue, points de la journée, coup de la journée, pronos d'un
+    match) ; le profil public lit `useBlockedIds` directement. **Un nouveau hook qui montre des
+    joueurs passe par `useMaskBlocked`**, sinon le joueur réapparaît en clair.
+  - Réactions filtrées **côté serveur** (`get_match_league_predictions`,
+    `get_prediction_reactors`) : un compteur agrégé ne se corrige pas côté client.
+  - Après blocage ou déblocage, tout le cache est invalidé. Seul l'écran « Joueurs bloqués »
+    (Réglages → Confidentialité, route `(app)/blocked-players`) montre le vrai pseudo.
+  - Fuite mineure acceptée : les lectures triées par `lower(pr.username)` gardent un joueur masqué
+    à sa place alphabétique d'origine.
+- **Signalement de joueurs seulement** (pas de ligue, décision de Corentin), motifs en **liste
+  fermée** `username` / `avatar`, jamais de texte libre, depuis le volet d'actions du profil public
+  (`player-actions-sheet.tsx`, un seul volet, pas de popover). Aucune lecture client ; un doublon
+  (23505) est un succès.
+- **Alerte** : le trigger `notify_user_report` envoie par pg_net un e-mail de `contact@` vers
+  `contact@` via l'API Resend (secret Vault `resend_api_key`), **sans l'identité du signaleur**, avec
+  les requêtes de traitement prêtes à copier. Secret absent : rien ne part, le signalement reste.
+  Ce motif pg_net → Resend est réutilisable (e-mail de bienvenue).
+- **Traiter un signalement** (Corentin, SQL editor du projet) :
+  `select public.moderate_profile('<id>', p_username => true, p_avatar => false);` remet
+  `user_xxxxxxxx` avec `username_chosen = false` (le joueur repasse par le choix du pseudo), vide
+  `avatar_url` si demandé et supprime les signalements traités. Réservée à `service_role`. **La
+  photo se retire à la main** dans Storage → `avatars` → `<id>` (le SQL ne peut pas supprimer dans
+  `storage.objects`). Rejeter : `delete from public.user_reports where id = '<id>';`.
+- Export RGPD : les blocages et signalements **faits** par l'utilisateur, jamais ceux qui le visent
+  (registre §12).
 
 ## État local et compte
 

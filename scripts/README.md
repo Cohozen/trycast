@@ -59,8 +59,9 @@ EMAIL1=e2e.user1@trycast.local EMAIL2=e2e.user2@trycast.local PASSWORD=motdepass
 | `e2e-reactions.sh` | Réactions sur les pronos : pose, remplacement, retrait, refus (soi-même, clé inconnue, avant kickoff, cible sans prono, hors ligue), table fermée au client, liste des auteurs, auteur anonymisé après son départ de la ligue | `seed-test-users.sql` + `seed-test-reactions.sql` (à rejouer avant chaque run) |
 | `e2e-round-highlights.sql` | Coup de la journée : lauréat unique (joker, exact, outsider), ex æquo, rien au-delà de 3 / en 1 contre 1 / avec un bonus en attente / journée inachevée, nul osé, étape KO, garde d'appartenance, cibles de la notification (préférence, déduplication, borne de 7 jours), contraintes du journal. `supabase db query --linked -f scripts/e2e-round-highlights.sql` | Aucun : transaction autonome, annulée à la fin |
 | `e2e-previous-rank.sql` | Rang d'avant journée (`get_my_previous_rank`) : agrégat, départage (scores exacts puis moins de pronos scorés), comptes de démo exclus, frontière `p_before`, rang de l'appelant seul. `supabase db query --linked -f scripts/e2e-previous-rank.sql` | Aucun : transaction autonome, annulée à la fin |
+| `e2e-moderation.sql` | Modération : filtre des pseudos (segments, sous-chaînes, leetspeak), RLS des blocages et des signalements (aucune lecture client), réactions d'un joueur bloqué masquées pour le bloqueur seul, `moderate_profile` réservée à `service_role`. `supabase db query --linked -f scripts/e2e-moderation.sql` | Aucun : transaction autonome, annulée à la fin (l'alerte e-mail ne part pas) |
 | `e2e-notifications.sh` | Tokens push par RPC, isolation des préférences | `seed-test-users.sql` |
-| `e2e-privacy.sh` | `consents` append-only, Edge Function `export-data`, étanchéité des tables waitlist | `seed-test-users.sql` |
+| `e2e-privacy.sh` | `consents` append-only, Edge Function `export-data` (dont les blocs `blocked_players` et `reports_made`), étanchéité des tables waitlist | `seed-test-users.sql` |
 | `e2e-email.sh` | Transport SMTP Resend | aucun |
 | `e2e-password-reset.sh` | Reset par code : usage unique, ancien mot de passe révoqué | aucun |
 

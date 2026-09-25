@@ -51,4 +51,6 @@ Un composant **réutilisable** (multi-domaines) va dans `apps/mobile/src/compone
 npm run verify   # à la racine : formatage, tests des Edge Functions, typecheck, lint et tests de l'app
 ```
 
+`verify` ne reformate pas, il contrôle : un fichier écrit par heredoc ou par script le fait échouer d'entrée sur Biome. Lancer `npm run format` d'abord.
+
 Si le domaine touche au schéma → voir la skill **trycast-supabase-migration**.

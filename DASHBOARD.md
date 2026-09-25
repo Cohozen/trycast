@@ -15,6 +15,8 @@
 > « v1.3.0 »). Chantier A : **wording
 > livré** (app, e-mails sur dev, site), e-mails d'auth à pousser en prod ; **alerte sur les crons
 > en échec livrée sur le dev** (moniteur Sentry `cron-health`), secret et push prod à faire.
+> Chantier B : **modération et révocation Apple commitées et vérifiées sur le dev** (filtre des
+> pseudos, bloquer, signaler) ; restent les secrets, les deploys et la prod, gestes de Corentin.
 
 ## Avancement des lots
 
@@ -112,26 +114,30 @@ La version publique de février (pronos de tournoi) repassera de toute façon en
 bloque la soumission App Review. Rien de natif : si B arrive après le gel, les testeurs le
 reçoivent par OTA de la 1.3.0 (sans bump), et l'App Review part sur un nouveau build de la même
 version (vérifier l'empreinte avant, skill `trycast-release`).
-- **Signaler, bloquer, filtre des pseudos** (règle 1.2, motif de rejet le plus probable : pseudos
-  et avatars visibles des autres joueurs). **Périmètre à discuter en détail à l'ouverture du
-  lot** (demande de Corentin, 2026-09-25), en particulier le blocage. Point de départ :
-  *signaler* depuis le profil public, motifs en **liste fermée** (pseudo, avatar), une ligne en
-  base et un e-mail à `contact@` (traitement à la main en SQL, pas d'app d'administration) ;
-  *bloquer* masque avatar et réactions du joueur bloqué pour soi ; *filtre* = liste de mots
-  refusés par la RPC de choix du pseudo, erreur en clé i18n. Nouveau traitement ⇒ registre,
-  politiques FR + EN, `export-data`, même lot.
-- **Révocation des jetons Apple** à la suppression du compte (règle 5.1.1(v), contrôlée en revue) :
-  l'`authorizationCode` rendu à la connexion Apple, échangé côté serveur contre un refresh token
-  conservé, révoqué par l'EF `delete-account` ; clé .p8 en secret des EF, **sur les deux projets**.
-  Les comptes Apple créés avant le lot n'auront pas de jeton : accepté.
+- ✅ **Signaler, bloquer, filtre des pseudos** (règle 1.2, 2026-09-25), code commité et vérifié
+  sur le dev (`scripts/e2e-moderation.sql`, passe iOS au simulateur en clair et en sombre). Filtre
+  à l'écriture par une contrainte sur `profiles.username` ; blocage depuis le profil public, qui
+  change le joueur en « Joueur masqué » pour soi seul, avec l'écran « Joueurs bloqués » dans
+  Réglages → Confidentialité ; signalement du pseudo ou de la photo, qui envoie un e-mail à
+  `contact@` avec la requête de traitement. Règles et recette de traitement : skill
+  `trycast-regles-metier`, section « Modération ». CGU FR/EN (tolérance zéro, examen sous 24 h),
+  politiques FR/EN, registre §12 et `export-data` à jour. **Pas encore vérifié** : l'e-mail
+  d'alerte (secret `resend_api_key` absent du dev).
+- ✅ **Révocation des jetons Apple** à la suppression du compte (règle 5.1.1(v), 2026-09-25) : rien
+  n'est stocké. L'app rouvre la feuille Apple au moment de supprimer, et l'EF `delete-account`
+  échange le code puis révoque le jeton (client_secret signé à chaque appel,
+  `delete-account/apple.ts`, testé sous Vitest). Couvre aussi les comptes Apple créés avant le
+  lot. **Pas encore vérifié** : le chemin réel, qui exige un iPhone, la prod et la clé .p8.
+- Gestes de Corentin : dans « Ce qu'il reste à faire », « Conformité App Store ». Rien de natif :
+  l'ensemble part par OTA ou avec le build 1.3.0.
 
 **C. Confort**
 - **E-mail de bienvenue des comptes Google et Apple, et d'eux seuls** (acté le 2026-09-25) : un
   compte e-mail reçoit déjà l'e-mail de confirmation, un compte fournisseur ne reçoit rien.
   Déclencheur proposé : le passage de
   `username_chosen` à `true` par `claim_username` (une seule fois par compte, le pseudo est connu),
-  envoi par Resend depuis une EF appelée en `pg_net`. ⚠️ Un secret Vault neuf se crée sur **chaque
-  projet avant le push**. En français seulement pour la beta. Vérifier que le registre couvre
+  envoi par l'API Resend en `pg_net`, sur le modèle du trigger `notify_user_report` (chantier B),
+  qui lit déjà la clé `resend_api_key` du Vault. En français seulement pour la beta. Vérifier que le registre couvre
   cet e-mail (gestion du compte). Il passe par le relais Apple, déjà déclaré.
 - **Remplissage des mots de passe par le système** (acté le 2026-09-25), déverrouillé par Face ID
   ou l'empreinte, sans lib native. **Pas de verrou biométrique à l'ouverture**, écarté : la session
@@ -157,7 +163,8 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
 - **App Store** : captures 6,9″ (pas d'iPad), étiquettes de confidentialité (brouillon dans
   `docs/rgpd/fiches-stores.md`), classification d'âge cohérente avec le minimum de 16 ans (répondre
   « jeu d'argent simulé » avec soin : pronostics gratuits, sans mise ni gain), compte de démo peuplé
-  en prod, note au relecteur.
+  en prod, note au relecteur (dire où signaler et bloquer un joueur : bouton « Plus d'actions » (…) du
+  profil public, et où débloquer : Réglages → Confidentialité → Joueurs bloqués).
 
 ### Lancement public — 6 Nations 2027 (février)
 - **Pronos de tournoi** avant le premier match : vainqueur, Grand Chelem, cuillère de bois, résolus
@@ -204,6 +211,24 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   dry-run) ; régler dans Sentry l'alerte e-mail du moniteur `cron-health` sur l'environnement
   `production` seul (le dev est souvent en `error`, voir « Points ouverts »).
 - **Matchs de test à id négatif en prod** : exécuter le SQL de nettoyage fourni (voir la dette).
+- **Conformité App Store (chantier B), gestes de Corentin**, dans cet ordre :
+  1. **Resend** : créer une clé API « envoi seul » limitée au domaine `trycast.fr`, puis dans le
+     SQL editor du **dev** et de la **prod** `select vault.create_secret('<clé>', 'resend_api_key');`
+     (le classifieur interdit à l'agent d'écrire un secret Vault). Sans elle, un signalement est
+     enregistré mais aucune alerte ne part.
+  2. **Portail Apple** : clé « Sign in with Apple » (.p8) rattachée à l'App ID principal, puis sur
+     les deux projets `supabase secrets set APPLE_TEAM_ID=5P7K97386D APPLE_KEY_ID=<id>
+     APPLE_PRIVATE_KEY="$(cat AuthKey_<id>.p8)"`. Sans eux, la suppression marche mais ne révoque rien.
+  3. `supabase functions deploy delete-account` et `supabase functions deploy export-data`, sur le
+     dev puis la prod ; puis `bash scripts/e2e-privacy.sh` sur le dev.
+  4. **Prod** : `supabase db push`, deux migrations attendues au dry-run (`20260926000100`,
+     `20260926000200`), skill `trycast-prod-rollout` ; puis le contrôle
+     `select id, username from public.profiles where not public.username_is_clean(username);`
+     (un pseudo refusé se traite par `moderate_profile`).
+  5. `git push` (pages légales du site) ; la partie app part par OTA ou avec le build 1.3.0.
+  6. **Au build 1.3.0 sur iPhone** : supprimer un compte Apple de test et vérifier que TryCast
+     disparaît de « Se connecter avec Apple » dans l'identifiant Apple ; faire un signalement et
+     vérifier l'e-mail reçu à `contact@`.
 
 ### 🔜 iOS — beta fermée TestFlight en octobre 2026 (plan du 2026-09-24)
 Objectif : des testeurs iPhone (amis, connaissances) **invités par e-mail** dans un groupe
@@ -258,12 +283,14 @@ de Google, logo blanc) ; le rendu en clair reste à voir. Gestes de Corentin :
    reconnexion sans redemande de pseudo, rangées « Mot de passe » et « Adresse e-mail » masquées,
    e-mail envoyé depuis `contact@` reçu via le relais, suppression du compte depuis l'app. Au
    simulateur, la saisie du mot de passe Apple ID reste bloquée (bug connu du simulateur) : la
-   référence est l'iPhone. Tant que la révocation des jetons n'existe pas (février), TryCast reste
-   listé dans « Se connecter avec Apple » de l'Apple ID après suppression du compte.
+   référence est l'iPhone. La révocation du jeton à la suppression du compte est codée
+   (chantier B de la 1.3.0) mais pas en service : jusqu'au build 1.3.0 et à ses secrets, TryCast
+   reste listé dans « Se connecter avec Apple » de l'identifiant Apple après suppression.
 
 **Conformité App Store** (modération, révocation des jetons Apple, fiche) : avancée de février
-dans la 1.3.0, chantiers B et E de « v1.3.0 ». Existant côté règle 1.2 : exclusion par le
-propriétaire de ligue, contact publié.
+dans la 1.3.0, chantiers B (livré, gestes de Corentin restants) et E de « v1.3.0 ». Côté règle 1.2,
+s'ajoutent à l'existant (exclusion par le propriétaire de ligue, contact publié) le filtre des
+pseudos, le blocage et le signalement.
 
 ### Liens d'invitation — ouverts, sans urgence
 1. **Aperçu dans une messagerie** : vérifier la vignette dans WhatsApp (Facebook Sharing Debugger pour forcer le cache).
@@ -314,6 +341,12 @@ propriétaire de ligue, contact publié.
 - **iOS suit Android** : beta fermée TestFlight par lien public, App Store public en février 2027.
 - **Sign in with Apple sur iOS seulement** (2026-09-24) : flux natif avec nonce, adresse e-mail seule
   demandée. Pas d'Apple sur Android (Services ID et secret à renouveler tous les six mois).
+- **Révocation Apple sans rien stocker** (2026-09-25) : code redemandé à la suppression ; renoncer
+  annule la suppression, un échec chez Apple est journalisé et ne l'empêche pas.
+- **Modération** (2026-09-25) : blocage **à sens unique**, joueur masqué et non retiré (rang
+  conservé) ; signalement des **joueurs seulement**, motifs pseudo et photo ; **pas de filtre sur
+  les noms de ligue** (visibles avec le code seulement, on peut quitter) ; traitement à la main
+  dans le SQL editor.
 
 ## Points ouverts / dette assumée
 - **Chantier des cotes** (reporté) : capturer les cotes plus tôt et ne jamais écraser une bonne cote par du vide. Seul le badge « Outsider des cotes » du coup de la journée en dépend.
@@ -322,6 +355,12 @@ propriétaire de ligue, contact publié.
 - **Plancher `browserslist`** de `package.json` obligatoire : le baisser re-casse silencieusement le dark natif (`light-dark()`).
 - Tailwind : neutraliser la palette par défaut (`--color-*: initial`).
 - Classement : rang du joueur au-dessus de la barre « moi » approximé à rang − 1 (documenté dans `pinned-me-row.tsx`).
+- **Blocage masqué côté client** : chaque hook qui montre des joueurs doit passer par
+  `useMaskBlocked` (règle d'`AGENTS.md`). Un blocage invalide tout le cache, à cibler si le
+  rechargement se voit. Les listes triées par pseudo (pronos d'un match) gardent un joueur masqué
+  à sa place alphabétique d'origine : fuite mineure acceptée.
+- **Filtre des pseudos** : deux mots collés (« salepute ») passent ; le signalement prend le relais.
+  Enrichir la liste se fait par une nouvelle migration.
 - **Critères du classement recopiés** dans `get_my_previous_rank` (total, scores exacts, moins de pronos scorés, démo exclue) : toucher au départage d'`apply_match_scores` impose de la modifier aussi.
 - Identifiants encore en dur : `package.json` (typegen `--project-id`), `app.json` (owner EAS, requis), migration cron `20260705000300`.
 - **⚠️ Données de test probablement en prod** (à vérifier par Corentin) : `select slug from public.competitions` (ligne `e2e-test` supprimable) et surtout `select api_game_id, kickoff_at from public.matches where api_game_id < 0` — seedés sur la vraie `nc-2026`, ils remontent dans les listes. L'app filtre les compétitions à id négatif, **pas les matchs**. Le SQL de nettoyage (constat, suppression, recalcul absolu des `standings` des joueurs touchés) est fourni à Corentin et attend son exécution en prod.

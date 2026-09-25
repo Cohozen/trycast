@@ -7,7 +7,7 @@
 **Responsable du traitement** : l'éditeur de TryCast, joignable à `contact@trycast.fr`.
 **Délégué à la protection des données** : aucun (non requis — pas de suivi à grande échelle,
 pas de données sensibles).
-**Dernière mise à jour** : 19 septembre 2026 (§11 signalements de problèmes). Précédente : 14 septembre 2026 (§10 beta fermée ; Proton pour la boîte de contact au §9 ; transfert vers les États-Unis de Resend corrigé aux §1 et §4).
+**Dernière mise à jour** : 25 septembre 2026 (§12 modération ; révocation du jeton Apple et visibilité dans le classement général au §1). Précédente : 19 septembre 2026 (§11 signalements de problèmes).
 
 Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](procedure-droits.md),
 [fiches-stores.md](fiches-stores.md). Version publique : `apps/web/src/pages/confidentialite.astro`.

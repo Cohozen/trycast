@@ -24,6 +24,12 @@ Schéma **uniquement par migrations** dans `supabase/migrations/`. Jamais d'édi
 - **`errcode` explicites** dans les `raise exception` (`42501` non autorisé/non authentifié, `23514` check violé, `P0002` introuvable/pas de compétition active, `23505` unique). Ces codes doivent correspondre au `switch` de `errors.ts` du domaine côté client.
 - **Piège récursion RLS** : une policy de `league_members` qui interroge `league_members`/`leagues` boucle (« infinite recursion detected in policy »). Utiliser des helpers `security definer` (`is_league_member` / `is_league_owner`) pour casser le cycle — toujours passer par eux dans les policies de ces tables.
 - Contraintes miroir côté client : quand tu ajoutes un `check` (ex. nom 3-40, format code), mets à jour `validation.ts` du domaine.
+- **Un `check` sur `profiles.username` casse l'inscription en silence** : le profil naît dans le trigger `handle_new_user`, et un refus y remonte de GoTrue en « Database error saving new user », sans code. Exposer la fonction du check en RPC et l'appeler avant `signUp` (modèle `username_is_clean`, skill `trycast-regles-metier`). Deux `check` sur la même table lèvent le même 23514 : les distinguer par le **nom de la contrainte**, présent dans le message.
+
+## Pièges plpgsql
+
+- `format('%s', <booléen>)` rend `t` ou `f` (fonction de sortie du type), pas `true`/`false` : caster en `::text` pour produire un SQL valide (vécu dans `notify_user_report`, qui écrit la requête de traitement dans l'e-mail).
+- Deux littéraux `E'…'` adjacents séparés par un retour à la ligne se concatènent, mais l'échappement du second n'est pas garanti : les joindre explicitement par `||`.
 
 ## Piège : changer une contrainte d'unicité qu'une EF vise en `onConflict`
 
@@ -45,7 +51,7 @@ Une fonction d'outillage réservée à `service_role` n'a **pas besoin d'être `
 - Bucket via `insert into storage.buckets (id, name, public) values (...) on conflict do nothing;` — passe bien en `db push` (contrairement à la crainte fréquente ; les policies sur `storage.objects` aussi, testé le 2026-07-13 sur `avatars`).
 - Policies cloisonnées par utilisateur : `(storage.foldername(name))[1] = (select auth.uid())::text` (chemin `<userId>/fichier`).
 - ⚠️ **Piège upsert/remove (débogué 2026-07-13)** : l'API Storage fait un **SELECT d'existence sous la RLS de l'utilisateur** avant un upload `upsert: true` **et** avant un `remove`. Sans policy **SELECT** « son propre dossier », l'API renvoie `403 "new row violates row-level security policy"` (HTTP 400) — **alors même que les policies INSERT/UPDATE sont correctes** et qu'un INSERT SQL direct sous le même JWT passe. Donc pour un avatar à chemin stable (upsert) : prévoir les 4 policies insert/update/delete/**select**. La lecture publique (bucket `public=true`) passe, elle, par l'URL CDN et court-circuite la RLS — la policy SELECT ne sert qu'aux écritures de l'utilisateur. E2E : `scripts/e2e-avatars.sh`.
-- Suppression directe interdite (`delete from storage.objects` → `storage.protect_delete()`), passer par l'API Storage.
+- Suppression directe interdite (`delete from storage.objects` → `storage.protect_delete()`), passer par l'API Storage. Une fonction SQL d'outillage ne peut donc pas retirer un fichier : sa procédure le dit (modèle `moderate_profile`, photo à retirer dans l'interface Storage).
 
 ## Scripts E2E (contre trycast-dev)
 
@@ -59,6 +65,7 @@ Chaque script re-seede son état avant exécution. Ordre de seed cumulatif : use
 
 - Coup de la journée : `supabase db query --linked -f scripts/e2e-round-highlights.sql`, **sans seed**. Modèle à reprendre pour un calcul SQL : tout dans une transaction terminée par `rollback`, données créées sur place (users dans `auth.users`, compétition, ligue, matchs), petites fonctions `pg_temp.*` pour les assertions (`raise exception` qui nomme le cas), et une ligne « OK » en sortie. La garde d'appartenance d'une RPC se teste dans la même transaction : `set_config('request.jwt.claims', …, true)` puis `set local role authenticated`, et `reset role` avant d'asserter (les fonctions `pg_temp` ne sont pas exécutables par `authenticated`). Faire tourner une copie **faussée** au moins une fois : un script qui ne sait pas échouer ne prouve rien.
 - Rang d'avant journée : `supabase db query --linked -f scripts/e2e-previous-rank.sql`, **sans seed**, même modèle (agrégat, départage, comptes de démo exclus, frontière `p_before`, rang de l'appelant seul). ⚠️ `get_my_previous_rank` recopie les critères du classement : toucher au départage de `apply_match_scores` impose de la modifier aussi (skill `trycast-regles-metier`).
+- Modération : `supabase db query --linked -f scripts/e2e-moderation.sql`, **sans seed**, même modèle (filtre des pseudos, RLS des blocages et signalements, réactions d'un joueur bloqué, `moderate_profile`). La file de pg_net est transactionnelle : l'alerte e-mail d'un signalement ne part pas d'une transaction annulée.
 
 Les scripts lisent `.env` (`EXPO_PUBLIC_SUPABASE_URL` / `_KEY`, clé publishable uniquement) et acceptent `EMAIL1/EMAIL2/PASSWORD` en override.
 

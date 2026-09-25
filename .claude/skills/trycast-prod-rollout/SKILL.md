@@ -36,6 +36,10 @@ Avant de rédiger, établir **exactement** ce qui part :
 5. **Contrainte visée par une EF** : si une migration change une contrainte d'unicité qu'une EF utilise en `onConflict`, l'EF en place casse dès le push. Donner le deploy **juste après** le push, entre deux ticks du cron concerné, et le signaler en tête (cf. skill `trycast-supabase-migration`).
 6. **Config EF** : une EF appelée par pg_cron doit être en `verify_jwt = false` dans
    `supabase/config.toml` avant son premier deploy (cf. skill `trycast-supabase-migration`).
+7. **Secrets des EF** : `grep -rn "Deno.env.get" supabase/functions/<nom>` sur chaque EF du lot.
+   Un secret absent ne fait souvent rien échouer de visible : sans `APPLE_TEAM_ID`, `APPLE_KEY_ID`
+   et `APPLE_PRIVATE_KEY`, `delete-account` supprime le compte mais ne révoque pas le jeton Apple
+   (échec seulement journalisé). À poser **sur les deux projets**, avant le deploy.
 
 Puis donner la procédure ci-dessous, **une commande par bloc `bash`**, en retirant les étapes sans
 objet et en nommant les fichiers attendus au dry-run.
@@ -73,10 +77,15 @@ supabase db push
 supabase db query --linked -f scripts/<seed>.sql
 ```
 
-**5. Edge Functions** modifiées, une commande par fonction :
+**5. Edge Functions** modifiées, une commande par fonction, précédée de ses secrets s'il en
+manque (`supabase secrets list --project-ref …` pour voir les noms) :
+```bash
+supabase secrets set NOM=valeur --project-ref bmdzadvugtkclnqjpndr
+```
 ```bash
 supabase functions deploy <nom> --project-ref bmdzadvugtkclnqjpndr
 ```
+Une clé privée multiligne (`.p8` d'Apple) passe par `NOM="$(cat fichier.p8)"`.
 
 **6. Relier le dev AUSSITÔT** — sinon le prochain `db push` d'un agent part en prod :
 ```bash

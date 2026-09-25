@@ -204,6 +204,19 @@ l'app**, pas un contenu rédigé. Rien de nouveau à cocher, mais deux libellés
   déjà visibles dans la ligue, sa notification passe par le traitement existant (§3 du
   registre) et l'événement `round_highlight_opened` ne porte que sa provenance.
 
+### Blocages et signalements de joueurs (v1.3.0, registre §12)
+
+Bloquer un joueur ou signaler son pseudo ou sa photo enregistre deux identifiants, un motif en
+liste fermée et une date : ce sont des **actions dans l'app**, pas un contenu rédigé. Rien de
+nouveau à cocher, mais deux libellés s'élargissent **avant la publication du build 1.3.0** :
+
+- **Play, « Autres actions »** : ajouter les blocages et signalements. Obligatoire,
+  **Fonctionnalité de l'appli**.
+- **Apple, « Product Interaction » (liée)** : même ajout, **App Functionality**.
+- Aucun événement de mesure n'a été ajouté : la ligne « Interactions / Analytics » ne change pas.
+- Le filtre des pseudos ne collecte rien. La révocation du jeton Apple à la suppression du compte
+  ne conserve ni code ni jeton : rien à déclarer.
+
 ---
 
 ## Privacy manifest iOS (`PrivacyInfo.xcprivacy`)

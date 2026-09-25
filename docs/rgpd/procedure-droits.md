@@ -21,8 +21,9 @@ L'utilisateur peut s'en occuper seul, immédiatement :
 **Réglages → Confidentialité → Exporter mes données**. L'export est produit par l'Edge
 Function `export-data` et couvre le compte, le profil, les pronostics et les points doubles
 (jokers), les réactions posées et reçues (celles-ci sans leur auteur, donnée d'un autre
-membre), les ligues, les classements, les préférences de notification et l'historique des
-consentements. Le jeton de
+membre), les ligues, les classements, les préférences de notification, l'historique des
+consentements, et les blocages et signalements **faits** par l'utilisateur (jamais ceux qui le
+visent, qui révéleraient leur auteur). Le jeton de
 notification en est volontairement exclu (secret d'appareil) : seules la plateforme et les
 dates apparaissent.
 
@@ -34,7 +35,10 @@ compte, produire l'export côté serveur en appelant `export-data` avec un jeton
 
 Là aussi, l'utilisateur est autonome : **Réglages → Supprimer mon compte**. L'Edge Function
 `delete-account` supprime le compte `auth.users` — tout le reste part en cascade — et purge
-le dossier de la photo de profil dans le bucket Storage (non couvert par la cascade).
+le dossier de la photo de profil dans le bucket Storage (non couvert par la cascade). Pour un
+compte Sign in with Apple, l'app redemande une connexion Apple juste avant : l'EF révoque le
+jeton, pour que TryCast disparaisse des apps connectées de l'identifiant Apple. Renoncer à cette
+connexion annule la suppression ; un échec chez Apple est journalisé et ne l'empêche pas.
 
 **Points à connaître pour répondre :**
 - La suppression est **immédiate et définitive**, sans corbeille ni délai de grâce.

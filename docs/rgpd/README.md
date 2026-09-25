@@ -30,7 +30,8 @@ de build.
 ## Ce qui est déjà en place côté code
 
 - **Portabilité** : Edge Function `export-data`, branchée sur Réglages → Confidentialité
-- **Effacement** : Edge Function `delete-account` (cascade SQL + purge du bucket avatars)
+- **Effacement** : Edge Function `delete-account` (cascade SQL + purge du bucket avatars,
+  révocation du jeton Apple pour un compte Sign in with Apple)
 - **Consentements historisés** : table `consents`, append-only, avec date de recueil
 - **Cloisonnement** : RLS PostgreSQL sur toutes les tables — le client n'est qu'une UX
 - **Minimisation** : IP de l'anti-spam hachées et salées au jour, purgées à 24 h ; jeton de

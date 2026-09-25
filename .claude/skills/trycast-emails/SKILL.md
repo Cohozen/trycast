@@ -9,6 +9,8 @@ Les 7 e-mails d'auth (GoTrue) : confirmation d'inscription, réinitialisation de
 
 Le même générateur produit les **e-mails de la beta** (`docs/emails/`), envoyés en broadcast Resend et non par GoTrue : procédure dans `docs/emails/README.md`.
 
+Hors générateur : l'**alerte de signalement d'un joueur** (v1.3.0), texte brut envoyé à `contact@` par l'API Resend depuis le trigger SQL `notify_user_report` (pg_net, clé dans le Vault sous `resend_api_key`, une clé « envoi seul » par projet). Détail dans le skill `trycast-regles-metier`, section « Modération ».
+
 ⚠️ **Adresses relais Apple** (`@privaterelay.appleid.com`, comptes Sign in with Apple qui masquent leur adresse) : le relais d'Apple **rejette** tout e-mail dont le domaine ou l'expéditeur n'est pas déclaré dans Apple Developer → Sign in with Apple for Email Communication. `trycast.fr` et l'expéditeur Resend doivent y figurer, et tout nouvel expéditeur s'y ajoute avant son premier envoi. Sinon ces comptes ne reçoivent rien, pas même le préavis de purge des inactifs, alors que la politique de confidentialité promet qu'Apple fait suivre.
 
 ## Ne jamais éditer `supabase/templates/*.html` à la main
