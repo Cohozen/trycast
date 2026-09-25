@@ -144,7 +144,7 @@ const footerLink = (label, url) =>
     `<a href="${url}" style="color:${C.faint};text-decoration:underline;">${label}</a>`;
 
 /** Pied des e-mails d'auth : partis sans que personne ne les attende, on ne lit pas les réponses. */
-const AUTH_FOOTER = `E-mail automatique envoyé par TryCast — inutile d'y répondre.<br />
+const AUTH_FOOTER = `E-mail automatique envoyé par TryCast - inutile d'y répondre.<br />
                                 Une question ? ${footerLink('contact@trycast.fr', 'mailto:contact@trycast.fr')}`;
 
 /**
