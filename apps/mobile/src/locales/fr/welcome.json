@@ -2,17 +2,17 @@
     "steps": {
         "intro": {
             "title": "Bienvenue sur TryCast",
-            "body": "Tu pronostiques les matchs de la compétition, tes potes aussi. À la fin, il n'y en a qu'un en haut du classement."
+            "body": "Tu pronostiques les matchs de la compétition, tes potes aussi. Chaque bon prono te fait grimper au classement."
         },
         "predictions": {
             "title": "Un prono, c'est un score",
             "body": "Tu annonces le score exact du match. Ta saisie s'enregistre toute seule et se verrouille au coup d'envoi.",
-            "bonus": "Coche le bonus offensif si une équipe marque 4 essais ou plus. Réussi, il rapporte. Raté, il coûte 10 points.",
+            "bonus": "Coche le bonus offensif si une équipe marque 4 essais ou plus. Réussi, il rapporte. Raté, tu perds 10 points.",
             "joker": "Un match joué d'avance ? Pose ton point double. 1 par phase, il double tous les points du match."
         },
         "leagues": {
-            "title": "Le sel du jeu, c'est la ligue",
-            "body": "Crée la tienne et partage son code à 8 caractères, ou rejoins celle de tes potes. Tu peux aussi jouer sans ligue : tes points comptent au général."
+            "title": "Joue avec tes potes",
+            "body": "Crée la tienne et partage son code, ou rejoins celle de tes potes. Tu peux aussi jouer sans ligue : tes points comptent au général."
         },
         "notifications": {
             "title": "Ne rate pas un coup d'envoi",

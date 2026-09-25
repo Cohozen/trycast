@@ -7,7 +7,7 @@
     "hero": {
         "title": "Join the game",
         "message": "Create your league or join your friends' to start predicting together.",
-        "footnote": "You can also predict without a league — your points still count overall."
+        "footnote": "You can also predict without a league - your points still count overall."
     },
     "leaderboard": {
         "title": "Leaderboard",
@@ -69,12 +69,12 @@
         }
     },
     "join": {
-        "intro": "Enter the 8-character code from your friend — or paste the invite link directly.",
+        "intro": "Enter the 8-character code from your friend - or paste the invite link directly.",
         "codeLabel": "Invite code",
         "paste": "Paste an invite link",
         "pasteEmpty": "No invite code in the clipboard.",
         "linkDetected": "Code detected from the pasted link",
-        "hint": "We show you a preview of the league before you join — nothing is confirmed as you type.",
+        "hint": "We show you a preview of the league before you join - nothing is confirmed as you type.",
         "preview": {
             "meta": "Private league · {{competition}}",
             "alreadyMember": "You're already in this league. Open it directly to see the leaderboard.",
@@ -114,14 +114,14 @@
             "notPlayedTitle": "Round not played yet",
             "notPlayedMessage": "Round {{round}} points will show here once the matches are done and predictions reconciled.",
             "backToPlayed": "See round {{round}}",
-            "dayNote": "Points for this round only — not the season total.",
+            "dayNote": "Points for this round only - not the season total.",
             "empty": "Per-round results arrive after the first finished matches.",
             "roundOverlineStages": "Rounds & knockouts",
             "stageShort": "KO",
             "stageNotPlayedTitle": "{{stage}} coming up",
             "stageNotPlayedMessage": "Points for {{ofPhrase}} will show up here once the matches are over and predictions are settled.",
             "backToPlayedStage": "See {{phrase}}",
-            "stageNote": "Points from this knockout stage only — not the season total.",
+            "stageNote": "Points from this knockout stage only - not the season total.",
             "matchCount_one": "{{count}} match",
             "matchCount_other": "{{count}} matches",
             "stages": {
@@ -266,7 +266,7 @@
         "transfer": {
             "title": "Transfer ownership",
             "subtitle": "Make a member the new league admin.",
-            "note": "You'll become a regular member — the new admin can remove you.",
+            "note": "You'll become a regular member - the new admin can remove you.",
             "confirm": "Transfer ownership"
         }
     },

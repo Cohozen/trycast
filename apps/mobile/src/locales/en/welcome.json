@@ -2,17 +2,17 @@
     "steps": {
         "intro": {
             "title": "Welcome to TryCast",
-            "body": "You predict the competition's matches, and so do your mates. In the end, only one of you tops the table."
+            "body": "You predict the competition's matches, and so do your mates. Every good call moves you up the table."
         },
         "predictions": {
             "title": "A prediction is a score",
             "body": "Call the exact score of the match. Your entry saves itself and locks at kick-off.",
-            "bonus": "Tick the attacking bonus if a team scores 4 tries or more. Get it right and it pays. Get it wrong and it costs 10 points.",
+            "bonus": "Tick the attacking bonus if a team scores 4 tries or more. Get it right and it pays. Get it wrong and you lose 10 points.",
             "joker": "A match looks like a sure thing? Play your double points. 1 per phase, it doubles all the points of the match."
         },
         "leagues": {
-            "title": "Leagues are where it's at",
-            "body": "Create yours and share its 8-character code, or join your mates'. You can also play without a league: your points still count overall."
+            "title": "Play with your mates",
+            "body": "Create yours and share its code, or join your mates'. You can also play without a league: your points still count overall."
         },
         "notifications": {
             "title": "Never miss a kick-off",

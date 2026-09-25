@@ -7,7 +7,7 @@
     "hero": {
         "title": "Rejoins la partie",
         "message": "Crée ta ligue ou rejoins celle de tes potes pour commencer à pronostiquer ensemble.",
-        "footnote": "Tu peux aussi pronostiquer sans ligue — tes points comptent au général."
+        "footnote": "Tu peux aussi pronostiquer sans ligue - tes points comptent au général."
     },
     "leaderboard": {
         "title": "Classement",
@@ -69,12 +69,12 @@
         }
     },
     "join": {
-        "intro": "Saisis le code à 8 caractères reçu de ton pote — ou colle directement le lien d'invitation.",
+        "intro": "Saisis le code à 8 caractères reçu de ton pote - ou colle directement le lien d'invitation.",
         "codeLabel": "Code d'invitation",
         "paste": "Coller un lien d'invitation",
         "pasteEmpty": "Aucun code d'invitation dans le presse-papier.",
         "linkDetected": "Code détecté depuis le lien collé",
-        "hint": "On te montre l'aperçu de la ligue avant que tu la rejoignes — rien n'est validé à la frappe.",
+        "hint": "On te montre l'aperçu de la ligue avant que tu la rejoignes - rien n'est validé à la frappe.",
         "preview": {
             "meta": "Ligue privée · {{competition}}",
             "alreadyMember": "Tu fais déjà partie de cette ligue. Ouvre-la directement pour voir le classement.",
@@ -114,14 +114,14 @@
             "notPlayedTitle": "Journée pas encore jouée",
             "notPlayedMessage": "Les points de la journée {{round}} s'afficheront ici une fois les matchs terminés et les pronos réconciliés.",
             "backToPlayed": "Voir la journée {{round}}",
-            "dayNote": "Points de cette journée uniquement — pas le cumul de la saison.",
+            "dayNote": "Points de cette journée uniquement - pas le cumul de la saison.",
             "empty": "Les résultats par journée arrivent après les premiers matchs terminés.",
             "roundOverlineStages": "Journées & phases finales",
             "stageShort": "PF",
             "stageNotPlayedTitle": "{{stage}} à venir",
             "stageNotPlayedMessage": "Les points {{ofPhrase}} s'afficheront ici une fois les matchs terminés et les pronos réconciliés.",
             "backToPlayedStage": "Voir {{phrase}}",
-            "stageNote": "Points de cette phase finale uniquement — pas le cumul de la saison.",
+            "stageNote": "Points de cette phase finale uniquement - pas le cumul de la saison.",
             "matchCount_one": "{{count}} match",
             "matchCount_other": "{{count}} matchs",
             "stages": {
@@ -266,7 +266,7 @@
         "transfer": {
             "title": "Transférer la propriété",
             "subtitle": "Désigne un membre comme nouvel admin de la ligue.",
-            "note": "Tu deviendras simple membre — le nouvel admin pourra te retirer.",
+            "note": "Tu deviendras simple membre - le nouvel admin pourra te retirer.",
             "confirm": "Transférer la propriété"
         }
     },
