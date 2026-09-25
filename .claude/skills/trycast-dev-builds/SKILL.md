@@ -189,8 +189,10 @@ entitlements) et sans Apple ID dans les Réglages du simulateur : la feuille s'a
 « Connectez-vous à votre compte Apple », puis renvoie `AuthorizationError 1000`
 (`ERR_REQUEST_UNKNOWN`), que l'app affiche en **erreur générique**. C'est voulu : seul le code 1001
 (`ERR_REQUEST_CANCELED`) est un renoncement silencieux. Un build signé par `npm run ios` embarque les
-entitlements : avec un Apple ID connecté dans le simulateur, le parcours devrait aller au bout
-(**pas encore vérifié**). La référence reste l'iPhone en TestFlight.
+entitlements, mais même avec un Apple ID connecté dans le simulateur, la saisie du mot de passe
+Apple ID ne mène nulle part (vécu le 2026-09-25, bug connu du simulateur, rien à corriger côté app).
+Le parcours complet se vérifie sur iPhone en TestFlight : validé le 2026-09-25 (1.2.0 build 4).
+Un build TestFlight vise Supabase **prod** : le fournisseur Apple doit y être activé avant le test.
 
 ⚠️ **`pod install` refuse les pods Swift dont les dépendances ne définissent pas de module** (vécu 2026-07-23, ajout de `@react-native-google-signin/google-signin`). Message : *« The Swift pod `AppCheckCore` depends upon `GoogleUtilities` and `RecaptchaInterop`, which do not define modules »* — le prebuild s'arrête net à l'étape CocoaPods. Correctif **dans `app.json`**, jamais dans le `Podfile` (généré, effacé par `--clean`) : plugin `expo-build-properties` avec les pods fautifs en `modular_headers`.
 

@@ -118,9 +118,11 @@ fictifs sous de nouveaux ids : reprendre les liens de la dernière sortie, et s'
   sans l'intermédiaire WWDR G3 : diagnostic, correctif et repli `xcodebuild` dans le skill
   `trycast-dev-builds`, section iOS.
 - **Sign in with Apple au simulateur** : sans Apple ID dans les Réglages du simulateur, la feuille
-  renvoie une erreur générique (code 1000), et c'est attendu. Un build de `npm run ios` embarque les
-  entitlements : avec un Apple ID connecté, le parcours devrait aller au bout (pas encore vérifié ;
-  détail dans `trycast-dev-builds`). La référence reste l'iPhone en TestFlight.
+  renvoie une erreur générique (code 1000), et c'est attendu. Avec un Apple ID connecté et un build
+  signé de `npm run ios`, la feuille s'ouvre mais la saisie du mot de passe Apple ID ne mène nulle
+  part (vécu le 2026-09-25, bug connu du simulateur). Au simulateur, on vérifie le rendu du bouton
+  et l'ouverture de la feuille ; le parcours complet se teste sur iPhone en TestFlight (détail dans
+  `trycast-dev-builds`).
 - **Tester un lien d'invitation sans liens universels** (inertes dans un build signé en local, sans
   entitlements) : utiliser
   `xcrun simctl openurl booted "trycast:///rejoindre/<CODE>"`, **avec trois barres obliques**. Avec
