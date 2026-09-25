@@ -79,13 +79,18 @@ La version publique de février (pronos de tournoi) repassera de toute façon en
     `locales/*/leagues.json` (6 chacun), `locales/*/auth.json` (`reset.resent`), pied des e-mails
     d'auth (`AUTH_FOOTER` de `scripts/build-email-templates.mjs`, puis `emails:build` et
     `emails:push`). Même règle pour les textes des fiches (titre Play « TryCast — Pronos Rugby »,
-    chantier E). Les commentaires du code ne sont pas concernés.
+    chantier E) et pour **le site** : `apps/web/src/i18n/fr.ts` et `en.ts` (12 chacun), pages
+    légales FR et EN (confidentialité ~26 chacune, suppression de compte, mentions légales, CGU),
+    `rejoindre.astro`, `<title>` éventuels des layouts. Pages légales : jumelles FR/EN dans le même
+    commit et `legalUpdatedAt` avancé (skill `trycast-site-web`), puis `npm run check && npm run
+    build`. Les commentaires du code et du CSS ne sont pas concernés.
   - **Mot de passe oublié, saisie du code** (`auth.reset.subtitle`) : préciser que l'e-mail ne part
     que si un compte est associé à l'adresse saisie.
   - **Guide d'accueil** (`locales/*/welcome.json`) : reformuler « À la fin, il n'y en a qu'un en
     haut du classement » (trop négatif) ; « Raté, il coûte 10 points » → « Raté, tu perds
     10 points » ; retitrer « Le sel du jeu, c'est la ligue » (« sel » peu compris) ; « partage son
-    code à 8 caractères » → « partage son code ».
+    code à 8 caractères » → « partage son code ». Le « code à 8 caractères » de l'écran « Rejoindre
+    une ligue » reste, exprès : il guide la saisie.
 - `SENTRY_AUTH_TOKEN` (source maps de la beta) ; **alerte sur les crons en échec** à trancher.
 - **Passe iOS** : DS en clair et en sombre (bouton Apple en clair compris), rendu de l'icône
   (canal alpha aplati), push sur iPhone.
