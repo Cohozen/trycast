@@ -87,8 +87,9 @@ La version publique de février (pronos de tournoi) repassera de toute façon en
   et le « code à 8 caractères » de l'écran « Rejoindre une ligue », qui guide la saisie.
   Reste : **les e-mails d'auth à pousser en prod** (Corentin, voir « Ce qu'il reste à faire ») et
   le titre Play « TryCast — Pronos Rugby », avec la fiche (chantier E).
-- `SENTRY_AUTH_TOKEN` (source maps de la beta) : geste de Corentin (voir « Ce qu'il reste à
-  faire »). Les source maps des OTA ne sont volontairement pas branchées pour l'instant.
+- ✅ `SENTRY_AUTH_TOKEN` (source maps de la beta) : secret EAS de l'environnement `production`
+  (2026-09-25). À contrôler au build 1.3.0 : artefacts de source maps dans Sentry. Les source maps
+  des OTA ne sont volontairement pas branchées pour l'instant.
 - ✅ **Alerte sur les crons en échec** (2026-09-25) : job pg_cron `cron-health` à la demie de
   chaque heure, qui envoie un check-in `ok` ou `error` à un moniteur Sentry Crons (échec d'un job,
   appels HTTP des crons en échec majoritaire, job de `job_runs` en erreur seule) ; un check-in
@@ -185,11 +186,6 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   puis les e-mails d'auth en prod depuis la racine,
   `npm run emails:push -- --project=<ref prod> --dry-run`, puis sans `--dry-run` (skill
   `trycast-emails`). Les locales de l'app partent avec le build 1.3.0.
-- `SENTRY_AUTH_TOKEN` en secret EAS — un **jeton d'organisation**, pas personnel. Sans lui, pas de
-  source maps : plantages en JS minifié. Depuis `apps/mobile` :
-  `eas env:set --name SENTRY_AUTH_TOKEN --environment production --visibility secret --type string`
-  (`env:create` est déprécié). Les source maps des OTA restent volontairement non branchées pour
-  l'instant.
 - **Projet EAS parasite `@cohozen/trycast-repo`** (2026-09-25) : créé par un `eas env:create` lancé
   depuis la racine du dépôt (réponse « yes » à « create an EAS project »). Le `app.json` qu'il a
   écrit à la racine est supprimé ; reste à supprimer le projet sur expo.dev (Project settings →
