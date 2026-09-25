@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
     type OAuthProviderId,
     type ProviderDefinition,
+    providersToRevoke,
     resolveProviders,
 } from '@/features/auth/providers';
 
@@ -76,5 +77,22 @@ describe('Sign in with Apple', () => {
 
     it("n'est jamais proposé sur Android", () => {
         expect(resolveProviders('android').map((p) => p.id)).not.toContain('apple');
+    });
+});
+
+describe('providersToRevoke', () => {
+    const withRevocation: ProviderDefinition[] = [
+        definitions[0],
+        { ...definitions[1], revokeOnDeletion: true },
+    ];
+
+    it('ne retient que les fournisseurs du compte marqués à révoquer', () => {
+        expect(providersToRevoke(['email', 'apple'], withRevocation)).toEqual(['apple']);
+        expect(providersToRevoke(['google'], withRevocation)).toEqual([]);
+        expect(providersToRevoke(['email'], withRevocation)).toEqual([]);
+    });
+
+    it('marque Apple dans la liste réelle', () => {
+        expect(providersToRevoke(['apple', 'google'])).toEqual(['apple']);
     });
 });

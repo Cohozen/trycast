@@ -2,7 +2,12 @@
 // supprime l'utilisateur auth.users via la service_role key. Le ON DELETE CASCADE
 // de profiles (et des futures tables user_id) nettoie le reste ; le Storage
 // n'est pas couvert par la cascade → on purge le dossier avatar à la main.
+// Un compte Sign in with Apple arrive avec un code de révocation (l'app rouvre
+// la feuille Apple avant d'appeler) : le jeton est révoqué avant la suppression,
+// et un échec n'empêche pas la suppression (apple.ts).
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+
+import { revokeAppleToken } from './apple.ts';
 
 const AVATARS_BUCKET = 'avatars';
 
@@ -29,6 +34,19 @@ Deno.serve(async (req: Request) => {
 
     if (userError || !user) {
         return json({ error: 'unauthorized' }, 401);
+    }
+
+    // Corps facultatif : les builds d'avant la révocation Apple n'en envoient pas
+    const body = (await req.json().catch(() => ({}))) as {
+        revocationCodes?: { apple?: string };
+    };
+    const appleCode = body.revocationCodes?.apple;
+    if (appleCode) {
+        await revokeAppleToken(appleCode, {
+            teamId: Deno.env.get('APPLE_TEAM_ID') ?? '',
+            keyId: Deno.env.get('APPLE_KEY_ID') ?? '',
+            privateKey: Deno.env.get('APPLE_PRIVATE_KEY') ?? '',
+        });
     }
 
     // Purge du dossier avatar (best-effort : ne bloque pas la suppression du

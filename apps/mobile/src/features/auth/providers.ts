@@ -33,6 +33,12 @@ export type ProviderDefinition = {
     labelKey: OAuthProvider['labelKey'];
     /** Mécanique par plateforme. Plateforme absente = fournisseur non proposé. */
     flows: Partial<Record<PlatformName, OAuthFlow>>;
+    /**
+     * Le jeton du fournisseur doit être révoqué à la suppression du compte
+     * (règle 5.1.1(v) de l'App Store pour Apple) : l'app redemande une
+     * connexion au fournisseur juste avant de supprimer.
+     */
+    revokeOnDeletion?: true;
 };
 
 /**
@@ -48,6 +54,7 @@ const DEFINITIONS: ProviderDefinition[] = [
         id: 'apple',
         labelKey: 'auth:actions.continueWithApple',
         flows: { ios: 'native-id-token' },
+        revokeOnDeletion: true,
     },
     {
         id: 'google',
@@ -98,4 +105,14 @@ export function resolveProviders(
         }
         return [{ id: definition.id, flow, labelKey: definition.labelKey }];
     });
+}
+
+/** Fournisseurs du compte dont le jeton est à révoquer avant sa suppression. */
+export function providersToRevoke(
+    methods: readonly string[],
+    definitions: ProviderDefinition[] = DEFINITIONS,
+): OAuthProviderId[] {
+    return definitions
+        .filter((definition) => definition.revokeOnDeletion && methods.includes(definition.id))
+        .map((definition) => definition.id);
 }

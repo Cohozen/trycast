@@ -1,4 +1,4 @@
-import { signInWithApple } from '@/features/auth/apple-sign-in';
+import { requestAppleAuthorizationCode, signInWithApple } from '@/features/auth/apple-sign-in';
 import { signInWithGoogle, signOutFromGoogle } from '@/features/auth/google-sign-in';
 import type { OAuthProvider, OAuthProviderId } from '@/features/auth/providers';
 import { signInWithWebRedirect } from '@/features/auth/web-oauth';
@@ -61,4 +61,29 @@ export async function signInWithProvider(provider: OAuthProvider): Promise<Provi
  */
 export async function signOutFromProviders(): Promise<void> {
     await signOutFromGoogle();
+}
+
+/**
+ * Codes de révocation à joindre à la suppression du compte, par fournisseur
+ * (`providersToRevoke`). Chaque fournisseur concerné rouvre sa feuille ; un
+ * renoncement rend `null` et la suppression n'a pas lieu.
+ */
+export async function requestRevocationCodes(
+    ids: OAuthProviderId[],
+): Promise<Partial<Record<OAuthProviderId, string>> | null> {
+    const codes: Partial<Record<OAuthProviderId, string>> = {};
+    for (const id of ids) {
+        switch (id) {
+            case 'apple': {
+                const code = await requestAppleAuthorizationCode();
+                if (code === null) return null;
+                codes.apple = code;
+                break;
+            }
+            case 'google':
+                // Pas de révocation exigée : Google n'est jamais marqué
+                break;
+        }
+    }
+    return codes;
 }

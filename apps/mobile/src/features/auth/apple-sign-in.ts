@@ -46,3 +46,24 @@ export async function signInWithApple(): Promise<AppleCredential | null> {
         throw error;
     }
 }
+
+/**
+ * Rouvre la feuille Apple juste avant la suppression du compte, pour obtenir
+ * un `authorizationCode` frais (valable 5 minutes, usage unique) que l'EF
+ * `delete-account` échange puis révoque. Aucune portée demandée : seule la
+ * preuve de connexion compte. `null` = l'utilisateur a renoncé.
+ */
+export async function requestAppleAuthorizationCode(): Promise<string | null> {
+    try {
+        const credential = await AppleAuthentication.signInAsync({ requestedScopes: [] });
+        if (!credential.authorizationCode) {
+            throw new Error('Sign in with Apple : réponse sans authorizationCode');
+        }
+        return credential.authorizationCode;
+    } catch (error) {
+        if (error instanceof Error && 'code' in error && error.code === 'ERR_REQUEST_CANCELED') {
+            return null;
+        }
+        throw error;
+    }
+}
