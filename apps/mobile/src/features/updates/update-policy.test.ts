@@ -27,20 +27,48 @@ describe('shouldReloadSilently', () => {
     const longAgo = now - SILENT_RELOAD_AFTER_MS;
 
     it('recharge après une longue absence avec une mise à jour en attente', () => {
-        expect(shouldReloadSilently({ pending: true, backgroundedAt: longAgo, now })).toBe(true);
+        expect(
+            shouldReloadSilently({ pending: true, backgroundedAt: longAgo, linkedAt: null, now }),
+        ).toBe(true);
     });
 
     it('ne recharge pas sans mise à jour en attente', () => {
-        expect(shouldReloadSilently({ pending: false, backgroundedAt: longAgo, now })).toBe(false);
+        expect(
+            shouldReloadSilently({ pending: false, backgroundedAt: longAgo, linkedAt: null, now }),
+        ).toBe(false);
     });
 
     it('ne recharge pas après une absence courte', () => {
-        expect(shouldReloadSilently({ pending: true, backgroundedAt: longAgo + 1, now })).toBe(
-            false,
-        );
+        expect(
+            shouldReloadSilently({
+                pending: true,
+                backgroundedAt: longAgo + 1,
+                linkedAt: null,
+                now,
+            }),
+        ).toBe(false);
     });
 
     it('ne recharge pas sans passage en arrière-plan', () => {
-        expect(shouldReloadSilently({ pending: true, backgroundedAt: null, now })).toBe(false);
+        expect(
+            shouldReloadSilently({ pending: true, backgroundedAt: null, linkedAt: null, now }),
+        ).toBe(false);
+    });
+
+    it('ne recharge pas une app rouverte par un lien ou une notification', () => {
+        expect(
+            shouldReloadSilently({ pending: true, backgroundedAt: longAgo, linkedAt: now, now }),
+        ).toBe(false);
+    });
+
+    it('ignore un lien reçu avant le passage en arrière-plan', () => {
+        expect(
+            shouldReloadSilently({
+                pending: true,
+                backgroundedAt: longAgo,
+                linkedAt: longAgo - 1,
+                now,
+            }),
+        ).toBe(true);
     });
 });
