@@ -124,8 +124,7 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   `contact@` avec la requête de traitement. Règles et recette de traitement : skill
   `trycast-regles-metier`, section « Modération ». CGU FR/EN (tolérance zéro, examen sous 24 h),
   politiques FR/EN, registre §12 et `export-data` à jour. En prod depuis le 2026-09-26. L'e-mail
-  d'alerte est vérifié sur le dev (Resend a accepté l'envoi vers `contact@`) ; reste à Corentin
-  d'en confirmer la réception. Le compte de démo « DemoTryCast » est exempté du filtre
+  d'alerte est vérifié de bout en bout sur le dev (reçu à `contact@` le 2026-09-26). Le compte de démo « DemoTryCast » est exempté du filtre
   (`is_demo`), sans quoi son profil ne se modifiait plus (skill `trycast-regles-metier`).
 - ✅ **Révocation des jetons Apple** à la suppression du compte (règle 5.1.1(v), 2026-09-25) : rien
   n'est stocké. L'app rouvre la feuille Apple au moment de supprimer, et l'EF `delete-account`
@@ -221,11 +220,9 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   déployées, les trois migrations de modération en prod (dont l'exemption des comptes de démo :
   au contrôle, seul « DemoTryCast » avait un pseudo refusé) et `git push` (pages légales en
   ligne). La partie app part avec le build 1.3.0, que Corentin garde en attente le temps de
-  décider ce qu'il inclut d'autre. Restent :
-  1. Confirmer la réception à `contact@` de l'e-mail d'alerte du signalement de test fait sur le
-     dev le 2026-09-26 (Resend a accepté l'envoi).
-  2. **Au build 1.3.0 sur iPhone** : supprimer un compte Apple de test et vérifier que TryCast
-     disparaît de « Se connecter avec Apple » dans l'identifiant Apple.
+  décider ce qu'il inclut d'autre. E-mail d'alerte d'un signalement reçu à `contact@`
+  (2026-09-26). Reste **au build 1.3.0 sur iPhone** : supprimer un compte Apple de test et
+  vérifier que TryCast disparaît de « Se connecter avec Apple » dans l'identifiant Apple.
 
 ### 🔜 iOS — beta fermée TestFlight en octobre 2026 (plan du 2026-09-24)
 Objectif : des testeurs iPhone (amis, connaissances) **invités par e-mail** dans un groupe
