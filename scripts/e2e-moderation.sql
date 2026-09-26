@@ -76,6 +76,11 @@ begin
     end;
     perform pg_temp.expect(v_state = '23514', 'filtre : update direct accepté');
 
+    -- Compte de démo (DemoTryCast) : exempté, son profil reste modifiable
+    update public.profiles set is_demo = true, username = 'DemoTryCast' where id = u[2];
+    update public.profiles set locale = 'en' where id = u[2];
+    update public.profiles set is_demo = false, username = 'ModoUser2' where id = u[2];
+
     -- Données : ligue, match commencé, prono de u1, réactions de u2 et u3 --------
     insert into public.competitions (api_league_id, api_season, name, slug, starts_on, ends_on, is_active)
     values (-901, 2026, 'E2E Modo', 'e2e-modo', current_date - 30, current_date + 30, false)
