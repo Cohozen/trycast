@@ -22,7 +22,8 @@
 > mots de passe par Face ID, invitation beta unique iPhone + Android) ; migration de bienvenue en
 > prod et `main` poussé le 2026-09-26 (AASA à `webcredentials` en ligne) ; le reste part avec le
 > build 1.3.0. Chantier D : **envoi automatique aux stores livré en code** (`build:prod` et
-> `build:prod:ios` en `--auto-submit`) ; restent les gestes Google avant le build 1.3.0.
+> `build:prod:ios` en `--auto-submit`), clé du compte de service Google dans EAS le 2026-09-26 ;
+> premier envoi réel à venir avec le build 1.3.0.
 
 ## Avancement des lots
 
@@ -168,11 +169,12 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
 - ✅ **`eas submit` Android et iOS** (2026-09-26), code commité : `submit.production.android`
   d'`eas.json` envoie en brouillon (`releaseStatus: "draft"`) sur la piste de test fermé
   (`alpha`), pour garder la main sur les notes de version ; la clé du compte de service Google
-  vivra dans les credentials EAS, jamais dans le dépôt. `build:prod` et le nouveau
+  vit dans les credentials EAS (téléversée le 2026-09-26), jamais dans le dépôt. `build:prod` et le nouveau
   `build:prod:ios` passent `--auto-submit` (plus `build:list:ios`) ; un envoi raté se rejoue par
   `eas submit -p android|ios --profile production --latest`, sans rebuild. L'ajout a déplacé
-  l'empreinte Android, sans conséquence : la 1.3.0 n'est pas buildée. Restent les gestes Google,
-  dans « Ce qu'il reste à faire ». Recette : `docs/stores/play-store.md`, « Envoi par `eas submit` ».
+  l'empreinte Android, sans conséquence : la 1.3.0 n'est pas buildée. Gestes Google faits le
+  2026-09-26 (compte de service, invitation Play Console, clé dans EAS) ; reste à vérifier au
+  premier envoi, dans « Ce qu'il reste à faire ». Recette : `docs/stores/play-store.md`, « Envoi par `eas submit` ».
 
 **E. Fiches des stores** (au gel, après le dernier changement d'écran)
 - **Play, fiche refaite** : 4 à 6 captures au nouveau DS depuis un build `preview` en français,
@@ -224,12 +226,11 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   puis les e-mails d'auth en prod depuis la racine,
   `npm run emails:push -- --project=<ref prod> --dry-run`, puis sans `--dry-run` (skill
   `trycast-emails`). Les locales de l'app partent avec le build 1.3.0.
-- **Envoi automatique à la Play Console (chantier D), gestes de Corentin avant le build 1.3.0**,
-  détaillés dans `docs/stores/play-store.md`, « Envoi par `eas submit` » : compte de service
-  Google Cloud avec l'API Google Play Android Developer activée et une clé JSON ; invitation du
-  compte dans la Play Console, avec le droit de publier sur les pistes de test ; clé téléversée
-  par `eas credentials -p android` (puis copie locale supprimée) ; piste de test fermé créée.
-  Sans clé, le build réussit et seul l'envoi échoue.
+- **Envoi automatique à la Play Console (chantier D)** : compte de service, invitation dans la
+  Play Console et clé dans EAS faits le 2026-09-26 (`docs/stores/play-store.md`, « Envoi par
+  `eas submit` »). Reste : **piste de test fermé créée** dans la console avant le build 1.3.0, et
+  constater au premier `npm run build:prod` que la release arrive en brouillon sur `alpha`. Un
+  envoi raté se rejoue par `eas submit -p android --profile production --latest`.
 - **Alerte sur les crons en échec, gestes de Corentin**, dans cet ordre : créer le secret
   `sentry_cron_checkin_url` (URL en `environment=production`, commande dans l'en-tête de
   `supabase/migrations/20260925000100_cron_health.sql`) dans le Vault **prod avant le push** ;
