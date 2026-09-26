@@ -65,16 +65,24 @@ Détails d'usage (observer, piloter, deep links, pièges) : skill `trycast-andro
 |---|---|
 | `npm run build:dev` | Dev client Android (APK, à installer soi-même) |
 | `npm run build:preview` | Build de release sur le projet **dev** — sert aux captures et à valider l'OTA |
-| `npm run build:prod` | **AAB** pour la Play Console, sur le projet **prod** |
-| `npm run build:list` | Les 5 derniers builds Android |
+| `npm run build:prod` | **AAB** sur le projet **prod**, envoyé à la Play Console (piste `alpha`, en brouillon) |
+| `npm run build:prod:ios` | **IPA** sur le projet **prod**, envoyé à TestFlight |
+| `npm run build:list` / `build:list:ios` | Les 5 derniers builds Android / iOS |
 | `npm run release -- --minor --notes "…"` | Prépare une release : bump, journal, vérifications, commit et tag `vX.Y.Z` |
 | `npm run ota:preview -- --message "…"` | Mise à jour à distance sur le canal `preview` |
 | `npm run ota:prod -- --message "…"` | Mise à jour à distance sur le canal `production` |
 | `npm run ota:list` | Les 5 dernières mises à jour publiées |
 | `npm run env:preview` / `env:prod` | Variables EAS de l'environnement, à vérifier avant un build |
 
-Android uniquement : iOS est différé faute de compte Apple Developer. Ces scripts
-gagneront leur variante le jour venu.
+Les deux builds de production passent `--auto-submit` : `eas submit` part dès la fin du build,
+avec le profil `submit.production` d'`eas.json`. Côté Play, la release arrive **en brouillon** sur
+la piste de test fermé (`alpha`) : les notes de version s'écrivent et le déploiement se lance dans
+la console. Les clés (compte de service Google, clé d'API App Store Connect) ne vivent que dans
+les credentials EAS. Si l'envoi échoue alors que le build a réussi, pas besoin de rebuilder :
+
+```bash
+eas submit -p android --profile production --latest
+```
 
 ### Quand une mise à jour suffit, et quand il faut rebuilder
 

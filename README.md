@@ -80,7 +80,8 @@ Depuis **`apps/mobile`** :
 | `npm run lint`                    | ESLint (config Expo, règles stylistiques désactivées)                          |
 | `npm run android:doctor`          | Diagnostic de la chaîne Android : JDK, SDK, AVD, appareils connectés            |
 | `npm run android:emulator`        | Démarre l'émulateur et attend qu'il soit réellement prêt                        |
-| `npm run build:dev` / `build:preview` / `build:prod` | Builds EAS Android (dev client / release sur le dev / AAB pour la Play Console) |
+| `npm run build:dev` / `build:preview` / `build:prod` | Builds EAS Android (dev client / release sur le dev / AAB envoyé en brouillon sur la piste de test fermé Play) |
+| `npm run build:prod:ios` | Build EAS iOS de production, envoyé à TestFlight |
 | `npm run ota:preview` / `ota:prod` | Mise à jour à distance sur le canal correspondant (garde-fous : voir `apps/mobile/scripts/README.md`) |
 | `npm run env:preview` / `env:prod` | Variables EAS de l'environnement, à vérifier avant un build |
 | `npm run release`                 | Prépare une version (voir « Numéro de version »)                               |
@@ -330,7 +331,7 @@ celle d'EAS). Le `.gitignore` racine n'y entre pas. Le champ `scripts` d'`apps/m
 en est **exclu** (`fingerprint.config.js`) : sans cette exclusion, ajouter une commande npm coupe les
 builds déjà distribués de toute mise à jour.
 
-Les scripts `build:*` ne visent qu'Android ; iOS se build par `eas build -p ios` (profils d'`eas.json`) et part en TestFlight par `eas submit`.
+`build:prod` et `build:prod:ios` passent `--auto-submit` : le build fini part tout seul vers la Play Console ou TestFlight, selon `submit.production` d'`eas.json`. Un envoi raté se rejoue par `eas submit -p android|ios --latest`.
 
 ### Numéro de version
 

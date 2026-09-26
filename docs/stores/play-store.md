@@ -325,6 +325,29 @@ Les écrans se débloquent les uns les autres — cet ordre évite les allers-re
 
 ---
 
+## Envoi par `eas submit`
+
+`npm run build:prod` (depuis `apps/mobile`) passe `--auto-submit` : l'AAB part tout seul vers la
+Play Console, en **brouillon** sur la piste de **test fermé** (`alpha`), d'après
+`submit.production.android` d'`eas.json`. Les notes de version s'écrivent et le déploiement se
+lance dans la console.
+
+Prérequis, une seule fois (gestes de Corentin) :
+
+1. **Google Cloud** : créer un compte de service dans un projet, activer l'**API Google Play
+   Android Developer**, générer une clé **JSON**.
+2. **Play Console** → Utilisateurs et autorisations : inviter l'adresse du compte de service,
+   avec le droit de publier sur les **pistes de test** pour TryCast.
+3. **Clé confiée à EAS** : `eas credentials -p android` → production → *Google Service Account* →
+   téléverser le JSON. **Jamais dans le dépôt**, et supprimer la copie locale ensuite.
+4. **Piste de test fermé** créée dans la console (le premier AAB est déjà passé à la main : la
+   1.2.0, sur le test interne).
+
+Sans clé, le build réussit et seul l'envoi échoue : le rejouer par
+`eas submit -p android --profile production --latest`, sans rebuilder.
+
+---
+
 ## Point ouvert : contenu généré par les utilisateurs
 
 Déclarer « interaction entre utilisateurs » est exact — pseudos, noms de ligues, photos de

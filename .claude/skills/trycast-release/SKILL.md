@@ -169,12 +169,20 @@ jour. Le pourquoi d'une version, lui, vit dans `CHANGELOG.md` et le tag.
 | `preview` | release | **dev** | `preview` |
 | `production` | **AAB** pour la Play Console | **prod** | `production` |
 
-Côté iOS, le profil `production` sort un `.ipa` pour App Store Connect :
-`eas build -p ios --profile production`, puis `eas submit -p ios` (les scripts `build:*` et
-`build:list` ne visent qu'Android). `submit.production.ios`
-d'`eas.json` porte l'identifiant de l'app App Store Connect et le Team ID ; la **clé d'API App Store
-Connect** et la **clé APNs** ne vivent que dans les credentials EAS (proposées au premier build ou
-submit interactif, sinon `eas credentials`), jamais dans le dépôt.
+Côté iOS, le profil `production` sort un `.ipa` pour App Store Connect (`npm run build:prod:ios`,
+`npm run build:list:ios`).
+
+**Envoi aux stores** : `build:prod` et `build:prod:ios` passent `--auto-submit`, donc `eas submit`
+part dès la fin du build avec `submit.production` d'`eas.json`.
+- `submit.production.android` : piste `alpha` (test fermé), `releaseStatus: "draft"` : la release
+  attend dans la Play Console, où Corentin écrit les notes et lance le déploiement. La **clé JSON
+  du compte de service Google** vit dans les credentials EAS (`eas credentials` → Android →
+  Google Service Account), pas de `serviceAccountKeyPath`, jamais dans le dépôt.
+- `submit.production.ios` : identifiant de l'app App Store Connect et Team ID ; la **clé d'API App
+  Store Connect** et la **clé APNs** ne vivent que dans les credentials EAS.
+- Envoi raté, build réussi : `eas submit -p android|ios --profile production --latest`, sans rebuild.
+- ⚠️ `eas.json` entre dans l'empreinte (vérifié le 2026-09-26 : ajouter `submit.production.android`
+  l'a déplacée). Le toucher, c'est couper les builds distribués de l'OTA, comme `app.json`.
 
 Commandes : `npm run build:dev|build:preview|build:prod`, `npm run env:preview|env:prod`, depuis
 `apps/mobile`. ⚠️ Un build `preview`/`production` inline les `EXPO_PUBLIC_*` au bundling **sur les
