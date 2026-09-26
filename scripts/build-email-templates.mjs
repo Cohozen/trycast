@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Génère les templates d'e-mails d'auth Supabase dans `supabase/templates/`, et les
- * e-mails de la beta envoyés en broadcast Resend dans `docs/emails/`.
+ * Génère les templates d'e-mails d'auth Supabase dans `supabase/templates/`, et
+ * dans `docs/emails/` l'e-mail de bienvenue (template Resend) et les e-mails de la
+ * beta envoyés en broadcast Resend.
  *
  * Pourquoi un générateur plutôt que 7 fichiers écrits à la main : un e-mail HTML
  * ne peut pas inclure de partiel ni de feuille de style externe, donc l'habillage
@@ -488,6 +489,31 @@ export const betaLeague = (code) => ({
     ],
 });
 
+/* ---- Bienvenue des comptes Google et Apple (template Resend, docs/emails/) ---- */
+
+/**
+ * Envoyé par le trigger profiles_welcome_email (migration 20260926000400) quand un
+ * compte créé par un fournisseur choisit son pseudo : un compte e-mail a déjà reçu
+ * l'e-mail de confirmation. Mis en ligne comme template Resend publié sous l'alias
+ * « welcome », avec la variable USERNAME (triple accolade, remplacée par Resend).
+ * Français seul pour la beta.
+ */
+export const WELCOME = {
+    file: 'welcome.html',
+    subject: 'Bienvenue sur TryCast',
+    preheader: 'Ton compte est prêt : place aux pronos.',
+    title: 'Bienvenue, {{{USERNAME}}}',
+    blocks: [
+        p("Ton compte TryCast est prêt. Voici l'essentiel pour bien démarrer."),
+        steps([
+            `Dans l'onglet ${strong('Matchs')}, pronostique le score exact de chaque match avant le coup d'envoi.`,
+            `Crée une ${strong('ligue')} et invite tes potes avec son lien, ou rejoins la leur avec leur code.`,
+            `Garde ton ${strong('joker')} pour le match qui compte : il double tes points, une fois par phase.`,
+        ]),
+        callout('Plus ton prono est précis, plus tu marques. Bon match !'),
+    ],
+};
+
 /* ---- Écriture / vérification ---- */
 
 /** Les sujets vivent ici ; config.toml en garde une copie pour `supabase start`. */
@@ -540,6 +566,7 @@ function main() {
 
     const outputs = [
         ...TEMPLATES.map((template) => ({ template, dir: OUT_DIR, label: 'supabase/templates' })),
+        { template: WELCOME, dir: BROADCAST_DIR, label: 'docs/emails' },
     ];
 
     let drifted = 0;

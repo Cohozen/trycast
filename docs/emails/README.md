@@ -46,6 +46,22 @@ testeurs iPhone ne comptent pas dans les 12 exigés par Google.
 À la fin de la beta, **supprimer l'Audience** dans Resend et **désactiver le lien public**
 TestFlight (registre des traitements, §10).
 
+## E-mail de bienvenue (template Resend)
+
+`welcome.html` est versionné et vérifié par `--check` : il ne contient rien de secret. Il part
+seul, envoyé par le trigger `profiles_welcome_email` (migration `20260926000400`) quand un compte
+Google ou Apple choisit son pseudo ; le trigger ne porte pas le HTML, il désigne le template
+Resend publié sous l'alias `welcome`. Le template vit au niveau du compte Resend : un seul pour
+le dev et la prod, et une retouche s'applique aux deux dès sa publication.
+
+Après toute modification de `WELCOME` dans le générateur :
+
+1. `npm run emails:build`, puis relire `docs/emails/welcome.html` dans un navigateur.
+2. Resend → Templates → `welcome` : remplacer le HTML, sujet « Bienvenue sur TryCast »,
+   variable `USERNAME` (texte, repli « toi »), puis **publier** : seul un template publié
+   s'envoie. Sans template publié, l'API répond 422 (visible dans `net._http_response`) et
+   rien ne part.
+
 ## TestFlight : les « Informations de test »
 
 C'est ce que le testeur lit dans l'app TestFlight. À coller en français dans App Store Connect →
