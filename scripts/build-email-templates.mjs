@@ -429,8 +429,8 @@ export const betaInvite = (testflightUrl) => ({
             "Merci de vouloir tester TryCast, l'app de pronostics rugby entre potes. La beta fermée démarre, et ta place est prête.",
         ),
         storeButtons([
-            { label: 'Sur iPhone', via: 'TestFlight', url: testflightUrl },
-            { label: 'Sur Android', via: 'Google Play', url: PLAY_TESTING_URL },
+            { label: '🍏 Sur iPhone', via: 'TestFlight', url: testflightUrl },
+            { label: '🤖 Sur Android', via: 'Google Play', url: PLAY_TESTING_URL },
         ]),
         p('Les étapes pour ton téléphone sont juste en dessous.', {
             size: 14,
