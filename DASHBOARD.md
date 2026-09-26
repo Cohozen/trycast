@@ -19,8 +19,9 @@
 > Chantier B : **modération et révocation Apple en prod** (filtre des pseudos, bloquer, signaler ;
 > secrets, EF et migrations posés le 2026-09-26) ; reste la vérification sur iPhone au build 1.3.0.
 > Chantier C : **livré en code** (e-mail de bienvenue des comptes Google et Apple, remplissage des
-> mots de passe par Face ID, invitation beta unique iPhone + Android) ; la migration de bienvenue
-> est poussée et vérifiée sur le dev, reste la prod ; le reste part avec `git push` et le build 1.3.0.
+> mots de passe par Face ID, invitation beta unique iPhone + Android) ; migration de bienvenue en
+> prod et `main` poussé le 2026-09-26 (AASA à `webcredentials` en ligne) ; le reste part avec le
+> build 1.3.0.
 
 ## Avancement des lots
 
@@ -144,15 +145,14 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   envoi par l'API Resend en `pg_net` comme `notify_user_report`, contenu dans le template Resend
   publié sous l'alias `welcome` (un seul pour dev et prod, déjà publié). En français seulement pour
   la beta. Registre §1 et politiques FR/EN à jour. La migration `20260926000400` est poussée sur
-  le dev et vérifiée par `scripts/e2e-welcome.sql` (2026-09-26) ; reste la prod (voir « Ce qu'il
-  reste à faire »). Cas accepté : un profil modéré reçoit de nouveau la bienvenue en rechoisissant
+  le dev et vérifiée par `scripts/e2e-welcome.sql`, puis en prod (2026-09-26). Cas accepté : un profil modéré reçoit de nouveau la bienvenue en rechoisissant
   son pseudo.
 - ✅ **Remplissage des mots de passe par Face ID** (2026-09-26), sans lib native.
   `webcredentials:www.trycast.fr` dans `associatedDomains` (`app.json`, empreinte déplacée : part
   avec le build 1.3.0), clé `webcredentials` dans l'`apple-app-site-association`
   (`apps/web/scripts/build-well-known.mjs`) et `textContentType="username"` sur les champs
-  d'adresse de l'écran de connexion. **Pas encore vérifié** : il faut le site déployé et le build
-  1.3.0 sur iPhone. Côté Android, Google Password Manager fonctionne déjà avec `autoComplete`.
+  d'adresse de l'écran de connexion. AASA en ligne avec `webcredentials` (contrôlé par `curl` le
+  2026-09-26). **Pas encore vérifié** sur appareil : il faut le build 1.3.0 sur iPhone. Côté Android, Google Password Manager fonctionne déjà avec `autoComplete`.
   **Pas de verrou biométrique à l'ouverture**, écarté : la session persiste, rien de sensible à
   protéger, une friction à chaque ouverture.
 - ✅ **Invitation à la beta, un seul e-mail pour iPhone et Android** (2026-09-26) : deux boutons
@@ -236,15 +236,11 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   (2026-09-26). Reste **au build 1.3.0 sur iPhone** : supprimer un compte Apple de test et
   vérifier que TryCast disparaît de « Se connecter avec Apple » dans l'identifiant Apple.
 - **Confort (chantier C), gestes de Corentin**, dans cet ordre :
-  1. `supabase db push` de `20260926000400_welcome_email.sql` en **prod** (skill
-     `trycast-prod-rollout`, une seule migration attendue au dry-run ; le secret `resend_api_key`
-     est déjà sur les deux projets, le template Resend `welcome` déjà publié). Le dev est fait :
-     migration poussée et `scripts/e2e-welcome.sql` passé le 2026-09-26.
-  2. `git push` : le site se rebuilde avec l'AASA à `webcredentials` et les politiques du
-     2026-09-26. Contrôle : `curl` de l'AASA (recette dans le skill `trycast-site-web`).
-  3. Rebuild du dev client iOS.
-  4. Confirmer le rendu des deux e-mails de test reçus le 2026-09-26 (bienvenue, invitation).
-  5. **Au build 1.3.0 sur iPhone** : après une inscription par e-mail, iOS propose d'enregistrer
+  Faits le 2026-09-26 : migration `20260926000400` sur le dev (E2E passé) et en prod, `git push`
+  (AASA à `webcredentials` et politiques en ligne). Restent :
+  1. Rebuild du dev client iOS.
+  2. Confirmer le rendu des deux e-mails de test reçus le 2026-09-26 (bienvenue, invitation).
+  3. **Au build 1.3.0 sur iPhone** : après une inscription par e-mail, iOS propose d'enregistrer
      le mot de passe ; à la connexion suivante, il le propose au Face ID.
 
 ### 🔜 iOS — beta fermée TestFlight en octobre 2026 (plan du 2026-09-24)
