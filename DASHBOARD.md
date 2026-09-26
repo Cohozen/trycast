@@ -161,7 +161,7 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   Resend. Le lien public TestFlight ne va pas dans le dépôt : l'e-mail se génère à la demande
   (`--testflight`, skill `trycast-emails`). Texte des « Informations de test » TestFlight prêt dans
   `docs/emails/README.md`. Apple (TestFlight) déclaré au registre §10, aux sous-traitants et dans
-  les politiques FR/EN. Envoi test des deux e-mails à Corentin le 2026-09-26 : rendu à confirmer.
+  les politiques FR/EN. Envoi test des deux e-mails à Corentin le 2026-09-26 : rendu validé dans Proton.
 
 **D. Outillage**
 - **`eas submit` Android** : compte de service Google Cloud (API Google Play Android Developer
@@ -237,10 +237,10 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   vérifier que TryCast disparaît de « Se connecter avec Apple » dans l'identifiant Apple.
 - **Confort (chantier C), gestes de Corentin**, dans cet ordre :
   Faits le 2026-09-26 : migration `20260926000400` sur le dev (E2E passé) et en prod, `git push`
-  (AASA à `webcredentials` et politiques en ligne). Restent :
+  (AASA à `webcredentials` et politiques en ligne), rendu des deux e-mails de test validé dans
+  Proton. Restent :
   1. Rebuild du dev client iOS.
-  2. Confirmer le rendu des deux e-mails de test reçus le 2026-09-26 (bienvenue, invitation).
-  3. **Au build 1.3.0 sur iPhone** : après une inscription par e-mail, iOS propose d'enregistrer
+  2. **Au build 1.3.0 sur iPhone** : après une inscription par e-mail, iOS propose d'enregistrer
      le mot de passe ; à la connexion suivante, il le propose au Face ID.
 
 ### 🔜 iOS — beta fermée TestFlight en octobre 2026 (plan du 2026-09-24)
