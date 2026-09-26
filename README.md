@@ -311,9 +311,12 @@ ainsi sans le moindre message. Vérifier avec `npm run env:prod` avant de lancer
 
 `expo-updates` en politique **`fingerprint`** : la version d'exécution est recalculée dès que
 quelque chose touche au natif, ce qui rend une mise à jour incompatible extrêmement improbable.
-Un correctif purement JavaScript part par `npm run ota:prod` et arrive au **deuxième**
-lancement de l'app (`EXUpdatesLaunchWaitMs = 0` : démarrage depuis le cache, application au
-lancement suivant — aucune attente perçue). Pas de relecture Google, pas de téléversement.
+Un correctif purement JavaScript part par `npm run ota:prod`. `expo-updates` seul ne le cherche
+qu'au démarrage à froid et l'applique au **deuxième** lancement (`EXUpdatesLaunchWaitMs = 0` :
+démarrage depuis le cache, aucune attente perçue). Depuis le build 1.3.0, l'app cherche aussi au
+retour au premier plan, puis propose « Redémarrer » ou recharge d'elle-même après une longue
+absence (`apps/mobile/src/features/updates/`, skill `trycast-release`). Pas de relecture Google,
+pas de téléversement.
 
 ⚠️ **Une mise à jour n'est délivrée qu'aux builds portant exactement la même empreinte**, et le
 non-appariement est **muet** : rien n'échoue, le correctif n'arrive simplement jamais. Comparer

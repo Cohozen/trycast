@@ -87,7 +87,8 @@ eas submit -p android --profile production --latest
 ### Quand une mise à jour suffit, et quand il faut rebuilder
 
 Un correctif **JavaScript** (texte, style, logique, écran) part par `ota:*` et arrive chez les
-testeurs à leur deuxième lancement — pas de relecture Google, pas de téléversement.
+testeurs à leur deuxième lancement, ou, depuis le build 1.3.0, dès le retour de l'app au premier
+plan (skill `trycast-release`) — pas de relecture Google, pas de téléversement.
 
 Un changement **natif** (lib native ajoutée ou retirée, `app.json`, montée de SDK) impose un
 nouveau build. La politique `fingerprint` le dit sans ambiguïté : l'empreinte change, et une

@@ -67,12 +67,47 @@ Le corollaire est ce qui compte au quotidien : **un correctif JS se publie sans 
 
 ```
 Rien de natif n'a changé ?
-├─ et tu ne bumpes pas   →  npm run ota:prod -- --message "…"   (arrive au 2ᵉ lancement)
+├─ et tu ne bumpes pas   →  npm run ota:prod -- --message "…"   (arrivée : section suivante)
 └─ et tu veux bumper     →  c'est un build. npm run release, puis npm run build:prod
 Quelque chose de natif a changé ?
 └─ build obligatoire, quoi qu'il arrive. Les binaires déjà distribués sont coupés des
    mises à jour tant que le nouveau n'est pas installé.
 ```
+
+## Comment une OTA arrive sur l'appareil
+
+Deux mécanismes se superposent :
+
+- **`expo-updates` seul** (défaut `ON_LOAD`, `EXUpdatesLaunchWaitMs = 0`) : il ne cherche qu'au
+  démarrage à froid, télécharge sans bloquer, et n'applique la mise à jour qu'au démarrage à
+  froid suivant. Une app gardée des jours en arrière-plan ne recevait donc jamais un correctif.
+- **`useOtaUpdate`** (`apps/mobile/src/features/updates/`, lot du 2026-09-26) : au retour au
+  premier plan, il cherche et télécharge, au plus toutes les 15 min (`CHECK_INTERVAL_MS`
+  d'`update-policy.ts`). Si l'app revient après plus de 10 min d'arrière-plan avec une mise à jour
+  en attente (`SILENT_RELOAD_AFTER_MS`), `reloadAsync` l'applique sans rien demander ; sinon
+  `UpdateToast` propose « Redémarrer » juste au-dessus de la tab bar.
+
+⚠️ Ce code n'agit que sur les OTA publiées **après** son arrivée sur l'appareil : un build qui ne
+le porte pas reçoit la mise à jour qui l'apporte à l'ancienne manière, au deuxième lancement.
+La 1.2.0 ne recevant plus d'OTA, il ne sert en pratique qu'à partir du build 1.3.0.
+
+Pièges :
+
+- **Monté une seule fois**, dans `FloatingTabList` d'`apps/mobile/src/components/app-tabs.tsx`,
+  hors de `props.children` (réservé aux `TabTrigger`) : le toast hérite de l'escamotage de la
+  barre au clavier et n'apparaît pas sur les écrans poussés. Chaque instance supplémentaire de
+  `useOtaUpdate` poserait son propre écouteur `AppState`.
+- **Inerte hors build distribué** : garde `Updates.channel`, chaîne vide (et non `null`) dans le
+  dev client ou un build local, la même que la rangée « Mise à jour » de Réglages. Pour voir le
+  toast en local, forcer temporairement `pending: true` dans `use-ota-update.ts`, sans le commiter.
+- **Rechargement silencieux et navigation entrante** : un lien d'invitation ou un tap de
+  notification qui ramène l'app après plus de 10 min déclenche aussi le rechargement, et la
+  destination pourrait se perdre. Pas encore vérifié ; repli prévu si c'est le cas : ne pas
+  recharger quand un événement `Linking` `url` arrive à la reprise.
+- **Recette de bout en bout**, sur un build `preview` (ou le test interne) : une première OTA
+  apporte le code, une seconde doit faire paraître le toast au retour au premier plan, et
+  « Redémarrer » change l'identifiant de mise à jour affiché dans Réglages. Puis arrière-plan
+  plus de 10 min : l'app doit revenir rechargée, sans toast.
 
 ## MINOR ou PATCH
 

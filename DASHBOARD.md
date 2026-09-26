@@ -23,7 +23,9 @@
 > prod et `main` poussé le 2026-09-26 (AASA à `webcredentials` en ligne) ; le reste part avec le
 > build 1.3.0. Chantier D : **envoi automatique aux stores livré en code** (`build:prod` et
 > `build:prod:ios` en `--auto-submit`), clé du compte de service Google dans EAS le 2026-09-26 ;
-> premier envoi réel à venir avec le build 1.3.0.
+> premier envoi réel à venir avec le build 1.3.0. **Mises à jour à distance au premier plan livrées
+> en code** (toast « Redémarrer » ou rechargement silencieux) ; effectives à partir du build 1.3.0,
+> vérification de bout en bout à faire sur un build distribué.
 
 ## Avancement des lots
 
@@ -164,6 +166,14 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   (`--testflight`, skill `trycast-emails`). Texte des « Informations de test » TestFlight prêt dans
   `docs/emails/README.md`. Apple (TestFlight) déclaré au registre §10, aux sous-traitants et dans
   les politiques FR/EN. Envoi test des deux e-mails à Corentin le 2026-09-26 : rendu validé dans Proton.
+- ✅ **Mises à jour à distance au premier plan** (2026-09-26), sans lib native : `expo-updates` ne
+  cherchait qu'au démarrage à froid. L'app cherche désormais au retour au premier plan (au plus
+  toutes les 15 min), recharge d'elle-même si elle revient après plus de 10 min avec une mise à
+  jour prête, et sinon affiche au-dessus de la tab bar le toast de la maquette, « Une mise à jour
+  est prête », avec un bouton « Redémarrer ». Inerte hors build distribué. Ne vaut que pour les OTA publiées
+  après lui, donc en pratique à partir du build 1.3.0. Escamotage au clavier vérifié sur Android,
+  pas sur iOS (AXe cassé). Vérification de bout en bout dans « Ce qu'il reste à faire ». Mécanique
+  et pièges : skill `trycast-release`, « Comment une OTA arrive sur l'appareil ».
 
 **D. Outillage**
 - ✅ **`eas submit` Android et iOS** (2026-09-26), code commité : `submit.production.android`
@@ -253,6 +263,13 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   1. Rebuild du dev client iOS.
   2. **Au build 1.3.0 sur iPhone** : après une inscription par e-mail, iOS propose d'enregistrer
      le mot de passe ; à la connexion suivante, il le propose au Face ID.
+- **Mises à jour au premier plan, vérification de bout en bout** (Corentin, sur un build `preview`
+  ou le test interne qui porte le code) : publier deux OTA successives ; à la seconde, le toast
+  paraît au retour au premier plan et « Redémarrer » change l'identifiant de mise à jour dans
+  Réglages. Puis arrière-plan plus de 10 min : rechargement silencieux. Enfin, après plus de
+  10 min, rouvrir l'app par un lien d'invitation et par un tap de notification : la destination
+  ne doit pas se perdre au rechargement (sinon, repli prévu : ne pas recharger quand un lien
+  arrive à la reprise). Escamotage du toast au clavier à voir sur iPhone.
 
 ### 🔜 iOS — beta fermée TestFlight en octobre 2026 (plan du 2026-09-24)
 Objectif : des testeurs iPhone (amis, connaissances) **invités par e-mail** dans un groupe
@@ -325,6 +342,10 @@ pseudos, le blocage et le signalement.
 ### RGPD et légal
 - Remplir les fiches stores à la soumission ; automatiser la **purge des comptes inactifs** (règle des 3 ans publiée, cron inexistant).
 - Noter le fournisseur de `contact@trycast.fr` dans `docs/rgpd/sous-traitants.md`.
+- **EAS Update (Expo) absent des sous-traitants** : Expo n'y figure que pour les push, alors que
+  chaque recherche de mise à jour à distance interroge ses serveurs (adresse IP, et sans doute un
+  identifiant d'installation aléatoire propre à `expo-updates`). À qualifier, puis déclarer si
+  besoin (registre, sous-traitants, politiques FR/EN).
 - **Enregistrer la langue d'inscription à la waitlist** (migration `join_waitlist` + registre), pour écrire aux anglophones dans leur langue.
 - Faire relire les pages légales anglaises si ce n'est pas fait.
 
