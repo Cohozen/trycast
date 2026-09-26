@@ -169,7 +169,7 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
 - ✅ **Mises à jour à distance au premier plan** (2026-09-26), sans lib native : `expo-updates` ne
   cherchait qu'au démarrage à froid. L'app cherche désormais au retour au premier plan (au plus
   toutes les 15 min), recharge d'elle-même si elle revient après plus de 10 min avec une mise à
-  jour prête, et sinon affiche au-dessus de la tab bar le toast de la maquette, « Une mise à jour
+  jour prête (jamais quand un lien ou un tap de notification l'a rouverte), et sinon affiche au-dessus de la tab bar le toast de la maquette, « Une mise à jour
   est prête », avec un bouton « Redémarrer ». Inerte hors build distribué. Ne vaut que pour les OTA publiées
   après lui, donc en pratique à partir du build 1.3.0. Escamotage au clavier vérifié sur Android,
   pas sur iOS (AXe cassé). Vérification de bout en bout dans « Ce qu'il reste à faire ». Mécanique
@@ -267,9 +267,9 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   ou le test interne qui porte le code) : publier deux OTA successives ; à la seconde, le toast
   paraît au retour au premier plan et « Redémarrer » change l'identifiant de mise à jour dans
   Réglages. Puis arrière-plan plus de 10 min : rechargement silencieux. Enfin, après plus de
-  10 min, rouvrir l'app par un lien d'invitation et par un tap de notification : la destination
-  ne doit pas se perdre au rechargement (sinon, repli prévu : ne pas recharger quand un lien
-  arrive à la reprise). Escamotage du toast au clavier à voir sur iPhone.
+  10 min, rouvrir l'app par un lien d'invitation puis par un tap de notification : pas de
+  rechargement, toast affiché, destination atteinte. Escamotage du toast au clavier à voir sur
+  iPhone.
 
 ### 🔜 iOS — beta fermée TestFlight en octobre 2026 (plan du 2026-09-24)
 Objectif : des testeurs iPhone (amis, connaissances) **invités par e-mail** dans un groupe

@@ -84,8 +84,9 @@ Deux mécanismes se superposent :
 - **`useOtaUpdate`** (`apps/mobile/src/features/updates/`, lot du 2026-09-26) : au retour au
   premier plan, il cherche et télécharge, au plus toutes les 15 min (`CHECK_INTERVAL_MS`
   d'`update-policy.ts`). Si l'app revient après plus de 10 min d'arrière-plan avec une mise à jour
-  en attente (`SILENT_RELOAD_AFTER_MS`), `reloadAsync` l'applique sans rien demander ; sinon
-  `UpdateToast` propose « Redémarrer » juste au-dessus de la tab bar.
+  en attente (`SILENT_RELOAD_AFTER_MS`), `reloadAsync` l'applique sans rien demander, sauf si un
+  lien ou un tap de notification l'a rouverte ; sinon `UpdateToast` propose « Redémarrer » juste
+  au-dessus de la tab bar.
 
 ⚠️ Ce code n'agit que sur les OTA publiées **après** son arrivée sur l'appareil : un build qui ne
 le porte pas reçoit la mise à jour qui l'apporte à l'ancienne manière, au deuxième lancement.
@@ -96,18 +97,22 @@ Pièges :
 - **Monté une seule fois**, dans `FloatingTabList` d'`apps/mobile/src/components/app-tabs.tsx`,
   hors de `props.children` (réservé aux `TabTrigger`) : le toast hérite de l'escamotage de la
   barre au clavier et n'apparaît pas sur les écrans poussés. Chaque instance supplémentaire de
-  `useOtaUpdate` poserait son propre écouteur `AppState`.
+  `useOtaUpdate` poserait ses propres écouteurs (`AppState`, `Linking`, notifications).
 - **Inerte hors build distribué** : garde `Updates.channel`, chaîne vide (et non `null`) dans le
   dev client ou un build local, la même que la rangée « Mise à jour » de Réglages. Pour voir le
   toast en local, forcer temporairement `pending: true` dans `use-ota-update.ts`, sans le commiter.
-- **Rechargement silencieux et navigation entrante** : un lien d'invitation ou un tap de
-  notification qui ramène l'app après plus de 10 min déclenche aussi le rechargement, et la
-  destination pourrait se perdre. Pas encore vérifié ; repli prévu si c'est le cas : ne pas
-  recharger quand un événement `Linking` `url` arrive à la reprise.
+- **Pas de rechargement silencieux sur une navigation entrante** : un rechargement perdrait la
+  destination d'un lien d'invitation ou d'un tap de notification. Tout événement `Linking` `url`
+  ou `addNotificationResponseReceivedListener` reçu depuis le passage en arrière-plan écarte donc
+  le rechargement, et le toast reste. Le lien arrivant avant ou après `active` selon la
+  plateforme, la décision est différée de `RESUME_SETTLE_MS` (1 s, `update-policy.ts`) : ne pas
+  la rendre immédiate, ni retirer l'un des deux écouteurs.
 - **Recette de bout en bout**, sur un build `preview` (ou le test interne) : une première OTA
   apporte le code, une seconde doit faire paraître le toast au retour au premier plan, et
   « Redémarrer » change l'identifiant de mise à jour affiché dans Réglages. Puis arrière-plan
-  plus de 10 min : l'app doit revenir rechargée, sans toast.
+  plus de 10 min : l'app doit revenir rechargée, sans toast. Enfin, après plus de 10 min, la
+  rouvrir par un lien d'invitation puis par un tap de notification : pas de rechargement, toast
+  affiché, destination atteinte.
 
 ## MINOR ou PATCH
 
