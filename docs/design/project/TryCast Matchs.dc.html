@@ -26,6 +26,24 @@
     <div style="font-size: 15px; color: var(--ink-600); max-width: 660px; line-height: 1.5;">Le flux d'accueil : stats de la compétition, actions de ligue, puis les matchs à venir groupés par date avec la saisie du prono en ligne (score + bonus offensif), auto-enregistrée. Le grenat reste une étincelle — onglet actif, compteur à pronostiquer, statut « à pronostiquer ». Thèmes clair et sombre.</div>
   </div>
 
+  <!-- Toasts · OTA update -->
+  <div style="display: flex; flex-direction: column; gap: 24px;">
+    <div style="display: flex; flex-direction: column; gap: 6px;">
+      <div style="font-family: var(--font-display); font-size: 26px; color: var(--ink-900);">Toast · mise à jour OTA</div>
+      <div style="font-size: 14px; color: var(--ink-600); max-width: 660px; line-height: 1.5;">Posé juste au-dessus de la tab bar. L'action est un simple lien « Redémarrer » (recharge le JS) — tape-le pour voir l'état « Redémarrage… ».</div>
+    </div>
+    <div style="display: flex; gap: 44px; align-items: flex-start;">
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <span style="font-size: 12px; font-weight: 700; color: var(--ink-600);">Encre inversée · clair</span>
+        <dc-import name="MesMatchs" theme="light" update-toast="{{ true }}" hint-size="390px,844px"></dc-import>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <span style="font-size: 12px; font-weight: 700; color: var(--ink-600);">Encre inversée · sombre</span>
+        <dc-import name="MesMatchs" theme="dark" update-toast="{{ true }}" hint-size="390px,844px"></dc-import>
+      </div>
+    </div>
+  </div>
+
   <!-- Row 1 · Live screens -->
   <div style="display: flex; gap: 56px; align-items: flex-start;">
     <div style="display: flex; flex-direction: column; gap: 16px;">

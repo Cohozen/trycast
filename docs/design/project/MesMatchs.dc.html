@@ -373,6 +373,23 @@
 
   </div>
 
+  <!-- OTA update toast · sits just above the floating tab bar -->
+  <sc-if value="{{ toastVisible }}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 16px; right: 16px; bottom: 114px; z-index: 6; display: flex; justify-content: center; pointer-events: none;">
+
+        <div role="status" style="pointer-events: auto; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 16px; border-radius: var(--radius-md); background: var(--text); color: var(--bg); box-shadow: var(--shadow-lg); font-size: 14px;">
+          <span style="display: flex; align-items: center; gap: 10px;">
+            <span style="width: 7px; height: 7px; border-radius: 50%; background: var(--accent);"></span>
+            <span>{{ toastMsg }}</span>
+          </span>
+          <sc-if value="{{ toastCanRestart }}" hint-placeholder-val="{{ true }}">
+            <button type="button" onClick="{{ onRestart }}" style="flex: none; padding: 12px 4px; margin: -12px -4px; border: none; background: transparent; font-family: var(--font-body); font-size: 14px; font-weight: 700; color: var(--bg); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; cursor: pointer; -webkit-tap-highlight-color: transparent;" style-active="opacity: 0.7;">Redémarrer</button>
+          </sc-if>
+        </div>
+
+    </div>
+  </sc-if>
+
   <!-- Floating tab bar -->
   <div class="tc-tabbar-wrap" style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;">
     <x-import component-from-global-scope="TryCastDesignSystem_a0f4ea.TabBar" items="{{ tabItems }}" active="{{ activeTab }}" on-change="{{ setTab }}" hint-size="100%,88px"></x-import>
@@ -380,7 +397,7 @@
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light' | 'dark'&quot;},&quot;screenState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;default&quot;,&quot;loading&quot;,&quot;no-league&quot;,&quot;no-matches&quot;],&quot;default&quot;:&quot;default&quot;,&quot;tsType&quot;:&quot;'default' | 'loading' | 'no-league' | 'no-matches'&quot;},&quot;competitionName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Tournoi des 6 Nations 2027&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showGlobalRank&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;statsCard&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;hero&quot;,&quot;classic&quot;],&quot;default&quot;:&quot;hero&quot;,&quot;tsType&quot;:&quot;'hero' | 'classic'&quot;},&quot;rankTrend&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;up&quot;,&quot;down&quot;,&quot;none&quot;],&quot;default&quot;:&quot;up&quot;,&quot;tsType&quot;:&quot;'up' | 'down' | 'none'&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;'light' | 'dark'&quot;},&quot;screenState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;default&quot;,&quot;loading&quot;,&quot;no-league&quot;,&quot;no-matches&quot;],&quot;default&quot;:&quot;default&quot;,&quot;tsType&quot;:&quot;'default' | 'loading' | 'no-league' | 'no-matches'&quot;},&quot;competitionName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Tournoi des 6 Nations 2027&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showGlobalRank&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;statsCard&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;hero&quot;,&quot;classic&quot;],&quot;default&quot;:&quot;hero&quot;,&quot;tsType&quot;:&quot;'hero' | 'classic'&quot;},&quot;rankTrend&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;up&quot;,&quot;down&quot;,&quot;none&quot;],&quot;default&quot;:&quot;up&quot;,&quot;tsType&quot;:&quot;'up' | 'down' | 'none'&quot;},&quot;updateToast&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
 class Component extends DCLogic {
   state = { preds: null, touched: null, saving: {}, tab: 'matchs', x2: 'm2', x2Pressing: null };
 
@@ -566,7 +583,16 @@ class Component extends DCLogic {
       { key: 'profil', label: 'Profil', icon: mk([E('circle', { key: 1, cx: 12, cy: 8, r: 3.6 }), E('path', { key: 2, d: 'M4.5 20c0-3.4 3.4-5.8 7.5-5.8s7.5 2.4 7.5 5.8' })]) },
     ];
 
+    const restarting = this.state.restarting;
     return {
+      toastVisible: !!this.props.updateToast,
+      toastMsg: restarting ? 'Redémarrage…' : 'Une mise à jour est prête',
+      toastCanRestart: !restarting,
+      onRestart: () => {
+        this.setState({ restarting: true });
+        clearTimeout(this._rs);
+        this._rs = setTimeout(() => this.setState({ restarting: false }), 1600);
+      },
       theme: this.props.theme || 'light',
       competitionName: this.props.competitionName || 'Tournoi des 6 Nations 2027',
       showGlobalRank: this.props.showGlobalRank !== false,
