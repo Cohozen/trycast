@@ -4,7 +4,8 @@
 > Mis à jour à la fin de chaque lot. **Pas de journal** : l'historique se lit dans `git log`
 > (et l'ancien journal des sessions par `git show 8418902:DASHBOARD.md`).
 >
-> État au **2026-09-25** : serveur **entièrement en prod**, bloc communauté compris. **Release
+> État au **2026-09-26** : serveur **en prod**, bloc communauté compris, sauf deux migrations
+> (`cron-health` et l'exemption des comptes de démo, voir « Ce qu'il reste à faire »). **Release
 > 1.2.0 publiée** (tag `v1.2.0`) et **déployée sur la Play Console**. **Configuration de
 > distribution iOS commitée** (lot 1 iOS) : elle déplace l'empreinte Android (`f0e880d9` →
 > `ea4e55aa`), donc **plus aucune OTA venue de `main` n'atteint la 1.2.0** ; tout part avec la
@@ -15,8 +16,9 @@
 > « v1.3.0 »). Chantier A : **wording
 > livré** (app, e-mails sur dev, site), e-mails d'auth à pousser en prod ; **alerte sur les crons
 > en échec livrée sur le dev** (moniteur Sentry `cron-health`), secret et push prod à faire.
-> Chantier B : **modération et révocation Apple commitées et vérifiées sur le dev** (filtre des
-> pseudos, bloquer, signaler) ; restent les secrets, les deploys et la prod, gestes de Corentin.
+> Chantier B : **modération et révocation Apple en prod** (filtre des pseudos, bloquer, signaler ;
+> secrets, EF et migrations posés le 2026-09-26) ; restent la migration qui exempte les comptes de
+> démo du filtre, puis la vérification sur iPhone au build 1.3.0.
 
 ## Avancement des lots
 
@@ -121,13 +123,16 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   Réglages → Confidentialité ; signalement du pseudo ou de la photo, qui envoie un e-mail à
   `contact@` avec la requête de traitement. Règles et recette de traitement : skill
   `trycast-regles-metier`, section « Modération ». CGU FR/EN (tolérance zéro, examen sous 24 h),
-  politiques FR/EN, registre §12 et `export-data` à jour. **Pas encore vérifié** : l'e-mail
-  d'alerte (secret `resend_api_key` absent du dev).
+  politiques FR/EN, registre §12 et `export-data` à jour. En prod depuis le 2026-09-26. L'e-mail
+  d'alerte est vérifié sur le dev (Resend a accepté l'envoi vers `contact@`) ; reste à Corentin
+  d'en confirmer la réception. Le compte de démo « DemoTryCast » est exempté du filtre
+  (`is_demo`), sans quoi son profil ne se modifiait plus (skill `trycast-regles-metier`).
 - ✅ **Révocation des jetons Apple** à la suppression du compte (règle 5.1.1(v), 2026-09-25) : rien
   n'est stocké. L'app rouvre la feuille Apple au moment de supprimer, et l'EF `delete-account`
   échange le code puis révoque le jeton (client_secret signé à chaque appel,
   `delete-account/apple.ts`, testé sous Vitest). Couvre aussi les comptes Apple créés avant le
-  lot. **Pas encore vérifié** : le chemin réel, qui exige un iPhone, la prod et la clé .p8.
+  lot. Clé .p8, secrets `APPLE_*` et EF en place sur les deux projets (2026-09-26). **Pas encore
+  vérifié** : le chemin réel, qui exige l'iPhone et le build 1.3.0.
 - Gestes de Corentin : dans « Ce qu'il reste à faire », « Conformité App Store ». Rien de natif :
   l'ensemble part par OTA ou avec le build 1.3.0.
 
@@ -211,24 +216,19 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   dry-run) ; régler dans Sentry l'alerte e-mail du moniteur `cron-health` sur l'environnement
   `production` seul (le dev est souvent en `error`, voir « Points ouverts »).
 - **Matchs de test à id négatif en prod** : exécuter le SQL de nettoyage fourni (voir la dette).
-- **Conformité App Store (chantier B), gestes de Corentin**, dans cet ordre :
-  1. **Resend** : créer une clé API « envoi seul » limitée au domaine `trycast.fr`, puis dans le
-     SQL editor du **dev** et de la **prod** `select vault.create_secret('<clé>', 'resend_api_key');`
-     (le classifieur interdit à l'agent d'écrire un secret Vault). Sans elle, un signalement est
-     enregistré mais aucune alerte ne part.
-  2. **Portail Apple** : clé « Sign in with Apple » (.p8) rattachée à l'App ID principal, puis sur
-     les deux projets `supabase secrets set APPLE_TEAM_ID=5P7K97386D APPLE_KEY_ID=<id>
-     APPLE_PRIVATE_KEY="$(cat AuthKey_<id>.p8)"`. Sans eux, la suppression marche mais ne révoque rien.
-  3. `supabase functions deploy delete-account` et `supabase functions deploy export-data`, sur le
-     dev puis la prod ; puis `bash scripts/e2e-privacy.sh` sur le dev.
-  4. **Prod** : `supabase db push`, deux migrations attendues au dry-run (`20260926000100`,
-     `20260926000200`), skill `trycast-prod-rollout` ; puis le contrôle
-     `select id, username from public.profiles where not public.username_is_clean(username);`
-     (un pseudo refusé se traite par `moderate_profile`).
-  5. `git push` (pages légales du site) ; la partie app part par OTA ou avec le build 1.3.0.
-  6. **Au build 1.3.0 sur iPhone** : supprimer un compte Apple de test et vérifier que TryCast
-     disparaît de « Se connecter avec Apple » dans l'identifiant Apple ; faire un signalement et
-     vérifier l'e-mail reçu à `contact@`.
+- **Conformité App Store (chantier B), gestes de Corentin**. Faits le 2026-09-26 : secret Vault
+  `resend_api_key` (une clé par projet), secrets `APPLE_*`, `delete-account` et `export-data`
+  déployées, et les deux migrations de modération en prod, sur les deux projets ; au contrôle,
+  seul « DemoTryCast » avait un pseudo refusé. Restent, dans cet ordre :
+  1. **Prod** : `supabase db push`, une seule migration attendue au dry-run
+     (`20260926000300_username_filter_demo.sql`, skill `trycast-prod-rollout`). Tant qu'elle n'y
+     est pas, le profil de « DemoTryCast », le compte des relecteurs des stores, ne se modifie
+     plus (langue, photo).
+  2. `git push` (pages légales du site) ; la partie app part par OTA ou avec le build 1.3.0.
+  3. Confirmer la réception à `contact@` de l'e-mail d'alerte du signalement de test fait sur le
+     dev le 2026-09-26.
+  4. **Au build 1.3.0 sur iPhone** : supprimer un compte Apple de test et vérifier que TryCast
+     disparaît de « Se connecter avec Apple » dans l'identifiant Apple.
 
 ### 🔜 iOS — beta fermée TestFlight en octobre 2026 (plan du 2026-09-24)
 Objectif : des testeurs iPhone (amis, connaissances) **invités par e-mail** dans un groupe
@@ -284,11 +284,12 @@ de Google, logo blanc) ; le rendu en clair reste à voir. Gestes de Corentin :
    e-mail envoyé depuis `contact@` reçu via le relais, suppression du compte depuis l'app. Au
    simulateur, la saisie du mot de passe Apple ID reste bloquée (bug connu du simulateur) : la
    référence est l'iPhone. La révocation du jeton à la suppression du compte est codée
-   (chantier B de la 1.3.0) mais pas en service : jusqu'au build 1.3.0 et à ses secrets, TryCast
+   (chantier B de la 1.3.0), secrets et EF en place en prod, mais l'app doit rouvrir la feuille
+   Apple avant de supprimer : jusqu'au build 1.3.0, TryCast
    reste listé dans « Se connecter avec Apple » de l'identifiant Apple après suppression.
 
 **Conformité App Store** (modération, révocation des jetons Apple, fiche) : avancée de février
-dans la 1.3.0, chantiers B (livré, gestes de Corentin restants) et E de « v1.3.0 ». Côté règle 1.2,
+dans la 1.3.0, chantiers B (en prod, sauf une migration) et E de « v1.3.0 ». Côté règle 1.2,
 s'ajoutent à l'existant (exclusion par le propriétaire de ligue, contact publié) le filtre des
 pseudos, le blocage et le signalement.
 

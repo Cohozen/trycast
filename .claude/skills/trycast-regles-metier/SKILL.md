@@ -144,8 +144,8 @@ Décisions prises avec Corentin : **ne pas les re-débattre**. Chaque règle a s
 ## Modération : filtre des pseudos, blocage, signalement (v1.3.0)
 
 Règle 1.2 de l'App Store (contenu créé par les utilisateurs : pseudos et photos, visibles de tous
-dans le classement général). Migrations `20260926000100_username_filter.sql` et
-`20260926000200_moderation.sql`, vérification `supabase db query --linked -f
+dans le classement général). Migrations `20260926000100_username_filter.sql`,
+`20260926000200_moderation.sql` et `20260926000300_username_filter_demo.sql`, vérification `supabase db query --linked -f
 scripts/e2e-moderation.sql` (transaction annulée, sans seed).
 
 - **Filtre des pseudos** : contrainte `profiles_username_clean` (fonction immutable
@@ -155,6 +155,11 @@ scripts/e2e-moderation.sql` (transaction annulée, sans seed).
   le leetspeak est ramené avant comparaison. **Enrichir une liste = `create or replace function`
   dans une nouvelle migration**, jamais en éditant l'ancienne. Plafond connu : deux mots collés
   (« salepute ») passent, le signalement prend le relais.
+- **Les comptes de démo (`is_demo`) sont exemptés du filtre** : la contrainte est
+  `is_demo or username_is_clean(username)`, pour « DemoTryCast », le compte des relecteurs des
+  stores. Le `not valid` ne suffisait pas : Postgres revérifie le check à chaque `update` de la
+  ligne, et son profil ne se modifiait plus (skill `trycast-supabase-migration`). `is_demo` n'est
+  écrit que par `service_role`, un joueur ne peut pas s'en servir pour contourner le filtre.
 - La fonction est exposée en RPC (anon compris) : l'écran d'inscription la vérifie **avant**
   `signUp`, sinon le refus du trigger de création de profil remonte de GoTrue en « Database error
   saving new user ». Ailleurs, le 23514 se distingue du check de format par le nom de la contrainte
