@@ -34,11 +34,17 @@ import ContentLayout from '../layouts/content-layout.astro';
     <p><strong>Pour la beta fermée</strong></p>
     <ul>
         <li>
-            <strong>Adresse e-mail et adresse de ton compte Google</strong> - pour t'envoyer
-            l'invitation et les informations de la beta, et pour t'inscrire sur la liste des
-            testeurs du Play Store, sans laquelle la version de test ne s'installe pas. Base
-            légale : ton consentement (tu as demandé à participer). Chaque e-mail contient un lien
-            de désinscription, et tu peux quitter la beta à tout moment.
+            <strong>Adresse e-mail et, sur Android, adresse de ton compte Google</strong> - pour
+            t'envoyer l'invitation et les informations de la beta et, sur Android, pour t'inscrire
+            sur la liste des testeurs du Play Store, sans laquelle la version de test ne s'installe
+            pas. Base légale : ton consentement (tu as demandé à participer). Chaque e-mail
+            contient un lien de désinscription, et tu peux quitter la beta à tout moment.
+        </li>
+        <li>
+            <strong>Sur iPhone, rien de plus</strong> - la version de test s'installe
+            par <strong>TestFlight</strong>, l'app d'Apple, depuis un lien public : nous ne recevons
+            ni ton nom ni ton adresse, seulement, de façon anonyme, la date d'installation, le
+            nombre de sessions et les plantages.
         </li>
     </ul>
     <p><strong>Dans l'application</strong></p>
@@ -142,7 +148,7 @@ import ContentLayout from '../layouts/content-layout.astro';
             transferts sont encadrés par les clauses contractuelles types de la Commission
             européenne.</li>
         <li><strong>Resend</strong> - acheminement des e-mails liés au compte (confirmation
-            d'adresse, réinitialisation du mot de passe), des e-mails de la beta fermée et des
+            d'adresse, bienvenue, réinitialisation du mot de passe), des e-mails de la beta fermée et des
             alertes de signalement adressées à l'éditeur. Les
             e-mails partent de serveurs situés dans l'Union européenne (Irlande), mais Resend,
             société établie aux États-Unis, y conserve leur contenu, leurs journaux d'envoi et la
@@ -153,6 +159,11 @@ import ContentLayout from '../layouts/content-layout.astro';
             Store pour installer une version de test. Société établie aux États-Unis ; les
             transferts sont encadrés par le Data Privacy Framework et les clauses contractuelles
             types.</li>
+        <li><strong>Apple (TestFlight)</strong>, si tu participes à la beta sur iPhone - Apple
+            installe la version de test et nous transmet, sans ton nom ni ton adresse, la date
+            d'installation, le nombre de sessions et les plantages. Société établie aux
+            États-Unis ; les transferts sont encadrés par le Data Privacy Framework et les clauses
+            contractuelles types.</li>
         <li><strong>Proton</strong> - hébergement de la
             boîte <a href="mailto:contact@trycast.fr">contact@trycast.fr</a> : les messages que tu nous
             envoies, y compris en répondant à un e-mail de la beta, y sont conservés. Société
@@ -195,8 +206,8 @@ import ContentLayout from '../layouts/content-layout.astro';
         </li>
         <li>
             <strong>Beta fermée</strong> : les e-mails s'arrêtent dès ta désinscription ; la liste
-            d'envoi et la liste des testeurs sont supprimées à la fin de la beta, ou plus tôt sur
-            simple demande.
+            d'envoi et la liste des testeurs sont supprimées, et le lien TestFlight désactivé, à la
+            fin de la beta, ou plus tôt sur simple demande.
         </li>
         <li>
             <strong>Messages envoyés à contact@trycast.fr</strong> : 1 an après la fin de

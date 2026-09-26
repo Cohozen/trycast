@@ -38,11 +38,17 @@ import ContentLayout from '../../layouts/content-layout.astro';
     <p><strong>For the closed beta</strong></p>
     <ul>
         <li>
-            <strong>Email address and your Google account address</strong> - to send you the
-            invitation and information about the beta, and to add you to the Play Store tester
-            list, without which the test version cannot be installed. Legal basis: your consent
-            (you asked to take part). Every email contains an unsubscribe link, and you can leave
-            the beta at any time.
+            <strong>Email address and, on Android, your Google account address</strong> - to
+            send you the invitation and information about the beta and, on Android, to add you to
+            the Play Store tester list, without which the test version cannot be installed. Legal
+            basis: your consent (you asked to take part). Every email contains an unsubscribe
+            link, and you can leave the beta at any time.
+        </li>
+        <li>
+            <strong>On iPhone, nothing more</strong> - the test version is installed
+            through <strong>TestFlight</strong>, Apple's app, from a public link: we receive
+            neither your name nor your address, only, anonymously, the installation date, the
+            number of sessions and crashes.
         </li>
     </ul>
     <p><strong>In the app</strong></p>
@@ -143,7 +149,7 @@ import ContentLayout from '../../layouts/content-layout.astro';
             States; transfers are governed by the European Commission's standard contractual
             clauses.</li>
         <li><strong>Resend</strong> - delivery of account-related emails (address confirmation,
-            password reset), closed beta emails and report alerts sent to the publisher. Emails are sent from servers located in the
+            welcome, password reset), closed beta emails and report alerts sent to the publisher. Emails are sent from servers located in the
             European Union (Ireland), but Resend, a company established in the United States,
             stores their content, their delivery logs and the beta mailing list there; transfers
             are governed by standard contractual clauses and the Data Privacy Framework.</li>
@@ -151,6 +157,11 @@ import ContentLayout from '../../layouts/content-layout.astro';
             Google account address appears on the tester list, a requirement of the Play Store for
             installing a test version. A company established in the United States; transfers are
             governed by the Data Privacy Framework and standard contractual clauses.</li>
+        <li><strong>Apple (TestFlight)</strong>, if you take part in the beta on iPhone - Apple
+            installs the test version and sends us, without your name or address, the
+            installation date, the number of sessions and crashes. A company established in the
+            United States; transfers are governed by the Data Privacy Framework and standard
+            contractual clauses.</li>
         <li><strong>Proton</strong> - hosting of
             the <a href="mailto:contact@trycast.fr">contact@trycast.fr</a> mailbox: the messages you
             send us, including replies to a beta email, are stored there. A company established
@@ -193,7 +204,8 @@ import ContentLayout from '../../layouts/content-layout.astro';
         </li>
         <li>
             <strong>Closed beta</strong>: emails stop as soon as you unsubscribe; the mailing list
-            and the tester list are deleted at the end of the beta, or earlier on request.
+            and the tester list are deleted, and the TestFlight link disabled, at the end of the
+            beta, or earlier on request.
         </li>
         <li>
             <strong>Messages sent to contact@trycast.fr</strong>: 1 year after the exchange ends, 3

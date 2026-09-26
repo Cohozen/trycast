@@ -7,7 +7,7 @@
 **Responsable du traitement** : l'éditeur de TryCast, joignable à `contact@trycast.fr`.
 **Délégué à la protection des données** : aucun (non requis — pas de suivi à grande échelle,
 pas de données sensibles).
-**Dernière mise à jour** : 25 septembre 2026 (§12 modération ; révocation du jeton Apple et visibilité dans le classement général au §1). Précédente : 19 septembre 2026 (§11 signalements de problèmes).
+**Dernière mise à jour** : 26 septembre 2026 (§10 beta sur iPhone par TestFlight ; e-mail de bienvenue au §1). Précédente : 25 septembre 2026 (§12 modération ; révocation du jeton Apple et visibilité dans le classement général au §1).
 
 Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](procedure-droits.md),
 [fiches-stores.md](fiches-stores.md). Version publique : `apps/web/src/pages/confidentialite.astro`.
@@ -23,7 +23,7 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 | **Personnes concernées** | Utilisateurs de l'application (≥ 16 ans) |
 | **Catégories de données** | Adresse e-mail, mot de passe (haché, jamais en clair — **absent** des comptes créés via un fournisseur d'identité), pseudo, photo de profil (facultative), langue, dates de création et de dernière connexion. Pour un compte créé via **Sign in with Google** : identifiant de compte Google, et les métadonnées transmises par Google (nom complet, URL de la photo de profil Google) conservées telles quelles par Supabase Auth. Pour un compte créé via **Sign in with Apple** (iOS seulement) : identifiant Apple et adresse e-mail — éventuellement une adresse relais `@privaterelay.appleid.com` si l'utilisateur masque la sienne ; le nom n'est **pas demandé** |
 | **Où** | `auth.users` (Supabase Auth — dont `raw_user_meta_data` pour les métadonnées du fournisseur), `public.profiles`, bucket Storage `avatars` |
-| **Destinataires** | Supabase (hébergement), Resend (e-mails de compte), **Google** pour les comptes utilisant Sign in with Google, **Apple** pour ceux utilisant Sign in with Apple (le fournisseur connaît alors la connexion à TryCast). Le pseudo et la photo sont visibles des autres membres des ligues rejointes, et de tous les inscrits dans le classement général ; l'e-mail ne l'est jamais |
+| **Destinataires** | Supabase (hébergement), Resend (e-mails de compte : confirmation, réinitialisation, changement d'adresse, et bienvenue des comptes créés par Google ou Apple, qui n'ont pas d'e-mail de confirmation), **Google** pour les comptes utilisant Sign in with Google, **Apple** pour ceux utilisant Sign in with Apple (le fournisseur connaît alors la connexion à TryCast). Le pseudo et la photo sont visibles des autres membres des ligues rejointes, et de tous les inscrits dans le classement général ; l'e-mail ne l'est jamais |
 | **Transferts hors UE** | Oui, vers **Resend** (États-Unis) : les e-mails partent de la région UE, mais leur contenu et leurs journaux sont stockés aux États-Unis. Et vers Google ou Apple (États-Unis), **uniquement** pour les comptes utilisant le fournisseur correspondant. Tous sont encadrés par le Data Privacy Framework et les clauses contractuelles types |
 | **Conservation** | Durée de vie du compte ; suppression immédiate et définitive à la demande de l'utilisateur ; suppression automatique après 3 ans d'inactivité (préavis par e-mail) |
 | **Sécurité** | RLS PostgreSQL (chaque compte ne lit/écrit que ses lignes), TLS, mot de passe haché par GoTrue, suppression via Edge Function `delete-account` qui purge aussi le dossier avatar. Sign in with Google et Sign in with Apple : jeton d'identité vérifié par Supabase Auth (avec nonce contre le rejeu pour Apple), aucun mot de passe ni jeton du fournisseur conservé. Apple : jeton révoqué à la suppression du compte, à partir d'un code demandé à ce moment-là et jamais stocké |
@@ -160,15 +160,15 @@ Documents liés : [sous-traitants.md](sous-traitants.md), [procedure-droits.md](
 
 | | |
 |---|---|
-| **Finalité** | Inviter les testeurs de la beta fermée Android, leur transmettre les informations utiles (lien d'installation, ligue des testeurs) et recevoir leurs retours |
+| **Finalité** | Inviter les testeurs de la beta fermée Android et iPhone (un seul e-mail pour les deux), leur transmettre les informations utiles (lien d'installation, ligue des testeurs) et recevoir leurs retours |
 | **Base légale** | Consentement — art. 6.1.a (inscription à la liste d'attente, ou demande directe de participer) |
 | **Personnes concernées** | Inscrits de la liste d'attente (§5) et proches de l'éditeur ayant demandé à tester |
-| **Catégories de données** | Adresse e-mail de contact, adresse du compte Google utilisé sur le Play Store (quand elle diffère), statut de désinscription, contenu des réponses |
-| **Où** | Audience Resend (liste d'envoi des broadcasts), liste de testeurs de la Play Console, boîte `contact@trycast.fr` pour les réponses. Le fichier d'import des adresses reste **hors du dépôt** et est supprimé après import |
-| **Destinataires** | **Resend** (envoi des broadcasts, stockage de l'Audience), **Google** (Play Console — la liste de testeurs conditionne l'installation), **Proton** (réponses reçues) |
-| **Transferts hors UE** | Oui, vers Resend et Google (États-Unis) — clauses contractuelles types et Data Privacy Framework ; vers Proton (Suisse) — décision d'adéquation |
-| **Conservation** | Jusqu'à la fin de la beta fermée : l'Audience Resend et la liste de testeurs Play sont alors **supprimées**. Plus tôt sur demande. La désinscription arrête les envois immédiatement (gérée par Resend, lien dans chaque e-mail) |
-| **Sécurité** | Aucune adresse dans le dépôt (public) ; le code de la ligue des testeurs n'y figure pas non plus (`docs/emails/*.local.html` ignoré par git) |
+| **Catégories de données** | Adresse e-mail de contact, adresse du compte Google utilisé sur le Play Store (quand elle diffère, testeurs Android seulement), statut de désinscription, contenu des réponses. Sur iPhone, rien de plus : TestFlight, installé par un **lien public**, affiche le testeur comme anonyme et ne nous transmet que la date d'installation, le nombre de sessions et les plantages |
+| **Où** | Audience Resend (liste d'envoi des broadcasts), liste de testeurs de la Play Console, groupe externe TestFlight (App Store Connect), boîte `contact@trycast.fr` pour les réponses. Le fichier d'import des adresses reste **hors du dépôt** et est supprimé après import |
+| **Destinataires** | **Resend** (envoi des broadcasts, stockage de l'Audience), **Google** (Play Console — la liste de testeurs conditionne l'installation), **Apple** (TestFlight — installation sur iPhone, statistiques anonymes), **Proton** (réponses reçues) |
+| **Transferts hors UE** | Oui, vers Resend, Google et Apple (États-Unis) — clauses contractuelles types et Data Privacy Framework ; vers Proton (Suisse) — décision d'adéquation |
+| **Conservation** | Jusqu'à la fin de la beta fermée : l'Audience Resend et la liste de testeurs Play sont alors **supprimées**, le lien public TestFlight désactivé. Plus tôt sur demande. La désinscription arrête les envois immédiatement (gérée par Resend, lien dans chaque e-mail) |
+| **Sécurité** | Aucune adresse dans le dépôt (public) ; le code de la ligue des testeurs et le lien public TestFlight (qui laisse entrer n'importe qui jusqu'au plafond) n'y figurent pas non plus (`docs/emails/*.local.html` ignoré par git) |
 
 ## 11. Signalements de problèmes
 

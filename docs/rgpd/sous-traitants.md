@@ -4,14 +4,15 @@
 > garanties suffisantes. Cette liste doit rester alignée avec le §4 de
 > `apps/web/src/pages/confidentialite.astro` : **toute ligne ajoutée ici doit l'être là aussi**.
 
-**Dernière mise à jour** : 14 septembre 2026.
+**Dernière mise à jour** : 26 septembre 2026.
 
 | Prestataire | Rôle | Données confiées | Localisation | Transfert hors UE |
 |---|---|---|---|---|
 | **Supabase** | Base de données, authentification, stockage des photos, Edge Functions | L'ensemble des données de compte et de jeu | UE — AWS eu-west-3 (Paris) | Non |
 | **Vercel** | Hébergement du site vitrine et du formulaire de liste d'attente | E-mails de la liste d'attente (en transit), journaux d'accès | États-Unis (edge mondial) | Oui — clauses contractuelles types |
-| **Resend** | Acheminement des e-mails transactionnels (confirmation, réinitialisation, changement d'adresse), des broadcasts de la beta fermée et des alertes de signalement de joueurs à `contact@` (v1.3.0) | Adresse e-mail, contenu de l'e-mail, journaux d'envoi ; pour la beta, l'Audience (liste d'envoi et statut de désinscription) | Envoi depuis l'UE — Irlande (`feedback-smtp.eu-west-1`) ; **stockage aux États-Unis** | Oui — clauses contractuelles types / Data Privacy Framework |
+| **Resend** | Acheminement des e-mails transactionnels (confirmation, bienvenue des comptes Google et Apple, réinitialisation, changement d'adresse), des broadcasts de la beta fermée et des alertes de signalement de joueurs à `contact@` (v1.3.0) | Adresse e-mail, contenu de l'e-mail, journaux d'envoi ; pour la beta, l'Audience (liste d'envoi et statut de désinscription) | Envoi depuis l'UE — Irlande (`feedback-smtp.eu-west-1`) ; **stockage aux États-Unis** | Oui — clauses contractuelles types / Data Privacy Framework |
 | **Google (Play Console)** | Liste des testeurs de la beta fermée | Adresse du compte Google de chaque testeur | États-Unis | Oui — Data Privacy Framework / clauses contractuelles types |
+| **Apple (TestFlight)** | Installation de la beta fermée sur iPhone, par lien public | Aucune identité (testeur anonyme) ; date d'installation, sessions et plantages | États-Unis | Oui — Data Privacy Framework / clauses contractuelles types |
 | **Proton** | Hébergement de la boîte `contact@trycast.fr` | Adresse e-mail et contenu des messages reçus (support, droits, retours de beta) | Suisse | Oui — décision d'adéquation |
 | **Expo** | Passerelle d'envoi des notifications push | Jeton d'appareil, titre et corps de la notification | États-Unis | Oui |
 | **Google (Firebase Cloud Messaging)** | Livraison des notifications sur Android | Jeton d'appareil, contenu de la notification | États-Unis | Oui |
