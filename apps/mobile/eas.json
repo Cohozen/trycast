@@ -37,6 +37,10 @@
             "ios": {
                 "ascAppId": "6815704140",
                 "appleTeamId": "5P7K97386D"
+            },
+            "android": {
+                "track": "alpha",
+                "releaseStatus": "draft"
             }
         }
     }
