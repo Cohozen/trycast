@@ -4,8 +4,8 @@
 > Mis à jour à la fin de chaque lot. **Pas de journal** : l'historique se lit dans `git log`
 > (et l'ancien journal des sessions par `git show 8418902:DASHBOARD.md`).
 >
-> État au **2026-09-26** : serveur **en prod**, bloc communauté compris, sauf deux migrations
-> (`cron-health` et l'exemption des comptes de démo, voir « Ce qu'il reste à faire »). **Release
+> État au **2026-09-26** : serveur **en prod**, bloc communauté compris, sauf la migration
+> `cron-health` (voir « Ce qu'il reste à faire »). **Release
 > 1.2.0 publiée** (tag `v1.2.0`) et **déployée sur la Play Console**. **Configuration de
 > distribution iOS commitée** (lot 1 iOS) : elle déplace l'empreinte Android (`f0e880d9` →
 > `ea4e55aa`), donc **plus aucune OTA venue de `main` n'atteint la 1.2.0** ; tout part avec la
@@ -218,16 +218,13 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
 - **Matchs de test à id négatif en prod** : exécuter le SQL de nettoyage fourni (voir la dette).
 - **Conformité App Store (chantier B), gestes de Corentin**. Faits le 2026-09-26 : secret Vault
   `resend_api_key` (une clé par projet), secrets `APPLE_*`, `delete-account` et `export-data`
-  déployées, et les deux migrations de modération en prod, sur les deux projets ; au contrôle,
-  seul « DemoTryCast » avait un pseudo refusé. Restent, dans cet ordre :
-  1. **Prod** : `supabase db push`, une seule migration attendue au dry-run
-     (`20260926000300_username_filter_demo.sql`, skill `trycast-prod-rollout`). Tant qu'elle n'y
-     est pas, le profil de « DemoTryCast », le compte des relecteurs des stores, ne se modifie
-     plus (langue, photo).
-  2. `git push` (pages légales du site) ; la partie app part par OTA ou avec le build 1.3.0.
-  3. Confirmer la réception à `contact@` de l'e-mail d'alerte du signalement de test fait sur le
-     dev le 2026-09-26.
-  4. **Au build 1.3.0 sur iPhone** : supprimer un compte Apple de test et vérifier que TryCast
+  déployées, les trois migrations de modération en prod (dont l'exemption des comptes de démo :
+  au contrôle, seul « DemoTryCast » avait un pseudo refusé) et `git push` (pages légales en
+  ligne). La partie app part avec le build 1.3.0, que Corentin garde en attente le temps de
+  décider ce qu'il inclut d'autre. Restent :
+  1. Confirmer la réception à `contact@` de l'e-mail d'alerte du signalement de test fait sur le
+     dev le 2026-09-26 (Resend a accepté l'envoi).
+  2. **Au build 1.3.0 sur iPhone** : supprimer un compte Apple de test et vérifier que TryCast
      disparaît de « Se connecter avec Apple » dans l'identifiant Apple.
 
 ### 🔜 iOS — beta fermée TestFlight en octobre 2026 (plan du 2026-09-24)
@@ -289,7 +286,7 @@ de Google, logo blanc) ; le rendu en clair reste à voir. Gestes de Corentin :
    reste listé dans « Se connecter avec Apple » de l'identifiant Apple après suppression.
 
 **Conformité App Store** (modération, révocation des jetons Apple, fiche) : avancée de février
-dans la 1.3.0, chantiers B (en prod, sauf une migration) et E de « v1.3.0 ». Côté règle 1.2,
+dans la 1.3.0, chantiers B (en prod, l'app suit avec le build 1.3.0) et E de « v1.3.0 ». Côté règle 1.2,
 s'ajoutent à l'existant (exclusion par le propriétaire de ligue, contact publié) le filtre des
 pseudos, le blocage et le signalement.
 
