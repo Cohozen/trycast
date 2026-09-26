@@ -14,6 +14,10 @@
  *       écrit en plus docs/emails/beta-league.local.html, l'e-mail de la ligue des
  *       testeurs. Le dépôt est public et le code ouvre la ligue à qui le lit : ce
  *       fichier est ignoré par git, et rien n'est écrit sans le code.
+ *   node scripts/build-email-templates.mjs --testflight https://testflight.apple.com/join/XXXXXXXX
+ *       écrit en plus docs/emails/beta-invite.local.html, l'invitation à la beta. Même
+ *       raison : le lien public TestFlight laisse entrer n'importe qui jusqu'au plafond.
+ *   Les deux options se combinent.
  *
  * Les broadcasts ne passent pas par GoTrue : pas de variables Go. Seules les
  * variables Resend fonctionnent, en triple accolade ({{{RESEND_UNSUBSCRIBE_URL}}}).
@@ -50,6 +54,12 @@ const SITE = 'https://www.trycast.fr';
  * avant un envoi.
  */
 const PLAY_TESTING_URL = 'https://play.google.com/apps/testing/com.cohozen.trycast';
+
+/** Fiche App Store de TestFlight, l'app d'Apple qui installe les versions de test. */
+const TESTFLIGHT_APP_URL = 'https://apps.apple.com/app/testflight/id899247664';
+
+/** Lien public du groupe TestFlight externe (App Store Connect → TestFlight → groupe). */
+const TESTFLIGHT_JOIN = /^https:\/\/testflight\.apple\.com\/join\/[A-Za-z0-9]+$/;
 
 /** Alphabet des codes de ligue — miroir de normalizeInviteCode (apps/mobile/src/features/leagues/validation.ts). */
 const LEAGUE_CODE = /^[A-HJ-KM-NP-Z2-9]{8}$/;
@@ -138,6 +148,38 @@ ${items
                                 </tr>`,
     )
     .join('\n')}
+                            </table>`;
+
+/**
+ * Deux boutons côte à côte, un par téléphone : même technique que cta(), fond encre
+ * façon badge de store. Pas les badges officiels : celui de l'App Store ne peut pas
+ * pointer vers TestFlight, et une image bloquée (Outlook, Proton) ferait disparaître
+ * le bouton. Pas de grenat : aucune des deux plateformes ne passe avant l'autre.
+ * Libellés courts : les deux cellules tiennent côte à côte sur 335 px.
+ */
+const storeButtons = (buttons) => `
+                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="margin:28px 0 0;">
+                                <tr>
+${buttons
+    .map(
+        (
+            { label, via, url },
+            i,
+        ) => `                                    <td valign="top" width="50%" style="width:50%;padding:0 ${i === 0 ? 6 : 0}px 0 ${i === 0 ? 0 : 6}px;">
+                                        <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%">
+                                            <tr>
+                                                <td align="center" bgcolor="${C.text}" style="background-color:${C.text};border-radius:14px;">
+                                                    <a href="${url}" style="display:block;background-color:${C.text};padding:12px 8px;font-family:${BODY};text-decoration:none;border-radius:14px;">
+                                                        <span style="display:block;font-size:16px;font-weight:600;line-height:22px;color:${C.onBrand};">${label}</span>
+                                                        <span style="display:block;font-size:13px;line-height:18px;color:${C.faint};">${via}</span>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>`,
+    )
+    .join('\n')}
+                                </tr>
                             </table>`;
 
 const footerLink = (label, url) =>
@@ -360,43 +402,67 @@ export const TEMPLATES = [
 
 const strong = (text) => `<strong style="color:${C.text};">${text}</strong>`;
 
+const link = (label, url) =>
+    `<a href="${url}" style="color:${C.text};font-weight:600;text-decoration:underline;">${label}</a>`;
+
 /** Commun aux deux e-mails : les testeurs écrivent par où ils veulent. */
 const feedback = p(
     `Un bug, une idée, un écran pas clair ? Réponds simplement à cet e-mail, ou écris-moi directement si on se connaît. Tous les retours comptent, même pour dire que tout va bien.`,
     { top: 12 },
 );
 
-export const BETA_INVITE = {
-    file: 'beta-invite.html',
+/**
+ * Un seul e-mail pour toute l'Audience, iPhone et Android : chacun suit les étapes de
+ * son téléphone. Le lien Play ne sert qu'aux comptes Google de la liste des testeurs ;
+ * un iPhoniste qui l'ouvre ne casse rien.
+ */
+export const betaInvite = (testflightUrl) => ({
+    file: 'beta-invite.local.html',
     subject: 'La beta TryCast est ouverte',
-    preheader: 'Installe TryCast sur Android et commence à pronostiquer avant tout le monde.',
+    preheader:
+        'Installe TryCast sur iPhone ou Android et commence à pronostiquer avant tout le monde.',
     title: 'La beta est ouverte',
     footer: BROADCAST_FOOTER,
     blocks: [
         p(
             "Merci de vouloir tester TryCast, l'app de pronostics rugby entre potes. La beta fermée démarre, et ta place est prête.",
         ),
-        callout(
-            `${strong('Android uniquement pour l’instant.')} La version iPhone viendra plus tard : sur iPhone, tu n'as rien à faire pour le moment.`,
-        ),
-        h2('Installer l’app en 3 étapes'),
+        storeButtons([
+            { label: 'Sur iPhone', via: 'TestFlight', url: testflightUrl },
+            { label: 'Sur Android', via: 'Google Play', url: PLAY_TESTING_URL },
+        ]),
+        p('Les étapes pour ton téléphone sont juste en dessous.', {
+            size: 14,
+            color: C.faint,
+            top: 14,
+        }),
+        h2('Sur iPhone'),
         steps([
-            `Ouvre le lien ci-dessous ${strong('sur ton téléphone Android')}, connecté au compte Google inscrit à la beta.`,
+            `Installe ${link('TestFlight', TESTFLIGHT_APP_URL)} depuis l'App Store : c'est l'app gratuite d'Apple pour les versions de test.`,
+            `Depuis ton iPhone, appuie sur ${strong('Sur iPhone')} plus haut, puis sur ${strong('Accepter')} et ${strong('Installer')}.`,
+            'Ouvre TryCast et crée ton compte (avec Apple, Google ou par e-mail). Les mises à jour arrivent par TestFlight.',
+        ]),
+        fallbackLink(testflightUrl),
+        h2('Sur Android'),
+        steps([
+            `Depuis ton téléphone Android, connecté au compte Google inscrit à la beta, appuie sur ${strong('Sur Android')} plus haut.`,
             `Appuie sur ${strong('Devenir testeur')}.`,
             'Installe TryCast depuis le Play Store, puis crée ton compte (avec Google ou par e-mail).',
         ]),
-        cta('Rejoindre la beta', PLAY_TESTING_URL),
         fallbackLink(PLAY_TESTING_URL),
-        h2('Un service à te demander'),
-        p(
-            `Garde l'app installée ${strong('au moins 14 jours')} : c'est la condition posée par Google avant de laisser TryCast sortir sur le Play Store. Pas besoin d'y passer tous les jours.`,
-            { top: 12 },
+        callout(
+            `Un service à te demander : garde l'app installée ${strong('au moins 14 jours')}. C'est la condition posée par Google avant de laisser TryCast sortir sur le Play Store. Pas besoin d'y passer tous les jours.`,
         ),
         h2('Un retour ?'),
         feedback,
-        callout('Tu peux quitter la beta à tout moment, depuis le même lien.'),
+        p(`Dans l'app, tu peux aussi passer par ${strong('Réglages → Signaler un problème')}.`, {
+            top: 12,
+        }),
+        callout(
+            'Tu peux quitter la beta à tout moment : depuis le lien Play sur Android, depuis TestFlight sur iPhone.',
+        ),
     ],
-};
+});
 
 export const betaLeague = (code) => ({
     file: 'beta-league.local.html',
@@ -434,30 +500,46 @@ function checkConfigTomlSubjects() {
     return missing.length;
 }
 
+/** Valeur qui suit l'option `name` en ligne de commande ; null si l'option est absente. */
+function argValue(name) {
+    const i = process.argv.indexOf(name);
+    return i === -1 ? null : (process.argv[i + 1] ?? '');
+}
+
 /** Valeur de --league-code, validée ; null si l'option est absente. */
 function leagueCodeArg() {
-    const i = process.argv.indexOf('--league-code');
-    if (i === -1) return null;
-    const code = (process.argv[i + 1] ?? '').toUpperCase().replaceAll(/[\s-]/g, '');
+    const raw = argValue('--league-code');
+    if (raw === null) return null;
+    const code = raw.toUpperCase().replaceAll(/[\s-]/g, '');
     if (!LEAGUE_CODE.test(code)) {
-        console.error(
-            `✗ --league-code : « ${process.argv[i + 1] ?? ''} » n'est pas un code de ligue`,
-        );
+        console.error(`✗ --league-code : « ${raw} » n'est pas un code de ligue`);
         console.error('  8 caractères, sans 0, O, 1, I ni L (cf. normalizeInviteCode)');
         process.exit(1);
     }
     return code;
 }
 
+/** Valeur de --testflight, validée ; null si l'option est absente. */
+function testflightArg() {
+    const url = argValue('--testflight');
+    if (url === null) return null;
+    if (!TESTFLIGHT_JOIN.test(url)) {
+        console.error(`✗ --testflight : « ${url} » n'est pas un lien public TestFlight`);
+        console.error('  attendu : https://testflight.apple.com/join/<code>');
+        process.exit(1);
+    }
+    return url;
+}
+
 function main() {
     const check = process.argv.includes('--check');
     const leagueCode = leagueCodeArg();
+    const testflightUrl = testflightArg();
     mkdirSync(OUT_DIR, { recursive: true });
     mkdirSync(BROADCAST_DIR, { recursive: true });
 
     const outputs = [
         ...TEMPLATES.map((template) => ({ template, dir: OUT_DIR, label: 'supabase/templates' })),
-        { template: BETA_INVITE, dir: BROADCAST_DIR, label: 'docs/emails' },
     ];
 
     let drifted = 0;
@@ -491,7 +573,12 @@ function main() {
         return;
     }
 
-    // Généré à la demande seulement, et jamais vérifié : il n'existe pas dans le dépôt.
+    // Générés à la demande seulement, et jamais vérifiés : ils n'existent pas dans le dépôt.
+    if (testflightUrl) {
+        const template = betaInvite(testflightUrl);
+        writeFileSync(join(BROADCAST_DIR, template.file), render(template), 'utf8');
+        console.log(`✓ docs/emails/${template.file} (ignoré par git)`);
+    }
     if (leagueCode) {
         const template = betaLeague(leagueCode);
         writeFileSync(join(BROADCAST_DIR, template.file), render(template), 'utf8');
