@@ -34,6 +34,7 @@ import { TAB_ICON_MOTION_DURATION } from '@/components/tab-icons/motion';
 import { ProfileTabIcon } from '@/components/tab-icons/profile-tab-icon';
 import { ResultsTabIcon } from '@/components/tab-icons/results-tab-icon';
 import type { TabIconComponent } from '@/components/tab-icons/types';
+import { UpdateToast } from '@/features/updates/components/update-toast';
 import { Pressable, Text, useThemeColor, View } from '@/tw';
 
 /**
@@ -192,6 +193,9 @@ function FloatingTabList(props: TabListProps) {
             <View
                 className="items-center px-4"
                 style={{ paddingBottom: Math.max(insets.bottom, 16) }}>
+                {/* Ici et non dans props.children, réservé aux TabTrigger : le
+                    toast suit la barre (escamotage au clavier, onglets seuls). */}
+                <UpdateToast />
                 <View className="w-full max-w-125 flex-row gap-1 rounded-[34px] border border-border-strong/85 bg-surface/95 p-2 tc-shadow-lg dark:border-border-strong/92">
                     <SlidingPill />
                     {props.children}

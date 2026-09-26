@@ -32,5 +32,10 @@
             "after": "."
         }
     },
-    "blockedPlayer": "Joueur masqué"
+    "blockedPlayer": "Joueur masqué",
+    "update": {
+        "ready": "Une mise à jour est prête",
+        "restart": "Redémarrer",
+        "restarting": "Redémarrage…"
+    }
 }

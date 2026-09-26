@@ -32,5 +32,10 @@
             "after": "."
         }
     },
-    "blockedPlayer": "Hidden player"
+    "blockedPlayer": "Hidden player",
+    "update": {
+        "ready": "An update is ready",
+        "restart": "Restart",
+        "restarting": "Restarting…"
+    }
 }
