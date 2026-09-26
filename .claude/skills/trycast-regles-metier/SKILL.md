@@ -186,10 +186,12 @@ scripts/e2e-moderation.sql` (transaction annulée, sans seed).
 - **Alerte** : le trigger `notify_user_report` envoie par pg_net un e-mail de `contact@` vers
   `contact@` via l'API Resend (secret Vault `resend_api_key`), **sans l'identité du signaleur**, avec
   les requêtes de traitement prêtes à copier. Secret absent : rien ne part, le signalement reste.
-  Ce motif pg_net → Resend est réutilisable (e-mail de bienvenue).
+  Même motif pg_net → Resend pour l'e-mail de bienvenue des comptes Google et Apple
+  (`send_welcome_email`, skill `trycast-emails`).
 - **Traiter un signalement** (Corentin, SQL editor du projet) :
   `select public.moderate_profile('<id>', p_username => true, p_avatar => false);` remet
-  `user_xxxxxxxx` avec `username_chosen = false` (le joueur repasse par le choix du pseudo), vide
+  `user_xxxxxxxx` avec `username_chosen = false` (le joueur repasse par le choix du pseudo, et
+  reçoit de nouveau l'e-mail de bienvenue en le rechoisissant : cas accepté), vide
   `avatar_url` si demandé et supprime les signalements traités. Réservée à `service_role`. **La
   photo se retire à la main** dans Storage → `avatars` → `<id>` (le SQL ne peut pas supprimer dans
   `storage.objects`). Rejeter : `delete from public.user_reports where id = '<id>';`.

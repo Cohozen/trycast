@@ -1,15 +1,37 @@
 ---
 name: trycast-emails
-description: Modifier les e-mails transactionnels TryCast (templates d'auth Supabase/GoTrue) — générateur scripts/build-email-templates.mjs, contraintes du HTML d'e-mail (CSS inline, tables, polices), variables Go disponibles, mise en ligne sur le projet dev et le piège de supabase config push. À consulter dès qu'on touche à supabase/templates/, au texte d'un e-mail d'auth, ou au parcours de reset de mot de passe par code.
+description: Modifier les e-mails TryCast — templates d'auth Supabase/GoTrue, e-mail de bienvenue des comptes Google et Apple (template Resend « welcome », trigger profiles_welcome_email) et e-mails de la beta (--testflight, --league-code) — générateur scripts/build-email-templates.mjs, contraintes du HTML d'e-mail (CSS inline, tables, polices), variables Go et Resend, mise en ligne sur le projet dev et le piège de supabase config push. À consulter dès qu'on touche à supabase/templates/, à docs/emails/, au texte d'un e-mail, ou au parcours de reset de mot de passe par code.
 ---
 
 # E-mails transactionnels TryCast
 
 Les 7 e-mails d'auth (GoTrue) : confirmation d'inscription, réinitialisation de mot de passe, changement d'adresse, invitation, réauthentification, + 2 notifications de sécurité (mot de passe modifié, adresse modifiée). Envoyés par **SMTP custom Resend** (domaine `trycast.fr` vérifié, région d'envoi EU, 30 e-mails/h).
 
-Le même générateur produit les **e-mails de la beta** (`docs/emails/`), envoyés en broadcast Resend et non par GoTrue : procédure dans `docs/emails/README.md`.
+Le même générateur produit, dans `docs/emails/`, l'**e-mail de bienvenue** (template Resend, ci-dessous) et les **e-mails de la beta**, envoyés en broadcast Resend et non par GoTrue : procédure dans `docs/emails/README.md`.
 
 Hors générateur : l'**alerte de signalement d'un joueur** (v1.3.0), texte brut envoyé à `contact@` par l'API Resend depuis le trigger SQL `notify_user_report` (pg_net, clé dans le Vault sous `resend_api_key`, une clé « envoi seul » par projet). Détail dans le skill `trycast-regles-metier`, section « Modération ».
+
+## E-mail de bienvenue : un template Resend, pas `emails:push`
+
+Un compte Google ou Apple ne reçoit pas d'e-mail de confirmation : il reçoit la bienvenue quand il choisit son pseudo. Le trigger `profiles_welcome_email` (migration `20260926000400`, fonction `send_welcome_email`) part sur le passage de `username_chosen` de `false` à `true`, comptes de démo exclus, et appelle l'API Resend en pg_net avec la même clé que `notify_user_report`. Il ne porte **pas le HTML** : il désigne le template Resend publié sous l'alias **`welcome`**, variable `USERNAME`. Pourquoi pas l'e-mail natif « Sign-in method linked » de Supabase : il ne part que de `linkIdentity()` sur un utilisateur déjà connecté, jamais à la création d'un compte par un fournisseur (vérifié dans le source de supabase/auth).
+
+- La source est `WELCOME` dans le générateur, qui écrit `docs/emails/welcome.html` (versionné, vérifié par `emails:check`). **`emails:push` ne le met pas en ligne** : après une retouche, remplacer le HTML du template `welcome` dans Resend et le **republier** (recette dans `docs/emails/README.md`).
+- Le template vit au niveau du **compte** Resend : un seul pour le dev et la prod, une publication touche les deux à la fois. Retoucher l'e-mail ne demande aucune migration.
+- ⚠️ Pièges de l'API Resend : le paramètre `template` exclut `html` et `text` dans la même requête ; seul un template **publié** s'envoie ; variables en **triple accolade** (`{{{USERNAME}}}`), et `FIRST_NAME`, `LAST_NAME`, `EMAIL`, `UNSUBSCRIBE_URL` sont des noms réservés. Template absent ou non publié : réponse 422, lisible seulement dans `net._http_response`, et rien ne part.
+- Cas accepté : un profil modéré (`moderate_profile` remet `username_chosen` à `false`) reçoit de nouveau la bienvenue en rechoisissant son pseudo.
+- Vérification : `supabase db query --linked -f scripts/e2e-welcome.sql` après le push de la migration (transaction annulée, rien ne part).
+
+## E-mails de la beta : ce qui ne doit pas entrer dans le dépôt
+
+Le dépôt est public. Le lien public TestFlight laisse entrer n'importe qui jusqu'au plafond du groupe, et le code de la ligue des testeurs ouvre la ligue : les deux e-mails qui les portent s'écrivent **à la demande**, en `docs/emails/*.local.html`, ignorés par git.
+
+```bash
+node scripts/build-email-templates.mjs --testflight https://testflight.apple.com/join/XXXXXXXX --league-code ABCD2345
+```
+
+Sans l'option, le fichier n'est pas écrit : **le régénérer avant chaque envoi** (un nettoyage du dossier l'efface). L'invitation est unique pour iPhone et Android (une seule Audience) : deux boutons HTML côte à côte, pas les badges officiels, car celui de l'App Store ne peut pas pointer vers TestFlight et une image bloquée (Outlook, Proton) ferait disparaître le bouton.
+
+⚠️ **La media query partagée de `render` est dans les 7 templates d'auth.** La modifier pour un e-mail de la beta change aussi les e-mails d'auth, et impose un `emails:push` sur **les deux** projets. Préférer une mise en page qui tient sans nouvelle règle CSS (les deux boutons tiennent côte à côte sur 335 px grâce à des libellés courts).
 
 ⚠️ **Adresses relais Apple** (`@privaterelay.appleid.com`, comptes Sign in with Apple qui masquent leur adresse) : le relais d'Apple **rejette** tout e-mail dont le domaine ou l'expéditeur n'est pas déclaré dans Apple Developer → Sign in with Apple for Email Communication. `trycast.fr` et l'expéditeur Resend doivent y figurer, et tout nouvel expéditeur s'y ajoute avant son premier envoi. Sinon ces comptes ne reçoivent rien, pas même le préavis de purge des inactifs, alors que la politique de confidentialité promet qu'Apple fait suivre.
 

@@ -17,8 +17,10 @@
 > livré** (app, e-mails sur dev, site), e-mails d'auth à pousser en prod ; **alerte sur les crons
 > en échec livrée sur le dev** (moniteur Sentry `cron-health`), secret et push prod à faire.
 > Chantier B : **modération et révocation Apple en prod** (filtre des pseudos, bloquer, signaler ;
-> secrets, EF et migrations posés le 2026-09-26) ; restent la migration qui exempte les comptes de
-> démo du filtre, puis la vérification sur iPhone au build 1.3.0.
+> secrets, EF et migrations posés le 2026-09-26) ; reste la vérification sur iPhone au build 1.3.0.
+> Chantier C : **livré en code** (e-mail de bienvenue des comptes Google et Apple, remplissage des
+> mots de passe par Face ID, invitation beta unique iPhone + Android) ; la migration de bienvenue
+> attend son push sur le dev puis en prod, le reste part avec `git push` et le build 1.3.0.
 
 ## Avancement des lots
 
@@ -136,21 +138,30 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   l'ensemble part par OTA ou avec le build 1.3.0.
 
 **C. Confort**
-- **E-mail de bienvenue des comptes Google et Apple, et d'eux seuls** (acté le 2026-09-25) : un
-  compte e-mail reçoit déjà l'e-mail de confirmation, un compte fournisseur ne reçoit rien.
-  Déclencheur proposé : le passage de
-  `username_chosen` à `true` par `claim_username` (une seule fois par compte, le pseudo est connu),
-  envoi par l'API Resend en `pg_net`, sur le modèle du trigger `notify_user_report` (chantier B),
-  qui lit déjà la clé `resend_api_key` du Vault. En français seulement pour la beta. Vérifier que le registre couvre
-  cet e-mail (gestion du compte). Il passe par le relais Apple, déjà déclaré.
-- **Remplissage des mots de passe par le système** (acté le 2026-09-25), déverrouillé par Face ID
-  ou l'empreinte, sans lib native. **Pas de verrou biométrique à l'ouverture**, écarté : la session
-  persiste, rien de sensible à protéger, une friction à chaque ouverture. Les champs portent déjà `autoComplete` ; manque, sur
-  iOS, `webcredentials:www.trycast.fr` dans `associatedDomains` (`app.json`, dans l'empreinte :
-  ça tombe bien, la 1.3.0 est un build) et la clé `webcredentials` dans
-  l'`apple-app-site-association` servi par le site (`apps/web/scripts/build-well-known.mjs`). Côté
-  Android, Google Password Manager fonctionne déjà avec `autoComplete`. Apple et Google Sign-In
-  sont déjà des connexions biométriques en une touche.
+- ✅ **E-mail de bienvenue des comptes Google et Apple, et d'eux seuls** (2026-09-26) : un compte
+  e-mail reçoit déjà l'e-mail de confirmation, un compte fournisseur ne recevait rien. Trigger
+  `profiles_welcome_email` sur le passage de `username_chosen` à `true` (comptes de démo exclus),
+  envoi par l'API Resend en `pg_net` comme `notify_user_report`, contenu dans le template Resend
+  publié sous l'alias `welcome` (un seul pour dev et prod, déjà publié). En français seulement pour
+  la beta. Registre §1 et politiques FR/EN à jour. Vérifié sur le dev par `scripts/e2e-welcome.sql`
+  **avec la migration incluse dans la transaction** : la migration `20260926000400` n'est poussée
+  ni sur le dev ni en prod (voir « Ce qu'il reste à faire »). Cas accepté : un profil modéré
+  reçoit de nouveau la bienvenue en rechoisissant son pseudo.
+- ✅ **Remplissage des mots de passe par Face ID** (2026-09-26), sans lib native.
+  `webcredentials:www.trycast.fr` dans `associatedDomains` (`app.json`, empreinte déplacée : part
+  avec le build 1.3.0), clé `webcredentials` dans l'`apple-app-site-association`
+  (`apps/web/scripts/build-well-known.mjs`) et `textContentType="username"` sur les champs
+  d'adresse de l'écran de connexion. **Pas encore vérifié** : il faut le site déployé et le build
+  1.3.0 sur iPhone. Côté Android, Google Password Manager fonctionne déjà avec `autoComplete`.
+  **Pas de verrou biométrique à l'ouverture**, écarté : la session persiste, rien de sensible à
+  protéger, une friction à chaque ouverture.
+- ✅ **Invitation à la beta, un seul e-mail pour iPhone et Android** (2026-09-26) : deux boutons
+  HTML côte à côte (pas les badges officiels, bloqués comme images et sans lien TestFlight
+  possible pour celui de l'App Store) et les étapes de chaque téléphone, pour une seule Audience
+  Resend. Le lien public TestFlight ne va pas dans le dépôt : l'e-mail se génère à la demande
+  (`--testflight`, skill `trycast-emails`). Texte des « Informations de test » TestFlight prêt dans
+  `docs/emails/README.md`. Apple (TestFlight) déclaré au registre §10, aux sous-traitants et dans
+  les politiques FR/EN. Envoi test des deux e-mails à Corentin le 2026-09-26 : rendu à confirmer.
 
 **D. Outillage**
 - **`eas submit` Android** : compte de service Google Cloud (API Google Play Android Developer
@@ -201,8 +212,9 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   n'a servi qu'à Corentin. ⚠️ **La 1.2.0 ne reçoit plus d'OTA** : la configuration iOS d'`app.json`
   a déplacé l'empreinte Android, choix assumé. Un correctif pour les testeurs Android part avec la
   1.3.0 (nouveau build) ; `npm run ota:prod` ne le signale pas, il publierait sans que personne ne
-  reçoive rien. Le lot 2 iOS (deux dépendances natives) la déplace encore, sans autre conséquence.
-  Le dev client iOS est rebuildé (2026-09-24), mais la passe visuelle iOS du DS n'est pas faite.
+  reçoive rien. Le lot 2 iOS (deux dépendances natives) et `webcredentials` (chantier C) la
+  déplacent encore, sans autre conséquence. **Le dev client iOS est à rebuilder** (`app.json`
+  touché par le chantier C).
 - **Wording de la 1.3.0, gestes de Corentin** : pousser `main` (le site se rebuilde sur Vercel),
   puis les e-mails d'auth en prod depuis la racine,
   `npm run emails:push -- --project=<ref prod> --dry-run`, puis sans `--dry-run` (skill
@@ -223,6 +235,17 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   décider ce qu'il inclut d'autre. E-mail d'alerte d'un signalement reçu à `contact@`
   (2026-09-26). Reste **au build 1.3.0 sur iPhone** : supprimer un compte Apple de test et
   vérifier que TryCast disparaît de « Se connecter avec Apple » dans l'identifiant Apple.
+- **Confort (chantier C), gestes de Corentin**, dans cet ordre :
+  1. `supabase db push` de `20260926000400_welcome_email.sql` sur le **dev**, puis
+     `supabase db query --linked -f scripts/e2e-welcome.sql` (ligne « OK » attendue) ; ensuite en
+     **prod** (skill `trycast-prod-rollout`, une seule migration attendue au dry-run ; le secret
+     `resend_api_key` est déjà sur les deux projets, le template Resend `welcome` déjà publié).
+  2. `git push` : le site se rebuilde avec l'AASA à `webcredentials` et les politiques du
+     2026-09-26. Contrôle : `curl` de l'AASA (recette dans le skill `trycast-site-web`).
+  3. Rebuild du dev client iOS.
+  4. Confirmer le rendu des deux e-mails de test reçus le 2026-09-26 (bienvenue, invitation).
+  5. **Au build 1.3.0 sur iPhone** : après une inscription par e-mail, iOS propose d'enregistrer
+     le mot de passe ; à la connexion suivante, il le propose au Face ID.
 
 ### 🔜 iOS — beta fermée TestFlight en octobre 2026 (plan du 2026-09-24)
 Objectif : des testeurs iPhone (amis, connaissances) **invités par e-mail** dans un groupe
@@ -236,8 +259,8 @@ Championship. **App Store public en février 2027**, avec Android. Compte **indi
 | ✅ 24 sept | Claude, puis Corentin | **Lot 1 — iOS distribuable** (ci-dessous) : premier build iOS de production (1.2.0, build 3, empreinte `e9fd702e`) envoyé par `eas submit`, validé par Apple, installé par TestFlight interne sur un iPhone de proche. |
 | ✅ 24 sept | Claude | **Lot 2 — Sign in with Apple** (ci-dessous) : code, RGPD et politiques FR/EN commités, dev client iOS rebuildé ; ✅ 25 sept : validé sur iPhone (TestFlight 1.2.0 build 4, Supabase prod). |
 | d'ici le 5 oct | Corentin + 1 ou 2 proches | iPhone réel en TestFlight interne (testeurs ajoutés comme utilisateurs App Store Connect) : Google. ✅ Apple et push validés le 2026-09-25 (build 4), sauf le tap sur une notification app tuée, corrigé et à revérifier au build 1.3.0. ✅ Inscription et partage d'une invitation par le lien `/rejoindre` validés le 2026-09-24 (build 1.2.0). Corentin n'a pas d'iPhone. |
-| ~6 oct (avancé du 15, plan du 25 sept) | Corentin | Release **1.3.0**, groupe externe « Beta fermée », soumission à la revue beta : description, `contact@trycast.fr`, compte de démo des stores, note au relecteur (gratuit, aucune mise, les cotes pondèrent les points). « Informations de test » (description de la beta, « Ce qu'il faut tester ») remplies **en français** : c'est ce que le testeur lit dans TestFlight. |
-| ~8-9 oct (avancé du 17-20) | Claude, puis Corentin | **Lien public TestFlight** (acté le 2026-09-24), pas l'invitation par e-mail d'Apple (en anglais, texte non maîtrisé) : lien activé sur le groupe externe, **plafonné** (~30 testeurs) et révocable ; aucun Apple ID à collecter. Le lien part dans **notre mail en français** depuis `contact@trycast.fr`, par le broadcast Resend de la beta Android (à adapter : il ne vise qu'Android). Claude rédige ce mail et le « Ce qu'il faut tester ». Procédure du mail : 1) installer **TestFlight** (App Store, gratuit, outil officiel d'Apple) ; 2) ouvrir le lien **depuis l'iPhone** → « Accepter » → « Installer » ; 3) ouvrir TryCast, les mises à jour arrivent par TestFlight. Retours par « Signaler un problème » (Sentry), pas par TestFlight. |
+| ~6 oct (avancé du 15, plan du 25 sept) | Corentin | Release **1.3.0**, groupe externe « Beta fermée », soumission à la revue beta : description, `contact@trycast.fr`, compte de démo des stores, note au relecteur (gratuit, aucune mise, les cotes pondèrent les points). « Informations de test » (description de la beta, « Ce qu'il faut tester ») remplies **en français** : c'est ce que le testeur lit dans TestFlight. Texte prêt à coller dans `docs/emails/README.md`. |
+| ~8-9 oct (avancé du 17-20) | Corentin | **Lien public TestFlight** (acté le 2026-09-24), pas l'invitation par e-mail d'Apple (en anglais, texte non maîtrisé) : lien activé sur le groupe externe, **plafonné** (~30 testeurs) et révocable ; aucun Apple ID à collecter. Il n'existe qu'une fois le premier build accepté par la Beta App Review. Le lien part dans **notre mail en français** depuis `contact@trycast.fr`, l'invitation unique iPhone + Android (✅ rédigée, chantier C) : la générer avec le vrai lien, `node scripts/build-email-templates.mjs --testflight <lien>`, puis suivre « Avant d'envoyer » de `docs/emails/README.md`. Retours par « Signaler un problème » (Sentry) ou par réponse à l'e-mail, pas par TestFlight. |
 | jusqu'au 7 nov | — | Marge pour un rejet et une nouvelle soumission. |
 
 **Lot 1 — iOS distribuable** (configuration seule) :
@@ -342,6 +365,10 @@ pseudos, le blocage et le signalement.
   conservé) ; signalement des **joueurs seulement**, motifs pseudo et photo ; **pas de filtre sur
   les noms de ligue** (visibles avec le code seulement, on peut quitter) ; traitement à la main
   dans le SQL editor.
+- **E-mails de la 1.3.0** (2026-09-26) : invitation beta **unique** pour iPhone et Android, boutons
+  HTML et non badges officiels ; bienvenue des comptes Google et Apple par un **template Resend**
+  envoyé depuis un trigger, l'e-mail natif « Sign-in method linked » de Supabase ne partant jamais
+  à la création d'un compte.
 
 ## Points ouverts / dette assumée
 - **Chantier des cotes** (reporté) : capturer les cotes plus tôt et ne jamais écraser une bonne cote par du vide. Seul le badge « Outsider des cotes » du coup de la journée en dépend.

@@ -100,6 +100,15 @@ serait aussi un passage en SSR, donc un adapter Vercel.
 du projet Vercel. Sans elles, **rien n'est écrit** et le build passe quand même — un fichier
 d'attente serait pire, la vérification échouant alors sans que rien ne le signale.
 
+L'AASA porte deux clés : `applinks` (liens `/rejoindre/*`) et `webcredentials` (v1.3.0), qui
+autorise iOS à enregistrer les mots de passe de l'app pour `www.trycast.fr` et à les proposer au
+Face ID. Elle répond à `webcredentials:www.trycast.fr` dans `ios.associatedDomains` d'`app.json` ;
+côté app, les champs d'adresse de l'écran de connexion portent `textContentType="username"` pour
+qu'iOS sache quel identifiant associer au mot de passe (`auth-screen.tsx`). **Retirer l'une des
+trois casse le remplissage sans aucun message.** Contrôle après déploiement :
+`curl -s https://www.trycast.fr/.well-known/apple-app-site-association | python3 -m json.tool`
+doit montrer `webcredentials.apps` avec `5P7K97386D.com.cohozen.trycast`.
+
 `ANDROID_CERT_FINGERPRINTS` : des **SHA-256**, 32 octets hexadécimaux séparés par des deux-points
 (95 caractères chacune). Le séparateur entre empreintes est indifférent — virgule, espace ou
 retour à la ligne — précisément pour qu'une copie brute de la Play Console, qui les affiche sur

@@ -112,13 +112,13 @@ Sous-agent `verif-visuelle`, skills **`trycast-android-emulator`** et **`trycast
 
 ## Supabase
 
-Skills **`trycast-supabase-migration`** (schéma, RLS, RPC, E2E, essais Wikipedia), **`trycast-prod-rollout`** (mise en prod), **`trycast-emails`** (templates d'auth).
+Skills **`trycast-supabase-migration`** (schéma, RLS, RPC, E2E, essais Wikipedia), **`trycast-prod-rollout`** (mise en prod), **`trycast-emails`** (templates d'auth, e-mails de bienvenue et de la beta).
 - **Deux projets** : **développement** — le seul que visent le `.env` local, les scripts et les agents — et **production**, touchée par Corentin seulement. **Aucun ref de projet écrit en dur** : les scripts le déduisent du `.env` (`scripts/project-ref.mjs`), les crons lisent l'URL des EF dans le Vault (`edge_functions_base_url`)
 - Schéma uniquement par migrations dans `supabase/migrations/`, puis `supabase db push` + `npm run typegen`. Edge Functions : `supabase functions deploy <name>`
 - **Passage en prod** (migrations, seeds de référence, EF) : geste de Corentin, procédure préparée avec le skill `trycast-prod-rollout`
 - ⚠️ **Une migration qui lit un secret Vault impose de le créer sur CHAQUE projet, prod comprise, avant son push** (les crons prod ont échoué en silence un mois pour un secret manquant). Sur un projet neuf, secrets Vault (`edge_functions_base_url`, `sync_fixtures_secret`, `sync_results_secret`, `sync_live_secret`, `sync_tries_secret`, `notify_secret`, `sentry_cron_checkin_url`, `resend_api_key`) et EF **avant** `supabase db push`
 - Toute règle de sécurité (deadline prono au kickoff, accès données) est imposée par RLS côté serveur, le client n'est qu'une UX
-- E-mails : templates `supabase/templates/*.html` **générés** (`npm run emails:build`), mis en ligne par `npm run emails:push` — **jamais `supabase config push`**. Reset du mot de passe **par code à 6 chiffres**, jamais un lien
+- E-mails : templates `supabase/templates/*.html` **générés** (`npm run emails:build`), mis en ligne par `npm run emails:push` — **jamais `supabase config push`**. L'e-mail de bienvenue est un template Resend (`welcome`) que `emails:push` ne met pas en ligne. Reset du mot de passe **par code à 6 chiffres**, jamais un lien
 - **Essais** : import Wikipedia qui **n'écrit que si le décompte reconstitue le score** — ne jamais assouplir ce contrôle ; scraping L'Équipe/Flashscore écarté. **Pas d'app d'administration** (décision actée) ; si un jour, une app à part, jamais greffée sur Astro
 
 ## RGPD

@@ -22,6 +22,8 @@ Seule exception : `push-email-config.mjs` accepte `--project=<ref>` pour pousser
 
 **Source unique des 7 e-mails d'auth.** Ne jamais éditer `supabase/templates/*.html` à la main : ils sont générés. Le script porte aussi les sujets et les clés GoTrue de chaque template.
 
+Il écrit aussi `docs/emails/welcome.html`, l'e-mail de bienvenue des comptes Google et Apple, que `emails:push` ne met **pas** en ligne : c'est un template Resend, republié à la main (`docs/emails/README.md`). Les e-mails de la beta ne s'écrivent qu'à la demande, ignorés par git : `--testflight <lien public>` pour l'invitation, `--league-code <code>` pour la ligue des testeurs.
+
 Les contraintes du HTML d'e-mail (styles inline, tables, tokens du DS en hex, polices non chargées) sont documentées en tête du fichier et dans le skill `trycast-emails`.
 
 ### `push-email-config.mjs`
