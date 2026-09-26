@@ -21,7 +21,8 @@
 > Chantier C : **livré en code** (e-mail de bienvenue des comptes Google et Apple, remplissage des
 > mots de passe par Face ID, invitation beta unique iPhone + Android) ; migration de bienvenue en
 > prod et `main` poussé le 2026-09-26 (AASA à `webcredentials` en ligne) ; le reste part avec le
-> build 1.3.0.
+> build 1.3.0. Chantier D : **envoi automatique aux stores livré en code** (`build:prod` et
+> `build:prod:ios` en `--auto-submit`) ; restent les gestes Google avant le build 1.3.0.
 
 ## Avancement des lots
 
@@ -71,7 +72,7 @@ sont des proches contactés directement.
 |---|---|---|
 | 25 sept → ~5 oct | Claude | Chantiers A à D ci-dessous, dans cet ordre |
 | ~5 oct | Claude, puis Corentin | **Gel** : captures des fiches (E), `npm run release -- --minor` |
-| ~6 oct | Corentin | Builds production Android + iOS, `eas submit` des deux. iOS : groupe externe, soumission à la **Beta App Review** (24-48 h pour le premier build externe). Android : piste de test fermé |
+| ~6 oct | Corentin | Builds production Android + iOS (`npm run build:prod` et `build:prod:ios`, qui enchaînent `eas submit`). iOS : groupe externe, soumission à la **Beta App Review** (24-48 h pour le premier build externe). Android : piste de test fermé |
 | ~8-9 oct | Corentin | **Beta ouverte** : un seul mail en français depuis `contact@trycast.fr`, lien d'opt-in Play et lien public TestFlight (procédure dans « iOS » ci-dessous) |
 | dès B et E prêts | Corentin | **Soumission App Review, publication manuelle** : une version approuvée attend « Pending Developer Release » sans être publique. Un rejet = correctif + nouveau build, sans attendre février |
 | ~23 oct | Corentin | 14 jours de test fermé Play avec ≥ 12 testeurs **Android** inscrits sans interruption → demande d'accès à la production (questionnaire, examen ~7 jours). La production reste non publiée jusqu'en février |
@@ -164,11 +165,14 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   les politiques FR/EN. Envoi test des deux e-mails à Corentin le 2026-09-26 : rendu validé dans Proton.
 
 **D. Outillage**
-- **`eas submit` Android** : compte de service Google Cloud (API Google Play Android Developer
-  activée), invité dans la Play Console avec le droit de publier sur les pistes de test, clé JSON
-  **confiée à EAS** (`eas credentials`), jamais dans le dépôt ; `submit.production.android` d'`eas.json`
-  avec la piste de test fermé (`alpha` par défaut) et `releaseStatus: "draft"` pour garder la
-  main sur les notes de version. Gestes Google : Corentin ; `eas.json` : Claude.
+- ✅ **`eas submit` Android et iOS** (2026-09-26), code commité : `submit.production.android`
+  d'`eas.json` envoie en brouillon (`releaseStatus: "draft"`) sur la piste de test fermé
+  (`alpha`), pour garder la main sur les notes de version ; la clé du compte de service Google
+  vivra dans les credentials EAS, jamais dans le dépôt. `build:prod` et le nouveau
+  `build:prod:ios` passent `--auto-submit` (plus `build:list:ios`) ; un envoi raté se rejoue par
+  `eas submit -p android|ios --profile production --latest`, sans rebuild. L'ajout a déplacé
+  l'empreinte Android, sans conséquence : la 1.3.0 n'est pas buildée. Restent les gestes Google,
+  dans « Ce qu'il reste à faire ». Recette : `docs/stores/play-store.md`, « Envoi par `eas submit` ».
 
 **E. Fiches des stores** (au gel, après le dernier changement d'écran)
 - **Play, fiche refaite** : 4 à 6 captures au nouveau DS depuis un build `preview` en français,
@@ -213,13 +217,19 @@ version (vérifier l'empreinte avant, skill `trycast-release`).
   a déplacé l'empreinte Android, choix assumé. Un correctif pour les testeurs Android part avec la
   1.3.0 (nouveau build) ; `npm run ota:prod` ne le signale pas, il publierait sans que personne ne
   reçoive rien. Le lot 2 iOS (deux dépendances natives) et `webcredentials` (chantier C) la
-  déplacent encore, sans autre conséquence. **Le dev client iOS est à rebuilder** (`app.json`
+  déplacent encore, comme `submit.production.android` d'`eas.json` (chantier D), sans autre
+  conséquence. **Le dev client iOS est à rebuilder** (`app.json`
   touché par le chantier C).
 - **Wording de la 1.3.0, gestes de Corentin** : pousser `main` (le site se rebuilde sur Vercel),
   puis les e-mails d'auth en prod depuis la racine,
   `npm run emails:push -- --project=<ref prod> --dry-run`, puis sans `--dry-run` (skill
   `trycast-emails`). Les locales de l'app partent avec le build 1.3.0.
-- `submit.production.android` d'`eas.json` attend le compte de service Google Play (chantier D de « v1.3.0 »).
+- **Envoi automatique à la Play Console (chantier D), gestes de Corentin avant le build 1.3.0**,
+  détaillés dans `docs/stores/play-store.md`, « Envoi par `eas submit` » : compte de service
+  Google Cloud avec l'API Google Play Android Developer activée et une clé JSON ; invitation du
+  compte dans la Play Console, avec le droit de publier sur les pistes de test ; clé téléversée
+  par `eas credentials -p android` (puis copie locale supprimée) ; piste de test fermé créée.
+  Sans clé, le build réussit et seul l'envoi échoue.
 - **Alerte sur les crons en échec, gestes de Corentin**, dans cet ordre : créer le secret
   `sentry_cron_checkin_url` (URL en `environment=production`, commande dans l'en-tête de
   `supabase/migrations/20260925000100_cron_health.sql`) dans le Vault **prod avant le push** ;
@@ -361,6 +371,9 @@ pseudos, le blocage et le signalement.
   conservé) ; signalement des **joueurs seulement**, motifs pseudo et photo ; **pas de filtre sur
   les noms de ligue** (visibles avec le code seulement, on peut quitter) ; traitement à la main
   dans le SQL editor.
+- **Envoi aux stores par `--auto-submit`** (2026-09-26) sur les builds de production, plutôt
+  qu'un script d'envoi séparé ; côté Play, en brouillon, les notes et le déploiement restant
+  dans la console.
 - **E-mails de la 1.3.0** (2026-09-26) : invitation beta **unique** pour iPhone et Android, boutons
   HTML et non badges officiels ; bienvenue des comptes Google et Apple par un **template Resend**
   envoyé depuis un trigger, l'e-mail natif « Sign-in method linked » de Supabase ne partant jamais

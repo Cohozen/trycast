@@ -96,7 +96,8 @@ npm run release -- --minor --notes "Partage d'une ligue par lien" \
 
 # 3. Ce que le script n'a pas fait, et ne fera jamais
 git push --follow-tags
-npm run build:prod
+npm run build:prod        # Android, envoyé tout seul à la Play Console (--auto-submit)
+npm run build:prod:ios    # iOS, envoyé tout seul à TestFlight
 ```
 
 Le `--dry-run` n'est pas une politesse : il affiche les commits groupés depuis le dernier tag,
@@ -184,10 +185,10 @@ part dès la fin du build avec `submit.production` d'`eas.json`.
 - ⚠️ `eas.json` entre dans l'empreinte (vérifié le 2026-09-26 : ajouter `submit.production.android`
   l'a déplacée). Le toucher, c'est couper les builds distribués de l'OTA, comme `app.json`.
 
-Commandes : `npm run build:dev|build:preview|build:prod`, `npm run env:preview|env:prod`, depuis
-`apps/mobile`. ⚠️ Un build `preview`/`production` inline les `EXPO_PUBLIC_*` au bundling **sur les
-serveurs EAS** : une variable absente disparaît en silence (piège détaillé dans
-`trycast-dev-builds`) — `npm run env:prod` avant de lancer.
+Commandes : `npm run build:dev|build:preview|build:prod|build:prod:ios`,
+`npm run env:preview|env:prod`, depuis `apps/mobile`. ⚠️ Un build `preview`/`production` inline
+les `EXPO_PUBLIC_*` au bundling **sur les serveurs EAS** : une variable absente disparaît en
+silence (piège détaillé dans `trycast-dev-builds`) — `npm run env:prod` avant de lancer.
 
 Réglages affiche `nativeApplicationVersion (nativeBuildVersion)` et, dessous, le **canal** et
 l'identifiant court de la mise à jour chargée : c'est la seule façon de savoir quel JS tourne chez

@@ -89,10 +89,10 @@ Skill **`trycast-liens-invitation`** (côté app) et `trycast-site-web` (côté 
 ## Versions, builds et OTA
 
 Skills **`trycast-release`** (version, empreinte, OTA, profils EAS) et **`trycast-dev-builds`** (quand et comment rebuilder).
-- **Une release se prépare par `npm run release -- --minor|--patch --notes "…"`** (en `--dry-run` d'abord), jamais à la main. Il ne pousse ni ne build rien
+- **Une release se prépare par `npm run release -- --minor|--patch --notes "…"`** (en `--dry-run` d'abord), jamais à la main. Il ne pousse ni ne build rien ; `build:prod` et `build:prod:ios`, eux, envoient d'eux-mêmes aux stores (`--auto-submit`)
 - `app.json` → `expo.version` est la seule source de vérité de la version marketing ; `package.json` la duplique, **bumper les deux ensemble**. Le numéro de build n'est **jamais** écrit dans le dépôt (EAS le gère)
 - ⚠️ **`expo.version` fait partie de l'empreinte** : tout bump impose un build, un correctif JS part **sans bump** par `npm run ota:prod`. **Ne pas ajouter `ExpoConfigVersions` aux `sourceSkips` — décision actée**
-- ⚠️ **Une OTA n'atteint que les builds de même empreinte, et le non-appariement est MUET** : comparer avant publication. `fingerprint.config.js` et le champ `scripts` d'`apps/mobile/package.json` (exclu de l'empreinte) ne se touchent qu'avec une release
+- ⚠️ **Une OTA n'atteint que les builds de même empreinte, et le non-appariement est MUET** : comparer avant publication. `eas.json` (dans l'empreinte, comme `app.json`), `fingerprint.config.js` et le champ `scripts` d'`apps/mobile/package.json` (exclu de l'empreinte) ne se touchent qu'avec une release
 - ⚠️ Un build `preview`/`production` inline les `EXPO_PUBLIC_*` sur les serveurs EAS : une variable absente disparaît en silence — `npm run env:prod` avant de lancer
 - **Dev builds** (`expo-dev-client`, pas Expo Go) : **toute lib native ajoutée/retirée, tout changement `app.json`/`app.config.ts`, toute montée de SDK ⇒ prévenir explicitement Corentin qu'un rebuild du dev client est nécessaire**
 - `apps/mobile/android/` et `apps/mobile/ios/` sont **générés et gitignorés** : `npx expo prebuild --clean -p <platform>`, rien ne s'y édite
