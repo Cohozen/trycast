@@ -24,10 +24,23 @@ node scripts/build-email-templates.mjs --testflight https://testflight.apple.com
 
 ## Un seul e-mail pour iPhone et Android
 
-L'invitation porte deux boutons côte à côte (« Sur iPhone », « Sur Android ») et les étapes de
-chaque téléphone : une seule Audience, pas de liste à couper en deux. Le lien Play ne sert
-qu'aux comptes Google de la liste des testeurs ; un iPhoniste qui l'ouvre ne casse rien. Les
+L'invitation porte deux boutons côte à côte (« 🍏 Sur iPhone », « 🤖 Sur Android ») et les
+étapes de chaque téléphone : une seule Audience, pas de liste à couper en deux. Le lien Play ne
+sert qu'aux comptes Google de la liste des testeurs ; un iPhoniste qui l'ouvre ne casse rien. Les
 testeurs iPhone ne comptent pas dans les 12 exigés par Google.
+
+Un emoji plutôt qu'un logo : le logo Apple est interdit aux tiers, le robot Android exigerait
+une attribution, et Proton comme Outlook bloquent les images distantes par défaut. Les étapes
+citent les libellés sans emoji, exprès.
+
+## Un broadcast, pas un template
+
+Un broadcast Resend n'accepte que des variables par contact (`FIRST_NAME`, `EMAIL`,
+`RESEND_UNSUBSCRIBE_URL`) : le lien TestFlight, le même pour tous, est écrit dans le HTML par
+`--testflight`. Il ne se crée qu'avec un **segment**, donc après l'import de l'Audience. Le
+déroulé : Corentin importe l'Audience et donne le vrai lien TestFlight ; Claude génère l'e-mail
+et crée le broadcast **en brouillon** par le MCP Resend (`create-broadcast` avec le segment, puis
+`update-broadcast` avec le HTML) ; Corentin fait l'envoi test, puis envoie.
 
 ## Avant d'envoyer
 
