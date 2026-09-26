@@ -86,6 +86,9 @@ if (teamId) {
                         },
                     ],
                 },
+                // Mots de passe enregistrés par iOS pour l'app et pour ce domaine,
+                // proposés au Face ID (webcredentials d'associatedDomains, app.json).
+                webcredentials: { apps: [`${teamId}.${APP_ID}`] },
             },
             null,
             2,

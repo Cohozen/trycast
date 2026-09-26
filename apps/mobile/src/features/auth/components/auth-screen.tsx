@@ -187,12 +187,16 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
                 </View>
             ) : null}
 
+            {/* textContentType « username » sur l'adresse : iOS l'enregistre comme identifiant
+                du mot de passe proposé au Face ID (webcredentials d'app.json). Il prime sur
+                autoComplete côté iOS ; Android garde l'indice « email ». */}
             {isLogin ? (
                 <View className="gap-3.5">
                     <TextField
                         autoCapitalize="none"
                         autoComplete="email"
                         keyboardType="email-address"
+                        textContentType="username"
                         label={t('auth:fields.email.label')}
                         onChangeText={setEmail}
                         placeholder={t('auth:fields.email.placeholder')}
@@ -240,6 +244,7 @@ export function AuthScreen({ initialMode }: { initialMode: AuthMode }) {
                         autoCapitalize="none"
                         autoComplete="email"
                         error={fieldErrors.email}
+                        textContentType="username"
                         keyboardType="email-address"
                         label={t('auth:fields.email.label')}
                         onChangeText={setEmail}
